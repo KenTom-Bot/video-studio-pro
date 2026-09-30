@@ -213,15 +213,15 @@ with st.sidebar:
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.toast(f"✅ Đã cấp quyền thành công cho {new_acc}!")
 
-        # 4. HỖ TRỢ LIÊN HỆ 
+        # 4. HỖ TRỢ LIÊN HỆ (Đã đổi sang định dạng PNG để chống lỗi vỡ ảnh)
         st.markdown("---")
         st.markdown("### 🎧 HỖ TRỢ")
         st.markdown("""
         <div class="hotline-text">📞 0968.484.369</div>
         <div class="social-icons">
-            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg](https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg)" alt="Facebook"></a>
-            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg](https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg)" alt="TikTok"></a>
-            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png)" alt="Zalo"></a>
+            <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/120px-2021_Facebook_icon.svg.png" alt="Facebook"></a>
+            <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/TikTok_logo.svg/120px-TikTok_logo.svg.png" alt="TikTok"></a>
+            <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/120px-Icon_of_Zalo.svg.png" alt="Zalo"></a>
         </div>
         """, unsafe_allow_html=True)
         
