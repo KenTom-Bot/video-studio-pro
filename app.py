@@ -1,30 +1,13 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from google import genai
 from google.genai import types
 from supabase import create_client, Client
 import json
-import base64
 import os
-import re
-import time
-from datetime import datetime, timedelta
 
-# --- CẤU HÌNH TRANG ---
-st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
-st.markdown("""
-<style>
-    .header-container { text-align: center; padding: 1.2rem; background: radial-gradient(circle, rgba(255,75,75,0.08) 0%, rgba(255,255,255,0) 70%); }
-    .main-title { font-size: 2.2rem !important; font-weight: 900 !important; background: linear-gradient(90deg, #ff0050 0%, #ff5252 50%, #ff7300 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    div[data-testid="stButton"] > button[kind="primary"] { background: linear-gradient(135deg, #e63946 0%, #d90429 100%) !important; color: white !important; font-weight: bold; }
-    .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-    .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-</style>
-""", unsafe_allow_html=True)
-
-# --- KẾT NỐI HỆ THỐNG ---
-api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
-client = genai.Client(api_key=api_key)
+# 1. CẤU HÌNH TRANG & KẾT NỐI
+st.set_page_config(page_title="Video Studio Pro", layout="wide")
+ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com" # Đổi thành email của bạn
 
 @st.cache_resource
 def init_supabase():
@@ -32,166 +15,137 @@ def init_supabase():
     except: return None
 supabase = init_supabase()
 
-# --- KHỞI TẠO BỘ NHỚ TẠM (SESSION STATE) ---
-for key in ["is_logged_in", "all_scripts", "generated_details", "active_script_id", "current_product_data"]:
-    if key not in st.session_state:
-        st.session_state[key] = False if key == "is_logged_in" else ([] if key == "all_scripts" else ({} if key == "generated_details" else None))
+api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+client = genai.Client(api_key=api_key) if api_key else None
 
-# --- SIDEBAR & ĐĂNG NHẬP ---
+# 2. BỘ NHỚ TẠM (SESSION)
+if "is_logged_in" not in st.session_state:
+    st.session_state.is_logged_in = False
+    st.session_state.current_email = ""
+    st.session_state.current_scripts = []
+
+# 3. GIAO DIỆN ĐĂNG NHẬP (SIDEBAR)
 with st.sidebar:
+    st.markdown("### 🔐 CỔNG ĐĂNG NHẬP")
     if not st.session_state.is_logged_in:
-        st.markdown("### 🔐 Đăng Nhập")
-        if st.button("🔑 Bắt đầu phiên làm việc", type="primary", use_container_width=True):
-            st.session_state.is_logged_in = True
-            st.rerun()
+        email_input = st.text_input("Nhập Email của bạn:")
+        if st.button("Đăng nhập"):
+            if email_input.strip():
+                st.session_state.is_logged_in = True
+                st.session_state.current_email = email_input.strip()
+                st.rerun()
+            else:
+                st.error("Vui lòng nhập Email!")
     else:
-        st.markdown("### 🗂️ Quản Lý Dự Án")
-        if st.button("➕ Tạo Dự Án Mới", type="primary", use_container_width=True):
-            st.session_state.all_scripts, st.session_state.generated_details, st.session_state.active_script_id = [], {}, None
-            st.rerun()
-        if st.button("🚪 Đăng Xuất", use_container_width=True):
+        st.success(f"Xin chào: **{st.session_state.current_email}**")
+        role = "👑 ADMIN" if st.session_state.current_email == ADMIN_EMAIL else "👤 USER"
+        st.info(f"Quyền hạn: {role}")
+        if st.button("Đăng xuất"):
             st.session_state.is_logged_in = False
+            st.session_state.current_email = ""
             st.rerun()
 
 if not st.session_state.is_logged_in:
-    st.info("👈 Vui lòng đăng nhập ở thanh công cụ bên trái.")
+    st.warning("👈 Vui lòng nhập Email ở menu bên trái để truy cập hệ thống.")
     st.stop()
 
-# --- LÕI AI ĐẠO DIỄN VÀ TIỆN ÍCH ---
-def clean_json(text):
-    cleaned = re.sub(r'```(?:json)?', '', text).strip()
-    match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
-    return json.loads(match.group(0)) if match else {}
+# 4. HÀM XỬ LÝ DỮ LIỆU & AI
+def save_project_to_db(email, title, content_list):
+    if not supabase: return False
+    try:
+        data = {
+            "user_email": email,
+            "project_title": title,
+            "script_content": content_list # Lưu kịch bản thành JSON
+        }
+        supabase.table("saved_projects").insert(data).execute()
+        return True
+    except Exception as e:
+        st.error(f"Lỗi lưu dự án: {e}")
+        return False
 
-def call_gemini(contents, sys_inst):
-    res = client.models.generate_content(
-        model="gemini-3.6-flash", contents=contents,
-        config=types.GenerateContentConfig(system_instruction=sys_inst, response_mime_type="application/json", temperature=0.7)
-    )
-    return clean_json(res.text)
+# 5. KHU VỰC SÁNG TẠO KỊCH BẢN MỚI
+st.title("🎬 HỆ THỐNG SÁNG TẠO VIDEO AI")
+tab1, tab2 = st.tabs(["✨ Tạo Kịch Bản Mới", "📂 Kho Lưu Trữ Dự Án"])
 
-def get_system_instructions(mode, style, aspect, goal):
-    return f"""
-    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL ĐA NĂNG. CHUYÊN SẢN XUẤT VIDEO NGẮN THƯƠNG MẠI.
-    - PHONG CÁCH: {style}
-    - ĐỊNH DẠNG: {aspect}
-    - MỤC TIÊU: {goal}
+with tab1:
+    st.markdown("### ✍️ Nhập thông tin sản phẩm/dự án")
+    project_name = st.text_input("Tên dự án (để lưu trữ):", "Chiến dịch Video mới")
+    product_info = st.text_area("Mô tả sản phẩm, nỗi đau khách hàng, điểm nổi bật:")
     
-    QUY TẮC BẮT BUỘC:
-    1. TRẢ VỀ JSON HỢP LỆ.
-    2. NHỊP ĐỘ CHỚP NHOÁNG: Video phải có nhịp điệu nhanh, chia thành nhiều phân đoạn nhỏ.
-    3. THỜI LƯỢNG CẢNH VEO 3: Các phân cảnh BẮT BUỘC phải được chia chính xác thành các mốc 8 giây hoặc 10 giây để tối ưu công cụ tạo video AI Veo 3. Không dùng các số thời lượng lẻ tẻ.
-    4. VOICE-OVER: Lời thoại lồng tiếng cần gắn liền trực tiếp với hướng dẫn hành động trong từng phân cảnh.
-    5. ĐỒNG NHẤT NHÂN VẬT: Đảm bảo tính nhất quán của nhân vật xuyên suốt các phân cảnh bằng các prompt ảnh chi tiết.
-    """
+    if st.button("🚀 Sinh Kịch Bản AI", type="primary"):
+        if not product_info:
+            st.warning("Vui lòng nhập mô tả sản phẩm!")
+        else:
+            with st.spinner("Đang kết nối Gemini AI..."):
+                prompt = f"""
+                Dựa vào thông tin sau: {product_info}. 
+                Hãy tạo 3 ý tưởng kịch bản video ngắn.
+                Trả về ĐÚNG định dạng JSON chứa 1 mảng 'scripts', mỗi phần tử có: 
+                'title' (tên kịch bản), 'hook' (câu mở đầu), 'body' (nội dung chính).
+                """
+                try:
+                    res = client.models.generate_content(
+                        model="gemini-3.6-flash", contents=prompt,
+                        config=types.GenerateContentConfig(response_mime_type="application/json")
+                    )
+                    # Xử lý JSON trả về
+                    text_res = res.text.strip().replace('```json', '').replace('```', '')
+                    st.session_state.current_scripts = json.loads(text_res).get("scripts", [])
+                    st.success("Tạo kịch bản thành công!")
+                except Exception as e:
+                    st.error("Lỗi AI hoặc định dạng JSON. Thử lại nhé!")
 
-def create_scene_details(script_id, mode, style, aspect, goal):
-    outline = next((sc for sc in st.session_state.all_scripts if sc["id"] == script_id), None)
-    if not outline: return
-    
-    prompt = f"""
-    Viết kịch bản chi tiết cho ID {script_id}: "{outline['title']}".
-    Hook: {outline['target_hook']}. Bối cảnh: {outline['setting_style']}.
-    Chia kịch bản thành các cảnh 8 giây và 10 giây.
-    Xuất JSON: chứa key 'scenes' với mảng các object (duration, voiceover_vi, image_prompt, video_prompt).
-    Trong video_prompt cho Veo 3, miêu tả rõ chuyển động camera (Pan, Zoom, Tracking).
-    """
-    sys_inst = get_system_instructions(mode, style, aspect, goal)
-    res = call_gemini([prompt], sys_inst)
-    st.session_state.generated_details[script_id] = res if isinstance(res, dict) else res[0]
-
-# --- GIAO DIỆN CHÍNH & SUPABASE ---
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
-
-st.markdown("## 📊 Creator Dashboard")
-with st.container(border=True):
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Video đã đăng", "217", "+12")
-    c2.metric("GMV (Doanh thu)", "45.2 Triệu", "+5.4M")
-    c3.metric("Tỷ lệ chuyển đổi", "3.2%", "+0.4%")
-    c4.metric("Angle tốt nhất", "Review & Test", "Chốt đơn cao nhất")
-
-st.markdown("### 🛒 Chọn Sản Phẩm Từ Database")
-if supabase:
-    try: products_data = supabase.table("products").select("*").execute().data
-    except: products_data = []
-    
-    if products_data:
-        prod_names = [p["product_name"] for p in products_data]
-        selected_name = st.selectbox("📌 Chọn sản phẩm:", options=prod_names)
-        st.session_state.current_product_data = next(p for p in products_data if p["product_name"] == selected_name)
-        prod = st.session_state.current_product_data
-        
-        with st.container(border=True):
-            col_a, col_b = st.columns(2)
-            with col_a:
-                st.markdown(f"**💰 Hoa hồng:** <span style='color:#15803d; font-weight:900;'>{prod.get('commission_percent', 0)}%</span>", unsafe_allow_html=True)
-                st.markdown(f"**🎯 Khách hàng:** {prod.get('target_audience', '')}")
-            with col_b:
-                st.markdown(f"**🧠 Insight:** {prod.get('product_insight', '')}")
-                st.markdown(f"**💔 Nỗi đau:** {prod.get('pain_points', '')}")
-else:
-    st.error("Chưa kết nối Supabase.")
-
-# --- CẤU HÌNH & RUN AI ---
-col_m, col_s, col_r = st.columns(3)
-with col_m: mode = st.selectbox("Thể loại:", ["🛒 Bán Hàng & Chuyển đổi", "🌟 Viral & Thương hiệu"])
-with col_s: style = st.selectbox("Phong cách:", ["Điện Ảnh Chân Thực", "Studio Tối Giản"])
-with col_r: aspect = st.selectbox("Khung hình:", ["9:16", "16:9"])
-
-up_files = st.file_uploader("📦 Ảnh sản phẩm tham chiếu:", type=["jpg", "png"], accept_multiple_files=True)
-
-if st.button("🚀 Sinh 5 Kịch Bản Đa Vũ Trụ", type="primary", use_container_width=True):
-    with st.spinner("Đang phân tích DNA Sản phẩm và sinh kịch bản..."):
-        try:
-            prod_ctx = f"THÔNG TIN SP: {json.dumps(st.session_state.current_product_data, ensure_ascii=False)}" if st.session_state.current_product_data else ""
-            prompt = f"{prod_ctx}\nTạo 5 kịch bản ngắn. Xuất JSON key 'script_outlines' (id, title, setting_style, target_hook)."
-            payload = [types.Part.from_bytes(data=f.getvalue(), mime_type=f.type) for f in up_files] if up_files else []
-            payload.append(prompt)
-            
-            res = call_gemini(payload, get_system_instructions(mode, style, aspect, "Sales"))
-            st.session_state.all_scripts = res.get("script_outlines", [])
-            st.session_state.generated_details, st.session_state.active_script_id = {}, None
-            st.rerun()
-        except Exception as e: st.error(f"Lỗi: {e}")
-
-# --- SPLIT SCREEN UI ---
-if st.session_state.all_scripts and st.session_state.active_script_id is None:
-    st.divider()
-    st.markdown("### 🎬 Kịch Bản Đề Xuất")
-    for sc in st.session_state.all_scripts:
-        sc_id = sc["id"]
-        with st.container(border=True):
-            c_info, c_btn = st.columns([3, 1])
-            with c_info:
-                status = "<span class='badge-ready'>ĐÃ CHI TIẾT</span>" if sc_id in st.session_state.generated_details else "<span class='badge-pending'>ĐANG CHỜ</span>"
-                st.markdown(f"**#{sc_id}. {sc.get('title')}** {status}", unsafe_allow_html=True)
-                st.caption(f"⚡ Hook: {sc.get('target_hook')}")
-            with c_btn:
-                if sc_id in st.session_state.generated_details:
-                    if st.button("👁️ Xem chi tiết", key=f"view_{sc_id}", use_container_width=True):
-                        st.session_state.active_script_id = sc_id
-                        st.rerun()
-                else:
-                    if st.button("✨ Tạo phân cảnh Veo 3", key=f"cre_{sc_id}", use_container_width=True):
-                        with st.spinner("Đang lên khung hình 8s/10s..."):
-                            create_scene_details(sc_id, mode, style, aspect, "Sales")
-                            st.session_state.active_script_id = sc_id
-                            st.rerun()
-
-if st.session_state.active_script_id and st.session_state.active_script_id in st.session_state.generated_details:
-    st.divider()
-    if st.button("⬅️ Quay lại danh sách"):
-        st.session_state.active_script_id = None
-        st.rerun()
-    
-    active_sc = st.session_state.generated_details[st.session_state.active_script_id]
-    st.markdown(f"### 🎬 CHI TIẾT: {active_sc.get('title', '')}")
-    
-    scenes = active_sc.get("scenes", [])
-    for idx, scene in enumerate(scenes, 1):
-        st.markdown(f"#### 📍 Cảnh {idx} ({scene.get('duration', '8s')})")
-        st.markdown(f"**💬 Thoại:** `{scene.get('voiceover_vi', '')}`")
-        if scene.get('image_prompt'): st.markdown(f"**🖼️ Prompt Ảnh:** `{scene.get('image_prompt')}`")
-        if scene.get('video_prompt'): st.markdown(f"**🎥 Prompt Veo 3:** `{scene.get('video_prompt')}`")
+    # Hiển thị kịch bản vừa tạo & Nút Lưu
+    if st.session_state.current_scripts:
         st.markdown("---")
+        for idx, sc in enumerate(st.session_state.current_scripts):
+            st.info(f"**Kịch bản {idx+1}: {sc.get('title', '')}**\n\n**Hook:** {sc.get('hook', '')}\n\n**Nội dung:** {sc.get('body', '')}")
+        
+        if st.button("💾 Lưu Dự Án Này Vào Database"):
+            if save_project_to_db(st.session_state.current_email, project_name, st.session_state.current_scripts):
+                st.success("✅ Đã lưu dự án thành công! Hãy sang tab 'Kho Lưu Trữ' để xem.")
+
+# 6. KHU VỰC KHO LƯU TRỮ PHÂN QUYỀN
+with tab2:
+    st.markdown("### 📂 Quản Lý Dự Án")
+    if not supabase:
+        st.error("Lỗi: Chưa kết nối Database Supabase.")
+    else:
+        # LOGIC PHÂN QUYỀN: 
+        # Nếu là Admin -> Lấy tất cả. Nếu là User -> Chỉ lấy của User đó.
+        try:
+            if st.session_state.current_email == ADMIN_EMAIL:
+                st.write("👑 **Góc nhìn Admin:** Toàn bộ dự án trên hệ thống")
+                response = supabase.table("saved_projects").select("*").order("created_at", desc=True).execute()
+            else:
+                st.write("👤 **Góc nhìn User:** Các dự án cá nhân của bạn")
+                response = supabase.table("saved_projects").select("*").eq("user_email", st.session_state.current_email).order("created_at", desc=True).execute()
+            
+            projects = response.data
+        except Exception as e:
+            projects = []
+            st.error(f"Lỗi tải dữ liệu: {e}")
+
+        if not projects:
+            st.info("Chưa có dự án nào được lưu.")
+        else:
+            for p in projects:
+                # Trình bày giao diện thẻ
+                display_name = f"🎬 {p['project_title']} (Tạo bởi: {p['user_email']})" if st.session_state.current_email == ADMIN_EMAIL else f"🎬 {p['project_title']}"
+                
+                with st.expander(display_name):
+                    st.caption(f"Thời gian tạo: {p['created_at']}")
+                    
+                    # Đọc kịch bản từ JSON
+                    saved_scripts = p.get("script_content", [])
+                    for i, sc in enumerate(saved_scripts):
+                        st.markdown(f"**Ý tưởng {i+1}: {sc.get('title', 'Không tên')}**")
+                        st.write(f"- Hook: {sc.get('hook', '')}")
+                    
+                    # Nút Xóa (Chỉ Admin hoặc Chủ dự án mới thấy)
+                    if st.button("🗑️ Xóa dự án", key=f"del_{p['id']}"):
+                        supabase.table("saved_projects").delete().eq("id", p['id']).execute()
+                        st.toast("Đã xóa!")
+                        st.rerun()
+                        
