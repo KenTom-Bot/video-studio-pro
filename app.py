@@ -122,12 +122,12 @@ def save_project_to_db(email, title, content_list):
 
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) - TỐI ƯU UX
+# 3. THANH BÊN (SIDEBAR) - CHUẨN UX MỚI
 # ==============================================================================
 with st.sidebar:
-    # --- 1. TÀI KHOẢN (TRÊN CÙNG) ---
-    st.markdown("### 🔐 TÀI KHOẢN")
     if not st.session_state.is_logged_in:
+        # KHI CHƯA ĐĂNG NHẬP -> HIỂN THỊ ĐĂNG NHẬP Ở TRÊN CÙNG
+        st.markdown("### 🔐 ĐĂNG NHẬP")
         email_input = st.text_input("Nhập Email:", key="login_email_input")
         if st.button("🔑 Đăng Nhập", type="primary"):
             email_check = email_input.strip()
@@ -147,17 +147,8 @@ with st.sidebar:
                 st.error("Tài khoản chưa được cấp quyền!")
                 st.toast("❌ Đăng nhập thất bại!")
     else:
-        st.success(f"Đang dùng: {st.session_state.current_email}")
-        if st.button("🚪 Đăng Xuất"):
-            st.session_state.is_logged_in = False
-            st.toast("✅ Đã đăng xuất thành công!")
-            st.rerun()
-
-    # --- KHU VỰC HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP ---
-    if st.session_state.is_logged_in:
-        st.markdown("---")
-        
-        # 2. TẠO & LƯU DỰ ÁN
+        # KHI ĐÃ ĐĂNG NHẬP -> HIỂN THỊ CÔNG CỤ LÀM VIỆC LÊN TRƯỚC
+        # 1. TẠO & LƯU DỰ ÁN
         st.markdown("### 🗂️ LÀM VIỆC")
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True):
             st.session_state.all_scripts = []
@@ -167,6 +158,7 @@ with st.sidebar:
             st.toast("✅ Đã mở không gian dự án mới!")
             st.rerun()
             
+        st.markdown("<br>", unsafe_allow_html=True)
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", st.session_state.active_project_title, key="sidebar_proj_input")
         if st.button("💾 Lưu Dự Án Này", use_container_width=True):
             if not st.session_state.all_scripts:
@@ -178,7 +170,7 @@ with st.sidebar:
         
         st.markdown("---")
         
-        # 3. KHO LƯU TRỮ
+        # 2. KHO LƯU TRỮ
         st.markdown("### 📂 KHO LƯU TRỮ")
         if not supabase:
             st.error("Chưa kết nối Database.")
@@ -208,7 +200,7 @@ with st.sidebar:
                             st.toast("✅ Đã xóa dự án thành công!")
                             st.rerun()
 
-        # 4. QUẢN TRỊ ADMIN
+        # 3. QUẢN TRỊ ADMIN
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
@@ -221,18 +213,27 @@ with st.sidebar:
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.toast(f"✅ Đã cấp quyền thành công cho {new_acc}!")
 
-    # --- 5. HỖ TRỢ LIÊN HỆ (LUÔN Ở DƯỚI CÙNG SIDEBAR) ---
-    st.markdown("---")
-    st.markdown("### 🎧 HỖ TRỢ")
-    st.markdown("""
-    <div class="hotline-text">📞 0968.484.369</div>
-    <div class="social-icons">
-        <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg](https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg)" alt="Facebook"></a>
-        <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg](https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg)" alt="TikTok"></a>
-        <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png)" alt="Zalo"></a>
-    </div>
-    """, unsafe_allow_html=True)
-    
+        # 4. HỖ TRỢ LIÊN HỆ 
+        st.markdown("---")
+        st.markdown("### 🎧 HỖ TRỢ")
+        st.markdown("""
+        <div class="hotline-text">📞 0968.484.369</div>
+        <div class="social-icons">
+            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg](https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg)" alt="Facebook"></a>
+            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg](https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg)" alt="TikTok"></a>
+            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png)" alt="Zalo"></a>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 5. TÀI KHOẢN & ĐĂNG XUẤT (DƯỚI CÙNG KHI ĐÃ ĐĂNG NHẬP)
+        st.markdown("---")
+        st.markdown("### 🔐 TÀI KHOẢN")
+        st.success(f"Đang dùng: {st.session_state.current_email}")
+        if st.button("🚪 Đăng Xuất"):
+            st.session_state.is_logged_in = False
+            st.toast("✅ Đã đăng xuất thành công!")
+            st.rerun()
+
 if not st.session_state.is_logged_in:
     st.info("👈 Vui lòng đăng nhập ở thanh công cụ bên trái.")
     st.stop()
@@ -255,7 +256,6 @@ if st.session_state.action_trigger == "create_detail":
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
 
-st.markdown("## 📊 Tự Động Hóa Dữ Liệu Sản Phẩm")
 if supabase:
     try: products_data = supabase.table("products").select("*").execute().data
     except: products_data = []
@@ -282,7 +282,7 @@ with col_m: mode = st.selectbox("🎯 Thể loại (Chỉ đạo cốt lõi):", 
 with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key="style_sel")
 with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key="aspect_sel")
 
-narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key="narrator_sel")
+narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key="narrator_sel")
 
 col_p_img, col_c_img = st.columns([1, 1])
 with col_p_img:
@@ -371,6 +371,7 @@ if st.session_state.active_script_id and st.session_state.active_script_id in st
     for idx, scene in enumerate(scenes, 1):
         st.markdown(f"#### 📍 Cảnh {idx} ({scene.get('duration', '8s')})")
         st.markdown(f"**💬 Thoại & Âm thanh:** `{scene.get('voiceover_vi', '')}`")
-        if scene.get('image_prompt'): st.markdown(f"**🖼️️ Prompt Ảnh (Imagen 3):** `{scene.get('image_prompt')}`")
+        if scene.get('image_prompt'): st.markdown(f"**🖼️ Prompt Ảnh (Imagen 3):** `{scene.get('image_prompt')}`")
         if scene.get('video_prompt'): st.markdown(f"**🎥 Prompt Video (Veo 3):** `{scene.get('video_prompt')}`")
         st.markdown("---")
+
