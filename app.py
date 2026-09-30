@@ -7,6 +7,7 @@ import json
 import base64
 import os
 import re
+import time
 from datetime import datetime, timedelta
 
 # ==============================================================================
@@ -21,10 +22,10 @@ st.markdown("""
     div[data-testid="stButton"] > button[kind="primary"] { background: linear-gradient(135deg, #e63946 0%, #d90429 100%) !important; color: white !important; border-radius: 8px !important; font-weight: bold; }
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
-    .social-icons { display: flex; justify-content: center; gap: 20px; margin-top: 15px; margin-bottom: 5px; }
-    .social-icons img { width: 36px; border-radius: 8px; transition: transform 0.2s; }
-    .social-icons img:hover { transform: scale(1.1); }
-    .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.1rem; margin-bottom: 10px; }
+    .social-icons { display: flex; justify-content: center; gap: 25px; margin-top: 10px; margin-bottom: 5px; }
+    .social-icons img { width: 42px; border-radius: 8px; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .social-icons img:hover { transform: scale(1.15); }
+    .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -124,8 +125,40 @@ def save_project_to_db(email, title, content_list):
 # 3. THANH BÊN (SIDEBAR) - TỐI ƯU UX
 # ==============================================================================
 with st.sidebar:
+    # --- 1. TÀI KHOẢN (TRÊN CÙNG) ---
+    st.markdown("### 🔐 TÀI KHOẢN")
+    if not st.session_state.is_logged_in:
+        email_input = st.text_input("Nhập Email:", key="login_email_input")
+        if st.button("🔑 Đăng Nhập", type="primary"):
+            email_check = email_input.strip()
+            if email_check in st.session_state.licensed_accounts:
+                acc_info = st.session_state.licensed_accounts[email_check]
+                exp_date_str = acc_info.get("expires_at", "2099-12-31")
+                try:
+                    if datetime.now() > datetime.strptime(exp_date_str, "%Y-%m-%d"):
+                        st.error(f"❌ Tài khoản hết hạn: {exp_date_str}!")
+                        st.stop()
+                except: pass
+                st.session_state.is_logged_in = True
+                st.session_state.current_email = email_check
+                st.toast("✅ Đăng nhập thành công!")
+                st.rerun()
+            else: 
+                st.error("Tài khoản chưa được cấp quyền!")
+                st.toast("❌ Đăng nhập thất bại!")
+    else:
+        st.success(f"Đang dùng: {st.session_state.current_email}")
+        if st.button("🚪 Đăng Xuất"):
+            st.session_state.is_logged_in = False
+            st.toast("✅ Đã đăng xuất thành công!")
+            st.rerun()
+
+    # --- KHU VỰC HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP ---
     if st.session_state.is_logged_in:
-        # TẠO DỰ ÁN MỚI
+        st.markdown("---")
+        
+        # 2. TẠO & LƯU DỰ ÁN
+        st.markdown("### 🗂️ LÀM VIỆC")
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True):
             st.session_state.all_scripts = []
             st.session_state.generated_details = {}
@@ -134,19 +167,18 @@ with st.sidebar:
             st.toast("✅ Đã mở không gian dự án mới!")
             st.rerun()
             
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # ĐẶT TÊN VÀ LƯU DỰ ÁN
-        st.session_state.active_project_title = st.text_input("💾 Tên dự án:", st.session_state.active_project_title, key="sidebar_proj_input")
-        if st.button("Lưu Dự Án Này", use_container_width=True):
-            if save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, st.session_state.all_scripts):
-                st.toast("✅ Đã lưu dự án vào Kho lưu trữ!")
+        st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", st.session_state.active_project_title, key="sidebar_proj_input")
+        if st.button("💾 Lưu Dự Án Này", use_container_width=True):
+            if not st.session_state.all_scripts:
+                st.warning("⚠️ Chưa có kịch bản nào để lưu!")
+            elif save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, st.session_state.all_scripts):
+                st.toast("✅ Đã lưu dự án vào Kho lưu trữ thành công!")
             else:
-                st.error("Lỗi khi lưu dự án.")
+                st.error("❌ Lỗi khi lưu dự án.")
         
         st.markdown("---")
         
-        # KHO LƯU TRỮ
+        # 3. KHO LƯU TRỮ
         st.markdown("### 📂 KHO LƯU TRỮ")
         if not supabase:
             st.error("Chưa kết nối Database.")
@@ -171,12 +203,12 @@ with st.sidebar:
                         saved_scripts = p.get("script_content", [])
                         for i, sc in enumerate(saved_scripts):
                             st.write(f"- {sc.get('title', 'Idea')}")
-                        if st.button("🗑️ Xóa", key=f"del_proj_{p['id']}", use_container_width=True):
+                        if st.button("🗑️ Xóa dự án này", key=f"del_proj_{p['id']}", use_container_width=True):
                             supabase.table("saved_projects").delete().eq("id", p['id']).execute()
-                            st.toast("✅ Đã xóa dự án!")
+                            st.toast("✅ Đã xóa dự án thành công!")
                             st.rerun()
 
-        # QUẢN TRỊ ADMIN
+        # 4. QUẢN TRỊ ADMIN
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
@@ -187,48 +219,20 @@ with st.sidebar:
                     exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=3 if "3 ngày" in duration_opt else int(duration_opt.split()[0])*30)).strftime("%Y-%m-%d")
                     st.session_state.licensed_accounts[new_acc.strip()] = {"roles": ALL_MODULES, "expires_at": exp_date}
                     save_licensed_accounts(st.session_state.licensed_accounts)
-                    st.toast(f"✅ Đã cấp quyền cho {new_acc}!")
+                    st.toast(f"✅ Đã cấp quyền thành công cho {new_acc}!")
 
-    # ==========================================
-    # CÁC MỤC LUÔN NẰM Ở DƯỚI CÙNG
-    # ==========================================
+    # --- 5. HỖ TRỢ LIÊN HỆ (LUÔN Ở DƯỚI CÙNG SIDEBAR) ---
     st.markdown("---")
     st.markdown("### 🎧 HỖ TRỢ")
     st.markdown("""
     <div class="hotline-text">📞 0968.484.369</div>
     <div class="social-icons">
-        <a href="#" target="_blank"><img src="[https://cdn-icons-png.flaticon.com/512/124/124010.png](https://cdn-icons-png.flaticon.com/512/124/124010.png)" alt="Facebook"></a>
-        <a href="#" target="_blank"><img src="[https://cdn-icons-png.flaticon.com/512/3046/3046121.png](https://cdn-icons-png.flaticon.com/512/3046/3046121.png)" alt="TikTok"></a>
-        <a href="#" target="_blank"><img src="[https://stc-zaloprofile.zdn.vn/pc/v1/images/zalo_sharelogo.png](https://stc-zaloprofile.zdn.vn/pc/v1/images/zalo_sharelogo.png)" alt="Zalo"></a>
+        <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg](https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg)" alt="Facebook"></a>
+        <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg](https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg)" alt="TikTok"></a>
+        <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/512px-Icon_of_Zalo.svg.png)" alt="Zalo"></a>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("---")
-    st.markdown("### 🔐 TÀI KHOẢN")
-    if not st.session_state.is_logged_in:
-        email_input = st.text_input("Nhập Email:", key="login_email_input")
-        if st.button("🔑 Đăng Nhập", type="primary"):
-            email_check = email_input.strip()
-            if email_check in st.session_state.licensed_accounts:
-                acc_info = st.session_state.licensed_accounts[email_check]
-                exp_date_str = acc_info.get("expires_at", "2099-12-31")
-                try:
-                    if datetime.now() > datetime.strptime(exp_date_str, "%Y-%m-%d"):
-                        st.error(f"❌ Tài khoản hết hạn: {exp_date_str}!")
-                        st.stop()
-                except: pass
-                st.session_state.is_logged_in = True
-                st.session_state.current_email = email_check
-                st.toast("✅ Đăng nhập thành công!")
-                st.rerun()
-            else: st.error("Tài khoản chưa được cấp quyền!")
-    else:
-        st.success(f"Đang dùng: {st.session_state.current_email}")
-        if st.button("🚪 Đăng Xuất"):
-            st.session_state.is_logged_in = False
-            st.toast("✅ Đã đăng xuất!")
-            st.rerun()
-
 if not st.session_state.is_logged_in:
     st.info("👈 Vui lòng đăng nhập ở thanh công cụ bên trái.")
     st.stop()
@@ -314,11 +318,14 @@ if st.button("🚀 Sinh 5 Kịch Bản Đa Vũ Trụ", type="primary", use_conta
         for c in char_inputs: payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type))
         payload.append(prompt)
         
-        res = call_gemini(payload, get_system_instructions(mode, style, aspect, narrator_mode, char_rules))
-        st.session_state.all_scripts = res.get("script_outlines", [])
-        st.session_state.generated_details = {}
-        st.session_state.active_script_id = None
-        st.toast("✅ Đã sinh xong 5 kịch bản!")
+        try:
+            res = call_gemini(payload, get_system_instructions(mode, style, aspect, narrator_mode, char_rules))
+            st.session_state.all_scripts = res.get("script_outlines", [])
+            st.session_state.generated_details = {}
+            st.session_state.active_script_id = None
+            st.toast("✅ Đã sinh xong 5 kịch bản thành công!")
+        except Exception as e:
+            st.error("❌ Lỗi khi sinh kịch bản. Vui lòng thử lại!")
         st.rerun()
 
 # ==============================================================================
@@ -339,17 +346,20 @@ if st.session_state.all_scripts and st.session_state.active_script_id is None:
                 if sc_id in st.session_state.generated_details:
                     if st.button("👁️ Xem chi tiết", key=f"view_{sc_id}", use_container_width=True):
                         st.session_state.active_script_id = sc_id
+                        st.toast("✅ Đang mở chi tiết kịch bản!")
                         st.rerun()
                 else:
                     if st.button("✨ Đạo diễn phân cảnh", key=f"cre_{sc_id}", type="primary", use_container_width=True):
                         st.session_state.action_trigger = "create_detail"
                         st.session_state.action_param = sc_id
+                        st.toast("⏳ Đang gửi yêu cầu phân cảnh...")
                         st.rerun()
 
 if st.session_state.active_script_id and st.session_state.active_script_id in st.session_state.generated_details:
     st.divider()
     if st.button("⬅️ Quay lại danh sách tổng"):
         st.session_state.active_script_id = None
+        st.toast("✅ Đã quay lại danh sách!")
         st.rerun()
     
     active_sc = st.session_state.generated_details[st.session_state.active_script_id]
@@ -361,7 +371,6 @@ if st.session_state.active_script_id and st.session_state.active_script_id in st
     for idx, scene in enumerate(scenes, 1):
         st.markdown(f"#### 📍 Cảnh {idx} ({scene.get('duration', '8s')})")
         st.markdown(f"**💬 Thoại & Âm thanh:** `{scene.get('voiceover_vi', '')}`")
-        if scene.get('image_prompt'): st.markdown(f"**🖼️ Prompt Ảnh (Imagen 3):** `{scene.get('image_prompt')}`")
+        if scene.get('image_prompt'): st.markdown(f"**🖼️️ Prompt Ảnh (Imagen 3):** `{scene.get('image_prompt')}`")
         if scene.get('video_prompt'): st.markdown(f"**🎥 Prompt Video (Veo 3):** `{scene.get('video_prompt')}`")
         st.markdown("---")
-
