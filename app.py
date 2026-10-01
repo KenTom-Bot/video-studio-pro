@@ -119,7 +119,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CƠ CHẾ ĐỒNG BỘ 100% (KHÓA MẶT, TÓC, TRANG PHỤC VÀ ANCHOR FRAME)
+# 2. HÀM AI LÕI & CHÍNH SÁCH KIỂM DUYỆT SẢN PHẨM & NGỮ ĐIỆU CHUYÊN SÂU
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -152,7 +152,7 @@ def generate_char_rules_string(profiles):
     if not profiles: return "🔹 NHÂN VẬT & DIỆN MẠO: Giữ nguyên 100% khuôn mặt, kiểu tóc, vóc dáng của diễn viên gốc."
     rules = "🔹 KHÓA CỨNG DIỆN MẠO KOC & ĐỒNG NHẤT 100%:\n"
     for p in profiles: 
-        rules += f"   + Nhân vật {p['id']} ({p['role']}): Bắt buộc sử dụng lệnh 'Character {p['id']} featuring exact facial identity, exact hairstyle, exact body shape, and exact reference image {p['id']}' trong mọi khung hình để chống trôi nhân vật.\n"
+        rules += f"   + Nhân vật {p['id']} ({p['role']}): Bắt buộc sử dụng lệnh 'Character {p['id']} featuring exact facial identity, exact hairstyle, exact body shape, and exact reference image {p['id']}' trong mọi khung hình.\n"
     return rules
 
 def get_dynamic_realtime_context():
@@ -172,16 +172,17 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
-    🛑 QUY TẮC BẮT BUỘC ĐỒNG NHẤT 100% VÀ CHUYỂN CẢNH (VIỆT HÓA 100%):
-    1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. ĐỒNG NHẤT DIỆN MẠO & TRANG PHỤC XUYÊN SUỐT: 
-       - Trang phục (bao gồm cả Áo, Quần/Váy, Giày dép được định nghĩa ở `script_outfit_setup`) và Kiểu tóc, Khuôn mặt của diễn viên PHẢI GIỮ NGUYÊN 100% ở mọi phân cảnh, tuyệt đối không được tự ý thay đổi.
-    3. CƠ CHẾ CẢNH NỐI TIẾP & ANCHOR FRAME: 
-       - Khi phân cảnh là "Cảnh nối tiếp (Dùng lại ảnh cuối)", phần `video_prompt` phải có lệnh neo hình ảnh: `holding the final frame steady as a reference anchor for the next shot, ensuring seamless visual continuity`.
-    4. CHUYỂN CẢNH (CHỈ DÙNG 2 TỪ KHÓA BẰNG TIẾNG VIỆT SAU TRONG `transition_type`):
-       - "Chuyển cảnh mới (Tạo ảnh mới)": Dùng khi chuyển sang ý mới hoặc đổi không gian.
-       - "Cảnh nối tiếp (Dùng lại ảnh cuối)": Dùng khi cảnh sau là hành động nối tiếp trực tiếp của cảnh trước. Khi đó phần `image_prompt` BẮT BUỘC phải ghi chính xác: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video".
-    5. {char_rules}
+    🛑 QUY TẮC AN TOÀN SẢN PHẨM & CHÍNH SÁCH NỀN TẢNG (TIKTOK SHOP, SHOPEE VIDEO, REELS, SHORTS...):
+    1. DANH MỤC CẤM & HẠN CHẾ: 
+       - CẤM TUYỆT ĐỐI các sản phẩm y dược, thuốc chữa bệnh, thực phẩm chức năng cam kết trị bệnh triệt để.
+       - Ngành Mẹ & Bé / Trẻ em: Tuyệt đối không để trẻ em một mình trong cảnh quay, không chứa yếu tố nguy hiểm, không dùng từ ngữ phóng đại y tế.
+       - Các mặt hàng cấm khác theo chính sách tiêu chuẩn của thương mại điện tử.
+    2. CẤM BÁO GIÁ CỤ THỂ: Tuyệt đối KHÔNG đưa giá tiền bằng con số (VD: cấm "99k", "150 nghìn"). Chỉ dùng từ hướng dẫn ưu đãi ("deal hời", "giá sốc góc màn hình").
+    3. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
+    4. ĐẠO DINH NGỮ ĐIỆU & SFX (BẮT BUỘC ĐỊNH DẠNG RÕ RÀNG): Phải chỉ định rõ Giới tính & Vùng miền chuẩn (VD: "Giọng Nữ Miền Bắc (chuẩn)" hoặc "Giọng Nam Miền Bắc (chuẩn)"), kết hợp cùng Tông giọng và Mục đích ngữ điệu cụ thể (VD: "nhịp độ nhanh, dồn dập, nhằm kích thích hối hả chốt đơn").
+    5. ĐỒNG NHẤT 100%: Giữ nguyên trang phục, kiểu tóc, khuôn mặt KOC và bối cảnh ở mọi cảnh.
+    6. CƠ CHẾ CẢNH NỐI TIẾP & ANCHOR FRAME: Dùng "Chuyển cảnh mới (Tạo ảnh mới)" hoặc "Cảnh nối tiếp (Dùng lại ảnh cuối)" với lệnh neo hình `holding the final frame steady as a reference anchor`.
+    7. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
@@ -212,17 +213,17 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
         "scenes": [
             {{
                 "scene_number": 1, "duration": "8s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", "scene_setting": "Góc toàn cảnh phòng ngủ ấm cúng...",
-                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, ngắt nghỉ cảm xúc...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
+                "voice_director_vn": "Giọng Nữ Miền Bắc (chuẩn) — Tông giọng trầm lắng, ngắt nghỉ cảm xúc, nhằm khơi gợi nỗi đau khó ngủ.", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
                 "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{vid_p_1}"
             }},
             {{
                 "scene_number": 2, "duration": "6s", "transition_type": "Cảnh nối tiếp (Dùng lại ảnh cuối)", "scene_setting": "Góc quay cận cảnh tiếp nối...",
-                "voice_director_vn": "Nhấn giọng tạo cao trào...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
+                "voice_director_vn": "Giọng Nữ Miền Bắc (chuẩn) — Tông giọng hào hứng, dồn dập, nhằm kích thích chốt đơn ngay.", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
                 "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "{vid_p_2}"
             }}
         ]
     }}
-    Lưu ý: "scenes" phải có 3 hoặc 4 phần tử. Các "duration" CHỈ được là "4s", "6s", "8s". KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG VALUE JSON.
+    Lưu ý: "scenes" phải có 3 hoặc 4 phần tử. Các "duration" CHỈ được là "4s", "6s", "8s". TUYỆT ĐỐI CẤM BÁO GIÁ CỤ THỂ VÀ VI PHẠM Y TẾ/MẸ BÉ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
     res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules))
     st.session_state.generated_details[target_id] = res
@@ -245,7 +246,7 @@ def clone_script(script_id):
     {time_ctx}
     DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
-    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới với các Hook tiếp cận có đầy đủ dấu câu ngắt nghỉ cảm xúc. 
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới tuân thủ tuyệt đối chính sách (không báo giá, không vi phạm y tế/mẹ bé), có đầy đủ dấu câu ngắt nghỉ cảm xúc. 
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
@@ -253,11 +254,11 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu có dấu câu ngắt nghỉ cảm xúc"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu an toàn chính sách"
             }}
         ]
     }}
-    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
+    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. CẤM BÁO GIÁ VÀ VI PHẠM Y TẾ.
     """
     res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
@@ -285,8 +286,8 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     {db_ctx}
     {dna_ctx}
     
-    🛑 YÊU CẦU MỞ RỘNG (BẮT BUỘC TUÂN THỦ):
-    1. GIỮ NGUYÊN SẢN PHẨM GỐC.
+    🛑 YÊU CẦU MỞ RỘNG (BẮT BUỘC TUÂN THỦ CHÍNH SÁCH):
+    1. GIỮ NGUYÊN SẢN PHẨM GỐC. CẤM BÁO GIÁ TIỀN CỤ THỂ VÀ CẤM VI PHẠM Y TẾ / MẸ BÉ.
     2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'.
     3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
     4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật | THỜI LƯỢNG: {duration_mins} phút.
@@ -299,11 +300,11 @@ def generate_more_scripts(angle, num_chars, duration_mins):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản chuẩn chiến lược",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu có dấu câu ngắt nghỉ cảm xúc"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu an toàn"
             }}
         ]
     }}
-    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
+    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. CẤM BÁO GIÁ.
     """
     res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
@@ -364,7 +365,7 @@ with st.sidebar:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
                 if 0 <= days_left <= 7:
-                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
+                    st.warning(f"⚠️️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -718,11 +719,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "id": 1, 
                         "title": "Tên kịch bản", 
                         "setting_style": "Bối cảnh thực tế", 
-                        "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu hấp dẫn"
+                        "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu an toàn"
                     }} 
                 ]
             }}
-            YÊU CẦU: Tạo chính xác 5 kịch bản khác nhau phù hợp với thời điểm hiện tại.
+            YÊU CẦU: Tạo chính xác 5 kịch bản khác nhau phù hợp với thời điểm hiện tại, cấm báo giá.
             LƯU Ý CỰC KỲ QUAN TRỌNG: TUYỆT ĐỐI KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
             """
             
@@ -772,7 +773,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (VIỆT HÓA 100%, ẨN PROMPT ẢNH NẾU LÀ CẢNH NỐI TIẾP)
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -812,7 +813,6 @@ if all_combined_scripts_list:
             st.markdown(f"**🎙️ Đạo diễn ngữ điệu & SFX:** *{scene.get('voice_director_vn', '')}*")
             st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
             
-            # KIỂM TRA NẾU LÀ CẢNH NỐI TIẾP THÌ ẨN PROMPT ẢNH VÀ NÚT COPY ẢNH ĐI
             img_p = scene.get('image_prompt', '')
             is_linked_scene = "nối tiếp" in trans_type.lower() or "dùng lại ảnh cuối" in img_p.lower() or "tham chiếu" in img_p.lower()
             
