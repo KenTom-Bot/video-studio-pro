@@ -120,7 +120,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CƠ CHẾ THỜI GIAN THỰC LINH HOẠT THEO THÁNG
+# 2. HÀM AI LÕI & CƠ CHẾ ĐỒNG BỘ GIỌNG NÓI, LIPS-SYNC & THỜI GIAN THỰC
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -151,42 +151,46 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
 
 def generate_char_rules_string(profiles):
     if not profiles: return "🔹 NHÂN VẬT: Linh hoạt theo kịch bản."
-    rules = "🔹 KHÓA KHUÔN MẶT KOC:\n"
-    for p in profiles: rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}' để khóa chặt khuôn mặt.\n"
+    rules = "🔹 KHÓA KHUÔN MẶT KOC & LIPS-SYNC:\n"
+    for p in profiles: 
+        rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}' để khóa chặt khuôn mặt và khẩu hình miệng.\n"
     return rules
 
 def get_dynamic_realtime_context():
     now = datetime.now()
     month = now.month
     year = now.year
-    if month in [12, 1, 2]: season_desc = f"Mùa Đông / Tết Nguyên Đán ({month}/{year})."
-    elif month in [3, 4, 5]: season_desc = f"Mùa Xuân / Giao mùa ({month}/{year})."
-    elif month in [6, 7, 8]: season_desc = f"Mùa Hè / Nắng Nóng ({month}/{year})."
-    else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year})."
-    return f"THỜI GIAN THỰC TẾ HIỆN TẠI: {season_desc}. Toàn bộ bối cảnh, ánh sáng, trang phục và tâm lý mua sắm trong kịch bản PHẢI phản ánh chính xác thời điểm thực tế này."
+    if month in [12, 1, 2]: season_desc = f"Mùa Đông / Tết Nguyên Đán ({month}/{year}). Bối cảnh thời tiết lạnh giá, không khí sum vầy, nhu cầu giữ ấm."
+    elif month in [3, 4, 5]: season_desc = f"Mùa Xuân / Giao mùa ({month}/{year}). Bối cảnh thời tiết ấm áp, mưa phùn hoặc se lạnh nhẹ."
+    elif month in [6, 7, 8]: season_desc = f"Mùa Hè / Nắng Nóng ({month}/{year}). Bối cảnh thời tiết oi bức, giải nhiệt, du lịch."
+    else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year}). Bối cảnh thời tiết gió thu lãng mạn, se lạnh về đêm."
+    return f"THỜI GIAN THỰC TẾ: {season_desc}. Toàn bộ bối cảnh, ánh sáng, trang phục phải phản ánh chính xác thời điểm thực tế này."
 
 def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
     time_ctx = get_dynamic_realtime_context()
+    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if "On-camera" in narrator_mode else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA:
-    1. THỜI GIAN THỰC LINH HOẠT: Kịch bản phải bám sát đúng thời điểm {time_ctx}.
+    1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
     2. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%.
     3. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số.
-    4. GIỌNG NÓI & BỐI CẢNH: Giọng Bắc (Hà Nội) chuẩn, nhịp điệu dồn dập, lôi cuốn. Khóa cố định môi trường và trang phục. {char_rules}
+    4. GIỌNG NÓI & NGẮT NGHỈ: Giọng Bắc (Hà Nội) chuẩn, nhịp điệu dồn dập, lôi cuốn. Lời thoại phải có đầy đủ dấu câu (dấu phẩy, dấu chấm, dấu ba chấm ...) để ngắt nghỉ tạo cảm xúc rõ ràng cho người xem. {char_rules}
     """
 
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
     time_ctx = get_dynamic_realtime_context()
+    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if "On-camera" in narrator_mode else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT:
-    1. THỜI GIAN THỰC: Bối cảnh, ánh sáng, trang phục phải hợp với {time_ctx}.
-    2. PHÂN CẢNH CHUẨN: Chia ĐÚNG 3 hoặc 4 cảnh, mỗi cảnh dài 4s, 6s hoặc 8s (Cấm dùng 10s).
-    3. NỐI LIỀN MẠCH (MATCH CUT): Cảnh nối tiếp ghi chính xác: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video".
-    4. {char_rules}
+    1. HÌNH THỨC THUYẾT MINH & LIPS-SYNC: {narrator_instruction}
+    2. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc lôi cuốn.
+    3. PHÂN CẢNH CHUẨN: Chia ĐÚNG 3 hoặc 4 cảnh, mỗi cảnh dài 4s, 6s hoặc 8s (Cấm dùng 10s).
+    4. NỐI LIỀN MẠCH (MATCH CUT): Cảnh nối tiếp ghi chính xác: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video".
+    5. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
@@ -195,25 +199,28 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     if not outline: return
     
     time_ctx = get_dynamic_realtime_context()
+    is_on_camera = "On-camera" in narrator_mode
+    
     prompt = f"""
     {time_ctx}
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('target_hook')}. Bối cảnh: {outline.get('setting_style')}.
+    THUYẾT MINH: {'Nhân vật xuất hiện nói chuyện trực tiếp, lip-sync khớp khẩu hình miệng' if is_on_camera else 'Lồng tiếng ngoài khung hình, tập trung show sản phẩm'}.
     TRẢ VỀ ĐÚNG 1 DICT JSON GỒM CÁC KEY SAU:
     {{
         "title": "{outline.get('title')}",
         "total_estimated_duration": "24s (0.4 phút)",
         "script_outfit_setup": "Nữ diễn viên mặc trang phục phù hợp với thời tiết hiện tại",
-        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ nhanh, dồn dập, giọng Miền Bắc chuẩn"}},
+        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ nhanh, dồn dập, giọng Miền Bắc chuẩn, ngắt nghỉ cảm xúc"}},
         "scenes": [
             {{
-                "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh bối cảnh thực tế...",
-                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn (Hà Nội)...", "voiceover_vi": "Lời thoại mở đầu thu hút...",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "Vertical 9:16 video, strict standard Northern Vietnamese accent, slow camera zoom in..."
+                "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh...",
+                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, nhấn mạnh từ khóa...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
+                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera with perfect lip-sync, expressing emotion with pauses...' if is_on_camera else 'Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, product showcase...'}"
             }},
             {{
                 "scene_number": 2, "duration": "6s", "transition_type": "Nối liền mạch (Match Cut)", "scene_setting": "Góc quay cận cảnh tiếp nối...",
-                "voice_director_vn": "Nhấn giọng hào hứng...", "voiceover_vi": "Lời thoại tiếp theo...",
-                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "Extreme close-up shot..."
+                "voice_director_vn": "Nhấn giọng hào hứng...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
+                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "{'Extreme close-up shot, perfect lip-sync, talking directly to camera...' if is_on_camera else 'Extreme close-up shot, off-screen voiceover...'}"
             }}
         ]
     }}
@@ -240,7 +247,7 @@ def clone_script(script_id):
     {time_ctx}
     DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
-    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo 5 biến thể mới với các Hook tiếp cận khác nhau phù hợp thời gian thực. 
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo 5 biến thể mới với các Hook tiếp cận có đầy đủ dấu câu ngắt nghỉ cảm xúc. 
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
@@ -248,7 +255,7 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu hấp dẫn"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu có dấu câu ngắt nghỉ cảm xúc"
             }}
         ]
     }}
@@ -283,7 +290,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     🛑 YÊU CẦU MỞ RỘNG (BẮT BUỘC TUÂN THỦ):
     1. GIỮ NGUYÊN SẢN PHẨM GỐC.
     2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'.
-    3. THỜI GIAN THỰC: Kịch bản phải phù hợp với bối cảnh thời gian hiện tại.
+    3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
     4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật | THỜI LƯỢNG: {duration_mins} phút.
     
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
@@ -293,7 +300,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản chuẩn chiến lược",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu hấp dẫn"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu có dấu câu ngắt nghỉ cảm xúc"
             }}
         ]
     }}
@@ -309,13 +316,11 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     try:
         clean_content = json.loads(json.dumps(payload_data, default=str)) 
         if project_id:
-            # Nếu đã có ID (đang mở dự án cũ), tiến hành CẬP NHẬT (UPDATE) vào chính dự án đó
             supabase.table("saved_projects").update({
                 "project_title": title,
                 "script_content": clean_content
             }).eq("id", project_id).execute()
         else:
-            # Nếu là dự án mới tinh, tiến hành THÊM MỚI (INSERT)
             data = {"user_email": email, "project_title": title, "script_content": clean_content}
             res = supabase.table("saved_projects").insert(data).execute()
             if res.data and len(res.data) > 0:
@@ -372,7 +377,7 @@ with st.sidebar:
             st.session_state.current_input_context = ""
             st.session_state.current_product_data_saved = None
             st.session_state.character_profiles = []
-            st.session_state.current_project_id = None # Reset ID để nhận diện là dự án mới
+            st.session_state.current_project_id = None
             st.session_state.reset_key += 1 
             st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
@@ -392,7 +397,6 @@ with st.sidebar:
                     "character_profiles": st.session_state.character_profiles,
                     "current_input_context": st.session_state.current_input_context
                 }
-                # Truyền kèm project_id để tự động update thay vì insert trùng lặp
                 save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
                 if save_result is True:
                     st.toast("✅ Đã cập nhật và lưu dự án thành công!")
@@ -442,7 +446,7 @@ with st.sidebar:
                                     st.session_state.expanded_scripts = []
                                     st.session_state.generated_details = {}
                                 
-                                st.session_state.current_project_id = p['id'] # Lưu lại ID để update
+                                st.session_state.current_project_id = p['id']
                                 st.session_state.active_project_title = p['project_title']
                                 st.session_state.active_script_id = None
                                 st.session_state.reset_key += 1
@@ -690,7 +694,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
             st.session_state.last_narrator = narrator_mode
             st.session_state.current_input_context = custom_note
             st.session_state.current_product_data_saved = st.session_state.get("current_product_data")
-            st.session_state.current_project_id = None # Khởi tạo dự án mới
+            st.session_state.current_project_id = None
             
             time_ctx = get_dynamic_realtime_context()
             prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.get('current_product_data'), ensure_ascii=False)}" if st.session_state.get("current_product_data") else ""
