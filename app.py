@@ -57,7 +57,7 @@ def load_licensed_accounts():
         try:
             with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f: return json.load(f)
         except: pass
-    return {ADMIN_EMAIL: {"roles": ALL_MODULES, "expires_at": "2099-12-31"}}
+    return {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31"}}
 
 def save_licensed_accounts(acc_dict):
     try:
@@ -258,31 +258,25 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     db_ctx = f"SẢN PHẨM (DB): {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
     dna_ctx = f"DNA SẢN PHẨM GỐC: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
     
-    # ÉP BUỘC AI TUÂN THỦ ĐỊNH HƯỚNG CHIẾN LƯỢC MÀ USER CHỌN
     prompt = f"""
     {prod_ctx}
     {db_ctx}
     {dna_ctx}
     
-    🛑 YÊU CẦU MỞ RỘNG CỰC KỲ QUAN TRỌNG (BẮT BUỘC TUÂN THỦ):
-    1. GIỮ NGUYÊN SẢN PHẨM GỐC: Tuyệt đối không được bịa ra sản phẩm khác. Phải tập trung vào đúng sản phẩm ở trên.
-    2. ĐỊNH HƯỚNG CHIẾN LƯỢC BẮT BUỘC: Toàn bộ 5 kịch bản mới phải được viết xoay quanh chiến lược: '{angle}'.
-       - Nếu chọn Flash Sale & Deal hời: Các kịch bản phải xoay quanh săn deal, giới hạn thời gian, giảm giá, kích thích chốt đơn nhanh.
-       - Nếu chọn Tình huống đời sống / Nỗi đau (PAS): Phải đi từ vấn đề thực tế đời sống rồi mới dẫn dắt giải pháp.
-       - Nếu chọn Review thực chiến: Phải tập trung bóc trần, kiểm định chất lượng, thử thách độ bền.
-       - Nếu chọn Mẹo vặt / Chia sẻ: Phải mang tính hướng dẫn, cung cấp giá trị hữu ích.
-       - Nếu chọn Tình huống hài hước: Phải có yếu tố gây cười, bất ngờ (Plot Twist).
-    3. SỐ LƯỢNG DIỄN VIÊN THAM GIA: {num_chars} nhân vật.
-    4. THỜI LƯỢNG MONG MUỐN: {duration_mins} phút.
+    YÊU CẦU MỞ RỘNG (CRITICAL: BẮT BUỘC GIỮ NGUYÊN SẢN PHẨM GỐC Ở TRÊN, KHÔNG ĐƯỢC BỊA SẢN PHẨM KHÁC):
+    - Thể loại / Góc tiếp cận: '{angle}'
+    - Số lượng nhân vật tham gia: {num_chars}
+    - Thời lượng mong muốn: {duration_mins} phút.
     
+    Dựa ĐÚNG vào Sản phẩm Gốc, tạo thêm 5 kịch bản MỚI HOÀN TOÀN. 
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
             {{
                 "id": {cur_len+1},
-                "title": "Tên kịch bản chuẩn chiến lược",
+                "title": "Tên kịch bản",
                 "setting_style": "Bối cảnh",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu hấp dẫn"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu cực kỳ hấp dẫn"
             }}
         ]
     }}
@@ -319,10 +313,12 @@ with st.sidebar:
                 acc_info = st.session_state.licensed_accounts[email_check]
                 exp_date_str = acc_info.get("expires_at", "2099-12-31")
                 try:
-                    if datetime.now() > datetime.strptime(exp_date_str, "%Y-%m-%d"):
-                        st.error(f"❌ Tài khoản hết hạn: {exp_date_str}!")
+                    exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
+                    if datetime.now() > exp_date:
+                        st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
                         st.stop()
                 except: pass
+                
                 st.session_state.is_logged_in = True
                 st.session_state.current_email = email_check
                 st.toast("✅ Đăng nhập thành công!")
@@ -330,6 +326,17 @@ with st.sidebar:
             else: 
                 st.error("Tài khoản chưa được cấp quyền!")
     else:
+        # KIỂM TRA CẢNH BÁO HẾT HẠN TRƯỚC 1 TUẦN (7 NGÀY)
+        current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
+        exp_date_str = current_acc.get("expires_at", "2099-12-31")
+        if current_acc and st.session_state.current_email != ADMIN_EMAIL:
+            try:
+                exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
+                days_left = (exp_date - datetime.now()).days
+                if 0 <= days_left <= 7:
+                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
+            except: pass
+
         st.markdown("### 🗂 LÀM VIỆC")
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True):
             st.session_state.all_scripts, st.session_state.cloned_scripts, st.session_state.expanded_scripts = [], [], []
@@ -415,30 +422,36 @@ with st.sidebar:
                                 st.toast("✅ Đã xóa dự án!")
                                 st.rerun()
 
+        # QUẢN TRỊ ADMIN (Thêm trường SĐT chăm sóc khách hàng)
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             with st.form("add_license"):
-                new_acc = st.text_input("Email cấp quyền:")
+                new_acc = st.text_input("Email khách hàng:")
+                new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Vd: 0968484369")
                 assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
                 duration_opt = st.selectbox("Thời hạn:", ["Dùng thử 3 ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "3 Năm", "5 Năm", "10 Năm", "Vĩnh viễn (Trọn đời)"])
-                if st.form_submit_button("💾 Cấp Quyền"):
+                if st.form_submit_button("💾 Cấp Quyền & Lưu SĐT"):
                     exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=3 if "Dùng thử" in duration_opt else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730, "3 Năm": 1095, "5 Năm": 1825, "10 Năm": 3650}.get(duration_opt, 30))).strftime("%Y-%m-%d")
-                    st.session_state.licensed_accounts[new_acc.strip()] = {"roles": assigned_modules, "expires_at": exp_date}
+                    st.session_state.licensed_accounts[new_acc.strip()] = {
+                        "roles": assigned_modules, 
+                        "phone": new_phone.strip(), 
+                        "expires_at": exp_date
+                    }
                     save_licensed_accounts(st.session_state.licensed_accounts)
-                    st.toast(f"✅ Đã cấp quyền cho {new_acc}!")
+                    st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
             
             if st.session_state.licensed_accounts:
-                with st.expander(f"📋 Danh sách tài khoản ({len(st.session_state.licensed_accounts)})"):
+                with st.expander(f"📋 Danh sách Khách hàng ({len(st.session_state.licensed_accounts)})"):
                     for acc, info in list(st.session_state.licensed_accounts.items()):
                         st.markdown(f"**👤 {acc}**")
-                        st.caption(f"Quyền: {', '.join(info.get('roles', ALL_MODULES))}")
-                        st.caption(f"Hết hạn: {info.get('expires_at')}")
+                        st.caption(f"📞 SĐT: {info.get('phone', 'Chưa có SĐT')}<br>• Quyền: {', '.join(info.get('roles', ALL_MODULES))}<br>• Hết hạn: {info.get('expires_at')}", unsafe_allow_html=True)
                         if acc != ADMIN_EMAIL and st.button(f"🗑 Xóa {acc}", key=f"del_acc_{acc}"):
                             del st.session_state.licensed_accounts[acc]
                             save_licensed_accounts(st.session_state.licensed_accounts)
                             st.toast("✅ Đã xóa tài khoản!")
                             st.rerun()
+                        st.markdown("---")
 
         st.markdown("---")
         st.markdown("""
@@ -459,7 +472,7 @@ with st.sidebar:
         st.success(f"Đang dùng: {st.session_state.current_email}")
         if st.button("🚪 Đăng Xuất"):
             st.session_state.is_logged_in = False
-            st.toast("✅ Đã đăng xuất!")
+            st.toast("✅ Đăng xuất thành công!")
             st.rerun()
 
 if not st.session_state.is_logged_in:
@@ -763,7 +776,7 @@ if all_combined_scripts_list:
                         if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
                         st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                     with col_btn1:
-                        if st.button("👁️️ Xem lại chi tiết", key=f"btn_rev_{sc_id}", use_container_width=True):
+                        if st.button("👁️ Xem lại chi tiết", key=f"btn_rev_{sc_id}", use_container_width=True):
                             st.session_state.active_script_id = sc_id
                             st.session_state.scroll_to_top = True
                             st.rerun()
