@@ -559,7 +559,7 @@ if num_chars > 0:
                     c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}")
                     if c_file and c_role: char_inputs.append({"id": idx+1, "role": c_role, "file": c_file})
 
-custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
+custom_note = st.text_area("✍️ Thêm ý tưởng ở đây:", key=f"note_main_{st.session_state.reset_key}")
 
 if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
     with st.spinner("Đạo diễn AI đang tính toán vật lý, nhân vật, và luật TikTok..."):
