@@ -99,6 +99,7 @@ def format_analysis_field(field_val) -> str:
     formatted = [f"<div style='margin-top: 6px;'>{line}</div>" if line.startswith('•') else f"<div style='margin-left: 15px; margin-top: 4px;'>• {line}</div>" for line in lines if line]
     return "".join(formatted) if formatted else text
 
+# Khởi tạo TOÀN BỘ các biến Session State
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
@@ -109,7 +110,8 @@ for key, default_val in [
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
     ("extra_num_chars", 1), ("extra_duration_mins", 1.0),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
-    ("last_mode", ""), ("last_style", ""), ("last_aspect", "9:16 (Dọc TikTok/Reels)"), ("last_narrator", "")
+    ("last_mode", ""), ("last_style", ""), ("last_aspect", "9:16 (Dọc TikTok/Reels)"), ("last_narrator", ""),
+    ("character_profiles", [])
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
@@ -287,7 +289,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     return more_scripts
 
 def save_project_to_db(email, title, payload_data):
-    if not supabase: return "Chưa kết nối Database Supabase."
+    if not supabase: return "Sai đường dẫn SUPABASE_URL hoặc mất kết nối mạng. Hãy kiểm tra lại file cấu hình."
     try:
         clean_content = json.loads(json.dumps(payload_data, default=str)) 
         data = {"user_email": email, "project_title": title, "script_content": clean_content}
@@ -300,7 +302,7 @@ def save_project_to_db(email, title, payload_data):
         return err_msg
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN (GỌN GÀNG, MỞ DỰ ÁN)
+# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -331,6 +333,7 @@ with st.sidebar:
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.session_state.current_input_context = ""
             st.session_state.current_product_data_saved = None
+            st.session_state.character_profiles = []
             st.session_state.reset_key += 1 
             st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
@@ -341,7 +344,6 @@ with st.sidebar:
             if not all_com: 
                 st.warning("⚠️ Chưa có kịch bản nào để lưu!")
             else:
-                # Lưu toàn bộ State để phục hồi nguyên trạng
                 payload = {
                     "content_analysis": st.session_state.content_analysis,
                     "all_scripts": st.session_state.all_scripts,
@@ -372,13 +374,16 @@ with st.sidebar:
                 for p in projects:
                     with st.expander(f"🎬 {p['project_title']}"):
                         st.caption(f"📅 {p['created_at'][:10]}")
-                        if st.session_state.current_email == ADMIN_EMAIL: st.caption(f"👤 Tạo bởi: {p['user_email']}")
+                        
+                        # CHỈ ADMIN MỚI THẤY NGƯỜI TẠO ĐỂ GIAO DIỆN KHÁCH HÀNG SẠCH SẼ
+                        if st.session_state.current_email == ADMIN_EMAIL: 
+                            st.caption(f"👤 Tạo bởi: {p['user_email']}")
                         
                         col_open, col_del = st.columns(2)
                         with col_open:
                             if st.button("📂 Mở", key=f"open_{p['id']}", use_container_width=True):
                                 saved_data = p.get("script_content", {})
-                                if isinstance(saved_data, dict):
+                                if isinstance(saved_data, dict) and "all_scripts" in saved_data:
                                     st.session_state.content_analysis = saved_data.get("content_analysis")
                                     st.session_state.all_scripts = saved_data.get("all_scripts", [])
                                     st.session_state.cloned_scripts = saved_data.get("cloned_scripts", [])
@@ -534,7 +539,7 @@ with col_m: mode = st.selectbox("🎯 Thể loại (Đã được phân quyền)
 with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
 with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key=f"aspect_sel_{st.session_state.reset_key}")
 
-narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
+narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
 
 col_p_img, col_c_img = st.columns([1, 1])
 with col_p_img:
@@ -642,7 +647,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (LÔJIC CHUẨN UX)
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -653,7 +658,7 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     # -------------------------------------------------------------------------
-    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT
+    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN CÁC KỊCH BẢN CHỜ ĐI)
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
         if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
