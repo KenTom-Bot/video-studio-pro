@@ -165,19 +165,6 @@ def get_dynamic_realtime_context():
     else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year})."
     return f"THỜI GIAN THỰC TẾ: {season_desc}. Toàn bộ bối cảnh, ánh sáng, trang phục phải phản ánh chính xác thời điểm thực tế này."
 
-def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
-    time_ctx = get_dynamic_realtime_context()
-    is_on_camera = "On-camera" in narrator_mode
-    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if is_on_camera else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
-    return f"""
-    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
-    {time_ctx}
-    🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA:
-    1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc lôi cuốn cho người xem.
-    3. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%. Cấm báo giá tiền cụ thể. {char_rules}
-    """
-
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
     time_ctx = get_dynamic_realtime_context()
     is_on_camera = "On-camera" in narrator_mode
@@ -185,12 +172,13 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
-    🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT PROMPT VEO 3 & LIPS-SYNC:
+    🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT (VIỆT HÓA 100%):
     1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. TÍCH HỢP THOẠI TRỰC TIẾP VÀO VEO 3 PROMPT: 
-       - Nếu chọn On-camera (Lip-sync): Phần `video_prompt` phải có lệnh miêu tả hành động kết hợp `character talking directly to camera, speaking the Vietnamese line: '[Điền nguyên văn câu thoại voiceover_vi]' with perfect lip-sync matching the speech, natural facial expressions`.
-       - Nếu chọn Off-screen: Phần `video_prompt` phải miêu tả góc quay sản phẩm kết hợp `off-screen voiceover with emotional pauses`.
-    3. PHÂN TÍCH CHUYỂN CẢNH THÔNG MINH: Tự phân tích tình huống kịch bản để chọn Cắt cứng (Hard Cut) với ảnh mới hoặc Nối liền mạch (Match Cut) đúng bản chất vật lý.
+    2. CHUYỂN CẢNH (CHỈ DÙNG 2 TỪ KHÓA BẰNG TIẾNG VIỆT SAU TRONG `transition_type`):
+       - "Chuyển cảnh mới (Tạo ảnh mới)": Dùng khi chuyển sang ý mới, đổi không gian hoặc góc nhìn khác. Khi đó bắt buộc phải sinh `image_prompt` hoàn toàn mới.
+       - "Cảnh nối tiếp (Dùng lại ảnh cuối)": Dùng khi cảnh sau là hành động nối tiếp trực tiếp của cảnh trước. Khi đó phần `image_prompt` BẮT BUỘC phải ghi chính xác dòng chữ: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video".
+    3. TÍCH HỢP THOẠI TRỰC TIẾP VÀO VEO 3 PROMPT: 
+       - Nếu chọn On-camera: `video_prompt` phải có lệnh miêu tả: character talking directly to camera, speaking the Vietnamese line: '[Điền nguyên văn voiceover_vi]' with perfect lip-sync matching the speech.
     4. {char_rules}
     """
 
@@ -202,10 +190,9 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     time_ctx = get_dynamic_realtime_context()
     is_on_camera = "On-camera" in narrator_mode
     
-    # Định nghĩa prompt video dựa trên rẽ nhánh Python sạch sẽ, chống lỗi cú pháp
     if is_on_camera:
-        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?' with perfect lip-sync matching the speech, natural facial expressions, slow camera zoom in..."
-        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!' with perfect lip-sync matching the speech, expressive emotions..."
+        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?' with perfect lip-sync matching the speech, natural facial expressions..."
+        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!' with perfect lip-sync matching the speech..."
     else:
         vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, slow camera zoom in on the product..."
         vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, off-screen voiceover, product detail showcase..."
@@ -222,14 +209,14 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
         "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ linh hoạt theo cảm xúc kịch bản, giọng Miền Bắc chuẩn"}},
         "scenes": [
             {{
-                "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh...",
+                "scene_number": 1, "duration": "8s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", "scene_setting": "Góc toàn cảnh...",
                 "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, ngắt nghỉ cảm xúc...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
                 "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{vid_p_1}"
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "Chuyển cảnh linh hoạt (Cắt cứng hoặc Match Cut dựa trên phân tích tình huống)", "scene_setting": "Góc quay tiếp theo...",
+                "scene_number": 2, "duration": "6s", "transition_type": "Cảnh nối tiếp (Dùng lại ảnh cuối)", "scene_setting": "Góc quay tiếp theo...",
                 "voice_director_vn": "Nhấn giọng tạo cao trào...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{vid_p_2}"
+                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "{vid_p_2}"
             }}
         ]
     }}
@@ -270,7 +257,7 @@ def clone_script(script_id):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
-    res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
+    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
     return clones
@@ -316,7 +303,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
-    res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
+    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
@@ -783,7 +770,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (VIỆT HÓA 100%, ẨN PROMPT ẢNH NẾU LÀ CẢNH NỐI TIẾP)
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -817,17 +804,21 @@ if all_combined_scripts_list:
         scenes = active_sc.get("scenes", [])
         if isinstance(scenes, dict): scenes = [scenes]
         for idx, scene in enumerate(scenes, 1):
-            st.markdown(f"#### 📍 Phân cảnh {idx} ({scene.get('duration', '8s')}) — [ {scene.get('transition_type', 'Cắt cứng')} ]")
+            trans_type = scene.get('transition_type', 'Chuyển cảnh mới (Tạo ảnh mới)')
+            st.markdown(f"#### 📍 Phân cảnh {idx} ({scene.get('duration', '8s')}) — [ {trans_type} ]")
             st.markdown(f"🏛️ **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
             st.markdown(f"**🎙️ Đạo diễn ngữ điệu & SFX:** *{scene.get('voice_director_vn', '')}*")
             st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
             
+            # KIỂM TRA NẾU LÀ CẢNH NỐI TIẾP THÌ ẨN PROMPT ẢNH VÀ NÚT COPY ẢNH ĐI
             img_p = scene.get('image_prompt', '')
-            if img_p: 
-                st.markdown(f"**🖼️ Prompt Ảnh (Imagen 3):**")
-                if "ảnh cuối" in img_p.lower() or "tham chiếu" in img_p.lower():
-                    st.info("🔗 Nối liền mạch: Không cần tạo ảnh mới. Hãy dùng frame cuối của Cảnh trước làm ảnh gốc (Image-to-Video) cho cảnh này.")
-                else:
+            is_linked_scene = "nối tiếp" in trans_type.lower() or "dùng lại ảnh cuối" in img_p.lower() or "tham chiếu" in img_p.lower()
+            
+            if is_linked_scene:
+                st.info("🔗 **Cảnh nối tiếp:** Không cần tạo ảnh mới. Hãy sử dụng khung hình cuối của Cảnh trước làm ảnh tham chiếu (Image-to-Video) cho cảnh này.")
+            else:
+                if img_p: 
+                    st.markdown(f"**🖼️️ Prompt Ảnh (Imagen 3):**")
                     st.code(img_p, language="text")
                     safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
             
