@@ -120,7 +120,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CHÍNH SÁCH BẢO VỆ LỖI JSON
+# 2. HÀM AI LÕI & CHÍNH SÁCH ĐỒNG BỘ HÓA TOÀN DIỆN
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -150,33 +150,33 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
             time.sleep(2)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "🔹 NHÂN VẬT: Linh hoạt theo kịch bản."
-    rules = "🔹 KHÓA KHUÔN MẶT KOC:\n"
-    for p in profiles: rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}'.\n"
+    if not profiles: return "🔹 NHÂN VẬT & KHUÔN MẶT: KOC người Việt xuất hiện xuyên suốt với biểu cảm tự nhiên."
+    rules = "🔹 KHÓA KHUÔN MẶT KOC & ĐỒNG NHẤT 100%:\n"
+    for p in profiles: 
+        rules += f"   + Nhân vật {p['id']} ({p['role']}): Bắt buộc sử dụng lệnh 'Character {p['id']} ({p['role']}) featuring exact identity of reference image {p['id']}' để AI khóa chặt khuôn mặt và hình thể chuẩn xác tuyệt đối.\n"
     return rules
 
 def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
-    🛑 QUY TẮC BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
-    1. TIÊU CHUẨN TIKTOK & AN TOÀN: Tuân thủ tuyệt đối quy tắc cộng đồng. An toàn 100% cho ngành Mẹ & Bé (Không để trẻ em một mình, không nguy hiểm, cấm lạm dụng từ y tế/cam kết chữa bệnh).
+    🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA TOÀN DIỆN (KHÔNG ĐƯỢC VI PHẠM):
+    1. TIÊU CHUẨN TIKTOK & AN TOÀN: Tuân thủ quy tắc cộng đồng, an toàn cho mọi lứa tuổi. Cấm tuyệt đối lạm dụng từ y tế cam kết 100% chữa bệnh.
     2. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số vào kịch bản hay lời thoại.
-    3. THỜI LƯỢNG VEO 3: Kịch bản phải được định hướng để chia nhỏ thành các cảnh 4s, 6s, 8s. TUYỆT ĐỐI KHÔNG DÙNG 10s.
-    4. VẬT LÝ & SẢN PHẨM: Giữ nguyên 100% hình dáng sản phẩm gốc.
-    5. GIỌNG NÓI ({narrator_mode}): Lời thoại phải đúng chính tả 100%, từ ngữ rõ ràng, ngắt nghỉ chuẩn để AI Voice đọc không bị vấp/sai. Khớp khẩu hình nếu có nhân vật.
-    6. CAMERA: Chỉ định góc máy rõ ràng. {char_rules}
+    3. ĐỒNG BỘ GIỌNG NÓI MIỀN BẮC (HÀ NỘI): Thiết lập lệnh đọc 'strict standard Northern Vietnamese (Hanoi) accent' với nhịp điệu lôi cuốn, ngắt nghỉ biểu cảm cảm xúc rõ ràng.
+    4. KHÓA BỐI CẢNH (MASTER ENVIRONMENT LOCK): Mọi phân cảnh trong cùng một kịch bản PHẢI giữ nguyên 100% chuỗi mô tả không gian gốc (Ví dụ: một phòng ngủ hiện đại ấm cúng, bàn ăn gia đình,...).
+    5. KHÓA TRANG PHỤC TOÀN DIỆN (FULL OUTFIT LOCK): Trang phục miêu tả trong `script_outfit_setup` (bao gồm cả Áo, Quần/Váy và Giày với màu sắc cụ thể) phải được giữ nguyên hoàn toàn xuyên suốt từ đầu đến cuối kịch bản.
+    6. {char_rules}
     """
 
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
-    🛑 QUY TẮC BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
+    🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA TOÀN DIỆN:
     1. TỰ ĐỘNG CÂN ĐỐI THỜI LƯỢNG & SỐ CẢNH: Tự động phân bổ kịch bản thành ĐÚNG 3 HOẶC 4 PHÂN CẢNH TỐI ƯU NHẤT.
     2. CHỈ DÙNG MỐC THỜI GIAN CHUẨN: Mỗi phân cảnh BẮT BUỘC CHỈ ĐƯỢC PHÉP dài 4s, 6s, hoặc 8s (TUYỆT ĐỐI KHÔNG DÙNG 10s hoặc số lẻ).
     3. NỐI LIỀN MẠCH (MATCH CUT): Nếu cảnh là nối tiếp hành động của cảnh trước, Cảnh đó là Match Cut. Khi đó phần 'image_prompt' BẮT BUỘC phải ghi chính xác dòng chữ: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video". Không tự bịa prompt mới.
-    4. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số vào kịch bản.
-    5. VẬT LÝ & SẢN PHẨM: Giữ nguyên 100% hình dáng sản phẩm gốc. Miêu tả rõ các định luật vật lý (gió, nước, bóng đổ) vào Video prompt.
-    6. GIỌNG NÓI ({narrator_mode}): Lời thoại phải đúng chính tả 100%, dễ đọc, ngắt nghỉ rõ ràng. {char_rules}
+    4. ĐỒNG BỘ GIỌNG NÓI & TRANG PHỤC: Giọng đọc chuẩn Miền Bắc (Hà Nội). Trang phục (Áo, Quần, Giày) giữ nguyên 100% ở mọi cảnh. Bối cảnh không đổi.
+    5. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
@@ -190,18 +190,18 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     {{
         "title": "{outline.get('title')}",
         "total_estimated_duration": "24s (0.4 phút)",
-        "script_outfit_setup": "Nữ diễn viên mặc đồ lụa màu kem, đi dép trắng...",
-        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ nhanh, dồn dập, nhiệt huyết"}},
+        "script_outfit_setup": "Nữ diễn viên mặc áo tay dài và quần dài đồng bộ màu kem beige, đi dép trong nhà trắng",
+        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ nhanh, dồn dập, nhiệt huyết, giọng Miền Bắc chuẩn"}},
         "scenes": [
             {{
-                "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh...",
-                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng vừa rít da?",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "Vertical 9:16 video, slow camera zoom in..."
+                "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh phòng ngủ hiện đại ấm cúng...",
+                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn (Hà Nội), nhấn nhá lôi cuốn...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng vừa rít da?",
+                "image_prompt": "Cinematic vertical 9:16 photo of a Vietnamese female wearing beige silk loungewear set...", "video_prompt": "Vertical 9:16 video, strict standard Northern Vietnamese accent, slow camera zoom in..."
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "Nối liền mạch (Match Cut)", "scene_setting": "Góc quay cận cảnh tiếp nối hành động...",
+                "scene_number": 2, "duration": "6s", "transition_type": "Nối liền mạch (Match Cut)", "scene_setting": "Góc quay cận cảnh tiếp nối hành động trong cùng phòng ngủ...",
                 "voice_director_vn": "Nhấn giọng hào hứng...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
-                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "Extreme close-up shot..."
+                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "Extreme close-up shot, strict standard Northern Vietnamese accent..."
             }}
         ]
     }}
@@ -276,7 +276,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
             {{
                 "id": {cur_len+1},
                 "title": "Tên kịch bản chuẩn chiến lược",
-                "setting_style": "Bối cảnh",
+                "setting_style": "Bối cảnh cố định",
                 "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu hấp dẫn"
             }}
         ]
@@ -302,7 +302,7 @@ def save_project_to_db(email, title, payload_data):
         return err_msg
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN (GIAO DIỆN TỐI ƯU THANH CUỘN & TÌM KIẾM)
+# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -382,14 +382,12 @@ with st.sidebar:
                 projects = res.data
             except: projects = []
 
-            # Ô tìm kiếm dự án theo tên hoặc ngày
-            search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên hoặc ngày (YYYY-MM-DD)", key="search_proj_input")
+            search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên hoặc ngày...", key="search_proj_input")
             if search_proj:
                 projects = [p for p in projects if search_proj.lower() in p['project_title'].lower() or search_proj in p['created_at']]
 
-            if not projects: st.info("Bạn chưa có dự án nào!")
+            if not projects: st.info("Không tìm thấy dự án phù hợp.")
             else:
-                # Dùng khung chứa có thanh cuộn ẩn bớt khi danh sách dài
                 st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
                 for p in projects:
                     with st.expander(f"🎬 {p['project_title']}"):
@@ -430,7 +428,7 @@ with st.sidebar:
                                 st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
 
-        # QUẢN TRỊ ADMIN (Tìm kiếm khách hàng, thanh cuộn & Nút Cập nhật trực tiếp)
+        # QUẢN TRỊ ADMIN
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
@@ -477,7 +475,6 @@ with st.sidebar:
                     st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
                     st.rerun()
             
-            # Ô tìm kiếm khách hàng
             search_cust = st.text_input("🔍 Tìm kiếm khách hàng:", placeholder="Nhập Email hoặc SĐT", key="search_cust_input")
             filtered_accs = list(st.session_state.licensed_accounts.items())
             if search_cust:
@@ -498,11 +495,10 @@ with st.sidebar:
                             clean_p = re.sub(r'\D', '', phone_val)
                             st.markdown(f"<a href='[https://zalo.me/](https://zalo.me/){clean_p}' target='_blank' style='background:#0068ff; color:white; padding:4px 8px; border-radius:4px; text-decoration:none; font-size:10px; font-weight:700;'>💬 Nhắn Zalo</a>", unsafe_allow_html=True)
                         
-                        # Nút mở form cập nhật trực tiếp tài khoản
                         if acc != ADMIN_EMAIL:
                             col_up, col_del = st.columns(2)
                             with col_up:
-                                if st.button("✏️ Sửa", key=f"edit_acc_{acc}", use_container_width=True):
+                                if st.button("✏️️ Sửa", key=f"edit_acc_{acc}", use_container_width=True):
                                     st.session_state.editing_acc_email = acc
                             with col_del:
                                 if st.button(f"🗑 Xóa", key=f"del_acc_{acc}", type="secondary", use_container_width=True):
@@ -511,7 +507,6 @@ with st.sidebar:
                                     st.toast("✅ Đã xóa tài khoản!")
                                     st.rerun()
                         
-                        # Nếu đang chọn sửa tài khoản này
                         if st.session_state.get("editing_acc_email") == acc:
                             with st.form(f"update_form_{acc}" ):
                                 st.markdown(f"**Cập nhật cho: {acc}**")
@@ -634,7 +629,7 @@ with col_m: mode = st.selectbox("🎯 Thể loại (Đã được phân quyền)
 with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
 with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key=f"aspect_sel_{st.session_state.reset_key}")
 
-narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙 Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
+narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
 
 col_p_img, col_c_img = st.columns([1, 1])
 with col_p_img:
@@ -651,13 +646,13 @@ if num_chars > 0:
                 idx = i + j
                 with cols[j]:
                     c_role = st.text_input(f"Vai trò NV {idx+1}", key=f"role_{idx}_{st.session_state.reset_key}")
-                    c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}")
+                    c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}", label_visibility="collapsed")
                     if c_file and c_role: char_inputs.append({"id": idx+1, "role": c_role, "file": c_file})
 
 custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
 
 if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
-    with st.spinner("Đang phân tích sản phẩm và lên kịch bản video ..."):
+    with st.spinner("Đạo diễn AI đang tính toán vật lý, nhân vật, và luật TikTok..."):
         try:
             st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
             char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -687,7 +682,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     {{
                         "id": 1, 
                         "title": "Tên kịch bản", 
-                        "setting_style": "Bối cảnh", 
+                        "setting_style": "Bối cảnh cố định", 
                         "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu hấp dẫn"
                     }} 
                 ]
@@ -742,7 +737,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (LÔJIC CHUẨN UX)
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (LUÔN GIỮ HIỂN THỊ SONG SONG CẢ 2 BẢNG)
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -753,7 +748,7 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     # -------------------------------------------------------------------------
-    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN CÁC KỊCH BẢN CHỜ ĐI)
+    # NẾU ĐANG BẤM XEM CHI TIẾT 1 KỊCH BẢN NÀO ĐÓ: HIỂN THỊ NÓ LÊN ĐẦU TIÊN
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
         if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
@@ -800,7 +795,13 @@ if all_combined_scripts_list:
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             st.markdown("---")
 
-        st.markdown("### 📋 Các Kịch Bản Đã Hoàn Thiện (Có Thể Xem Lại & Nhân Bản)")
+    # -------------------------------------------------------------------------
+    # HIỂN THỊ SONG SONG CẢ 2 BẢNG: ĐÃ HOÀN THIỆN VÀ ĐANG CHỜ (ĐÚNG NHƯ ẢNH 22)
+    # -------------------------------------------------------------------------
+    st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Xuất & Nhân Bản)**")
+    if not completed_scripts:
+        st.info("💡 Chưa có kịch bản nào được tạo chi tiết.")
+    else:
         for outline in completed_scripts:
             sc_id = int(outline.get("id", 0))
             is_current = (sc_id == st.session_state.active_script_id)
@@ -809,6 +810,9 @@ if all_combined_scripts_list:
                 with col_i1:
                     badge = " <span class='badge-ready'>ĐANG XEM</span>" if is_current else ""
                     st.markdown(f"**#{sc_id}. {outline.get('title')}**{badge}", unsafe_allow_html=True)
+                    hook_val = outline.get('target_hook', '')
+                    if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
+                    st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                 with col_btn1:
                     if not is_current:
                         if st.button("👁️ Xem lại", key=f"btn_rev_{sc_id}", use_container_width=True):
@@ -820,81 +824,39 @@ if all_combined_scripts_list:
                         st.session_state.action_trigger = "clone_script"
                         st.session_state.action_param = sc_id
                         st.rerun()
-        
-        st.markdown("---")
-        with st.container(border=True):
-            st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
-            col_g1, col_g2, col_g3 = st.columns([2, 1, 1])
-            with col_g1:
-                st.session_state.extra_angle_type = st.selectbox("Định hướng chiến lược:", ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"], key=f"extra_angle_selectbox_detail_{st.session_state.reset_key}")
-            with col_g2:
-                st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_detail_{st.session_state.reset_key}")
-            with col_g3:
-                st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_detail_{st.session_state.reset_key}")
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_detail", type="primary", use_container_width=True):
-                st.session_state.action_trigger = "generate_more"
-                st.rerun()
 
-    # -------------------------------------------------------------------------
-    # TRẠNG THÁI 2: ĐANG XEM DANH SÁCH TỔNG QUAN
-    # -------------------------------------------------------------------------
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### ⏳ **2. Kịch Bản Đang Chờ Tạo Chi Tiết**")
+    if not pending_scripts:
+        st.success("🎉 Tất cả các kịch bản trong danh sách đã được tạo chi tiết thành công.")
     else:
-        st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Xuất & Nhân Bản)**")
-        if not completed_scripts:
-            st.info("💡 Chưa có kịch bản nào được tạo chi tiết.")
-        else:
-            for outline in completed_scripts:
-                sc_id = int(outline.get("id", 0))
-                with st.container(border=True):
-                    col_i1, col_btn1, col_btn2 = st.columns([2.5, 1, 1])
-                    with col_i1:
-                        st.markdown(f"**#{sc_id}. {outline.get('title')}** — <span class='badge-ready'>ĐÃ HOÀN THIỆN</span>", unsafe_allow_html=True)
-                        hook_val = outline.get('target_hook', '')
-                        if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
-                        st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
-                    with col_btn1:
-                        if st.button("👁️ Xem lại chi tiết", key=f"btn_rev_{sc_id}", use_container_width=True):
-                            st.session_state.active_script_id = sc_id
-                            st.session_state.scroll_to_top = True
-                            st.rerun()
-                    with col_btn2:
-                        if st.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
-                            st.session_state.action_trigger = "clone_script"
-                            st.session_state.action_param = sc_id
-                            st.rerun()
+        for outline in pending_scripts:
+            sc_id = int(outline.get("id", 0))
+            with st.container(border=True):
+                col_i2, col_a2 = st.columns([3, 1.2])
+                with col_i2:
+                    st.markdown(f"**#{sc_id}. {outline.get('title')}** — <span class='badge-pending'>ĐANG CHỜ</span>", unsafe_allow_html=True)
+                    hook_val = outline.get('target_hook', '')
+                    if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
+                    st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
+                with col_a2:
+                    if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.action_trigger = "create_detail"
+                        st.session_state.action_param = sc_id
+                        st.rerun()
 
+    # VÙNG GỌI THÊM NẰM DƯỚI CÙNG
+    st.markdown("---")
+    with st.container(border=True):
+        st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
+        col_g1, col_g2, col_g3 = st.columns([2, 1, 1])
+        with col_g1:
+            st.session_state.extra_angle_type = st.selectbox("Định hướng chiến lược:", ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"], key=f"extra_angle_selectbox_main_{st.session_state.reset_key}")
+        with col_g2:
+            st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
+        with col_g3:
+            st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_main_{st.session_state.reset_key}")
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("### ⏳ **2. Kịch Bản Đang Chờ Tạo Chi Tiết**")
-        if not pending_scripts:
-            st.success("🎉 Tất cả kịch bản đã được tạo chi tiết thành công.")
-        else:
-            for outline in pending_scripts:
-                sc_id = int(outline.get("id", 0))
-                with st.container(border=True):
-                    col_i2, col_a2 = st.columns([3, 1.2])
-                    with col_i2:
-                        st.markdown(f"**#{sc_id}. {outline.get('title')}** — <span class='badge-pending'>ĐANG CHỜ</span>", unsafe_allow_html=True)
-                        hook_val = outline.get('target_hook', '')
-                        if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
-                        st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
-                    with col_a2:
-                        if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                            st.session_state.action_trigger = "create_detail"
-                            st.session_state.action_param = sc_id
-                            st.rerun()
-
-        st.markdown("---")
-        with st.container(border=True):
-            st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
-            col_g1, col_g2, col_g3 = st.columns([2, 1, 1])
-            with col_g1:
-                st.session_state.extra_angle_type = st.selectbox("Định hướng chiến lược:", ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"], key=f"extra_angle_selectbox_main_{st.session_state.reset_key}")
-            with col_g2:
-                st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
-            with col_g3:
-                st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_main_{st.session_state.reset_key}")
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_main", type="primary", use_container_width=True):
-                st.session_state.action_trigger = "generate_more"
-                st.rerun()
+        if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_main", type="primary", use_container_width=True):
+            st.session_state.action_trigger = "generate_more"
+            st.rerun()
