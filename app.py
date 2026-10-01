@@ -36,6 +36,7 @@ st.markdown("""
     .loading-pulse { animation: pulse 1.5s infinite ease-in-out; color: #d90429; font-weight: 800; text-align: center; padding: 25px; background: #fef2f2; border: 2px dashed #fca5a5; border-radius: 12px; margin: 20px 0; }
     .detail-header-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #1e3a8a; }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 15px; border: 1px solid #bbf7d0; }
+    .scrollable-sidebar-container { max-height: 380px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -110,7 +111,7 @@ for key, default_val in [
     ("extra_num_chars", 1), ("extra_duration_mins", 1.0),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", ""), ("last_style", ""), ("last_aspect", "9:16 (Dọc TikTok/Reels)"), ("last_narrator", ""),
-    ("character_profiles", [])
+    ("character_profiles", []), ("editing_acc_email", None)
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
@@ -263,20 +264,20 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     {db_ctx}
     {dna_ctx}
     
-    YÊU CẦU MỞ RỘNG (CRITICAL: BẮT BUỘC GIỮ NGUYÊN SẢN PHẨM GỐC Ở TRÊN, KHÔNG ĐƯỢC BỊA SẢN PHẨM KHÁC):
-    - Thể loại / Góc tiếp cận: '{angle}'
-    - Số lượng nhân vật tham gia: {num_chars}
-    - Thời lượng mong muốn: {duration_mins} phút.
+    🛑 YÊU CẦU MỞ RỘNG CỰC KỲ QUAN TRỌNG (BẮT BUỘC TUÂN THỦ):
+    1. GIỮ NGUYÊN SẢN PHẨM GỐC: Tuyệt đối không được bịa ra sản phẩm khác. Phải tập trung vào đúng sản phẩm ở trên.
+    2. ĐỊNH HƯỚNG CHIẾN LƯỢC BẮT BUỘC: Toàn bộ 5 kịch bản mới phải được viết xoay quanh chiến lược: '{angle}'.
+    3. SỐ LƯỢNG DIỄN VIÊN THAM GIA: {num_chars} nhân vật.
+    4. THỜI LƯỢNG MONG MUỐN: {duration_mins} phút.
     
-    Dựa ĐÚNG vào Sản phẩm Gốc, tạo thêm 5 kịch bản MỚI HOÀN TOÀN. 
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
             {{
                 "id": {cur_len+1},
-                "title": "Tên kịch bản",
+                "title": "Tên kịch bản chuẩn chiến lược",
                 "setting_style": "Bối cảnh",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu cực kỳ hấp dẫn"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu hấp dẫn"
             }}
         ]
     }}
@@ -301,7 +302,7 @@ def save_project_to_db(email, title, payload_data):
         return err_msg
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN
+# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN (GIAO DIỆN TỐI ƯU THANH CUỘN & TÌM KIẾM)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -326,7 +327,7 @@ with st.sidebar:
             else: 
                 st.error("Tài khoản chưa được cấp quyền!")
     else:
-        # KIỂM TRA CẢNH BÁO HẾT HẠN TRƯỚC 1 TUẦN (7 NGÀY)
+        # CẢNH BÁO HẾT HẠN TRƯỚC 7 NGÀY
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
         if current_acc and st.session_state.current_email != ADMIN_EMAIL:
@@ -381,12 +382,18 @@ with st.sidebar:
                 projects = res.data
             except: projects = []
 
-            if not projects: st.info("Chưa có dự án nào.")
+            # Ô tìm kiếm dự án theo tên hoặc ngày
+            search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên hoặc ngày (YYYY-MM-DD)", key="search_proj_input")
+            if search_proj:
+                projects = [p for p in projects if search_proj.lower() in p['project_title'].lower() or search_proj in p['created_at']]
+
+            if not projects: st.info("Không tìm thấy dự án phù hợp.")
             else:
+                # Dùng khung chứa có thanh cuộn ẩn bớt khi danh sách dài
+                st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
                 for p in projects:
                     with st.expander(f"🎬 {p['project_title']}"):
                         st.caption(f"📅 {p['created_at'][:10]}")
-                        
                         if st.session_state.current_email == ADMIN_EMAIL: 
                             st.caption(f"👤 Tạo bởi: {p['user_email']}")
                         
@@ -421,12 +428,40 @@ with st.sidebar:
                                 supabase.table("saved_projects").delete().eq("id", p['id']).execute()
                                 st.toast("✅ Đã xóa dự án!")
                                 st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
 
-        # QUẢN TRỊ ADMIN (Thêm trường SĐT chăm sóc khách hàng)
+        # QUẢN TRỊ ADMIN (Tìm kiếm khách hàng, thanh cuộn & Nút Cập nhật trực tiếp)
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
-            st.markdown("### ⚙ QUẢN TRỊ ADMIN")
+            st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
+            
+            st.markdown("##### 🚨 Khách Sắp/Đã Hết Hạn")
+            expired_or_soon = []
+            for acc, info in st.session_state.licensed_accounts.items():
+                if acc == ADMIN_EMAIL: continue
+                exp_str = info.get("expires_at", "2099-12-31")
+                try:
+                    exp_dt = datetime.strptime(exp_str, "%Y-%m-%d")
+                    d_left = (exp_dt - datetime.now()).days
+                    if d_left <= 7:
+                        expired_or_soon.append((acc, info.get('phone', ''), d_left, exp_str))
+                except: pass
+            
+            if expired_or_soon:
+                for cust, phone, d_left, exp_str in expired_or_soon:
+                    status_text = f"Đã quá hạn {abs(d_left)} ngày" if d_left < 0 else (f"Hết hạn hôm nay!" if d_left == 0 else f"Còn {d_left} ngày")
+                    with st.container(border=True):
+                        st.markdown(f"**👤 {cust}**")
+                        st.caption(f"📞 SĐT: {phone or 'Chưa có'}<br>⚠️ Trạng thái: <b>{status_text}</b> ({exp_str})", unsafe_allow_html=True)
+                        if phone:
+                            clean_phone = re.sub(r'\D', '', phone)
+                            st.markdown(f"<a href='[https://zalo.me/](https://zalo.me/){clean_phone}' target='_blank' style='background:#0068ff; color:white; padding:4px 10px; border-radius:4px; text-decoration:none; font-size:11px; font-weight:700;'>💬 Nhắn Zalo nhắc hạn</a>", unsafe_allow_html=True)
+            else:
+                st.caption("✅ Không có khách nào sắp hết hạn trong 7 ngày tới.")
+            
+            st.markdown("---")
             with st.form("add_license"):
+                st.markdown("##### ➕ Cấp Quyền Khách Hàng Mới")
                 new_acc = st.text_input("Email khách hàng:")
                 new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Vd: 0968484369")
                 assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
@@ -440,18 +475,61 @@ with st.sidebar:
                     }
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
+                    st.rerun()
             
-            if st.session_state.licensed_accounts:
-                with st.expander(f"📋 Danh sách Khách hàng ({len(st.session_state.licensed_accounts)})"):
-                    for acc, info in list(st.session_state.licensed_accounts.items()):
+            # Ô tìm kiếm khách hàng
+            search_cust = st.text_input("🔍 Tìm kiếm khách hàng:", placeholder="Nhập Email hoặc SĐT", key="search_cust_input")
+            filtered_accs = list(st.session_state.licensed_accounts.items())
+            if search_cust:
+                filtered_accs = [(acc, info) for acc, info in filtered_accs if search_cust.lower() in acc.lower() or search_cust in str(info.get('phone', ''))]
+
+            if filtered_accs:
+                st.markdown(f"##### 📋 Danh sách Khách hàng ({len(filtered_accs)})")
+                st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
+                for acc, info in filtered_accs:
+                    with st.container(border=True):
                         st.markdown(f"**👤 {acc}**")
-                        st.caption(f"📞 SĐT: {info.get('phone', 'Chưa có SĐT')}<br>• Quyền: {', '.join(info.get('roles', ALL_MODULES))}<br>• Hết hạn: {info.get('expires_at')}", unsafe_allow_html=True)
-                        if acc != ADMIN_EMAIL and st.button(f"🗑 Xóa {acc}", key=f"del_acc_{acc}"):
-                            del st.session_state.licensed_accounts[acc]
-                            save_licensed_accounts(st.session_state.licensed_accounts)
-                            st.toast("✅ Đã xóa tài khoản!")
-                            st.rerun()
-                        st.markdown("---")
+                        phone_val = info.get('phone', '')
+                        roles_val = info.get('roles', ALL_MODULES)
+                        exp_val = info.get('expires_at', '2099-12-31')
+                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'}<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val}", unsafe_allow_html=True)
+                        
+                        if phone_val:
+                            clean_p = re.sub(r'\D', '', phone_val)
+                            st.markdown(f"<a href='[https://zalo.me/](https://zalo.me/){clean_p}' target='_blank' style='background:#0068ff; color:white; padding:4px 8px; border-radius:4px; text-decoration:none; font-size:10px; font-weight:700;'>💬 Nhắn Zalo</a>", unsafe_allow_html=True)
+                        
+                        # Nút mở form cập nhật trực tiếp tài khoản
+                        if acc != ADMIN_EMAIL:
+                            col_up, col_del = st.columns(2)
+                            with col_up:
+                                if st.button("✏️ Sửa", key=f"edit_acc_{acc}", use_container_width=True):
+                                    st.session_state.editing_acc_email = acc
+                            with col_del:
+                                if st.button(f"🗑 Xóa", key=f"del_acc_{acc}", type="secondary", use_container_width=True):
+                                    del st.session_state.licensed_accounts[acc]
+                                    save_licensed_accounts(st.session_state.licensed_accounts)
+                                    st.toast("✅ Đã xóa tài khoản!")
+                                    st.rerun()
+                        
+                        # Nếu đang chọn sửa tài khoản này
+                        if st.session_state.get("editing_acc_email") == acc:
+                            with st.form(f"update_form_{acc}" ):
+                                st.markdown(f"**Cập nhật cho: {acc}**")
+                                upd_phone = st.text_input("SĐT mới:", value=phone_val, key=f"upd_p_{acc}")
+                                upd_roles = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=roles_val, key=f"upd_r_{acc}")
+                                upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val, key=f"upd_e_{acc}")
+                                if st.form_submit_button("💾 Lưu Cập Nhật"):
+                                    st.session_state.licensed_accounts[acc] = {
+                                        "roles": upd_roles,
+                                        "phone": upd_phone.strip(),
+                                        "expires_at": upd_exp.strip()
+                                    }
+                                    save_licensed_accounts(st.session_state.licensed_accounts)
+                                    st.session_state.editing_acc_email = None
+                                    st.toast("✅ Đã cập nhật tài khoản thành công!")
+                                    st.rerun()
+                    st.markdown("---")
+                st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("---")
         st.markdown("""
@@ -459,9 +537,9 @@ with st.sidebar:
             <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
             <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
             <div class="social-icons-container">
-                <a href="#" class="btn-zalo" target="_blank">Zalo</a>
-                <a href="#" class="btn-fb" target="_blank">f</a>
-                <a href="#" class="btn-tt" target="_blank">♪</a>
+                <a href="[https://zalo.me/0968484369](https://zalo.me/0968484369)" target="_blank" class="btn-zalo">Zalo</a>
+                <a href="[https://facebook.com/](https://facebook.com/)" target="_blank" class="btn-fb">f</a>
+                <a href="[https://tiktok.com/](https://tiktok.com/)" target="_blank" class="btn-tt">♪</a>
             </div>
             <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0968.484.369</div>
         </div>
@@ -472,7 +550,7 @@ with st.sidebar:
         st.success(f"Đang dùng: {st.session_state.current_email}")
         if st.button("🚪 Đăng Xuất"):
             st.session_state.is_logged_in = False
-            st.toast("✅ Đăng xuất thành công!")
+            st.toast("✅ Đăng xuất!")
             st.rerun()
 
 if not st.session_state.is_logged_in:
