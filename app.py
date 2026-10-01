@@ -27,11 +27,6 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .support-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 12px; padding: 12px; text-align: center; margin-top: 15px; }
-    .btn-zalo { background: #0068FF; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #0056d6; }
-    .btn-fb { background: #1877F2; color: white !important; font-weight: 900; padding: 8px 24px; border-radius: 8px; text-decoration: none; font-size: 16px; border: 1px solid #166fe5; font-family: serif; }
-    .btn-tt { background: #000000; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #333; }
-    .social-icons-container { display: flex; gap: 12px; justify-content: center; margin-top: 10px; margin-bottom: 10px; }
-    .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
     @keyframes pulse { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.01); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
     .loading-pulse { animation: pulse 1.5s infinite ease-in-out; color: #d90429; font-weight: 800; text-align: center; padding: 25px; background: #fef2f2; border: 2px dashed #fca5a5; border-radius: 12px; margin: 20px 0; }
     .detail-header-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #1e3a8a; }
@@ -103,7 +98,7 @@ for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
     ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
-    ("current_product_data", None), ("current_input_context", ""),
+    ("current_input_context", ""), ("current_product_data_saved", None),
     ("action_trigger", None), ("action_param", None), ("reset_key", 0),
     ("scroll_to_top", False),
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
@@ -171,7 +166,7 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     🛑 QUY TẮC BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
     1. TỰ ĐỘNG CÂN ĐỐI THỜI LƯỢNG & SỐ CẢNH: Tự động phân bổ kịch bản thành ĐÚNG 3 HOẶC 4 PHÂN CẢNH TỐI ƯU NHẤT.
     2. CHỈ DÙNG MỐC THỜI GIAN CHUẨN: Mỗi phân cảnh BẮT BUỘC CHỈ ĐƯỢC PHÉP dài 4s, 6s, hoặc 8s (TUYỆT ĐỐI KHÔNG DÙNG 10s hoặc số lẻ).
-    3. NỐI LỀN MẠCH (MATCH CUT): Nếu cảnh là nối tiếp hành động của cảnh trước, Cảnh đó là Match Cut. Khi đó phần 'image_prompt' BẮT BUỘC phải ghi chính xác dòng chữ: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video". Không tự bịa prompt mới.
+    3. NỐI LIỀN MẠCH (MATCH CUT): Nếu cảnh là nối tiếp hành động của cảnh trước, Cảnh đó là Match Cut. Khi đó phần 'image_prompt' BẮT BUỘC phải ghi chính xác dòng chữ: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video". Không tự bịa prompt mới.
     4. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số vào kịch bản.
     5. VẬT LÝ & SẢN PHẨM: Giữ nguyên 100% hình dáng sản phẩm gốc. Miêu tả rõ các định luật vật lý (gió, nước, bóng đổ) vào Video prompt.
     6. GIỌNG NÓI ({narrator_mode}): Lời thoại phải đúng chính tả 100%, dễ đọc, ngắt nghỉ rõ ràng. {char_rules}
@@ -218,8 +213,15 @@ def clone_script(script_id):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if sc["id"] == script_id), None)
     cur_len = len(all_combined)
-    prompt = f"Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới với các Hook khác nhau. Format JSON key 'script_outlines' (id từ {cur_len+1})."
     
+    dna_str = json.dumps(st.session_state.content_analysis, ensure_ascii=False) if st.session_state.content_analysis else "Chưa có dữ liệu"
+    
+    prompt = f"""
+    DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
+    Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo 5 biến thể mới với các Hook khác nhau. 
+    Format JSON key 'script_outlines' (id từ {cur_len+1}).
+    """
     res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
@@ -234,9 +236,24 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     cur_len = len(all_combined)
-    prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data, ensure_ascii=False)}" if st.session_state.current_product_data else ""
-    prompt = f"{prod_ctx}\nYÊU CẦU MỚI: Thể loại '{angle}', {num_chars} nhân vật, thời lượng {duration_mins} phút.\nTạo thêm 5 kịch bản MỚI. Format JSON key 'script_outlines' (id từ {cur_len+1})."
     
+    prod_ctx = f"THÔNG TIN NGƯỜI DÙNG NHẬP: {st.session_state.current_input_context}"
+    db_ctx = f"SẢN PHẨM (DB): {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
+    dna_ctx = f"DNA SẢN PHẨM GỐC: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
+    
+    prompt = f"""
+    {prod_ctx}
+    {db_ctx}
+    {dna_ctx}
+    
+    YÊU CẦU MỞ RỘNG (CRITICAL: BẮT BUỘC GIỮ NGUYÊN SẢN PHẨM GỐC Ở TRÊN, KHÔNG ĐƯỢC BỊA SẢN PHẨM KHÁC):
+    - Thể loại / Góc tiếp cận: '{angle}'
+    - Số lượng nhân vật tham gia: {num_chars}
+    - Thời lượng mong muốn: {duration_mins} phút.
+    
+    Dựa ĐÚNG vào Sản phẩm Gốc, tạo thêm 5 kịch bản MỚI HOÀN TOÀN. 
+    Format JSON key 'script_outlines' (id từ {cur_len+1}).
+    """
     res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
@@ -282,6 +299,8 @@ with st.sidebar:
             st.session_state.generated_details, st.session_state.content_analysis = {}, None
             st.session_state.active_script_id = None
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+            st.session_state.current_input_context = ""
+            st.session_state.current_product_data_saved = None
             st.session_state.reset_key += 1 
             st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
@@ -350,10 +369,10 @@ with st.sidebar:
         <div class="support-box">
             <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
             <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
-            <div class="social-icons-container">
-                <a href="#" class="btn-zalo" target="_blank">Zalo</a>
-                <a href="#" class="btn-fb" target="_blank">f</a>
-                <a href="#" class="btn-tt" target="_blank">♪</a>
+            <div style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
+                <a href="[https://zalo.me/0968484369](https://zalo.me/0968484369)" target="_blank" style="background: #0068ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📱 Zalo</a>
+                <a href="[https://facebook.com/](https://facebook.com/)" target="_blank" style="background: #0866ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📘 Facebook</a>
+                <a href="[https://tiktok.com/](https://tiktok.com/)" target="_blank" style="background: #000000; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">🎵 TikTok</a>
             </div>
             <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0968.484.369</div>
         </div>
@@ -479,6 +498,8 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
             st.session_state.last_style = style
             st.session_state.last_aspect = aspect
             st.session_state.last_narrator = narrator_mode
+            st.session_state.current_input_context = custom_note
+            st.session_state.current_product_data_saved = st.session_state.current_product_data
             
             prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data, ensure_ascii=False)}" if st.session_state.current_product_data else ""
             prompt = f"""
@@ -524,7 +545,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 st.session_state.active_script_id = None
                 st.session_state.scroll_to_top = True
                 st.toast("✅ Đã sinh xong 5 kịch bản và phân tích DNA!")
-                time.sleep(1)
+                time.sleep(0.5)
                 st.rerun()
         except Exception as e:
             st.error(f"❌ Lỗi xử lý AI: {str(e)}")
@@ -547,7 +568,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (LÔJIC CHUẨN UX)
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -558,10 +579,10 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     # -------------------------------------------------------------------------
-    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN CÁC KỊCH BẢN CHỜ ĐI)
+    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN KỊCH BẢN CHỜ ĐI)
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
-        if st.button("⬅️️ Thu gọn và Quay lại danh sách tổng"):
+        if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
@@ -685,7 +706,6 @@ if all_combined_scripts_list:
                             st.session_state.action_param = sc_id
                             st.rerun()
 
-        # VÙNG GỌI THÊM NẰM DƯỚI CÙNG
         st.markdown("---")
         with st.container(border=True):
             st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
