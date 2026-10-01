@@ -22,8 +22,9 @@ st.markdown("""
     div[data-testid="stButton"] > button[kind="primary"] { background: linear-gradient(135deg, #e63946 0%, #d90429 100%) !important; color: white !important; border-radius: 8px !important; font-weight: bold; }
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
-    .social-icons { display: flex; justify-content: center; gap: 25px; margin-top: 10px; margin-bottom: 5px; }
-    .social-icons img { width: 42px; border-radius: 8px; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .social-icons { display: flex; justify-content: center; gap: 20px; margin-top: 10px; margin-bottom: 5px; }
+    /* ĐÃ ÉP CẢ WIDTH, HEIGHT VÀ OBJECT-FIT ĐỂ ICON LUÔN BẰNG NHAU TĂM TẮP */
+    .social-icons img { width: 42px; height: 42px; object-fit: cover; border-radius: 10px; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background-color: white; }
     .social-icons img:hover { transform: scale(1.15); }
     .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
 </style>
@@ -122,7 +123,7 @@ def save_project_to_db(email, title, content_list):
 
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) - CHUẨN UX MỚI
+# 3. THANH BÊN (SIDEBAR)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -213,19 +214,19 @@ with st.sidebar:
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.toast(f"✅ Đã cấp quyền thành công cho {new_acc}!")
 
-        # 4. HỖ TRỢ LIÊN HỆ (Đã đổi sang định dạng PNG để chống lỗi vỡ ảnh)
+        # 4. HỖ TRỢ LIÊN HỆ (Đã đổi thứ tự và đổi ảnh TikTok thành dạng hình vuông chữ J)
         st.markdown("---")
         st.markdown("### 🎧 HỖ TRỢ")
         st.markdown("""
         <div class="hotline-text">📞 0968.484.369</div>
         <div class="social-icons">
-            <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/120px-2021_Facebook_icon.svg.png" alt="Facebook"></a>
-            <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/TikTok_logo.svg/120px-TikTok_logo.svg.png" alt="TikTok"></a>
-            <a href="#" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/120px-Icon_of_Zalo.svg.png" alt="Zalo"></a>
+            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/120px-Icon_of_Zalo.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/120px-Icon_of_Zalo.svg.png)" alt="Zalo"></a>
+            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/120px-2021_Facebook_icon.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/120px-2021_Facebook_icon.svg.png)" alt="Facebook"></a>
+            <a href="#" target="_blank"><img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Tiktok_icon.svg/120px-Tiktok_icon.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Tiktok_icon.svg/120px-Tiktok_icon.svg.png)" alt="TikTok"></a>
         </div>
         """, unsafe_allow_html=True)
         
-        # 5. TÀI KHOẢN & ĐĂNG XUẤT (DƯỚI CÙNG KHI ĐÃ ĐĂNG NHẬP)
+        # 5. TÀI KHOẢN & ĐĂNG XUẤT (DƯỚI CÙNG)
         st.markdown("---")
         st.markdown("### 🔐 TÀI KHOẢN")
         st.success(f"Đang dùng: {st.session_state.current_email}")
@@ -282,7 +283,7 @@ with col_m: mode = st.selectbox("🎯 Thể loại (Chỉ đạo cốt lõi):", 
 with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key="style_sel")
 with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key="aspect_sel")
 
-narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key="narrator_sel")
+narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key="narrator_sel")
 
 col_p_img, col_c_img = st.columns([1, 1])
 with col_p_img:
@@ -290,7 +291,6 @@ with col_p_img:
 with col_c_img:
     num_chars = st.number_input("👤 Số lượng Diễn viên (Tối đa 8):", min_value=0, max_value=8, step=1, key="num_chars_main")
 
-# Hiển thị nhân vật tối đa 8 người
 char_inputs = []
 if num_chars > 0:
     for i in range(0, num_chars, 4):
@@ -357,7 +357,7 @@ if st.session_state.all_scripts and st.session_state.active_script_id is None:
 
 if st.session_state.active_script_id and st.session_state.active_script_id in st.session_state.generated_details:
     st.divider()
-    if st.button("⬅️ Quay lại danh sách tổng"):
+    if st.button("⬅️️ Quay lại danh sách tổng"):
         st.session_state.active_script_id = None
         st.toast("✅ Đã quay lại danh sách!")
         st.rerun()
