@@ -365,7 +365,7 @@ with st.sidebar:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
                 if 0 <= days_left <= 7:
-                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
+                    st.warning(f"⚠️️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -592,7 +592,7 @@ if not st.session_state.is_logged_in:
 # ==============================================================================
 # 4. XỬ LÝ NÚT BẤM ĐỘNG AI (ĐA VŨ TRỤ) - LOADING SCREEN & AUTO SCROLL TO TOP
 # ==============================================================================
-if st.session_state.action_trigger:
+if st.session_state.get("action_trigger"):
     action = st.session_state.action_trigger
     param = st.session_state.action_param
     st.session_state.action_trigger = None
@@ -657,7 +657,7 @@ if supabase:
                 st.markdown(f"**💔 Nỗi đau:** {prod.get('pain_points', '')}")
 
 st.markdown("---")
-st.markdown("### ⚙️ Thiết Lập Đạo Diễn & Nguồn Ảnh")
+st.markdown("### ⚙️️ Thiết Lập Đạo Diễn & Nguồn Ảnh")
 col_m, col_s, col_r = st.columns(3)
 with col_m: mode = st.selectbox("🎯 Thể loại (Đã được phân quyền):", allowed_categories, key=f"mode_sel_{st.session_state.reset_key}")
 with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
@@ -888,6 +888,6 @@ if all_combined_scripts_list:
         with col_g2:
             st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_main", type="primary", use_container_width=True):
+        if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_main", type="primary"):
             st.session_state.action_trigger = "generate_more"
             st.rerun()
