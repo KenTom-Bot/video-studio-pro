@@ -99,12 +99,11 @@ def format_analysis_field(field_val) -> str:
     formatted = [f"<div style='margin-top: 6px;'>{line}</div>" if line.startswith('•') else f"<div style='margin-left: 15px; margin-top: 4px;'>• {line}</div>" for line in lines if line]
     return "".join(formatted) if formatted else text
 
-# Khởi tạo TOÀN BỘ các biến Session State
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
     ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
-    ("current_product_data", None), ("current_input_context", ""), ("current_product_data_saved", None),
+    ("current_input_context", ""), ("current_product_data_saved", None),
     ("action_trigger", None), ("action_param", None), ("reset_key", 0),
     ("scroll_to_top", False),
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
@@ -287,10 +286,10 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
 
-def save_project_to_db(email, title, content_list):
+def save_project_to_db(email, title, payload_data):
     if not supabase: return "Chưa kết nối Database Supabase."
     try:
-        clean_content = json.loads(json.dumps(content_list, default=str)) 
+        clean_content = json.loads(json.dumps(payload_data, default=str)) 
         data = {"user_email": email, "project_title": title, "script_content": clean_content}
         supabase.table("saved_projects").insert(data).execute()
         return True
@@ -301,7 +300,7 @@ def save_project_to_db(email, title, content_list):
         return err_msg
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN
+# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN (GỌN GÀNG, MỞ DỰ ÁN)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -342,7 +341,17 @@ with st.sidebar:
             if not all_com: 
                 st.warning("⚠️ Chưa có kịch bản nào để lưu!")
             else:
-                save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, all_com)
+                # Lưu toàn bộ State để phục hồi nguyên trạng
+                payload = {
+                    "content_analysis": st.session_state.content_analysis,
+                    "all_scripts": st.session_state.all_scripts,
+                    "cloned_scripts": st.session_state.cloned_scripts,
+                    "expanded_scripts": st.session_state.expanded_scripts,
+                    "generated_details": st.session_state.generated_details,
+                    "character_profiles": st.session_state.character_profiles,
+                    "current_input_context": st.session_state.current_input_context
+                }
+                save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload)
                 if save_result is True:
                     st.toast("✅ Đã lưu dự án vào Database thành công!")
                 else:
@@ -362,13 +371,40 @@ with st.sidebar:
             else:
                 for p in projects:
                     with st.expander(f"🎬 {p['project_title']}"):
-                        st.caption(f"{p['created_at'][:10]}")
-                        if st.session_state.current_email == ADMIN_EMAIL: st.caption(f"Tạo bởi: {p['user_email']}")
-                        for i, sc in enumerate(p.get("script_content", [])): st.write(f"- {sc.get('title', 'Idea')}")
-                        if st.button("🗑️ Xóa", key=f"del_{p['id']}", use_container_width=True):
-                            supabase.table("saved_projects").delete().eq("id", p['id']).execute()
-                            st.toast("✅ Đã xóa dự án!")
-                            st.rerun()
+                        st.caption(f"📅 {p['created_at'][:10]}")
+                        if st.session_state.current_email == ADMIN_EMAIL: st.caption(f"👤 Tạo bởi: {p['user_email']}")
+                        
+                        col_open, col_del = st.columns(2)
+                        with col_open:
+                            if st.button("📂 Mở", key=f"open_{p['id']}", use_container_width=True):
+                                saved_data = p.get("script_content", {})
+                                if isinstance(saved_data, dict):
+                                    st.session_state.content_analysis = saved_data.get("content_analysis")
+                                    st.session_state.all_scripts = saved_data.get("all_scripts", [])
+                                    st.session_state.cloned_scripts = saved_data.get("cloned_scripts", [])
+                                    st.session_state.expanded_scripts = saved_data.get("expanded_scripts", [])
+                                    raw_details = saved_data.get("generated_details", {})
+                                    st.session_state.generated_details = {int(k): v for k, v in raw_details.items()} if raw_details else {}
+                                    st.session_state.character_profiles = saved_data.get("character_profiles", [])
+                                    st.session_state.current_input_context = saved_data.get("current_input_context", "")
+                                elif isinstance(saved_data, list):
+                                    st.session_state.all_scripts = saved_data
+                                    st.session_state.content_analysis = None
+                                    st.session_state.cloned_scripts = []
+                                    st.session_state.expanded_scripts = []
+                                    st.session_state.generated_details = {}
+                                
+                                st.session_state.active_project_title = p['project_title']
+                                st.session_state.active_script_id = None
+                                st.session_state.reset_key += 1
+                                st.session_state.scroll_to_top = True
+                                st.toast("✅ Đã khôi phục toàn bộ không gian dự án!")
+                                st.rerun()
+                        with col_del:
+                            if st.button("🗑️ Xóa", key=f"del_{p['id']}", type="secondary", use_container_width=True):
+                                supabase.table("saved_projects").delete().eq("id", p['id']).execute()
+                                st.toast("✅ Đã xóa dự án!")
+                                st.rerun()
 
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
@@ -606,7 +642,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (LÔJIC CHUẨN UX)
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -617,7 +653,7 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     # -------------------------------------------------------------------------
-    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN CÁC KỊCH BẢN CHỜ ĐI)
+    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
         if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
