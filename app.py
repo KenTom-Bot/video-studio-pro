@@ -120,7 +120,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CƠ CHẾ ĐỒNG BỘ GIỌNG NÓI, LIPS-SYNC VÀ CHUYỂN CẢNH LINH HOẠT
+# 2. HÀM AI LÕI & CƠ CHẾ PHÂN TÍCH NHỊP ĐỘ, LIPS-SYNC & THỜI GIAN THỰC
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -153,17 +153,17 @@ def generate_char_rules_string(profiles):
     if not profiles: return "🔹 NHÂN VẬT: Linh hoạt theo kịch bản."
     rules = "🔹 KHÓA KHUÔN MẶT KOC & LIPS-SYNC:\n"
     for p in profiles: 
-        rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}' để khóa chặt khuôn mặt và khẩu hình miệng.\n"
+        rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}' để khóa khuôn mặt và khẩu hình miệng.\n"
     return rules
 
 def get_dynamic_realtime_context():
     now = datetime.now()
     month = now.month
     year = now.year
-    if month in [12, 1, 2]: season_desc = f"Mùa Đông / Tết Nguyên Đán ({month}/{year}). Bối cảnh thời tiết lạnh giá, không khí sum vầy, nhu cầu giữ ấm."
-    elif month in [3, 4, 5]: season_desc = f"Mùa Xuân / Giao mùa ({month}/{year}). Bối cảnh thời tiết ấm áp, mưa phùn hoặc se lạnh nhẹ."
-    elif month in [6, 7, 8]: season_desc = f"Mùa Hè / Nắng Nóng ({month}/{year}). Bối cảnh thời tiết oi bức, giải nhiệt, du lịch."
-    else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year}). Bối cảnh thời tiết gió thu lãng mạn, se lạnh về đêm."
+    if month in [12, 1, 2]: season_desc = f"Mùa Đông / Tết Nguyên Đán ({month}/{year}). Thời tiết lạnh giá, nhu cầu giữ ấm, không khí sum vầy."
+    elif month in [3, 4, 5]: season_desc = f"Mùa Xuân / Giao mùa ({month}/{year}). Thời tiết ấm áp, mưa phùn hoặc se lạnh nhẹ."
+    elif month in [6, 7, 8]: season_desc = f"Mùa Hè / Nắng Nóng ({month}/{year}). Thời tiết oi bức, giải nhiệt, du lịch biển."
+    else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year}). Thời tiết gió thu lãng mạn, se lạnh về đêm, chăm sóc giấc ngủ."
     return f"THỜI GIAN THỰC TẾ: {season_desc}. Toàn bộ bối cảnh, ánh sáng, trang phục phải phản ánh chính xác thời điểm thực tế này."
 
 def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
@@ -175,9 +175,11 @@ def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA:
     1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc lôi cuốn cho người xem.
-    3. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%. Cấm báo giá tiền cụ thể.
-    4. GIỌNG NÓI: Giọng Bắc (Hà Nội) chuẩn, nhịp điệu dồn dập, lôi cuốn. Khóa cố định môi trường và trang phục. {char_rules}
+    2. PHÂN TÍCH NHỊP ĐỘ & CẢM XÚC THEO THỂ LOẠI: 
+       - Kịch bản Chốt sale / Flash Sale / Review: Nhịp độ phải NHANH, DỒN DẬP, MẠNH MẼ (nhiều từ hơn trong một phân cảnh, từ ngữ sắc bén, kích thích chốt đơn).
+       - Kịch bản Cảm xúc / Đời sống (PAS) / Kể chuyện: Nhịp độ CHẬM RÃI, TRẦM ẤM, NHIỀU BIỂU CẢM (ít từ hơn, nhiều khoảng lặng / pauses để người xem thấm đượm cảm xúc).
+    3. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc.
+    4. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, cấm từ y tế cam kết 100% và cấm báo giá tiền cụ thể bằng con số. {char_rules}
     """
 
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
@@ -189,10 +191,9 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT:
     1. HÌNH THỨC THUYẾT MINH & LIPS-SYNC: {narrator_instruction}
-    2. CHUYỂN CẢNH LINH HOẠT (CẮT CẢNH / NỐI LIỀN MẠCH): Dựa vào diễn biến kịch bản để tự quyết định chuyển cảnh. Nếu đổi góc nhìn hoặc bước sang tình huống mới, BẮT BUỘC dùng Cắt cứng (Hard Cut) với prompt ảnh hoàn toàn mới. Chỉ dùng Nối liền mạch (Match Cut) khi cảnh sau là hành động tiếp diễn trực tiếp của cảnh trước.
-    3. NGẮT NGHỈ CẢM XÚC: Câu thoại `voiceover_vi` phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`).
-    4. PHÂN CẢNH CHUẨN: Chia ĐÚNG 3 hoặc 4 cảnh, mỗi cảnh dài 4s, 6s hoặc 8s (Cấm dùng 10s).
-    5. {char_rules}
+    2. PHÂN TÍCH NHỊP ĐỘ & SỐ LƯỢNG TỪ: Tự động phân bổ số lượng từ trong lời thoại phù hợp với cảm xúc (Dồn dập cho bán hàng; Chậm rãi, sâu lắng cho cảm xúc). Đảm bảo phân cảnh dài 4s, 6s hoặc 8s.
+    3. CHUYỂN CẢNH LINH HOẠT (CẮT CẢNH / NỐI LIỀN MẠCH): Dựa vào diễn biến kịch bản để tự quyết định chuyển cảnh. Dùng Cắt cứng (Hard Cut) khi chuyển ý, đổi không gian. Chỉ dùng Nối liền mạch (Match Cut) khi cảnh sau là hành động tiếp diễn trực tiếp của cảnh trước.
+    4. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
@@ -212,17 +213,17 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
         "title": "{outline.get('title')}",
         "total_estimated_duration": "24s (0.4 phút)",
         "script_outfit_setup": "Nữ diễn viên mặc trang phục phù hợp với thời tiết hiện tại",
-        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ nhanh, dồn dập, giọng Miền Bắc chuẩn, ngắt nghỉ cảm xúc"}},
+        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ linh hoạt theo cảm xúc kịch bản, giọng Miền Bắc chuẩn"}},
         "scenes": [
             {{
                 "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh...",
-                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, nhấn mạnh từ khóa...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera with perfect lip-sync, expressing emotion with pauses...' if is_on_camera else 'Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, product showcase...'}"
+                "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, ngắt nghỉ cảm xúc...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
+                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera with perfect lip-sync matching the Vietnamese speech, natural facial expressions...' if is_on_camera else 'Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, product showcase...'}"
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "Chuyển cảnh linh hoạt (Cắt cứng hoặc Match Cut tùy tình huống)", "scene_setting": "Góc quay tiếp theo...",
-                "voice_director_vn": "Nhấn giọng hào hứng...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Extreme close-up shot, perfect lip-sync, talking directly to camera...' if is_on_camera else 'Extreme close-up shot, off-screen voiceover...'}"
+                "scene_number": 2, "duration": "6s", "transition_type": "Chuyển cảnh linh hoạt (Cắt cứng hoặc Match Cut)", "scene_setting": "Góc quay tiếp theo...",
+                "voice_director_vn": "Nhấn giọng tạo cao trào...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
+                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Extreme close-up shot, perfect lip-sync, talking directly to camera, matching voice emotion...' if is_on_camera else 'Extreme close-up shot, off-screen voiceover...'}"
             }}
         ]
     }}
