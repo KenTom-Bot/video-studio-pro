@@ -188,7 +188,7 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT PROMPT VEO 3 & LIPS-SYNC:
     1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
     2. TÍCH HỢP THOẠI TRỰC TIẾP VÀO VEO 3 PROMPT: 
-       - Nếu chọn On-camera (Lip-sync): Phần `video_prompt` phải có cấu trúc: `Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: '[Điền nguyên văn câu thoại voiceover_vi]' with perfect lip-sync matching the speech, natural facial expressions`.
+       - Nếu chọn On-camera (Lip-sync): Phần `video_prompt` phải có lệnh miêu tả hành động kết hợp `character talking directly to camera, speaking the Vietnamese line: '[Điền nguyên văn câu thoại voiceover_vi]' with perfect lip-sync matching the speech, natural facial expressions`.
        - Nếu chọn Off-screen: Phần `video_prompt` phải miêu tả góc quay sản phẩm kết hợp `off-screen voiceover with emotional pauses`.
     3. PHÂN TÍCH CHUYỂN CẢNH THÔNG MINH: Tự phân tích tình huống kịch bản để chọn Cắt cứng (Hard Cut) với ảnh mới hoặc Nối liền mạch (Match Cut) đúng bản chất vật lý.
     4. {char_rules}
@@ -202,6 +202,14 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     time_ctx = get_dynamic_realtime_context()
     is_on_camera = "On-camera" in narrator_mode
     
+    # Định nghĩa prompt video dựa trên rẽ nhánh Python sạch sẽ, chống lỗi cú pháp
+    if is_on_camera:
+        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?' with perfect lip-sync matching the speech, natural facial expressions, slow camera zoom in..."
+        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!' with perfect lip-sync matching the speech, expressive emotions..."
+    else:
+        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, slow camera zoom in on the product..."
+        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, off-screen voiceover, product detail showcase..."
+
     prompt = f"""
     {time_ctx}
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('target_hook')}. Bối cảnh: {outline.get('setting_style')}.
@@ -216,12 +224,12 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
             {{
                 "scene_number": 1, "duration": "8s", "transition_type": "Mở đầu (Master Anchor Shot)", "scene_setting": "Góc toàn cảnh...",
                 "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, ngắt nghỉ cảm xúc...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: \\'Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?\\' with perfect lip-sync matching the speech, natural facial expressions...' if is_on_camera else 'Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, product showcase...'}"
+                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{vid_p_1}"
             }},
             {{
                 "scene_number": 2, "duration": "6s", "transition_type": "Chuyển cảnh linh hoạt (Cắt cứng hoặc Match Cut dựa trên phân tích tình huống)", "scene_setting": "Góc quay tiếp theo...",
                 "voice_director_vn": "Nhấn giọng tạo cao trào...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
-                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Extreme close-up shot, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: \\'Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!\\' with perfect lip-sync matching the speech...' if is_on_camera else 'Extreme close-up shot, off-screen voiceover...'}"
+                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{vid_p_2}"
             }}
         ]
     }}
@@ -458,7 +466,7 @@ with st.sidebar:
                                     st.toast("✅ Đã khôi phục toàn bộ không gian dự án!")
                                     st.rerun()
                         with col_del:
-                            if st.button("🗑️️ Xóa", key=f"del_{p['id']}", type="secondary", use_container_width=True):
+                            if st.button("🗑️ Xóa", key=f"del_{p['id']}", type="secondary", use_container_width=True):
                                 supabase.table("saved_projects").delete().eq("id", p['id']).execute()
                                 st.toast("✅ Đã xóa dự án!")
                                 st.rerun()
@@ -684,7 +692,7 @@ if num_chars > 0:
                     c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}", label_visibility="collapsed")
                     if c_file and c_role: char_inputs.append({"id": idx+1, "role": c_role, "file": c_file})
 
-custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
+custom_note = st.text_area("✍️️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
 
 if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
     with st.spinner("⏳ Đạo diễn AI đang phân tích dữ liệu sản phẩm, tâm lý khách hàng và sinh 5 kịch bản chuẩn chiến lược... Vui lòng đợi..."):
