@@ -387,7 +387,7 @@ with st.sidebar:
             if search_proj:
                 projects = [p for p in projects if search_proj.lower() in p['project_title'].lower() or search_proj in p['created_at']]
 
-            if not projects: st.info("Không tìm thấy dự án phù hợp.")
+            if not projects: st.info("Bạn chưa có dự án nào!")
             else:
                 # Dùng khung chứa có thanh cuộn ẩn bớt khi danh sách dài
                 st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
