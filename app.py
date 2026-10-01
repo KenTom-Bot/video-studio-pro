@@ -737,7 +737,7 @@ if all_combined_scripts_list:
             with col_g3:
                 st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_detail_{st.session_state.reset_key}")
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_detail", type="primary", use_container_width=True):
+            if st.button("🚀 Thêm 5 Kịch Bản Mới", key="btn_add_more_detail", type="primary", use_container_width=True):
                 st.session_state.action_trigger = "generate_more"
                 st.rerun()
 
