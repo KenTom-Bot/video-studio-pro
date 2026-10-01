@@ -99,12 +99,12 @@ def format_analysis_field(field_val) -> str:
     formatted = [f"<div style='margin-top: 6px;'>{line}</div>" if line.startswith('•') else f"<div style='margin-left: 15px; margin-top: 4px;'>• {line}</div>" for line in lines if line]
     return "".join(formatted) if formatted else text
 
-# Khởi tạo TOÀN BỘ các biến Session State
+# Khởi tạo TOÀN BỘ các biến Session State an toàn
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
     ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
-    ("current_input_context", ""), ("current_product_data_saved", None),
+    ("current_input_context", ""), ("current_product_data_saved", None), ("current_product_data", None),
     ("action_trigger", None), ("action_param", None), ("reset_key", 0),
     ("scroll_to_top", False),
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
@@ -289,7 +289,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     return more_scripts
 
 def save_project_to_db(email, title, payload_data):
-    if not supabase: return "Sai đường dẫn SUPABASE_URL hoặc mất kết nối mạng. Hãy kiểm tra lại file cấu hình."
+    if not supabase: return "Chưa kết nối Database Supabase."
     try:
         clean_content = json.loads(json.dumps(payload_data, default=str)) 
         data = {"user_email": email, "project_title": title, "script_content": clean_content}
@@ -333,7 +333,6 @@ with st.sidebar:
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.session_state.current_input_context = ""
             st.session_state.current_product_data_saved = None
-            st.session_state.character_profiles = []
             st.session_state.reset_key += 1 
             st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
@@ -375,7 +374,6 @@ with st.sidebar:
                     with st.expander(f"🎬 {p['project_title']}"):
                         st.caption(f"📅 {p['created_at'][:10]}")
                         
-                        # CHỈ ADMIN MỚI THẤY NGƯỜI TẠO ĐỂ GIAO DIỆN KHÁCH HÀNG SẠCH SẼ
                         if st.session_state.current_email == ADMIN_EMAIL: 
                             st.caption(f"👤 Tạo bởi: {p['user_email']}")
                         
@@ -439,15 +437,15 @@ with st.sidebar:
         st.markdown("---")
         st.markdown("""
         <div class="support-box">
-        <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
-        <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
-        <div style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
-            <a href="https://zalo.me/0968484369" target="_blank" style="background: #0068ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📱 Zalo</a>
-            <a href="https://facebook.com/your_facebook" target="_blank" style="background: #0866ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📘 Facebook</a>
-            <a href="https://tiktok.com/@your_tiktok" target="_blank" style="background: #000000; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">🎵 TikTok</a>
+            <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
+            <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
+            <div class="social-icons-container">
+                <a href="#" class="btn-zalo" target="_blank">Zalo</a>
+                <a href="#" class="btn-fb" target="_blank">f</a>
+                <a href="#" class="btn-tt" target="_blank">♪</a>
+            </div>
+            <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0968.484.369</div>
         </div>
-        <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 096 8484 369</div>
-    </div>
         """, unsafe_allow_html=True)
         
         st.markdown("---")
@@ -507,7 +505,7 @@ if st.session_state.action_trigger:
 # ==============================================================================
 # 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
 
 current_acc_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
 allowed_categories = [m for m in ALL_MODULES if m in current_acc_info.get("roles", ALL_MODULES)]
@@ -539,7 +537,7 @@ with col_m: mode = st.selectbox("🎯 Thể loại (Đã được phân quyền)
 with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
 with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key=f"aspect_sel_{st.session_state.reset_key}")
 
-narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
+narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙 Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
 
 col_p_img, col_c_img = st.columns([1, 1])
 with col_p_img:
@@ -559,9 +557,9 @@ if num_chars > 0:
                     c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}")
                     if c_file and c_role: char_inputs.append({"id": idx+1, "role": c_role, "file": c_file})
 
-custom_note = st.text_area("✍️ Thêm ý tưởng ở đây:", key=f"note_main_{st.session_state.reset_key}")
+custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
 
-if st.button("🚀 PHÂN TÍCH SẢN PHẨM VÀ TẠO Ý TƯỞNG", type="primary", use_container_width=True):
+if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
     with st.spinner("Đạo diễn AI đang tính toán vật lý, nhân vật, và luật TikTok..."):
         try:
             st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
@@ -571,9 +569,9 @@ if st.button("🚀 PHÂN TÍCH SẢN PHẨM VÀ TẠO Ý TƯỞNG", type="primar
             st.session_state.last_aspect = aspect
             st.session_state.last_narrator = narrator_mode
             st.session_state.current_input_context = custom_note
-            st.session_state.current_product_data_saved = st.session_state.current_product_data
+            st.session_state.current_product_data_saved = st.session_state.get("current_product_data")
             
-            prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data, ensure_ascii=False)}" if st.session_state.current_product_data else ""
+            prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.get('current_product_data'), ensure_ascii=False)}" if st.session_state.get("current_product_data") else ""
             prompt = f"""
             {prod_ctx}
             GHI CHÚ DỰ ÁN: {custom_note}
@@ -737,7 +735,7 @@ if all_combined_scripts_list:
             with col_g3:
                 st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_detail_{st.session_state.reset_key}")
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🚀 Thêm 5 Kịch Bản Mới", key="btn_add_more_detail", type="primary", use_container_width=True):
+            if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_detail", type="primary", use_container_width=True):
                 st.session_state.action_trigger = "generate_more"
                 st.rerun()
 
