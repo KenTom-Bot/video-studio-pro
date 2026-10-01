@@ -722,7 +722,7 @@ if st.button("🚀 PHÂN TÍCH SẢN PHẨM VÀ TẠO KỊCH BẢN", type="prima
 # ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
 if st.session_state.content_analysis and isinstance(st.session_state.content_analysis, dict):
     st.divider()
-    st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Đa Tầng**")
+    st.markdown(f"### 🔍 **Phân Tích Sản Phẩm Chi Tiết**")
     ca = st.session_state.content_analysis
     with st.container(border=True):
         st.markdown("##### 🎯 **1. Chân dung Khách hàng & Nỗi đau:**")
