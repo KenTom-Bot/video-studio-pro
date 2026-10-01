@@ -107,7 +107,7 @@ for key, default_val in [
     ("action_trigger", None), ("action_param", None), ("reset_key", 0),
     ("scroll_to_top", False),
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
-    ("extra_num_chars", 1), ("extra_duration_mins", 1.0),
+    ("extra_num_chars", 1),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", ""), ("last_style", ""), ("last_aspect", "9:16 (Dọc TikTok/Reels)"), ("last_narrator", ""),
     ("character_profiles", []), ("editing_acc_email", None), ("current_project_id", None)
@@ -176,10 +176,9 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     1. DANH MỤC CẤM & HẠN CHẾ: 
        - CẤM TUYỆT ĐỐI các sản phẩm y dược, thuốc chữa bệnh, thực phẩm chức năng cam kết trị bệnh triệt để.
        - Ngành Mẹ & Bé / Trẻ em: Tuyệt đối không để trẻ em một mình trong cảnh quay, không chứa yếu tố nguy hiểm, không dùng từ ngữ phóng đại y tế.
-       - Các mặt hàng cấm khác theo chính sách tiêu chuẩn của thương mại điện tử.
     2. CẤM BÁO GIÁ CỤ THỂ: Tuyệt đối KHÔNG đưa giá tiền bằng con số (VD: cấm "99k", "150 nghìn"). Chỉ dùng từ hướng dẫn ưu đãi ("deal hời", "giá sốc góc màn hình").
     3. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    4. ĐẠO DINH NGỮ ĐIỆU & SFX (BẮT BUỘC ĐỊNH DẠNG RÕ RÀNG): Phải chỉ định rõ Giới tính & Vùng miền chuẩn (VD: "Giọng Nữ Miền Bắc (chuẩn)" hoặc "Giọng Nam Miền Bắc (chuẩn)"), kết hợp cùng Tông giọng và Mục đích ngữ điệu cụ thể (VD: "nhịp độ nhanh, dồn dập, nhằm kích thích hối hả chốt đơn").
+    4. ĐẠO DIỄN NGỮ ĐIỆU & SFX (BẮT BUỘC ĐỊNH DẠNG RÕ RÀNG): Phải chỉ định rõ Giới tính & Vùng miền chuẩn (VD: "Giọng Nữ Miền Bắc (chuẩn)" hoặc "Giọng Nam Miền Bắc (chuẩn)"), kết hợp cùng Tông giọng và Mục đích ngữ điệu cụ thể (VD: "nhịp độ nhanh, dồn dập, nhằm kích thích hối hả chốt đơn").
     5. ĐỒNG NHẤT 100%: Giữ nguyên trang phục, kiểu tóc, khuôn mặt KOC và bối cảnh ở mọi cảnh.
     6. CƠ CHẾ CẢNH NỐI TIẾP & ANCHOR FRAME: Dùng "Chuyển cảnh mới (Tạo ảnh mới)" hoặc "Cảnh nối tiếp (Dùng lại ảnh cuối)" với lệnh neo hình `holding the final frame steady as a reference anchor`.
     7. {char_rules}
@@ -260,12 +259,12 @@ def clone_script(script_id):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. CẤM BÁO GIÁ VÀ VI PHẠM Y TẾ.
     """
-    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
+    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules))
     clones = res.get("script_outlines", [])
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
     return clones
 
-def generate_more_scripts(angle, num_chars, duration_mins):
+def generate_more_scripts(angle, num_chars):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
     aspect = st.session_state.get("last_aspect", "9:16 (Dọc TikTok/Reels)")
@@ -290,7 +289,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     1. GIỮ NGUYÊN SẢN PHẨM GỐC. CẤM BÁO GIÁ TIỀN CỤ THỂ VÀ CẤM VI PHẠM Y TẾ / MẸ BÉ.
     2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'.
     3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
-    4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật | THỜI LƯỢNG: {duration_mins} phút.
+    4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật.
     5. BẮT BUỘC TẠO CHÍNH XÁC 5 KỊCH BẢN MỚI TRONG MẢNG `script_outlines`.
     
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
@@ -306,7 +305,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. CẤM BÁO GIÁ.
     """
-    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
+    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules))
     more_scripts = res.get("script_outlines", [])
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
@@ -340,23 +339,24 @@ with st.sidebar:
         st.markdown("### 🔐 ĐĂNG NHẬP")
         email_input = st.text_input("Nhập Email:", key="login_email_input")
         if st.button("🔑 Đăng Nhập", type="primary"):
-            email_check = email_input.strip()
-            if email_check in st.session_state.licensed_accounts:
-                acc_info = st.session_state.licensed_accounts[email_check]
-                exp_date_str = acc_info.get("expires_at", "2099-12-31")
-                try:
-                    exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
-                    if datetime.now() > exp_date:
-                        st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
-                        st.stop()
-                except: pass
-                
-                st.session_state.is_logged_in = True
-                st.session_state.current_email = email_check
-                st.toast("✅ Đăng nhập thành công!")
-                st.rerun()
-            else: 
-                st.error("Tài khoản chưa được cấp quyền!")
+            with st.spinner("⏳ Đang xác thực đăng nhập..."):
+                email_check = email_input.strip()
+                if email_check in st.session_state.licensed_accounts:
+                    acc_info = st.session_state.licensed_accounts[email_check]
+                    exp_date_str = acc_info.get("expires_at", "2099-12-31")
+                    try:
+                        exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
+                        if datetime.now() > exp_date:
+                            st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
+                            st.stop()
+                    except: pass
+                    
+                    st.session_state.is_logged_in = True
+                    st.session_state.current_email = email_check
+                    st.toast("✅ Đăng nhập thành công!")
+                    st.rerun()
+                else: 
+                    st.error("Tài khoản chưa được cấp quyền!")
     else:
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
@@ -365,22 +365,23 @@ with st.sidebar:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
                 if 0 <= days_left <= 7:
-                    st.warning(f"⚠️️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
+                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Vui lòng liên hệ hotline bên dưới để gia hạn!")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True):
-            st.session_state.all_scripts, st.session_state.cloned_scripts, st.session_state.expanded_scripts = [], [], []
-            st.session_state.generated_details, st.session_state.content_analysis = {}, None
-            st.session_state.active_script_id = None
-            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
-            st.session_state.current_input_context = ""
-            st.session_state.current_product_data_saved = None
-            st.session_state.character_profiles = []
-            st.session_state.current_project_id = None
-            st.session_state.reset_key += 1 
-            st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
-            st.rerun()
+            with st.spinner("⏳ Đang khởi tạo dự án mới..."):
+                st.session_state.all_scripts, st.session_state.cloned_scripts, st.session_state.expanded_scripts = [], [], []
+                st.session_state.generated_details, st.session_state.content_analysis = {}, None
+                st.session_state.active_script_id = None
+                st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+                st.session_state.current_input_context = ""
+                st.session_state.current_product_data_saved = None
+                st.session_state.character_profiles = []
+                st.session_state.current_project_id = None
+                st.session_state.reset_key += 1 
+                st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
+                st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", st.session_state.active_project_title)
         if st.button("💾 Lưu Dự Án Này", use_container_width=True):
@@ -618,7 +619,7 @@ if st.session_state.action_trigger:
                 
         elif action == "generate_more":
             with st.spinner(f"⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới theo chiến lược '{st.session_state.extra_angle_type}'... Vui lòng đợi trong giây lát..."):
-                new_scripts = generate_more_scripts(st.session_state.extra_angle_type, st.session_state.extra_num_chars, st.session_state.extra_duration_mins)
+                new_scripts = generate_more_scripts(st.session_state.extra_angle_type, st.session_state.extra_num_chars)
                 st.session_state.expanded_scripts.extend(new_scripts)
                 st.session_state.scroll_to_top = True
                 st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
@@ -881,13 +882,11 @@ if all_combined_scripts_list:
     st.markdown("---")
     with st.container(border=True):
         st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
-        col_g1, col_g2, col_g3 = st.columns([2, 1, 1])
+        col_g1, col_g2 = st.columns([2, 1])
         with col_g1:
             st.session_state.extra_angle_type = st.selectbox("Định hướng chiến lược:", ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"], key=f"extra_angle_selectbox_main_{st.session_state.reset_key}")
         with col_g2:
             st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
-        with col_g3:
-            st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_main_{st.session_state.reset_key}")
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_main", type="primary", use_container_width=True):
             st.session_state.action_trigger = "generate_more"
