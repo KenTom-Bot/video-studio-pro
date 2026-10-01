@@ -99,11 +99,12 @@ def format_analysis_field(field_val) -> str:
     formatted = [f"<div style='margin-top: 6px;'>{line}</div>" if line.startswith('•') else f"<div style='margin-left: 15px; margin-top: 4px;'>• {line}</div>" for line in lines if line]
     return "".join(formatted) if formatted else text
 
+# Khởi tạo TOÀN BỘ các biến Session State
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
     ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
-    ("current_input_context", ""), ("current_product_data_saved", None),
+    ("current_product_data", None), ("current_input_context", ""), ("current_product_data_saved", None),
     ("action_trigger", None), ("action_param", None), ("reset_key", 0),
     ("scroll_to_top", False),
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
@@ -287,7 +288,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     return more_scripts
 
 def save_project_to_db(email, title, content_list):
-    if not supabase: return "Sai đường dẫn SUPABASE_URL hoặc mất kết nối mạng. Hãy kiểm tra lại file cấu hình."
+    if not supabase: return "Chưa kết nối Database Supabase."
     try:
         clean_content = json.loads(json.dumps(content_list, default=str)) 
         data = {"user_email": email, "project_title": title, "script_content": clean_content}
@@ -605,7 +606,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (LÔJIC CHUẨN UX)
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -616,7 +617,7 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     # -------------------------------------------------------------------------
-    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT
+    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN CÁC KỊCH BẢN CHỜ ĐI)
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
         if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
