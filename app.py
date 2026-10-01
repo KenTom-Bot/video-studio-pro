@@ -111,7 +111,7 @@ for key, default_val in [
     ("extra_num_chars", 1), ("extra_duration_mins", 1.0),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", ""), ("last_style", ""), ("last_aspect", "9:16 (Dọc TikTok/Reels)"), ("last_narrator", ""),
-    ("character_profiles", []), ("editing_acc_email", None)
+    ("character_profiles", []), ("editing_acc_email", None), ("current_project_id", None)
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
@@ -159,17 +159,10 @@ def get_dynamic_realtime_context():
     now = datetime.now()
     month = now.month
     year = now.year
-    
-    # Xác định mùa/thời điểm thực tế linh hoạt theo tháng trong năm
-    if month in [12, 1, 2]:
-        season_desc = f"Mùa Đông / Tết Nguyên Đán ({month}/{year}). Bối cảnh thời tiết lạnh giá, không khí sum vầy, nhu cầu giữ ấm, quà Tết, tất niên."
-    elif month in [3, 4, 5]:
-        season_desc = f"Mùa Xuân / Giao mùa ({month}/{year}). Bối cảnh thời tiết ấm áp, mưa phùn hoặc se lạnh nhẹ, du xuân, dã ngoại."
-    elif month in [6, 7, 8]:
-        season_desc = f"Mùa Hè / Nắng Nóng ({month}/{year}). Bối cảnh thời tiết oi bức, giải nhiệt, du lịch biển, chống nắng, mặc thoáng mát."
-    else:
-        season_desc = f"Mùa Thu / Se Lạnh ({month}/{year}). Bối cảnh thời tiết gió thu lãng mạn, se lạnh về đêm, chăm sóc giấc ngủ, chuyển mùa."
-        
+    if month in [12, 1, 2]: season_desc = f"Mùa Đông / Tết Nguyên Đán ({month}/{year})."
+    elif month in [3, 4, 5]: season_desc = f"Mùa Xuân / Giao mùa ({month}/{year})."
+    elif month in [6, 7, 8]: season_desc = f"Mùa Hè / Nắng Nóng ({month}/{year})."
+    else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year})."
     return f"THỜI GIAN THỰC TẾ HIỆN TẠI: {season_desc}. Toàn bộ bối cảnh, ánh sáng, trang phục và tâm lý mua sắm trong kịch bản PHẢI phản ánh chính xác thời điểm thực tế này."
 
 def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
@@ -178,7 +171,7 @@ def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA:
-    1. THỜI GIAN THỰC LINH HOẠT: Kịch bản phải bám sát đúng thời điểm {time_ctx}, không được lấy sai mùa.
+    1. THỜI GIAN THỰC LINH HOẠT: Kịch bản phải bám sát đúng thời điểm {time_ctx}.
     2. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%.
     3. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số.
     4. GIỌNG NÓI & BỐI CẢNH: Giọng Bắc (Hà Nội) chuẩn, nhịp điệu dồn dập, lôi cuốn. Khóa cố định môi trường và trang phục. {char_rules}
@@ -311,12 +304,22 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
 
-def save_project_to_db(email, title, payload_data):
+def save_project_to_db(email, title, payload_data, project_id=None):
     if not supabase: return "Chưa kết nối Database Supabase."
     try:
         clean_content = json.loads(json.dumps(payload_data, default=str)) 
-        data = {"user_email": email, "project_title": title, "script_content": clean_content}
-        supabase.table("saved_projects").insert(data).execute()
+        if project_id:
+            # Nếu đã có ID (đang mở dự án cũ), tiến hành CẬP NHẬT (UPDATE) vào chính dự án đó
+            supabase.table("saved_projects").update({
+                "project_title": title,
+                "script_content": clean_content
+            }).eq("id", project_id).execute()
+        else:
+            # Nếu là dự án mới tinh, tiến hành THÊM MỚI (INSERT)
+            data = {"user_email": email, "project_title": title, "script_content": clean_content}
+            res = supabase.table("saved_projects").insert(data).execute()
+            if res.data and len(res.data) > 0:
+                st.session_state.current_project_id = res.data[0]['id']
         return True
     except Exception as e:
         err_msg = str(e)
@@ -369,6 +372,7 @@ with st.sidebar:
             st.session_state.current_input_context = ""
             st.session_state.current_product_data_saved = None
             st.session_state.character_profiles = []
+            st.session_state.current_project_id = None # Reset ID để nhận diện là dự án mới
             st.session_state.reset_key += 1 
             st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
@@ -388,9 +392,10 @@ with st.sidebar:
                     "character_profiles": st.session_state.character_profiles,
                     "current_input_context": st.session_state.current_input_context
                 }
-                save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload)
+                # Truyền kèm project_id để tự động update thay vì insert trùng lặp
+                save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
                 if save_result is True:
-                    st.toast("✅ Đã lưu dự án vào Database thành công!")
+                    st.toast("✅ Đã cập nhật và lưu dự án thành công!")
                 else:
                     st.error(f"❌ {save_result}")
         
@@ -437,6 +442,7 @@ with st.sidebar:
                                     st.session_state.expanded_scripts = []
                                     st.session_state.generated_details = {}
                                 
+                                st.session_state.current_project_id = p['id'] # Lưu lại ID để update
                                 st.session_state.active_project_title = p['project_title']
                                 st.session_state.active_script_id = None
                                 st.session_state.reset_key += 1
@@ -450,7 +456,7 @@ with st.sidebar:
                                 st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
 
-        # QUẢN TRỊ ADMIN (Đã fix link Zalo trực tiếp, chính xác)
+        # QUẢN TRỊ ADMIN
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
@@ -589,7 +595,7 @@ if st.session_state.action_trigger:
                 char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
                 create_scene_details(param, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
                 st.session_state.active_script_id = param
-                st.session_state.scroll_to_top = True # Lệnh cuộn mượt mà lên đầu trang khi tạo xong
+                st.session_state.scroll_to_top = True
                 st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
                 time.sleep(0.5)
                 st.rerun()
@@ -684,6 +690,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
             st.session_state.last_narrator = narrator_mode
             st.session_state.current_input_context = custom_note
             st.session_state.current_product_data_saved = st.session_state.get("current_product_data")
+            st.session_state.current_project_id = None # Khởi tạo dự án mới
             
             time_ctx = get_dynamic_realtime_context()
             prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.get('current_product_data'), ensure_ascii=False)}" if st.session_state.get("current_product_data") else ""
@@ -761,7 +768,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.code(str(ca.get('prompt_dna_lock', 'N/A')), language="text")
 
 # ==============================================================================
-# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT (HIỂN THỊ ĐỒNG THỜI CẢ 2 PHẦN)
+# 6. DANH SÁCH KỊCH BẢN & XEM CHI TIẾT
 # ==============================================================================
 all_combined_scripts_list = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 
@@ -771,9 +778,6 @@ if all_combined_scripts_list:
     completed_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) in st.session_state.generated_details]
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
-    # -------------------------------------------------------------------------
-    # NẾU ĐANG XEM CHI TIẾT 1 KỊCH BẢN: HIỂN THỊ LÊN TRÊN CÙNG
-    # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
         if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
             st.session_state.active_script_id = None
@@ -819,9 +823,6 @@ if all_combined_scripts_list:
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             st.markdown("---")
 
-    # -------------------------------------------------------------------------
-    # HIỂN THỊ SONG SONG CẢ 2 MỤC: ĐÃ HOÀN THIỆN VÀ ĐANG CHỜ
-    # -------------------------------------------------------------------------
     st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Xuất & Nhân Bản)**")
     if not completed_scripts:
         st.info("💡 Chưa có kịch bản nào được tạo chi tiết.")
@@ -869,7 +870,6 @@ if all_combined_scripts_list:
                         st.session_state.action_param = sc_id
                         st.rerun()
 
-    # VÙNG GỌI THÊM NẰM DƯỚI CÙNG
     st.markdown("---")
     with st.container(border=True):
         st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
@@ -881,6 +881,6 @@ if all_combined_scripts_list:
         with col_g3:
             st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_main_{st.session_state.reset_key}")
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_main", type="primary", use_container_width=True):
+        if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_main", type="primary", use_container_width=True):
             st.session_state.action_trigger = "generate_more"
             st.rerun()
