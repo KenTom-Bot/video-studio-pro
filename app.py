@@ -153,6 +153,18 @@ def generate_char_rules_string(profiles):
     for p in profiles: rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}'.\n"
     return rules
 
+def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
+    return f"""
+    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
+    🛑 QUY TẮC BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
+    1. TIÊU CHUẨN TIKTOK & AN TOÀN: Tuân thủ tuyệt đối quy tắc cộng đồng. An toàn 100% cho ngành Mẹ & Bé (Không để trẻ em một mình, không nguy hiểm, cấm lạm dụng từ y tế/cam kết chữa bệnh).
+    2. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số vào kịch bản hay lời thoại.
+    3. THỜI LƯỢNG VEO 3: Kịch bản phải được định hướng để chia nhỏ thành các cảnh 4s, 6s, 8s. TUYỆT ĐỐI KHÔNG DÙNG 10s.
+    4. VẬT LÝ & SẢN PHẨM: Giữ nguyên 100% hình dáng sản phẩm gốc.
+    5. GIỌNG NÓI ({narrator_mode}): Lời thoại phải đúng chính tả 100%, từ ngữ rõ ràng, ngắt nghỉ chuẩn để AI Voice đọc không bị vấp/sai. Khớp khẩu hình nếu có nhân vật.
+    6. CAMERA: Chỉ định góc máy rõ ràng. {char_rules}
+    """
+
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
@@ -197,21 +209,35 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     st.session_state.generated_details[target_id] = res
 
 def clone_script(script_id):
+    mode = st.session_state.get("last_mode", "Bán Hàng")
+    style = st.session_state.get("last_style", "Điện ảnh")
+    aspect = st.session_state.get("last_aspect", "9:16 (Dọc TikTok/Reels)")
+    narrator = st.session_state.get("last_narrator", "On-camera")
+    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+    
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if sc["id"] == script_id), None)
     cur_len = len(all_combined)
     prompt = f"Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới với các Hook khác nhau. Format JSON key 'script_outlines' (id từ {cur_len+1})."
-    res = call_gemini([prompt], "Bạn là Đạo diễn Content TikTok.")
+    
+    res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
     return clones
 
 def generate_more_scripts(angle, num_chars, duration_mins):
+    mode = st.session_state.get("last_mode", "Bán Hàng")
+    style = st.session_state.get("last_style", "Điện ảnh")
+    aspect = st.session_state.get("last_aspect", "9:16 (Dọc TikTok/Reels)")
+    narrator = st.session_state.get("last_narrator", "On-camera")
+    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+    
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     cur_len = len(all_combined)
     prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data, ensure_ascii=False)}" if st.session_state.current_product_data else ""
     prompt = f"{prod_ctx}\nYÊU CẦU MỚI: Thể loại '{angle}', {num_chars} nhân vật, thời lượng {duration_mins} phút.\nTạo thêm 5 kịch bản MỚI. Format JSON key 'script_outlines' (id từ {cur_len+1})."
-    res = call_gemini([prompt], "Bạn là Đạo diễn Content TikTok.")
+    
+    res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
@@ -535,7 +561,7 @@ if all_combined_scripts_list:
     # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN CÁC KỊCH BẢN CHỜ ĐI)
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
-        if st.button("⬅️ Thu gọn và Quay lại danh sách tổng"):
+        if st.button("⬅️️ Thu gọn và Quay lại danh sách tổng"):
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
@@ -548,7 +574,7 @@ if all_combined_scripts_list:
         st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(active_sc.get('title', 'KỊCH BẢN')).upper()}**")
         st.markdown(f"""
         <div class='detail-header-box'>
-            ⏱️ Thời lượng: <b>{active_sc.get('total_estimated_duration', '30s (0.5 phút)')}</b> | 
+            ⏱️ Thời lượng: <b>{active_sc.get('total_estimated_duration', '24s (0.4 phút)')}</b> | 
             🎙️ Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', 'nhịp độ nhanh, dồn dập')})</b> | 
             👔 Trang phục toàn diện: <b>{active_sc.get('script_outfit_setup', 'Mặc định theo kịch bản')}</b> | 
             📐 Khung hình: <b>{st.session_state.get('last_aspect', '9:16 (Dọc TikTok/Reels)')}</b>
@@ -654,7 +680,6 @@ if all_combined_scripts_list:
                         st.markdown(f"**#{sc_id}. {outline.get('title')}** — <span class='badge-pending'>ĐANG CHỜ</span>", unsafe_allow_html=True)
                         st.caption(f"⚡ Hook: *\"{outline.get('target_hook')}\"*")
                     with col_a2:
-                        # NÚT CAM NỔI BẬT THEO YÊU CẦU
                         if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
                             st.session_state.action_trigger = "create_detail"
                             st.session_state.action_param = sc_id
