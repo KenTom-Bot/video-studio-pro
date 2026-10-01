@@ -119,7 +119,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CƠ CHẾ LIPS-SYNC TÍCH HỢP LỜI THOẠI TRỰC TIẾP
+# 2. HÀM AI LÕI & CƠ CHẾ ĐỒNG BỘ 100% (KHÓA MẶT, TÓC, TRANG PHỤC VÀ ANCHOR FRAME)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -149,10 +149,10 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
             time.sleep(2)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "🔹 NHÂN VẬT: Linh hoạt theo kịch bản."
-    rules = "🔹 KHÓA KHUÔN MẶT KOC & LIPS-SYNC:\n"
+    if not profiles: return "🔹 NHÂN VẬT & DIỆN MẠO: Giữ nguyên 100% khuôn mặt, kiểu tóc, vóc dáng của diễn viên gốc."
+    rules = "🔹 KHÓA CỨNG DIỆN MẠO KOC & ĐỒNG NHẤT 100%:\n"
     for p in profiles: 
-        rules += f"   + Nhân vật {p['id']} ({p['role']}): Dùng lệnh 'Character {p['id']} featuring exact identity of reference image {p['id']}' để khóa chặt khuôn mặt và khẩu hình miệng.\n"
+        rules += f"   + Nhân vật {p['id']} ({p['role']}): Bắt buộc sử dụng lệnh 'Character {p['id']} featuring exact facial identity, exact hairstyle, exact body shape, and exact reference image {p['id']}' trong mọi khung hình để chống trôi nhân vật.\n"
     return rules
 
 def get_dynamic_realtime_context():
@@ -165,19 +165,6 @@ def get_dynamic_realtime_context():
     else: season_desc = f"Mùa Thu / Se Lạnh ({month}/{year})."
     return f"THỜI GIAN THỰC TẾ: {season_desc}. Toàn bộ bối cảnh, ánh sáng, trang phục phải phản ánh chính xác thời điểm thực tế này."
 
-def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
-    time_ctx = get_dynamic_realtime_context()
-    is_on_camera = "On-camera" in narrator_mode
-    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if is_on_camera else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
-    return f"""
-    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
-    {time_ctx}
-    🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA:
-    1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc lôi cuốn cho người xem.
-    3. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%. Cấm báo giá tiền cụ thể. {char_rules}
-    """
-
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
     time_ctx = get_dynamic_realtime_context()
     is_on_camera = "On-camera" in narrator_mode
@@ -185,13 +172,16 @@ def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
-    🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT PROMPT VEO 3 & LIPS-SYNC:
+    🛑 QUY TẮC BẮT BUỘC ĐỒNG NHẤT 100% VÀ CHUYỂN CẢNH (VIỆT HÓA 100%):
     1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. TÍCH HỢP THOẠI TRỰC TIẾP VÀO VEO 3 PROMPT: 
-       - Nếu chọn On-camera (Lip-sync): Phần `video_prompt` phải có lệnh miêu tả hành động kết hợp `character talking directly to camera, speaking the Vietnamese line with perfect lip-sync matching the speech, natural facial expressions`.
-       - Nếu chọn Off-screen: Phần `video_prompt` phải miêu tả góc quay sản phẩm kết hợp `off-screen voiceover with emotional pauses`.
-    3. PHÂN TÍCH CHUYỂN CẢNH THÔNG MINH: Tự phân tích tình huống kịch bản để chọn Cắt cứng (Hard Cut) với ảnh mới hoặc Nối liền mạch (Match Cut) đúng bản chất vật lý.
-    4. {char_rules}
+    2. ĐỒNG NHẤT DIỆN MẠO & TRANG PHỤC XUYÊN SUỐT: 
+       - Trang phục (bao gồm cả Áo, Quần/Váy, Giày dép được định nghĩa ở `script_outfit_setup`) và Kiểu tóc, Khuôn mặt của diễn viên PHẢI GIỮ NGUYÊN 100% ở mọi phân cảnh, tuyệt đối không được tự ý thay đổi.
+    3. CƠ CHẾ CẢNH NỐI TIẾP & ANCHOR FRAME: 
+       - Khi phân cảnh là "Cảnh nối tiếp (Dùng lại ảnh cuối)", phần `video_prompt` phải có lệnh neo hình ảnh: `holding the final frame steady as a reference anchor for the next shot, ensuring seamless visual continuity`.
+    4. CHUYỂN CẢNH (CHỈ DÙNG 2 TỪ KHÓA BẰNG TIẾNG VIỆT SAU TRONG `transition_type`):
+       - "Chuyển cảnh mới (Tạo ảnh mới)": Dùng khi chuyển sang ý mới hoặc đổi không gian.
+       - "Cảnh nối tiếp (Dùng lại ảnh cuối)": Dùng khi cảnh sau là hành động nối tiếp trực tiếp của cảnh trước. Khi đó phần `image_prompt` BẮT BUỘC phải ghi chính xác: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video".
+    5. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
@@ -203,11 +193,11 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     is_on_camera = "On-camera" in narrator_mode
     
     if is_on_camera:
-        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?' with perfect lip-sync matching the speech, natural facial expressions, slow camera zoom in..."
-        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!' with perfect lip-sync matching the speech, expressive emotions..."
+        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?' with perfect lip-sync matching the speech, maintaining exact facial identity, exact hairstyle, and exact outfit from reference..."
+        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, character talking directly to camera, speaking the Vietnamese line: 'Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!' with perfect lip-sync matching the speech, holding the final frame steady as a reference anchor for the next shot..."
     else:
-        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, slow camera zoom in on the product..."
-        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, off-screen voiceover, product detail showcase..."
+        vid_p_1 = "Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover with emotional pauses, maintaining exact outfit and setting..."
+        vid_p_2 = "Extreme close-up shot, strict standard Northern Vietnamese accent, off-screen voiceover, holding the final frame steady as a reference anchor..."
 
     prompt = f"""
     {time_ctx}
@@ -217,16 +207,16 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     {{
         "title": "{outline.get('title')}",
         "total_estimated_duration": "24s (0.4 phút)",
-        "script_outfit_setup": "Nữ diễn viên mặc trang phục phù hợp với thời tiết hiện tại",
-        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ linh hoạt theo cảm xúc kịch bản, giọng Miền Bắc chuẩn"}},
+        "script_outfit_setup": "Nữ diễn viên mặc bộ đồ lụa dài tay màu kem beige đồng bộ từ áo đến quần dài, đi dép trong nhà màu trắng, tóc buộc gọn gàng",
+        "voice_profile": {{"gender": "Nữ", "tone": "nhịp độ linh hoạt theo cảm xúc kịch bản, giọng Miền Bắc chuẩn, giữ nguyên âm sắc"}},
         "scenes": [
             {{
-                "scene_number": 1, "duration": "8s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", "scene_setting": "Góc toàn cảnh...",
+                "scene_number": 1, "duration": "8s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", "scene_setting": "Góc toàn cảnh phòng ngủ ấm cúng...",
                 "voice_director_vn": "Giọng Nữ Miền Bắc chuẩn, ngắt nghỉ cảm xúc...", "voiceover_vi": "Trằn trọc cả đêm... vì chăn ga cũ vừa hầm nóng, vừa rít da?",
                 "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{vid_p_1}"
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "Cảnh nối tiếp (Dùng lại ảnh cuối)", "scene_setting": "Góc quay tiếp theo...",
+                "scene_number": 2, "duration": "6s", "transition_type": "Cảnh nối tiếp (Dùng lại ảnh cuối)", "scene_setting": "Góc quay cận cảnh tiếp nối...",
                 "voice_director_vn": "Nhấn giọng tạo cao trào...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
                 "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "{vid_p_2}"
             }}
@@ -269,7 +259,7 @@ def clone_script(script_id):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
-    res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
+    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
     return clones
@@ -315,7 +305,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
-    res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
+    res = call_gemini([prompt], get_system_instructions_for_details(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
@@ -746,7 +736,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
             payload.append(prompt)
             
-            res = call_gemini(payload, get_system_instructions(mode, style, aspect, narrator_mode, char_rules))
+            res = call_gemini(payload, get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules))
             
             if not res or "script_outlines" not in res:
                 st.error("❌ AI không trả về đúng định dạng JSON. Vui lòng thử lại!")
