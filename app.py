@@ -23,7 +23,6 @@ st.markdown("""
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
     .social-icons { display: flex; justify-content: center; gap: 20px; margin-top: 10px; margin-bottom: 5px; }
-    /* ĐÃ ÉP CẢ WIDTH, HEIGHT VÀ OBJECT-FIT ĐỂ ICON LUÔN BẰNG NHAU TĂM TẮP */
     .social-icons img { width: 42px; height: 42px; object-fit: cover; border-radius: 10px; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background-color: white; }
     .social-icons img:hover { transform: scale(1.15); }
     .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
@@ -68,7 +67,7 @@ for key, default_val in [
     if key not in st.session_state: st.session_state[key] = default_val
 
 # ==============================================================================
-# 2. HÀM AI LÕI & DATABASE
+# 2. HÀM AI LÕI & DATABASE (NÂNG CẤP LUẬT ĐẠO DIỄN)
 # ==============================================================================
 def clean_json(text):
     cleaned = re.sub(r'```(?:json)?', '', text).strip()
@@ -85,25 +84,30 @@ def call_gemini(contents, sys_inst):
     )
     return clean_json(res.text)
 
+# Chuyển đổi định dạng list rule để tránh bị lặp số 1, 2, 3
 def generate_char_rules_string(profiles):
-    if not profiles: return "3. NHÂN VẬT: Linh hoạt theo kịch bản."
-    rules = "3. KHÓA KHUÔN MẶT KOC VÀ ĐỒNG NHẤT NHÂN VẬT:\n"
+    if not profiles: return "🔹 KHÓA NHÂN VẬT: Linh hoạt theo kịch bản (Không có KOC cố định)."
+    rules = "🔹 KHÓA KHUÔN MẶT KOC VÀ ĐỒNG NHẤT NHÂN VẬT:\n"
     for p in profiles:
         rules += f"   + Nhân vật {p['id']} ({p['role']}): BẮT BUỘC dùng lệnh 'Character {p['id']} featuring the exact identity of reference image {p['id']}'.\n"
     return rules
 
+# Cập nhật Prompt Hệ Thống Siêu Cấp
 def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL ĐA NĂNG CHO VEO 3 VÀ IMAGEN 3.
     THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
+    
     🛑 QUY TẮC BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
-    1. TRẢ VỀ JSON HỢP LỆ.
-    2. TÍNH VẬT LÝ THỰC TẾ: Trong prompt video Veo 3, BẮT BUỘC miêu tả chi tiết tương tác vật lý (gió thổi làm bay tóc, đổ bóng, trọng lực, khói/nước).
+    🔹 FORMAT ĐẦU RA: Chỉ trả về định dạng JSON hợp lệ.
+    🔹 CHÍNH SÁCH NỀN TẢNG (TIKTOK/FB/YT): Tích hợp mặc định bộ lọc chuẩn mực cộng đồng. Tuyệt đối an toàn cho ngành Mẹ & Bé (Không để trẻ em một mình trong bối cảnh nguy hiểm, không hở hang, cấm lạm dụng từ khóa y tế hoặc cam kết chữa bệnh thái quá).
+    🔹 VẬT LÝ THỰC TẾ: Trong prompt video Veo 3, BẮT BUỘC miêu tả chi tiết tương tác vật lý (gió thổi làm bay tóc/quần áo, đổ bóng tự nhiên, trọng lực khi rơi, hiệu ứng khói/nước).
     {char_rules}
-    4. SẢN PHẨM THỰC TẾ: Phải giữ nguyên 100% hình dáng gốc (Lệnh: 'Maintain exact original product appearance').
-    5. CƠ CHẾ GIỌNG NÓI & BIỂU CẢM: {narrator_mode}. Lời thoại phải khớp khẩu hình.
-    6. THỜI LƯỢNG VEO 3 BẮT BUỘC: 4s, 6s, 8s, hoặc 10s (Không dùng số lẻ).
-    7. CHUYỂN ĐỘNG CAMERA: Chỉ định rõ (Pan, Tilt, Zoom in/out, Tracking shot, Close-up).
+    🔹 SẢN PHẨM THỰC TẾ: Phải giữ nguyên 100% hình dáng gốc của sản phẩm (Dùng lệnh: 'Maintain exact original product appearance from reference').
+    🔹 CẤM BÁO GIÁ TRỰC TIẾP: Tuyệt đối KHÔNG đưa giá tiền bằng con số cụ thể vào kịch bản hay lời thoại.
+    🔹 LỜI THOẠI & GIỌNG NÓI ({narrator_mode}): Thoại phải khớp khẩu hình. Văn phong phải chuẩn chính tả 100%, từ ngữ phổ thông, dễ đọc, ngắt nghỉ đúng nhịp để AI TTS (Text-to-Speech) lồng tiếng không bị vấp hay đọc sai.
+    🔹 THỜI LƯỢNG VEO 3 BẮT BUỘC: Mỗi phân cảnh CHỈ ĐƯỢC PHÉP CHIA THÀNH CÁC MỐC 4s, 6s, HOẶC 8s (Tuyệt đối không dùng 10s hay bất kỳ con số nào khác).
+    🔹 CHUYỂN ĐỘNG CAMERA: Luôn chỉ định rõ ràng (Pan, Tilt, Zoom in/out, Tracking shot, Close-up).
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
