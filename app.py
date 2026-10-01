@@ -143,8 +143,7 @@ def save_project_to_db(email, title, content_list):
         data = {"user_email": email, "project_title": title, "script_content": content_list}
         supabase.table("saved_projects").insert(data).execute()
         return True
-    except: return False.
-
+    except: return False
 
 # ==============================================================================
 # 3. THANH BÊN (SIDEBAR) - CHUẨN UX & ICON CSS
