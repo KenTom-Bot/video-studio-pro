@@ -99,7 +99,6 @@ def format_analysis_field(field_val) -> str:
     formatted = [f"<div style='margin-top: 6px;'>{line}</div>" if line.startswith('•') else f"<div style='margin-left: 15px; margin-top: 4px;'>• {line}</div>" for line in lines if line]
     return "".join(formatted) if formatted else text
 
-# Khởi tạo TOÀN BỘ các biến Session State an toàn
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
@@ -259,25 +258,31 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     db_ctx = f"SẢN PHẨM (DB): {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
     dna_ctx = f"DNA SẢN PHẨM GỐC: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
     
+    # ÉP BUỘC AI TUÂN THỦ ĐỊNH HƯỚNG CHIẾN LƯỢC MÀ USER CHỌN
     prompt = f"""
     {prod_ctx}
     {db_ctx}
     {dna_ctx}
     
-    YÊU CẦU MỞ RỘNG (CRITICAL: BẮT BUỘC GIỮ NGUYÊN SẢN PHẨM GỐC Ở TRÊN, KHÔNG ĐƯỢC BỊA SẢN PHẨM KHÁC):
-    - Thể loại / Góc tiếp cận: '{angle}'
-    - Số lượng nhân vật tham gia: {num_chars}
-    - Thời lượng mong muốn: {duration_mins} phút.
+    🛑 YÊU CẦU MỞ RỘNG CỰC KỲ QUAN TRỌNG (BẮT BUỘC TUÂN THỦ):
+    1. GIỮ NGUYÊN SẢN PHẨM GỐC: Tuyệt đối không được bịa ra sản phẩm khác. Phải tập trung vào đúng sản phẩm ở trên.
+    2. ĐỊNH HƯỚNG CHIẾN LƯỢC BẮT BUỘC: Toàn bộ 5 kịch bản mới phải được viết xoay quanh chiến lược: '{angle}'.
+       - Nếu chọn Flash Sale & Deal hời: Các kịch bản phải xoay quanh săn deal, giới hạn thời gian, giảm giá, kích thích chốt đơn nhanh.
+       - Nếu chọn Tình huống đời sống / Nỗi đau (PAS): Phải đi từ vấn đề thực tế đời sống rồi mới dẫn dắt giải pháp.
+       - Nếu chọn Review thực chiến: Phải tập trung bóc trần, kiểm định chất lượng, thử thách độ bền.
+       - Nếu chọn Mẹo vặt / Chia sẻ: Phải mang tính hướng dẫn, cung cấp giá trị hữu ích.
+       - Nếu chọn Tình huống hài hước: Phải có yếu tố gây cười, bất ngờ (Plot Twist).
+    3. SỐ LƯỢNG DIỄN VIÊN THAM GIA: {num_chars} nhân vật.
+    4. THỜI LƯỢNG MONG MUỐN: {duration_mins} phút.
     
-    Dựa ĐÚNG vào Sản phẩm Gốc, tạo thêm 5 kịch bản MỚI HOÀN TOÀN. 
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
             {{
                 "id": {cur_len+1},
-                "title": "Tên kịch bản",
+                "title": "Tên kịch bản chuẩn chiến lược",
                 "setting_style": "Bối cảnh",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu cực kỳ hấp dẫn"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu hấp dẫn"
             }}
         ]
     }}
@@ -333,6 +338,7 @@ with st.sidebar:
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.session_state.current_input_context = ""
             st.session_state.current_product_data_saved = None
+            st.session_state.character_profiles = []
             st.session_state.reset_key += 1 
             st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
@@ -492,11 +498,11 @@ if st.session_state.action_trigger:
                 
         elif action == "generate_more":
             with st.container(border=True):
-                st.markdown("<div class='loading-pulse'>⏳ HỆ THỐNG ĐANG XỬ LÝ: Đang mở rộng đa vũ trụ, sáng tạo thêm 5 kịch bản mới...</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='loading-pulse'>⏳ HỆ THỐNG ĐANG XỬ LÝ: Đang mở rộng thêm 5 kịch bản theo chiến lược '{st.session_state.extra_angle_type}'...</div>", unsafe_allow_html=True)
                 new_scripts = generate_more_scripts(st.session_state.extra_angle_type, st.session_state.extra_num_chars, st.session_state.extra_duration_mins)
                 st.session_state.expanded_scripts.extend(new_scripts)
                 st.session_state.scroll_to_top = True
-                st.toast("✅ Đã sinh thêm kịch bản thành công!")
+                st.toast("✅ Đã sinh thêm kịch bản theo đúng định hướng!")
                 time.sleep(0.5)
                 st.rerun()
     except Exception as e:
@@ -757,7 +763,7 @@ if all_combined_scripts_list:
                         if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
                         st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                     with col_btn1:
-                        if st.button("👁️ Xem lại chi tiết", key=f"btn_rev_{sc_id}", use_container_width=True):
+                        if st.button("👁️️ Xem lại chi tiết", key=f"btn_rev_{sc_id}", use_container_width=True):
                             st.session_state.active_script_id = sc_id
                             st.session_state.scroll_to_top = True
                             st.rerun()
