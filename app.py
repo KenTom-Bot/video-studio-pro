@@ -25,6 +25,12 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .support-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 12px; padding: 12px; text-align: center; margin-top: 15px; }
+    /* Icon CSS */
+    .btn-zalo { background: #0068FF; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #0056d6; }
+    .btn-fb { background: #1877F2; color: white !important; font-weight: 900; padding: 8px 24px; border-radius: 8px; text-decoration: none; font-size: 16px; border: 1px solid #166fe5; font-family: serif; }
+    .btn-tt { background: #000000; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #333; }
+    .social-icons-container { display: flex; gap: 12px; justify-content: center; margin-top: 10px; margin-bottom: 10px; }
+    .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -54,7 +60,6 @@ def save_licensed_accounts(acc_dict):
         with open(ACCOUNTS_FILE, "w", encoding="utf-8") as f: json.dump(acc_dict, f, ensure_ascii=False, indent=2)
     except: pass
 
-# Format DNA Analysis
 def format_analysis_field(field_val) -> str:
     if isinstance(field_val, dict): return "<br>".join([f"• <b>{str(k).replace('_', ' ').title()}:</b> {str(v)}" for k, v in field_val.items()])
     elif isinstance(field_val, list): return "<br>".join([f"• {str(item)}" for item in field_val])
@@ -64,12 +69,13 @@ def format_analysis_field(field_val) -> str:
     formatted = [f"<div style='margin-top: 6px;'>{line}</div>" if line.startswith('•') else f"<div style='margin-left: 15px; margin-top: 4px;'>• {line}</div>" for line in lines if line]
     return "".join(formatted) if formatted else text
 
+# Khởi tạo bộ nhớ (Thêm reset_key để làm mới toàn bộ Form/Ảnh)
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
     ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
     ("current_product_data", None), ("current_input_context", ""),
-    ("action_trigger", None), ("action_param", None),
+    ("action_trigger", None), ("action_param", None), ("reset_key", 0),
     ("extra_angle_type", "⚡ Dạng Flash Sale & Deal hời (Tập trung chốt đơn)"),
     ("extra_num_chars", 1), ("extra_duration_mins", 1.0),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}")
@@ -153,7 +159,7 @@ def save_project_to_db(email, title, content_list):
 
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) - BỐ CỤC CHUẨN
+# 3. THANH BÊN (SIDEBAR) - BỐ CỤC CHUẨN UX
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -176,14 +182,15 @@ with st.sidebar:
             else: 
                 st.error("Tài khoản chưa được cấp quyền!")
     else:
-        # 1. LÀM VIỆC
-        st.markdown("### 🗂️ LÀM VIỆC")
+        # 1. LÀM VIỆC & RESET HOÀN TOÀN DỮ LIỆU
+        st.markdown("### 🗂️️ LÀM VIỆC")
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True):
             st.session_state.all_scripts, st.session_state.cloned_scripts, st.session_state.expanded_scripts = [], [], []
             st.session_state.generated_details, st.session_state.content_analysis = {}, None
             st.session_state.active_script_id = None
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
-            st.toast("✅ Đã mở dự án mới!")
+            st.session_state.reset_key += 1 # KÍCH HOẠT LÀM MỚI TOÀN BỘ ẢNH VÀ FORM NHẬP LIỆU
+            st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
             st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", st.session_state.active_project_title)
@@ -217,16 +224,17 @@ with st.sidebar:
                             st.toast("✅ Đã xóa dự án!")
                             st.rerun()
 
-        # 3. QUẢN TRỊ ADMIN (Khôi phục list tài khoản)
+        # 3. QUẢN TRỊ ADMIN (Bổ sung cấp quyền Thể loại)
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
             with st.form("add_license"):
                 new_acc = st.text_input("Email cấp quyền:")
+                assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
                 duration_opt = st.selectbox("Thời hạn:", ["Dùng thử 3 ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "3 Năm", "5 Năm", "10 Năm", "Vĩnh viễn (Trọn đời)"])
                 if st.form_submit_button("💾 Cấp Quyền"):
                     exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=3 if "Dùng thử" in duration_opt else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730, "3 Năm": 1095, "5 Năm": 1825, "10 Năm": 3650}.get(duration_opt, 30))).strftime("%Y-%m-%d")
-                    st.session_state.licensed_accounts[new_acc.strip()] = {"roles": ALL_MODULES, "expires_at": exp_date}
+                    st.session_state.licensed_accounts[new_acc.strip()] = {"roles": assigned_modules, "expires_at": exp_date}
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.toast(f"✅ Đã cấp quyền cho {new_acc}!")
             
@@ -234,6 +242,7 @@ with st.sidebar:
                 with st.expander(f"📋 Danh sách tài khoản ({len(st.session_state.licensed_accounts)})"):
                     for acc, info in list(st.session_state.licensed_accounts.items()):
                         st.markdown(f"**👤 {acc}**")
+                        st.caption(f"Quyền: {', '.join(info.get('roles', ALL_MODULES))}")
                         st.caption(f"Hết hạn: {info.get('expires_at')}")
                         if acc != ADMIN_EMAIL and st.button(f"🗑️ Xóa {acc}", key=f"del_acc_{acc}"):
                             del st.session_state.licensed_accounts[acc]
@@ -242,16 +251,16 @@ with st.sidebar:
                             st.rerun()
                         st.markdown("---")
 
-        # 4. HỖ TRỢ LIÊN HỆ (GIAO DIỆN CŨ ĐẸP MẮT VÀ BỀN BỈ)
+        # 4. HỖ TRỢ LIÊN HỆ
         st.markdown("---")
         st.markdown("""
         <div class="support-box">
             <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
             <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
-            <div style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
-                <a href="[https://zalo.me/0968484369](https://zalo.me/0968484369)" target="_blank" style="background: #0068ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📱 Zalo</a>
-                <a href="[https://facebook.com/your_facebook](https://facebook.com/your_facebook)" target="_blank" style="background: #0866ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📘 Facebook</a>
-                <a href="[https://tiktok.com/@your_tiktok](https://tiktok.com/@your_tiktok)" target="_blank" style="background: #000000; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">🎵 TikTok</a>
+            <div class="social-icons-container">
+                <a href="#" class="btn-zalo" target="_blank">Zalo</a>
+                <a href="#" class="btn-fb" target="_blank">f</a>
+                <a href="#" class="btn-tt" target="_blank">♪</a>
             </div>
             <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0968.484.369</div>
         </div>
@@ -301,13 +310,19 @@ if st.session_state.action_trigger:
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
 
+# KIỂM TRA PHÂN QUYỀN THỂ LOẠI CHO USER HIỆN TẠI
+current_acc_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
+user_roles = current_acc_info.get("roles", ALL_MODULES)
+allowed_categories = [m for m in ALL_MODULES if m in user_roles]
+if not allowed_categories: allowed_categories = ALL_MODULES
+
 if supabase:
     try: products_data = supabase.table("products").select("*").execute().data
     except: products_data = []
     
     if products_data:
         prod_names = [p["product_name"] for p in products_data]
-        selected_name = st.selectbox("📌 Chọn sản phẩm từ Database:", options=prod_names, key="select_prod_main")
+        selected_name = st.selectbox("📌 Chọn sản phẩm từ Database:", options=prod_names, key=f"select_prod_main_{st.session_state.reset_key}")
         st.session_state.current_product_data = next(p for p in products_data if p["product_name"] == selected_name)
         prod = st.session_state.current_product_data
         
@@ -323,17 +338,17 @@ if supabase:
 st.markdown("---")
 st.markdown("### ⚙️ Thiết Lập Đạo Diễn & Nguồn Ảnh")
 col_m, col_s, col_r = st.columns(3)
-with col_m: mode = st.selectbox("🎯 Thể loại (Chỉ đạo cốt lõi):", ALL_MODULES, key="mode_sel")
-with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key="style_sel")
-with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key="aspect_sel")
+with col_m: mode = st.selectbox("🎯 Thể loại (Đã được phân quyền):", allowed_categories, key=f"mode_sel_{st.session_state.reset_key}")
+with col_s: style = st.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D / Anime", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
+with col_r: aspect = st.selectbox("Khung hình:", ["9:16 (Dọc TikTok/Reels)", "16:9 (Ngang YouTube)"], key=f"aspect_sel_{st.session_state.reset_key}")
 
-narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key="narrator_sel")
+narrator_mode = st.selectbox("🎙️ Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙️ Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
 
 col_p_img, col_c_img = st.columns([1, 1])
 with col_p_img:
-    up_files = st.file_uploader("📦 Ảnh SP/Bối cảnh (Sẽ được AI giữ nguyên gốc 100%):", type=["jpg", "png"], accept_multiple_files=True, key="up_main_files")
+    up_files = st.file_uploader("📦 Ảnh SP/Bối cảnh (Sẽ được AI giữ nguyên gốc 100%):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_main_files_{st.session_state.reset_key}")
 with col_c_img:
-    num_chars = st.number_input("👤 Số lượng Diễn viên (Tối đa 8):", min_value=0, max_value=8, step=1, key="num_chars_main")
+    num_chars = st.number_input("👤 Số lượng Diễn viên (Tối đa 8):", min_value=0, max_value=8, step=1, key=f"num_chars_main_{st.session_state.reset_key}")
 
 char_inputs = []
 if num_chars > 0:
@@ -343,11 +358,11 @@ if num_chars > 0:
             if i + j < num_chars:
                 idx = i + j
                 with cols[j]:
-                    c_role = st.text_input(f"Vai trò NV {idx+1}", key=f"role_{idx}")
-                    c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}")
+                    c_role = st.text_input(f"Vai trò NV {idx+1}", key=f"role_{idx}_{st.session_state.reset_key}")
+                    c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}")
                     if c_file and c_role: char_inputs.append({"id": idx+1, "role": c_role, "file": c_file})
 
-custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key="note_main")
+custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
 
 # ==================== NÚT SINH KỊCH BẢN & PHÂN TÍCH DNA ====================
 if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
@@ -469,12 +484,12 @@ if all_combined_scripts_list and st.session_state.active_script_id is None and n
             st.session_state.extra_angle_type = st.selectbox(
                 "Định hướng chiến lược:",
                 ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"],
-                key="extra_angle_selectbox_main"
+                key=f"extra_angle_selectbox_main_{st.session_state.reset_key}"
             )
         with col_g2:
-            st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key="extra_num_chars_main")
+            st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
         with col_g3:
-            st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key="extra_duration_mins_main")
+            st.session_state.extra_duration_mins = st.number_input("Thời lượng (Phút):", min_value=0.5, max_value=5.0, value=1.0, step=0.5, key=f"extra_duration_mins_main_{st.session_state.reset_key}")
         
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_more_main", type="primary", use_container_width=True):
@@ -502,3 +517,4 @@ if st.session_state.active_script_id and st.session_state.active_script_id in st
         if scene.get('image_prompt'): st.markdown(f"**🖼️ Prompt Ảnh (Imagen 3):** `{scene.get('image_prompt')}`")
         if scene.get('video_prompt'): st.markdown(f"**🎥 Prompt Video (Veo 3):** `{scene.get('video_prompt')}`")
         st.markdown("---")
+
