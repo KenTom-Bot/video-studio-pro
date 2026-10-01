@@ -120,7 +120,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CƠ CHẾ ĐỒNG BỘ GIỌNG NÓI, LIPS-SYNC & THỜI GIAN THỰC
+# 2. HÀM AI LÕI & CƠ CHẾ ĐỒNG BỘ GIỌNG NÓI, LIPS-SYNC VÀ CHUYỂN CẢNH LINH HOẠT
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -168,28 +168,30 @@ def get_dynamic_realtime_context():
 
 def get_system_instructions(mode, style, aspect, narrator_mode, char_rules):
     time_ctx = get_dynamic_realtime_context()
-    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if "On-camera" in narrator_mode else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
+    is_on_camera = "On-camera" in narrator_mode
+    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if is_on_camera else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC ĐỒNG BỘ HÓA:
     1. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    2. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%.
-    3. CẤM BÁO GIÁ: Tuyệt đối KHÔNG đưa giá tiền cụ thể bằng con số.
-    4. GIỌNG NÓI & NGẮT NGHỈ: Giọng Bắc (Hà Nội) chuẩn, nhịp điệu dồn dập, lôi cuốn. Lời thoại phải có đầy đủ dấu câu (dấu phẩy, dấu chấm, dấu ba chấm ...) để ngắt nghỉ tạo cảm xúc rõ ràng cho người xem. {char_rules}
+    2. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc lôi cuốn cho người xem.
+    3. TIÊU CHUẨN TIKTOK & AN TOÀN: An toàn tuyệt đối, không dùng từ y tế cam kết 100%. Cấm báo giá tiền cụ thể.
+    4. GIỌNG NÓI: Giọng Bắc (Hà Nội) chuẩn, nhịp điệu dồn dập, lôi cuốn. Khóa cố định môi trường và trang phục. {char_rules}
     """
 
 def get_system_instructions_for_details(mode, style, aspect, narrator_mode, char_rules):
     time_ctx = get_dynamic_realtime_context()
-    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if "On-camera" in narrator_mode else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
+    is_on_camera = "On-camera" in narrator_mode
+    narrator_instruction = "Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính, đồng bộ khẩu hình miệng (Lip-sync khớp lời thoại)." if is_on_camera else "Lồng tiếng ngoài khung hình (Off-screen voiceover), tập trung quay cận cảnh sản phẩm và bối cảnh."
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 QUY TẮC BẮT BUỘC KHI DỰNG CHI TIẾT:
     1. HÌNH THỨC THUYẾT MINH & LIPS-SYNC: {narrator_instruction}
-    2. NGẮT NGHỈ CẢM XÚC: Các câu thoại `voiceover_vi` BẮT BUỘC phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`) để ngắt nghỉ tạo nhịp cảm xúc lôi cuốn.
-    3. PHÂN CẢNH CHUẨN: Chia ĐÚNG 3 hoặc 4 cảnh, mỗi cảnh dài 4s, 6s hoặc 8s (Cấm dùng 10s).
-    4. NỐI LIỀN MẠCH (MATCH CUT): Cảnh nối tiếp ghi chính xác: "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video".
+    2. CHUYỂN CẢNH LINH HOẠT (CẮT CẢNH / NỐI LIỀN MẠCH): Dựa vào diễn biến kịch bản để tự quyết định chuyển cảnh. Nếu đổi góc nhìn hoặc bước sang tình huống mới, BẮT BUỘC dùng Cắt cứng (Hard Cut) với prompt ảnh hoàn toàn mới. Chỉ dùng Nối liền mạch (Match Cut) khi cảnh sau là hành động tiếp diễn trực tiếp của cảnh trước.
+    3. NGẮT NGHỈ CẢM XÚC: Câu thoại `voiceover_vi` phải có đầy đủ dấu câu (dấu phẩy, dấu ba chấm `...`, dấu chấm than `!`).
+    4. PHÂN CẢNH CHUẨN: Chia ĐÚNG 3 hoặc 4 cảnh, mỗi cảnh dài 4s, 6s hoặc 8s (Cấm dùng 10s).
     5. {char_rules}
     """
 
@@ -218,9 +220,9 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
                 "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Vertical 9:16 video, strict standard Northern Vietnamese accent, character talking directly to camera with perfect lip-sync, expressing emotion with pauses...' if is_on_camera else 'Vertical 9:16 video, strict standard Northern Vietnamese accent, off-screen voiceover, product showcase...'}"
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "Nối liền mạch (Match Cut)", "scene_setting": "Góc quay cận cảnh tiếp nối...",
+                "scene_number": 2, "duration": "6s", "transition_type": "Chuyển cảnh linh hoạt (Cắt cứng hoặc Match Cut tùy tình huống)", "scene_setting": "Góc quay tiếp theo...",
                 "voice_director_vn": "Nhấn giọng hào hứng...", "voiceover_vi": "Thời tiết sang thu rồi..., đổi ngay bộ chăn ga lụa Thái này thôi!",
-                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", "video_prompt": "{'Extreme close-up shot, perfect lip-sync, talking directly to camera...' if is_on_camera else 'Extreme close-up shot, off-screen voiceover...'}"
+                "image_prompt": "Cinematic vertical 9:16 photo of...", "video_prompt": "{'Extreme close-up shot, perfect lip-sync, talking directly to camera...' if is_on_camera else 'Extreme close-up shot, off-screen voiceover...'}"
             }}
         ]
     }}
