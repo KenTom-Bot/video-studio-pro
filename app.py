@@ -31,7 +31,6 @@ st.markdown("""
     .btn-fb { background: #1877F2; color: white !important; font-weight: 900; padding: 8px 24px; border-radius: 8px; text-decoration: none; font-size: 16px; border: 1px solid #166fe5; font-family: serif; }
     .btn-tt { background: #000000; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #333; }
     .social-icons-container { display: flex; gap: 12px; justify-content: center; margin-top: 10px; margin-bottom: 10px; }
-    .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
     @keyframes pulse { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.01); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
     .loading-pulse { animation: pulse 1.5s infinite ease-in-out; color: #d90429; font-weight: 800; text-align: center; padding: 25px; background: #fef2f2; border: 2px dashed #fca5a5; border-radius: 12px; margin: 20px 0; }
     .detail-header-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #1e3a8a; }
@@ -120,7 +119,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & CƠ CHẾ LIPS-SYNC TÍCH HỢP LỜI THOẠI TRỰC TIẾP
+# 2. HÀM AI LÕI & CƠ CHẾ SINH 5 KỊCH BẢN CHUẨN XÁC
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -249,7 +248,7 @@ def clone_script(script_id):
     {time_ctx}
     DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
-    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo 5 biến thể mới với các Hook tiếp cận có đầy đủ dấu câu ngắt nghỉ cảm xúc. 
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới với các Hook tiếp cận có đầy đủ dấu câu ngắt nghỉ cảm xúc. 
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
@@ -261,7 +260,7 @@ def clone_script(script_id):
             }}
         ]
     }}
-    LƯU Ý: KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
+    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
     res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
@@ -294,6 +293,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'.
     3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
     4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật | THỜI LƯỢNG: {duration_mins} phút.
+    5. BẮT BUỘC TẠO CHÍNH XÁC 5 KỊCH BẢN MỚI TRONG MẢNG `script_outlines`.
     
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
@@ -306,7 +306,7 @@ def generate_more_scripts(angle, num_chars, duration_mins):
             }}
         ]
     }}
-    LƯU Ý: KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
+    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
     res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
@@ -618,11 +618,11 @@ if st.session_state.action_trigger:
                 
         elif action == "generate_more":
             with st.container(border=True):
-                st.markdown(f"<div class='loading-pulse'>⏳ HỆ THỐNG ĐANG XỬ LÝ: Đang mở rộng thêm 5 kịch bản theo chiến lược '{st.session_state.extra_angle_type}'...</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='loading-pulse'>⏳ HỆ THỐNG ĐANG XỬ LÝ: Đang mở rộng, sáng tạo thêm 5 kịch bản mới theo chiến lược '{st.session_state.extra_angle_type}'... Vui lòng đợi trong giây lát...</div>", unsafe_allow_html=True)
                 new_scripts = generate_more_scripts(st.session_state.extra_angle_type, st.session_state.extra_num_chars, st.session_state.extra_duration_mins)
                 st.session_state.expanded_scripts.extend(new_scripts)
                 st.session_state.scroll_to_top = True
-                st.toast("✅ Đã sinh thêm kịch bản theo đúng định hướng!")
+                st.toast("✅ Đã sinh thêm 5 kịch bản thành công!")
                 time.sleep(0.5)
                 st.rerun()
     except Exception as e:
@@ -724,7 +724,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     }} 
                 ]
             }}
-            YÊU CẦU: Tạo đúng 5 kịch bản khác nhau phù hợp với thời điểm hiện tại.
+            YÊU CẦU: Tạo chính xác 5 kịch bản khác nhau phù hợp với thời điểm hiện tại.
             LƯU Ý CỰC KỲ QUAN TRỌNG: TUYỆT ĐỐI KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
             """
             
@@ -815,7 +815,7 @@ if all_combined_scripts_list:
             
             img_p = scene.get('image_prompt', '')
             if img_p: 
-                st.markdown(f"**🖼️ Prompt Ảnh (Imagen 3):**")
+                st.markdown(f"**🖼️️ Prompt Ảnh (Imagen 3):**")
                 if "ảnh cuối" in img_p.lower() or "tham chiếu" in img_p.lower():
                     st.info("🔗 Nối liền mạch: Không cần tạo ảnh mới. Hãy dùng frame cuối của Cảnh trước làm ảnh gốc (Image-to-Video) cho cảnh này.")
                 else:
