@@ -651,7 +651,7 @@ if num_chars > 0:
 
 custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
 
-if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
+if st.button("🚀 PHÂN TÍCH SẢN PHẨM VÀ TẠO KỊCH BẢN", type="primary", use_container_width=True):
     with st.spinner("Đạo diễn AI đang tính toán vật lý, nhân vật, và luật TikTok..."):
         try:
             st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
