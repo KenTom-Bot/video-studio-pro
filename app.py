@@ -27,6 +27,11 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .support-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 12px; padding: 12px; text-align: center; margin-top: 15px; }
+    .btn-zalo { background: #0068FF; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #0056d6; }
+    .btn-fb { background: #1877F2; color: white !important; font-weight: 900; padding: 8px 24px; border-radius: 8px; text-decoration: none; font-size: 16px; border: 1px solid #166fe5; font-family: serif; }
+    .btn-tt { background: #000000; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; border: 1px solid #333; }
+    .social-icons-container { display: flex; gap: 12px; justify-content: center; margin-top: 10px; margin-bottom: 10px; }
+    .hotline-text { text-align: center; font-weight: 800; color: #d90429; font-size: 1.2rem; margin-bottom: 5px; }
     @keyframes pulse { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.01); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
     .loading-pulse { animation: pulse 1.5s infinite ease-in-out; color: #d90429; font-weight: 800; text-align: center; padding: 25px; background: #fef2f2; border: 2px dashed #fca5a5; border-radius: 12px; margin: 20px 0; }
     .detail-header-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #1e3a8a; }
@@ -219,8 +224,19 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
-    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo 5 biến thể mới với các Hook khác nhau. 
-    Format JSON key 'script_outlines' (id từ {cur_len+1}).
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo 5 biến thể mới với các Hook tiếp cận khác nhau. 
+    BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
+    {{
+        "script_outlines": [
+            {{
+                "id": {cur_len+1},
+                "title": "Tên kịch bản",
+                "setting_style": "Bối cảnh",
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu hấp dẫn để người dùng dễ hình dung"
+            }}
+        ]
+    }}
+    LƯU Ý: KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
     """
     res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     clones = res.get("script_outlines", [])
@@ -252,7 +268,18 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     - Thời lượng mong muốn: {duration_mins} phút.
     
     Dựa ĐÚNG vào Sản phẩm Gốc, tạo thêm 5 kịch bản MỚI HOÀN TOÀN. 
-    Format JSON key 'script_outlines' (id từ {cur_len+1}).
+    BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
+    {{
+        "script_outlines": [
+            {{
+                "id": {cur_len+1},
+                "title": "Tên kịch bản",
+                "setting_style": "Bối cảnh",
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu cực kỳ hấp dẫn"
+            }}
+        ]
+    }}
+    LƯU Ý: KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
     """
     res = call_gemini([prompt], get_system_instructions(mode, style, aspect, narrator, char_rules))
     more_scripts = res.get("script_outlines", [])
@@ -260,14 +287,17 @@ def generate_more_scripts(angle, num_chars, duration_mins):
     return more_scripts
 
 def save_project_to_db(email, title, content_list):
-    if not supabase: return "Chưa kết nối Database Supabase."
+    if not supabase: return "Sai đường dẫn SUPABASE_URL hoặc mất kết nối mạng. Hãy kiểm tra lại file cấu hình."
     try:
         clean_content = json.loads(json.dumps(content_list, default=str)) 
         data = {"user_email": email, "project_title": title, "script_content": clean_content}
         supabase.table("saved_projects").insert(data).execute()
         return True
     except Exception as e:
-        return str(e)
+        err_msg = str(e)
+        if "Name or service not known" in err_msg or "Errno -2" in err_msg:
+            return "Sai đường link Supabase (Thiếu https:// hoặc bị lỗi đánh máy) trong cài đặt Secrets."
+        return err_msg
 
 # ==============================================================================
 # 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN
@@ -315,7 +345,7 @@ with st.sidebar:
                 if save_result is True:
                     st.toast("✅ Đã lưu dự án vào Database thành công!")
                 else:
-                    st.error(f"❌ Lỗi Database: {save_result}")
+                    st.error(f"❌ {save_result}")
         
         st.markdown("---")
         st.markdown("### 📂 KHO LƯU TRỮ")
@@ -369,10 +399,10 @@ with st.sidebar:
         <div class="support-box">
             <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
             <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
-            <div style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
-                <a href="[https://zalo.me/0968484369](https://zalo.me/0968484369)" target="_blank" style="background: #0068ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📱 Zalo</a>
-                <a href="[https://facebook.com/](https://facebook.com/)" target="_blank" style="background: #0866ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📘 Facebook</a>
-                <a href="[https://tiktok.com/](https://tiktok.com/)" target="_blank" style="background: #000000; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">🎵 TikTok</a>
+            <div class="social-icons-container">
+                <a href="#" class="btn-zalo" target="_blank">Zalo</a>
+                <a href="#" class="btn-fb" target="_blank">f</a>
+                <a href="#" class="btn-tt" target="_blank">♪</a>
             </div>
             <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0968.484.369</div>
         </div>
@@ -516,7 +546,14 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     "visual_physics_rules": "Quy chuẩn vật lý",
                     "prompt_dna_lock": "Khóa thị giác"
                 }},
-                "script_outlines": [ {{"id": 1, "title": "Tên", "setting_style": "Bối cảnh", "target_hook": "Mở đầu"}} ]
+                "script_outlines": [ 
+                    {{
+                        "id": 1, 
+                        "title": "Tên kịch bản", 
+                        "setting_style": "Bối cảnh", 
+                        "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu hấp dẫn"
+                    }} 
+                ]
             }}
             YÊU CẦU: Tạo đúng 5 kịch bản khác nhau.
             LƯU Ý CỰC KỲ QUAN TRỌNG: TUYỆT ĐỐI KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
@@ -579,7 +616,7 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     # -------------------------------------------------------------------------
-    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT (ẨN KỊCH BẢN CHỜ ĐI)
+    # TRẠNG THÁI 1: ĐANG XEM KỊCH BẢN CHI TIẾT
     # -------------------------------------------------------------------------
     if st.session_state.active_script_id is not None:
         if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
@@ -676,7 +713,9 @@ if all_combined_scripts_list:
                     col_i1, col_btn1, col_btn2 = st.columns([2.5, 1, 1])
                     with col_i1:
                         st.markdown(f"**#{sc_id}. {outline.get('title')}** — <span class='badge-ready'>ĐÃ HOÀN THIỆN</span>", unsafe_allow_html=True)
-                        st.caption(f"⚡ Hook: *\"{outline.get('target_hook')}\"*")
+                        hook_val = outline.get('target_hook', '')
+                        if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
+                        st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                     with col_btn1:
                         if st.button("👁️ Xem lại chi tiết", key=f"btn_rev_{sc_id}", use_container_width=True):
                             st.session_state.active_script_id = sc_id
@@ -699,7 +738,9 @@ if all_combined_scripts_list:
                     col_i2, col_a2 = st.columns([3, 1.2])
                     with col_i2:
                         st.markdown(f"**#{sc_id}. {outline.get('title')}** — <span class='badge-pending'>ĐANG CHỜ</span>", unsafe_allow_html=True)
-                        st.caption(f"⚡ Hook: *\"{outline.get('target_hook')}\"*")
+                        hook_val = outline.get('target_hook', '')
+                        if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
+                        st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                     with col_a2:
                         if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
                             st.session_state.action_trigger = "create_detail"
