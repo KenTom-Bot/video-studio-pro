@@ -894,7 +894,7 @@ if is_generating_main:
     st.rerun()
 
 else:
-    if st.button("🚀 PHÂN TÍCH KỊCH BẢN VÀ TẠO KỊCH BẢN", type="primary", use_container_width=True, disabled=is_processing):
+    if st.button("🚀 PHÂN TÍCH SẢN PHẨM VÀ TẠO KỊCH BẢN", type="primary", use_container_width=True, disabled=is_processing):
         safe_char_inputs = [{"id": c["id"], "role": c["role"], "mime_type": c["file"].type, "bytes": c["file"].getvalue()} for c in char_inputs]
         safe_up_files = [{"mime_type": f.type, "bytes": f.getvalue()} for f in up_files] if up_files else []
         
