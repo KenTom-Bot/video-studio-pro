@@ -138,7 +138,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP
+# 2. HÀM AI LÕI & LUẬT THÉP (PHÂN TÁCH LOGIC THỜI TIẾT, VĂN PHONG, TỐI GIẢN)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -195,7 +195,7 @@ def get_mode_specific_rules(mode):
     - MỤC TIÊU LÕI: Trao giá trị thực tế, chia sẻ kiến thức chuyên môn, mẹo hay hoặc kể chuyện logic để KÉO LƯỢT FOLLOW.
     - CƠ CHẾ KÊU GỌI (CTA): Tuyệt đối KHÔNG bán hàng, KHÔNG chốt đơn. Kết thúc bằng cái kết mở hoặc kêu gọi Follow/Bình luận.
     - VĂN PHONG & LOGIC (CỰC KỲ QUAN TRỌNG): 
-      + Giọng điệu phải CHÂN THẬT, CHUYÊN NGHIỆP, đúng định vị kênh (VD: Bác sĩ thì phải chuẩn y khoa, nghiêm túc).
+      + Giọng điệu phải CHÂN THẬT, CHUYÊN NGHIỆP, đúng định vị kênh.
       + TUYỆT ĐỐI KHÔNG nhồi nhét thời tiết, mùa màng vô lý vào video kiến thức. Đi thẳng vào trọng tâm chuyên môn!
       + Mạch thoại phải liên kết LOGIC, tự nhiên như chuyên gia đang giảng giải, không sáo rỗng.
         """
@@ -226,7 +226,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     is_on_camera = "On-camera" in narrator_mode
-    narrator_instruction = f"Nhân vật nói chuyện trực tiếp trước ống kính, lip-sync khớp lời thoại." if is_on_camera else "Lồng tiếng ngoài khung hình, tập trung quay diễn biến/sản phẩm."
+    narrator_instruction = f"Nhân vật nói chuyện trực tiếp trước ống kính, lip-sync khớp lời thoại." if is_on_camera else "Lồng tiếng ngoài khung hình, tập trung quay diễn biến."
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
     {time_ctx}
@@ -345,7 +345,7 @@ def clone_script(script_id):
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
     return clones
 
-def generate_more_scripts(angle, num_chars):
+def generate_more_scripts(angle, num_chars, extra_char_inputs):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
     narrator = st.session_state.get("last_narrator", "On-camera")
@@ -385,7 +385,15 @@ def generate_more_scripts(angle, num_chars):
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars))
+    
+    payload = []
+    if extra_char_inputs:
+        for c in extra_char_inputs:
+            payload.append(f"ẢNH NHÂN VẬT THAM CHIẾU {c['id']} - VAI TRÒ: {c['role']}:")
+            payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
+    payload.append(prompt)
+    
+    res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars))
     if not res or "script_outlines" not in res:
         raise Exception("AI không trả về đúng định dạng JSON, vui lòng thử lại.")
     more_scripts = res.get("script_outlines", [])
@@ -850,7 +858,11 @@ if st.session_state.get("action_trigger"):
         chars = param.get("chars")
         with st.spinner(f"⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới theo chiến lược '{angle}'... Vui lòng đợi..."):
             try:
-                new_scripts = generate_more_scripts(angle, chars)
+                extra_char_inputs_temp = st.session_state.get("temp_extra_char_inputs", [])
+                if extra_char_inputs_temp:
+                    st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in extra_char_inputs_temp]
+                
+                new_scripts = generate_more_scripts(angle, chars, extra_char_inputs_temp)
                 st.session_state.expanded_scripts.extend(new_scripts)
                 st.session_state.scroll_to_top = True
                 st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
@@ -884,7 +896,7 @@ if is_viral_mode:
     with col_v1:
         viral_persona = st.text_input("👤 Định vị Kênh / Người nói (Tùy chọn):", placeholder="VD: Bác sĩ da liễu, Mẹ bỉm sữa 3 con, Góc nhìn GenZ...", key=f"viral_persona_{st.session_state.reset_key}")
     with col_v2:
-        viral_topic = st.text_area("💡 Chủ đề Video / Mẹo muốn chia sẻ:", placeholder="VD: 3 sai lầm khi rửa mặt, Tại sao không nên nghỉ việc ngang...", height=68, key=f"viral_topic_{st.session_state.reset_key}")
+        viral_topic = st.text_area("💡 Chủ đề Video / Mẹo muốn chia sẻ:", placeholder="Nhập thông tin, yêu cầu chi tiết, hoặc ý tưởng cụ thể của bạn vào đây...", height=68, key=f"viral_topic_{st.session_state.reset_key}")
     
     with st.expander("📎 Dữ liệu bổ sung (Upload Ảnh Tham chiếu / Ghi chú đặc biệt) - KHÔNG BẮT BUỘC"):
         up_files = st.file_uploader("📦 Upload Ảnh Tham chiếu (Bối cảnh/Đồ vật - Tùy chọn):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_main_files_v_{st.session_state.reset_key}")
@@ -1054,7 +1066,7 @@ if all_combined_scripts_list:
                 st.info("🔗 **Cảnh nối tiếp:** Không cần tạo ảnh mới. Hãy sử dụng khung hình cuối của Cảnh trước làm ảnh tham chiếu (Image-to-Video) cho cảnh này.")
             else:
                 if img_p: 
-                    st.markdown(f"**🖼️ Prompt Ảnh (Imagen 3):**")
+                    st.markdown(f"**🖼️️ Prompt Ảnh (Imagen 3):**")
                     st.code(img_p, language="text")
                     safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
             
@@ -1118,6 +1130,7 @@ if all_combined_scripts_list:
 
     st.markdown("---")
     st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
+    
     col_g1, col_g2 = st.columns([2, 1])
     with col_g1:
         if "Viral" in st.session_state.get("last_mode", "Bán Hàng"):
@@ -1138,15 +1151,24 @@ if all_combined_scripts_list:
                 "💡 Mẹo vặt / Chia sẻ (Lồng ghép sản phẩm)", 
                 "😂 Tình huống hài hước (Chốt sale bất ngờ)"
             ]
-            
-        chosen_angle = st.selectbox("Định hướng chiến lược:", angle_opts, key=f"extra_angle_selectbox_{st.session_state.reset_key}")
+        chosen_angle = st.selectbox("🧭 Chọn Định hướng chiến lược mới:", angle_opts, key=f"extra_angle_selectbox_{st.session_state.reset_key}")
     with col_g2:
-        chosen_chars = st.number_input(
-            "Số diễn viên:", 
-            min_value=1, max_value=8, value=1, step=1, 
-            key=f"extra_num_chars_callmore_{st.session_state.reset_key}"
-        )
+        chosen_chars = st.number_input("Số diễn viên cho kịch bản mới:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_callmore_{st.session_state.reset_key}")
     
+    extra_char_inputs = []
+    if chosen_chars > 0:
+        st.markdown("###### 👤 Diễn viên cho kịch bản mới (Tùy chọn thay đổi)")
+        for i in range(chosen_chars):
+            col_role, col_img = st.columns([2, 1])
+            with col_role:
+                c_role = st.text_input(f"Vai trò NV {i+1} (mới):", key=f"extra_role_{i}_{st.session_state.reset_key}", placeholder="VD: Bác sĩ... Hoặc để trống")
+            with col_img:
+                c_file = st.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"extra_file_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
+            
+            if c_file:
+                role_val = c_role.strip() if c_role.strip() else "AI tự phân tích dựa theo ngữ cảnh và ảnh"
+                extra_char_inputs.append({"id": i+1, "role": role_val, "file": c_file})
+
     st.markdown("<br>", unsafe_allow_html=True)
     c_l, c_btn, c_r = st.columns([1, 2, 1])
     
@@ -1155,4 +1177,5 @@ if all_combined_scripts_list:
         if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
             st.session_state.action_trigger = "generate_more"
             st.session_state.action_param = {"angle": chosen_angle, "chars": chosen_chars}
+            st.session_state.temp_extra_char_inputs = extra_char_inputs
             st.rerun()
