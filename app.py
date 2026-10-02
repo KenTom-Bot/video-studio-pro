@@ -108,7 +108,8 @@ for key, default_val in [
     ("extra_num_chars", 1),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", ""), ("last_style", ""), ("last_aspect", "9:16 (Dọc TikTok/Reels)"), ("last_narrator", ""),
-    ("character_profiles", []), ("editing_acc_email", None), ("current_project_id", None)
+    ("character_profiles", []), ("editing_acc_email", None), ("current_project_id", None),
+    ("action_trigger", None), ("action_param", None)
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
@@ -246,9 +247,9 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
                 "scene_number": 2, "duration": "6s", "transition_type": "<AI 'Chuyển 'Cảnh HOẶC cảnh mới' nối phân tiếp' tích: tự>", 
                 "scene_setting": "...",
                 "voice_director_vn": "...", 
-                "voiceover_vi": "<Tiếp 1... cảnh liền logic mạch nối truyện từ và>",
+                "voiceover_vi": "<Tiếp 1... cảnh liền mạch nối truyện từ>",
                 "image_prompt": "<Nếu Dùng cuối cảnh của ghi: là nối thì tiếp trước... ảnh>", 
-                "video_prompt": "<Nếu a anchor... as chèn cảnh final frame holding là lệnh: nối reference steady the tiếp>"
+                "video_prompt": "<Nếu a anchor... as chèn final frame holding lệnh: nối reference steady the tiếp>"
             }}
         ]
     }}
@@ -654,7 +655,65 @@ if not st.session_state.is_logged_in:
     st.stop()
 
 # ==============================================================================
-# 4. KHÔNG GIAN SÁNG TẠO CHÍNH
+# 4. HỆ THỐNG KIỂM SOÁT SỰ KIỆN TOÀN CẦU (GLOBAL LOCK - ANTI GHOST UI)
+# ==============================================================================
+# Bằng cách đưa luồng xử lý lên đầu trang, ta ngắt toàn bộ việc render giao diện bên dưới.
+# Điều này CHỐNG NHÂN ĐÔI GIAO DIỆN 100% và KHÓA TOÀN BỘ NÚT BẤM KHÁC.
+if st.session_state.get("action_trigger"):
+    action = st.session_state.action_trigger
+    param = st.session_state.action_param
+    st.session_state.action_trigger = None # Xóa trạng thái ngay để tránh lặp
+    
+    # Render giao diện tải toàn màn hình (chỉ hiển thị duy nhất nội dung này)
+    st.markdown("<h2 style='text-align:center; color:#d90429;'>🚀 HỆ THỐNG ĐANG XỬ LÝ...</h2>", unsafe_allow_html=True)
+    
+    if action == "create_detail":
+        with st.spinner(f"⏳ Đang dựng kịch bản #{param}, khớp nối WPM và Thông số Sản phẩm... Vui lòng đợi..."):
+            try:
+                char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+                create_scene_details(param, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
+                st.session_state.active_script_id = param
+                st.session_state.scroll_to_top = True
+                st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
+            except Exception as e:
+                st.error(f"❌ Lỗi: {e}")
+                time.sleep(2)
+            time.sleep(0.5)
+            st.rerun()
+            
+    elif action == "clone_script":
+        with st.spinner(f"⏳ Đang phân tích và nhân bản biến thể từ Kịch bản #{param}... Vui lòng đợi..."):
+            try:
+                new_clones = clone_script(param)
+                st.session_state.cloned_scripts.extend(new_clones)
+                st.session_state.scroll_to_top = True
+                st.toast("✅ Đã nhân bản kịch bản thành công!")
+            except Exception as e:
+                st.error(f"❌ Lỗi: {e}")
+                time.sleep(2)
+            time.sleep(0.5)
+            st.rerun()
+            
+    elif action == "generate_more":
+        angle = param.get("angle")
+        chars = param.get("chars")
+        with st.spinner(f"⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới theo chiến lược '{angle}'... Vui lòng đợi..."):
+            try:
+                new_scripts = generate_more_scripts(angle, chars)
+                st.session_state.expanded_scripts.extend(new_scripts)
+                st.session_state.scroll_to_top = True
+                st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
+            except Exception as e:
+                st.error(f"❌ Lỗi: {e}")
+                time.sleep(2)
+            time.sleep(0.5)
+            st.rerun()
+
+    # Chặn không cho tải phần giao diện bên dưới khi đang bận xử lý AI
+    st.stop() 
+
+# ==============================================================================
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
 
@@ -814,7 +873,6 @@ if all_combined_scripts_list:
     if st.session_state.active_script_id is not None:
         btn_collapse_ph = st.empty()
         if btn_collapse_ph.button("⬅ Thu gọn và Quay lại danh sách tổng"):
-            btn_collapse_ph.empty()
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
@@ -839,7 +897,7 @@ if all_combined_scripts_list:
         for idx, scene in enumerate(scenes, 1):
             trans_type = scene.get('transition_type', 'Chuyển cảnh mới (Tạo ảnh mới)')
             st.markdown(f"#### 📍 Phân cảnh {idx} ({scene.get('duration', '8s')}) — [ {trans_type} ]")
-            st.markdown(f"🏛️️ **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
+            st.markdown(f"🏛️ **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
             st.markdown(f"**🎙️ Đạo diễn ngữ điệu & SFX:** *{scene.get('voice_director_vn', '')}*")
             st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
             
@@ -878,26 +936,16 @@ if all_combined_scripts_list:
                     st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                 with col_btn1:
                     if not is_current:
-                        btn_rev_ph = st.empty()
-                        if btn_rev_ph.button("👁 Xem lại", key=f"btn_rev_{sc_id}", use_container_width=True):
-                            btn_rev_ph.empty()
+                        if st.button("👁 Xem lại", key=f"btn_rev_{sc_id}", use_container_width=True):
                             st.session_state.active_script_id = sc_id
                             st.session_state.scroll_to_top = True
                             st.rerun()
                 with col_btn2:
-                    btn_clone_ph = st.empty()
-                    if btn_clone_ph.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
-                        with btn_clone_ph.container():
-                            with st.spinner(f"⏳ Đang phân tích và nhân bản biến thể từ Kịch bản #{sc_id}... Vui lòng đợi trong giây lát..."):
-                                try:
-                                    new_clones = clone_script(sc_id)
-                                    st.session_state.cloned_scripts.extend(new_clones)
-                                    st.session_state.scroll_to_top = True
-                                    st.toast("✅ Đã nhân bản kịch bản thành công!")
-                                    time.sleep(0.5)
-                                    st.rerun()
-                                except Exception as e:
-                                    st.error(f"❌ Lỗi khi nhân bản kịch bản: {e}")
+                    if st.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
+                        # CHỈ THIẾT LẬP TRẠNG THÁI RỒI GỌI RERUN, KHÔNG XỬ LÝ INLINE
+                        st.session_state.action_trigger = "clone_script"
+                        st.session_state.action_param = sc_id
+                        st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### ⏳ **2. Kịch Bản Đang Chờ Tạo Chi Tiết**")
@@ -914,20 +962,11 @@ if all_combined_scripts_list:
                     if not hook_val or str(hook_val).strip().lower() in ['none', 'null', '']: hook_val = "Kịch bản tập trung làm nổi bật USP sản phẩm."
                     st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                 with col_a2:
-                    btn_cre_ph = st.empty()
-                    if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                        with btn_cre_ph.container():
-                            with st.spinner(f"⏳ Đang dựng chi tiết phân cảnh và đồng bộ WPM cho kịch bản #{sc_id}... Vui lòng đợi..."):
-                                try:
-                                    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
-                                    create_scene_details(sc_id, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
-                                    st.session_state.active_script_id = sc_id
-                                    st.session_state.scroll_to_top = True
-                                    st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
-                                    time.sleep(0.5)
-                                    st.rerun()
-                                except Exception as e:
-                                    st.error(f"❌ Lỗi khi tạo chi tiết: {e}")
+                    if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
+                        # CHỈ THIẾT LẬP TRẠNG THÁI RỒI GỌI RERUN, KHÔNG XỬ LÝ INLINE
+                        st.session_state.action_trigger = "create_detail"
+                        st.session_state.action_param = sc_id
+                        st.rerun()
 
     st.markdown("---")
     st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
@@ -949,16 +988,8 @@ if all_combined_scripts_list:
     c_l, c_btn, c_r = st.columns([1, 2, 1])
     
     with c_btn:
-        btn_more_ph = st.empty()
-        if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
-            with btn_more_ph.container():
-                with st.spinner("⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới... Vui lòng đợi trong giây lát..."):
-                    try:
-                        new_scripts = generate_more_scripts(chosen_angle, chosen_chars)
-                        st.session_state.expanded_scripts.extend(new_scripts)
-                        st.session_state.scroll_to_top = True
-                        st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
-                        time.sleep(0.5)
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ Lỗi khi gọi thêm kịch bản: {e}")
+        if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
+            # CHỈ THIẾT LẬP TRẠNG THÁI RỒI GỌI RERUN, KHÔNG XỬ LÝ INLINE
+            st.session_state.action_trigger = "generate_more"
+            st.session_state.action_param = {"angle": chosen_angle, "chars": chosen_chars}
+            st.rerun()
