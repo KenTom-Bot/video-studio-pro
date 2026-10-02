@@ -894,7 +894,7 @@ if is_generating_main:
     st.rerun()
 
 else:
-    if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True, disabled=is_processing):
+    if st.button("🚀 PHÂN TÍCH KỊCH BẢN VÀ TẠO KỊCH BẢN", type="primary", use_container_width=True, disabled=is_processing):
         safe_char_inputs = [{"id": c["id"], "role": c["role"], "mime_type": c["file"].type, "bytes": c["file"].getvalue()} for c in char_inputs]
         safe_up_files = [{"mime_type": f.type, "bytes": f.getvalue()} for f in up_files] if up_files else []
         
@@ -912,10 +912,10 @@ else:
         }
         st.rerun()
 
-# ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
+# ==================== HIỂN THỊ PHÂN TÍCH SẢN PHẨM ====================
 if st.session_state.content_analysis and isinstance(st.session_state.content_analysis, dict):
     st.divider()
-    st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Đa Tầng**")
+    st.markdown(f"### 🔍 **Phân Tích Sản Phẩm Chi Tiết**")
     ca = st.session_state.content_analysis
     with st.container(border=True):
         st.markdown("##### 🎯 **1. Chân dung Khán giả & Vấn đề:**")
