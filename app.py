@@ -719,7 +719,7 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
     up_files = st.file_uploader("📦 Upload Ảnh SP / Bối cảnh (Sẽ được AI giữ nguyên màu/thiết kế 100%):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_main_files_s_{st.session_state.reset_key}", disabled=is_processing)
-    custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI (Tùy chọn):", placeholder="Nhập yêu cầu nhấn mạnh tính năng, kịch bản mẫu, hoặc ý tưởng cụ thể của bạn vào đây...", key=f"note_main_s_{st.session_state.reset_key}", disabled=is_processing)
+    custom_note = st.text_area("✍️ Nhập thêm ý tưởng cho kịch bản (Tùy chọn):", placeholder="Nhập yêu cầu nhấn mạnh tính năng, kịch bản mẫu, hoặc ý tưởng cụ thể của bạn vào đây...", key=f"note_main_s_{st.session_state.reset_key}", disabled=is_processing)
 
 st.markdown("---")
 st.markdown("### 🎥 Đạo Diễn, Góc Quay & Thời Lượng")
