@@ -118,7 +118,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (KIỂM DUYỆT / BẢO VỆ MÀU SẮC / WPM / TÂM LÝ & LIỀN MẠCH)
+# 2. HÀM AI LÕI & LUẬT THÉP (COPYWRITING MƯỢT MÀ / ÉP CẢNH NỐI TIẾP / BẢO VỆ MÀU SẮC)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -170,12 +170,11 @@ def get_sys_inst_outlines(mode, style, aspect, narrator_mode, char_rules):
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 CÁC QUY TẮC "LUẬT THÉP" BẮT BUỘC TUÂN THỦ 100%:
-    1. CHÍNH SÁCH NỀN TẢNG (TIKTOK SHOP, REELS, SHORTS, SHOPEE):
-       - CẤM BÁO GIÁ: Tuyệt đối KHÔNG nhắc đến giá tiền cụ thể bằng con số (VD: cấm "99k", cấm "150 nghìn"). Chỉ dùng từ hướng dẫn ("deal hời", "giá sốc góc màn hình").
-       - MẸ & BÉ / Y TẾ / TRẺ EM: Tuân thủ tuyệt đối quy định an toàn (không dùng từ cam kết chữa bệnh, không hình ảnh nhạy cảm/nguy hiểm cho trẻ nhỏ).
-    2. SỰ THẬT SẢN PHẨM: Mọi thông số, tính năng phải đúng 100% với Dữ liệu Sản phẩm Gốc. Tuyệt đối không bịa đặt thêm tính năng.
-    3. ĐỒNG NHẤT 100% DIỆN MẠO: Giữ nguyên trang phục, vóc dáng, kiểu tóc và khuôn mặt ở tất cả các cảnh.
-    4. {char_rules}
+    1. VĂN PHONG COPYWRITING KOC THỰC CHIẾN: Câu thoại phải mượt mà, tự nhiên như người thật review. KHÔNG nhồi nhét lủng củng các thông số. Dùng các từ thân thiện mạng xã hội (VD: "mấy bà ơi", "deal siêu hời", "chốt liền tay"). 
+    2. CHÍNH SÁCH NỀN TẢNG: Tuyệt đối KHÔNG nhắc đến giá tiền cụ thể bằng con số (VD: cấm "99k", cấm "150 nghìn"). Tuân thủ an toàn trẻ em/mẹ bé/y tế.
+    3. SỰ THẬT SẢN PHẨM: Mọi thông số phải đúng 100% với Dữ liệu Sản phẩm Gốc.
+    4. ĐỒNG NHẤT 100% DIỆN MẠO: Giữ nguyên trang phục, vóc dáng, kiểu tóc và khuôn mặt ở tất cả các cảnh.
+    5. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, aspect, narrator_mode, char_rules):
@@ -186,24 +185,22 @@ def get_sys_inst_details(mode, style, aspect, narrator_mode, char_rules):
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. THỂ LOẠI: {mode} | PHONG CÁCH: {style} | ĐỊNH DẠNG: {aspect}
     {time_ctx}
     🛑 CÁC QUY TẮC "LUẬT THÉP" BẮT BUỘC TUÂN THỦ 100%:
-    1. BẢO VỆ MÀU SẮC, HÌNH ẢNH SẢN PHẨM & CHỐNG TEXT RÁC (QUAN TRỌNG NHẤT):
-       - Trong mọi `image_prompt` và `video_prompt`, BẮT BUỘC CHÈN ĐOẠN LỆNH TIẾNG ANH SAU CÙNG: 
-         "Maintain EXACT original product colors, textures, and details. DO NOT apply any color grading or cinematic filters that alter the true colors. NO generated text, NO subtitles, NO floating logos, NO distortion."
-    2. CHÍNH SÁCH NỀN TẢNG (TIKTOK SHOP, REELS, SHORTS, SHOPEE):
-       - CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ. Cấm cam kết y tế triệt để. Đảm bảo an toàn tuyệt đối.
-    3. TÍNH LIỀN MẠCH THOẠI & TÂM LÝ HỌC COPYWRITING:
-       - Lời thoại giữa các phân cảnh phải nối tiếp logic, trôi chảy thành MỘT CÂU CHUYỆN hoàn chỉnh, không bị ngắt quãng cụt lủn.
-       - Sử dụng ngôn từ sắc bén, thôi miên, đánh trúng điểm đau (pain points) và khao khát của khách hàng để tạo hiệu ứng chuyển đổi cao.
-    4. QUY CHUẨN TỐC ĐỘ NÓI (SPEECH RATE PHYSICS - ÉP KỸ THUẬT SỐ TỪ):
-       - BẮT BUỘC ĐẾM SỐ TỪ CHUẨN XÁC THEO NHỊP ĐIỆU:
-       - Kịch bản Dồn dập (Chốt Sale): Tốc độ 3.5 - 4 từ/giây (Cảnh 4s bắt buộc 14-16 từ; Cảnh 6s bắt buộc 21-24 từ; Cảnh 8s bắt buộc 28-32 từ).
-       - Kịch bản Cảm xúc (Kể chuyện, Nỗi đau): Tốc độ 1.8 - 2.2 từ/giây, ngắt nghỉ sâu (Cảnh 4s bắt buộc 7-9 từ; Cảnh 6s bắt buộc 11-13 từ; Cảnh 8s bắt buộc 15-18 từ).
-    5. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    6. ĐẠO DIỄN NGỮ ĐIỆU: Bắt buộc định dạng chuẩn: 'Giọng Nữ Miền Bắc (chuẩn)' hoặc 'Giọng Nam Miền Bắc (chuẩn)', kèm mô tả biểu cảm khớp với lời thoại và nhịp độ.
-    7. PHÂN TÍCH CHUYỂN CẢNH LOGIC:
-       - Nếu cảnh đổi góc máy, đổi ý -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-       - Chỉ khi hành động diễn ra liên tục liền mạch không đứt đoạn -> Mới dùng "Cảnh nối tiếp (Dùng lại ảnh cuối)" kèm lệnh `holding the final frame steady as a reference anchor`.
-    8. KHỚP THÔNG SỐ SẢN PHẨM 100%: Mọi tính năng nêu trong kịch bản phải chuẩn xác tuyệt đối với dữ liệu sản phẩm gốc, không tự bịa đặt.
+    1. VĂN PHONG COPYWRITING (THOẠI MƯỢT MÀ, TỰ NHIÊN):
+       - Lời thoại `voiceover_vi` BẮT BUỘC phải rất tự nhiên, xuôi tai, mang giọng điệu KOC/Reviewer trò chuyện trực tiếp với người xem. 
+       - TUYỆT ĐỐI KHÔNG viết câu văn dài dòng, lủng củng, không nhồi nhét quá nhiều tính năng vào một câu.
+       - Các câu thoại giữa các phân cảnh phải nối tiếp mạch lạc thành MỘT CÂU CHUYỆN hoàn chỉnh, không bị ngắt quãng cụt lủn.
+    2. BẢO VỆ MÀU SẮC, HÌNH ẢNH SẢN PHẨM & CHỐNG TEXT RÁC:
+       - Trong mọi `image_prompt` và `video_prompt`, BẮT BUỘC CHÈN: "Maintain EXACT original product colors, textures, and details. DO NOT apply any color grading or cinematic filters that alter the true colors. NO generated text, NO subtitles, NO floating logos."
+    3. QUY CHUẨN TỐC ĐỘ NÓI (SPEECH RATE PHYSICS):
+       - Kịch bản Dồn dập (Chốt Sale): Tốc độ 3.5 - 4 từ/giây (Cảnh 4s bắt buộc 14-16 từ; Cảnh 6s bắt buộc 21-24 từ).
+       - Kịch bản Cảm xúc (Kể chuyện, Nỗi đau): Tốc độ 1.8 - 2.2 từ/giây, ngắt nghỉ sâu bằng dấu '...' (Cảnh 4s bắt buộc 7-9 từ; Cảnh 6s bắt buộc 11-13 từ).
+    4. BẮT BUỘC SỬ DỤNG "CẢNH NỐI TIẾP":
+       - Một video review xuất sắc phải có hành động liền mạch. BẠN BẮT BUỘC PHẢI THIẾT KẾ ĐỂ CÓ ÍT NHẤT 1 PHÂN CẢNH LÀ "Cảnh nối tiếp (Dùng lại ảnh cuối)" (Ví dụ: Cảnh 1 toàn cảnh, Cảnh 2 lập tức nối tiếp quay cận cảnh tay sờ vào sản phẩm).
+       - Trong video_prompt của Cảnh nối tiếp, phải chèn lệnh `holding the final frame steady as a reference anchor for the next shot`.
+    5. CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ. Cấm cam kết y tế triệt để. Đảm bảo an toàn tuyệt đối.
+    6. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
+    7. ĐẠO DIỄN NGỮ ĐIỆU: Bắt buộc định dạng: 'Giọng Nữ Miền Bắc (chuẩn)' hoặc 'Giọng Nam Miền Bắc (chuẩn)', kèm mô tả tông giọng và cảm xúc.
+    8. KHỚP THÔNG SỐ SẢN PHẨM 100%: Mọi tính năng nêu trong kịch bản phải chuẩn xác tuyệt đối với dữ liệu sản phẩm gốc.
     9. {char_rules}
     """
 
@@ -226,7 +223,7 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     THUYẾT MINH: {'Nhân vật xuất hiện trực tiếp, lip-sync' if is_on_camera else 'Lồng tiếng ngoài khung hình'}.
     
     LƯU Ý ĐẶC BIỆT DÀNH CHO PROMPT VEO 3 / IMAGEN 3:
-    BẮT BUỘC gắn thêm câu lệnh bảo vệ sản phẩm vào TẤT CẢ image_prompt và video_prompt: "NO generated text, NO subtitles, NO floating logos. Maintain 100% exact original product proportions, shape, colors, and details without any distortion."
+    BẮT BUỘC gắn thêm lệnh tiếng Anh bảo vệ màu sản phẩm và chống text rác vào TẤT CẢ image_prompt và video_prompt.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
@@ -239,21 +236,21 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
                 "scene_number": 1, "duration": "4s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", 
                 "scene_setting": "Mô tả bối cảnh góc máy...",
                 "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn) — Tông giọng cụ thể, mục đích tác động tâm lý...", 
-                "voiceover_vi": "Lời thoại liền mạch truyện, đếm chính xác số từ khớp với chuẩn tốc độ WPM (KHÔNG CHỨA GIÁ TIỀN)...",
-                "image_prompt": "Cinematic vertical 9:16 photo... Maintain EXACT original product colors, textures, and details. DO NOT apply any color grading or lighting filters that alter the true colors. NO generated text, NO subtitles, NO floating logos.", 
+                "voiceover_vi": "Lời thoại tự nhiên, mượt mà, đếm chính xác số từ khớp với chuẩn tốc độ WPM (KHÔNG CHỨA GIÁ TIỀN)...",
+                "image_prompt": "Cinematic vertical 9:16 photo... Maintain EXACT original product colors, textures, and details. DO NOT apply any color grading or lighting filters. NO generated text, NO subtitles, NO floating logos.", 
                 "video_prompt": "Vertical 9:16 video... {'character talking directly to camera, speaking the Vietnamese line: [Điền nguyên văn lời thoại] with perfect lip-sync...' if is_on_camera else 'off-screen voiceover...'} Maintain EXACT original product colors. NO generated text, NO floating logos."
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "<AI 'Chuyển 'Cảnh HOẶC cảnh mới' nối phân tiếp' tích: tự>", 
-                "scene_setting": "...",
-                "voice_director_vn": "...", 
-                "voiceover_vi": "<Tiếp 1... cảnh liền mạch nối truyện từ>",
-                "image_prompt": "<Nếu Dùng cuối cảnh của ghi: là nối thì tiếp trước... ảnh>", 
-                "video_prompt": "<Nếu a anchor... as chèn final frame holding lệnh: nối reference steady the tiếp>"
+                "scene_number": 2, "duration": "6s", "transition_type": "Cảnh nối tiếp (Dùng lại ảnh cuối)", 
+                "scene_setting": "BẮT BUỘC thiết kế 1 hành động quay cận hoặc nối tiếp liền mạch từ cảnh trước...",
+                "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn) — ...", 
+                "voiceover_vi": "Lời thoại mượt mà tiếp nối logic trực tiếp từ câu của cảnh 1...",
+                "image_prompt": "Dùng ảnh cuối của cảnh trước làm ảnh tham chiếu cho video", 
+                "video_prompt": "Vertical 9:16 video... holding the final frame steady as a reference anchor for the next shot... Maintain EXACT colors. NO generated text."
             }}
         ]
     }}
-    Lưu ý: Các "duration" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". TUYỆT ĐỐI CẤM BÁO GIÁ CỤ THỂ VÀ VI PHẠM Y TẾ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON.
+    Lưu ý: BẮT BUỘC phải có Cảnh nối tiếp. Các "duration" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". TUYỆT ĐỐI CẤM BÁO GIÁ CỤ THỂ VÀ VI PHẠM Y TẾ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON.
     """
     res = call_gemini([prompt], get_sys_inst_details(mode, style, aspect, narrator_mode, char_rules))
     if not res or "scenes" not in res:
@@ -278,7 +275,7 @@ def clone_script(script_id):
     {time_ctx}
     DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
-    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới tuân thủ tuyệt đối chính sách (KHÔNG BÁO GIÁ TIỀN, không vi phạm y tế/mẹ bé), có đầy đủ dấu câu ngắt nghỉ cảm xúc. Đảm bảo thông số khớp 100%.
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới tuân thủ tuyệt đối chính sách (KHÔNG BÁO GIÁ TIỀN, không vi phạm y tế/mẹ bé), có đầy đủ dấu câu ngắt nghỉ cảm xúc. Đảm bảo thông số khớp 100%. Lời thoại mượt mà tự nhiên, không lủng củng.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
@@ -286,7 +283,7 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt diễn biến kịch bản và câu thoại Hook tâm lý (không chứa giá tiền, không cam kết láo)"
+                "target_hook": "Viết 2-3 câu tóm tắt diễn biến kịch bản và câu thoại Hook văn phong KOC mượt mà (không chứa giá tiền)"
             }}
         ]
     }}
@@ -323,7 +320,7 @@ def generate_more_scripts(angle, num_chars):
     🛑 YÊU CẦU MỞ RỘNG (BẮT BUỘC TUÂN THỦ CHÍNH SÁCH):
     1. GIỮ NGUYÊN SẢN PHẨM GỐC & KHỚP 100% THÔNG SỐ. CẤM BÁO GIÁ TIỀN CỤ THỂ BẰNG CON SỐ VÀ CẤM VI PHẠM Y TẾ / MẸ BÉ / TRẺ EM.
     2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'. Đánh mạnh tâm lý học.
-    3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
+    3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng. Văn phong nói mượt mà, tự nhiên.
     4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật.
     5. BẮT BUỘC TẠO CHÍNH XÁC 5 KỊCH BẢN MỚI TRONG MẢNG `script_outlines`.
     
@@ -334,7 +331,7 @@ def generate_more_scripts(angle, num_chars):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản chuẩn chiến lược",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu sắc bén, đánh đúng nỗi đau/khao khát, an toàn nền tảng"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook tự nhiên, mượt mà đánh đúng nỗi đau/khao khát, an toàn nền tảng"
             }}
         ]
     }}
@@ -665,10 +662,10 @@ if st.session_state.get("action_trigger"):
     st.session_state.action_trigger = None # Xóa trạng thái ngay để tránh lặp
     
     # Render giao diện tải toàn màn hình (chỉ hiển thị duy nhất nội dung này)
-    st.markdown("<h2 style='text-align:center; color:#d90429;'>🚀 HỆ THỐNG ĐANG XỬ LÝ...</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center; color:#d90429;'>🚀 HỆ THỐNG ĐANG XỬ LÝ... VUI LÒNG ĐỢI</h2>", unsafe_allow_html=True)
     
     if action == "create_detail":
-        with st.spinner(f"⏳ Đang dựng kịch bản #{param}, khớp nối WPM và Thông số Sản phẩm... Vui lòng đợi..."):
+        with st.spinner(f"⏳ Đang dựng kịch bản #{param}, khớp nối WPM, văn phong KOC và Thông số Sản phẩm..."):
             try:
                 char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
                 create_scene_details(param, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
@@ -767,7 +764,7 @@ if num_chars > 0:
                     c_file = st.file_uploader(f"Ảnh NV {idx+1}", type=["jpg", "png"], key=f"file_{idx}_{st.session_state.reset_key}", label_visibility="collapsed")
                     if c_file and c_role: char_inputs.append({"id": idx+1, "role": c_role, "file": c_file})
 
-custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
+custom_note = st.text_area("✍️️ Ghi chú đặc biệt cho AI:", key=f"note_main_{st.session_state.reset_key}")
 
 btn_gen_main_ph = st.empty()
 if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
@@ -873,6 +870,7 @@ if all_combined_scripts_list:
     if st.session_state.active_script_id is not None:
         btn_collapse_ph = st.empty()
         if btn_collapse_ph.button("⬅ Thu gọn và Quay lại danh sách tổng"):
+            btn_collapse_ph.empty()
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
@@ -886,7 +884,7 @@ if all_combined_scripts_list:
         st.markdown(f"""
         <div class='detail-header-box'>
             ⏱️ Thời lượng: <b>{active_sc.get('total_estimated_duration', '24s (0.4 phút)')}</b> | 
-            🎙️ Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', 'nhịp độ chuẩn')})</b> | 
+            🎙️️ Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', 'nhịp độ chuẩn')})</b> | 
             👔 Trang phục toàn diện: <b>{active_sc.get('script_outfit_setup', 'Mặc định theo kịch bản')}</b> | 
             📐 Khung hình: <b>{st.session_state.get('last_aspect', '9:16 (Dọc TikTok/Reels)')}</b>
         </div>
@@ -897,7 +895,7 @@ if all_combined_scripts_list:
         for idx, scene in enumerate(scenes, 1):
             trans_type = scene.get('transition_type', 'Chuyển cảnh mới (Tạo ảnh mới)')
             st.markdown(f"#### 📍 Phân cảnh {idx} ({scene.get('duration', '8s')}) — [ {trans_type} ]")
-            st.markdown(f"🏛️ **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
+            st.markdown(f"🏛 **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
             st.markdown(f"**🎙️ Đạo diễn ngữ điệu & SFX:** *{scene.get('voice_director_vn', '')}*")
             st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
             
@@ -942,7 +940,7 @@ if all_combined_scripts_list:
                             st.rerun()
                 with col_btn2:
                     if st.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
-                        # CHỈ THIẾT LẬP TRẠNG THÁI RỒI GỌI RERUN, KHÔNG XỬ LÝ INLINE
+                        # KHÓA GIAO DIỆN XỬ LÝ LÊN ĐẦU
                         st.session_state.action_trigger = "clone_script"
                         st.session_state.action_param = sc_id
                         st.rerun()
@@ -963,7 +961,7 @@ if all_combined_scripts_list:
                     st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                 with col_a2:
                     if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                        # CHỈ THIẾT LẬP TRẠNG THÁI RỒI GỌI RERUN, KHÔNG XỬ LÝ INLINE
+                        # KHÓA GIAO DIỆN XỬ LÝ LÊN ĐẦU
                         st.session_state.action_trigger = "create_detail"
                         st.session_state.action_param = sc_id
                         st.rerun()
@@ -989,7 +987,7 @@ if all_combined_scripts_list:
     
     with c_btn:
         if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
-            # CHỈ THIẾT LẬP TRẠNG THÁI RỒI GỌI RERUN, KHÔNG XỬ LÝ INLINE
+            # KHÓA GIAO DIỆN XỬ LÝ LÊN ĐẦU
             st.session_state.action_trigger = "generate_more"
             st.session_state.action_param = {"angle": chosen_angle, "chars": chosen_chars}
             st.rerun()
