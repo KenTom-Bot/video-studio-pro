@@ -34,9 +34,26 @@ st.markdown("""
     .detail-header-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #1e3a8a; }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 15px; border: 1px solid #bbf7d0; }
     .scrollable-sidebar-container { max-height: 380px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
-    div[data-testid="stFileUploader"] section { padding: 4px; min-height: 2rem; }
+    div[data-testid="stFileUploader"] section { padding: 4px; min-height: 2rem; border: 1.5px dashed #cbd5e1 !important; background-color: #f8fafc !important; }
     div[data-testid="stFileUploader"] section > input { padding: 0px; }
-    .streamlit-expanderHeader { font-weight: bold; color: #1e3a8a; background-color: #f8fafc; border-radius: 8px; }
+    .streamlit-expanderHeader { font-weight: bold; color: #1e3a8a; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    
+    /* LÀM NỔI BẬT CÁC Ô NHẬP LIỆU (UX CẢI TIẾN) */
+    div[data-baseweb="input"] > div, div[data-baseweb="textarea"] > div {
+        background-color: #f8fafc !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease;
+    }
+    div[data-baseweb="input"] > div:focus-within, div[data-baseweb="textarea"] > div:focus-within {
+        border-color: #d90429 !important;
+        box-shadow: 0 0 0 2px rgba(217, 4, 41, 0.15) !important;
+        background-color: #ffffff !important;
+    }
+    input::placeholder, textarea::placeholder {
+        color: #94a3b8 !important;
+        opacity: 1 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -121,7 +138,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (PHÂN TÁCH LOGIC THỜI TIẾT, VĂN PHONG, TỐI GIẢN)
+# 2. HÀM AI LÕI & LUẬT THÉP
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -225,12 +242,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     4. QUY CHUẨN TỐC ĐỘ NÓI (WPM PHYSICS - ÉP KỸ THUẬT SỐ TỪ):
        - Nhịp độ nhanh/dồn dập: 3.5 - 4 từ/giây (Cảnh 4s bắt buộc 14-16 từ; Cảnh 6s bắt buộc 21-24 từ; Cảnh 8s bắt buộc 28-32 từ).
        - Nhịp độ chậm/Cảm xúc/Trầm lắng: 1.8 - 2.2 từ/giây, ngắt nghỉ sâu (Cảnh 4s bắt buộc 7-9 từ; Cảnh 6s bắt buộc 11-13 từ).
-    5. SỐ LƯỢNG NHÂN VẬT & THOẠI MƯỢT MÀ TỰ NHIÊN LÀM MỘT MẠCH: 
-       - Kịch bản phải có ĐÚNG {num_chars} nhân vật tương tác (nếu >1).
-       - Lời thoại (`voiceover_vi`) TUYỆT ĐỐI không được lủng củng như rô bốt đọc thông số. Nó phải mượt mà, ngôn ngữ giao tiếp mạng xã hội đời thường. Câu thoại giữa các cảnh phải KHỚP NỐI VÀ LIỀN MẠCH với nhau thành MỘT CÂU CHUYỆN hoàn chỉnh từ đầu đến cuối.
+    5. THOẠI MƯỢT MÀ VÀ LIỀN MẠCH THÀNH 1 KHỐI: 
+       - Lời thoại (`voiceover_vi`) TUYỆT ĐỐI KHÔNG được cụt lủn hay lủng củng. Phải tự nhiên như đời thật. 
+       - Câu thoại giữa các cảnh phải nối tiếp logic, phân tích sâu, mang lại giá trị cao cho người xem.
     6. LOGIC CHUYỂN CẢNH (BẮT BUỘC CÓ CẢNH NỐI TIẾP):
-       - AI BẮT BUỘC PHẢI PHÂN TÍCH: Nếu cảnh đổi góc máy, thời gian, đổi ý -> Dùng "Chuyển cảnh mới". 
-       - Nếu hành động diễn ra liên tục không đứt đoạn -> BẮT BUỘC dùng "Cảnh nối tiếp (Dùng lại ảnh cuối)" kèm lệnh `holding the final frame steady as a reference anchor for the next shot`. Phải có ít nhất 1 cảnh nối tiếp trong video.
+       - AI BẮT BUỘC PHẢI PHÂN TÍCH: Nếu cảnh đổi góc máy, đổi thời gian -> Dùng "Chuyển cảnh mới". 
+       - Nếu hành động diễn ra liên tục -> BẮT BUỘC dùng "Cảnh nối tiếp (Dùng lại ảnh cuối)" kèm lệnh `holding the final frame steady as a reference anchor for the next shot`. Phải có ít nhất 1 cảnh nối tiếp trong video.
     7. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
     8. ĐẠO DIỄN NGỮ ĐIỆU: Định dạng chuẩn 'Giọng Nữ Miền Bắc (chuẩn)' hoặc 'Giọng Nam', kèm mô tả cảm xúc chân thực nhất.
     9. {char_rules}
@@ -250,8 +267,8 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     
     prompt = f"""
     {time_ctx}
-    DỮ LIỆU SẢN PHẨM / CHỦ ĐỀ THỰC TẾ: {prod_data_ctx}
-    PHÂN TÍCH DNA TÂM LÝ: {dna_data_ctx}
+    DỮ LIỆU ĐẦU VÀO: {prod_data_ctx}
+    PHÂN TÍCH DNA: {dna_data_ctx}
     
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('target_hook')}. Bối cảnh: {outline.get('setting_style')}.
     THUYẾT MINH: {'Nhân vật xuất hiện trực tiếp, lip-sync' if is_on_camera else 'Lồng tiếng ngoài khung hình'}.
@@ -266,8 +283,8 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
             {{
                 "scene_number": 1, "duration": "4s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", 
                 "scene_setting": "Mô tả bối cảnh góc máy...",
-                "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn) — Tông giọng cụ thể, mục đích tác động tâm lý...", 
-                "voiceover_vi": "Lời thoại số lượng từ chuẩn xác khớp WPM...",
+                "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn) — Tông giọng cụ thể...", 
+                "voiceover_vi": "Lời thoại tự nhiên, mượt mà, đúng số lượng từ WPM, KHÔNG nhồi nhét sáo rỗng...",
                 "image_prompt": "Cinematic vertical 9:16 photo... Maintain EXACT original colors, textures, and details. NO color grading. NO generated text, NO subtitles, NO floating logos.", 
                 "video_prompt": "Vertical 9:16 video... {'character talking directly to camera, speaking the Vietnamese line: [Điền nguyên văn lời thoại] with perfect lip-sync...' if is_on_camera else 'off-screen voiceover...'} Maintain EXACT original colors. NO generated text."
             }},
@@ -275,13 +292,13 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
                 "scene_number": 2, "duration": "6s", "transition_type": "<AI 'Chuyển 'Cảnh HOẶC cảnh logic: mới' nối phân tiếp' tích tự>", 
                 "scene_setting": "...",
                 "voice_director_vn": "...", 
-                "voiceover_vi": "<Lời chuyện câu cảnh cực kỳ liền logic mà mượt mạch nhiên... nối thoại tiếp trước, từ tự>",
+                "voiceover_vi": "<Câu chuyện chỉnh... câu hoàn logic, mượt mạch một nối thoại thành tiếp trực từ>",
                 "image_prompt": "<Nếu Dùng cuối cảnh của ghi: là nối thì tiếp trước... ảnh>", 
                 "video_prompt": "<Nếu a anchor... as chèn final frame holding là lệnh: nối phải reference steady the tiếp>"
             }}
         ]
     }}
-    Lưu ý: Các "duration" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". TUYỆT ĐỐI TUÂN THỦ MỤC TIÊU THỂ LOẠI (CTA Bán hàng vs Viral Kéo Follow). KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON.
+    Lưu ý: Các "duration" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON.
     """
     res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction))
     if not res or "scenes" not in res:
@@ -402,7 +419,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
 with st.sidebar:
     if not st.session_state.is_logged_in:
         st.markdown("### 🔐 ĐĂNG NHẬP")
-        email_input = st.text_input("Nhập Email:", key="login_email_input")
+        email_input = st.text_input("Nhập Email:", placeholder="Nhập email tài khoản của bạn...", key="login_email_input")
         
         btn_login_ph = st.empty()
         if btn_login_ph.button("🔑 Đăng Nhập", type="primary"):
@@ -455,7 +472,7 @@ with st.sidebar:
                     time.sleep(0.5)
                     st.rerun()
             
-        st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", st.session_state.active_project_title)
+        st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", placeholder="VD: Chiến dịch Tháng 10...", value=st.session_state.active_project_title)
         
         btn_save_proj_ph = st.empty()
         if btn_save_proj_ph.button("💾 Lưu Dự Án Này", use_container_width=True):
@@ -549,7 +566,7 @@ with st.sidebar:
         # QUẢN TRỊ ADMIN
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
-            st.markdown("### ⚙️ QUẢN TRỊ ADMIN")
+            st.markdown("### ⚙️️ QUẢN TRỊ ADMIN")
             
             st.markdown("##### 🚨 Khách Sắp/Đã Hết Hạn")
             expired_or_soon = []
@@ -578,7 +595,7 @@ with st.sidebar:
             st.markdown("---")
             with st.form("add_license"):
                 st.markdown("##### ➕ Cấp Quyền Khách Hàng Mới")
-                new_acc = st.text_input("Email khách hàng:")
+                new_acc = st.text_input("Email khách hàng:", placeholder="Nhập email khách hàng cần cấp quyền...")
                 new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Vd: 0968484369")
                 assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
                 duration_opt = st.selectbox("Thời hạn:", ["Dùng thử 3 ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "3 Năm", "5 Năm", "10 Năm", "Vĩnh viễn (Trọn đời)"])
@@ -636,9 +653,9 @@ with st.sidebar:
                         if st.session_state.get("editing_acc_email") == acc:
                             with st.form(f"update_form_{acc}" ):
                                 st.markdown(f"**Cập nhật cho: {acc}**")
-                                upd_phone = st.text_input("SĐT mới:", value=phone_val, key=f"upd_p_{acc}")
+                                upd_phone = st.text_input("SĐT mới:", value=phone_val, placeholder="Cập nhật số điện thoại...", key=f"upd_p_{acc}")
                                 upd_roles = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=roles_val, key=f"upd_r_{acc}")
-                                upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val, key=f"upd_e_{acc}")
+                                upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val, placeholder="YYYY-MM-DD", key=f"upd_e_{acc}")
                                 btn_save_upd = st.form_submit_button("💾 Lưu Cập Nhật")
                                 if btn_save_upd:
                                     with st.spinner("⏳ Đang lưu..."):
@@ -695,7 +712,7 @@ if st.session_state.get("action_trigger"):
     st.markdown("<h2 style='text-align:center; color:#d90429;'>🚀 HỆ THỐNG ĐANG XỬ LÝ... VUI LÒNG ĐỢI</h2>", unsafe_allow_html=True)
     
     if action == "generate_main":
-        with st.spinner("⏳ Đạo diễn AI đang phân tích dữ liệu, tâm lý khách hàng và sinh 5 kịch bản chuẩn chiến lược..."):
+        with st.spinner("⏳ Đạo diễn AI đang phân tích dữ liệu, tâm lý và sinh kịch bản..."):
             try:
                 char_inputs_temp = st.session_state.get("temp_char_inputs", [])
                 up_files_temp = st.session_state.get("temp_up_files", [])
@@ -775,7 +792,7 @@ if st.session_state.get("action_trigger"):
                 
                 payload = []
                 if up_files_temp:
-                    payload.append("ẢNH SẢN PHẨM / BỐI CẢNH THAM CHIẾU:")
+                    payload.append("ẢNH THAM CHIẾU:")
                     for f in up_files_temp: payload.append(types.Part.from_bytes(data=f.getvalue(), mime_type=f.type if f.type else "image/jpeg"))
                 if char_inputs_temp:
                     for c in char_inputs_temp:
@@ -871,7 +888,7 @@ if is_viral_mode:
     
     with st.expander("📎 Dữ liệu bổ sung (Upload Ảnh Tham chiếu / Ghi chú đặc biệt) - KHÔNG BẮT BUỘC"):
         up_files = st.file_uploader("📦 Upload Ảnh Tham chiếu (Bối cảnh/Đồ vật - Tùy chọn):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_main_files_v_{st.session_state.reset_key}")
-        custom_note = st.text_area("✍️ Ghi chú kịch bản / Ý tưởng cụ thể (Tùy chọn):", key=f"note_main_v_{st.session_state.reset_key}")
+        custom_note = st.text_area("✍️ Ghi chú kịch bản / Ý tưởng cụ thể (Tùy chọn):", placeholder="Nhập thông tin, yêu cầu chi tiết, hoặc ý tưởng cụ thể của bạn vào đây...", key=f"note_main_v_{st.session_state.reset_key}")
 else:
     st.markdown("#### 🛒 Nhập thông tin sản phẩm")
     if supabase:
@@ -895,7 +912,7 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
     up_files = st.file_uploader("📦 Upload Ảnh SP / Bối cảnh (Sẽ được AI giữ nguyên màu/thiết kế 100%):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_main_files_s_{st.session_state.reset_key}")
-    custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI (Tùy chọn):", key=f"note_main_s_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI (Tùy chọn):", placeholder="Nhập yêu cầu nhấn mạnh tính năng, kịch bản mẫu, hoặc ý tưởng cụ thể của bạn vào đây...", key=f"note_main_s_{st.session_state.reset_key}")
 
 
 st.markdown("---")
