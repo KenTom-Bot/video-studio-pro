@@ -117,7 +117,7 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (KIỂM DUYỆT / BẢO VỆ MÀU SẮC 100% / WPM VẬT LÝ)
+# 2. HÀM AI LÕI & LUẬT THÉP (KIỂM DUYỆT / BẢO VỆ MÀU SẮC / WPM / TÂM LÝ & LIỀN MẠCH)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -172,8 +172,9 @@ def get_sys_inst_outlines(mode, style, aspect, narrator_mode, char_rules):
     1. CHÍNH SÁCH NỀN TẢNG (TIKTOK SHOP, REELS, SHORTS, SHOPEE):
        - CẤM BÁO GIÁ: Tuyệt đối KHÔNG nhắc đến giá tiền cụ thể bằng con số (VD: cấm "99k", cấm "150 nghìn"). Chỉ dùng từ hướng dẫn ("deal hời", "giá sốc góc màn hình").
        - MẸ & BÉ / Y TẾ / TRẺ EM: Tuân thủ tuyệt đối quy định an toàn (không dùng từ cam kết chữa bệnh, không hình ảnh nhạy cảm/nguy hiểm cho trẻ nhỏ).
-    2. ĐỒNG NHẤT 100% DIỆN MẠO: Giữ nguyên trang phục, vóc dáng, kiểu tóc và khuôn mặt ở tất cả các cảnh.
-    3. {char_rules}
+    2. SỰ THẬT SẢN PHẨM: Mọi thông số, tính năng phải đúng 100% với Dữ liệu Sản phẩm Gốc. Tuyệt đối không bịa đặt thêm tính năng.
+    3. ĐỒNG NHẤT 100% DIỆN MẠO: Giữ nguyên trang phục, vóc dáng, kiểu tóc và khuôn mặt ở tất cả các cảnh.
+    4. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, aspect, narrator_mode, char_rules):
@@ -189,15 +190,20 @@ def get_sys_inst_details(mode, style, aspect, narrator_mode, char_rules):
          "Maintain EXACT original product colors, textures, and details. DO NOT apply any color grading or cinematic filters that alter the true colors. NO generated text, NO subtitles, NO floating logos, NO distortion."
     2. CHÍNH SÁCH NỀN TẢNG (TIKTOK SHOP, REELS, SHORTS, SHOPEE):
        - CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ. Cấm cam kết y tế triệt để. Đảm bảo an toàn tuyệt đối.
-    3. QUY CHUẨN TỐC ĐỘ NÓI (SPEECH RATE PHYSICS - ÉP KỸ THUẬT SỐ TỪ):
+    3. TÍNH LIỀN MẠCH THOẠI & TÂM LÝ HỌC COPYWRITING:
+       - Lời thoại giữa các phân cảnh phải nối tiếp logic, trôi chảy thành MỘT CÂU CHUYỆN hoàn chỉnh, không bị ngắt quãng cụt lủn.
+       - Sử dụng ngôn từ sắc bén, thôi miên, đánh trúng điểm đau (pain points) và khao khát của khách hàng để tạo hiệu ứng chuyển đổi cao.
+    4. QUY CHUẨN TỐC ĐỘ NÓI (SPEECH RATE PHYSICS - ÉP KỸ THUẬT SỐ TỪ):
+       - BẮT BUỘC ĐẾM SỐ TỪ CHUẨN XÁC THEO NHỊP ĐIỆU:
        - Kịch bản Dồn dập (Chốt Sale): Tốc độ 3.5 - 4 từ/giây (Cảnh 4s bắt buộc 14-16 từ; Cảnh 6s bắt buộc 21-24 từ; Cảnh 8s bắt buộc 28-32 từ).
-       - Kịch bản Cảm xúc (Kể chuyện, Nỗi đau): Tốc độ 1.8 - 2.2 từ/giây, ngắt nghỉ sâu bằng dấu '...' (Cảnh 4s bắt buộc 7-9 từ; Cảnh 6s bắt buộc 11-13 từ; Cảnh 8s bắt buộc 15-18 từ).
-    4. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    5. ĐẠO DIỄN NGỮ ĐIỆU: Bắt buộc định dạng chuẩn: 'Giọng Nữ Miền Bắc (chuẩn)' hoặc 'Giọng Nam Miền Bắc (chuẩn)', kèm mô tả tông giọng và cảm xúc.
-    6. PHÂN TÍCH CHUYỂN CẢNH LOGIC (KHÔNG ĐƯỢC MẶC ĐỊNH NỐI TIẾP):
-       - AI BẮT BUỘC PHẢI PHÂN TÍCH: Nếu cảnh đổi góc máy, đổi ý -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-       - Chỉ khi hành động diễn ra liên tục liền mạch không đứt đoạn -> Mới dùng "Cảnh nối tiếp (Dùng lại ảnh cuối)" và trong video_prompt phải chèn lệnh `holding the final frame steady as a reference anchor for the next shot`.
-    7. {char_rules}
+       - Kịch bản Cảm xúc (Kể chuyện, Nỗi đau): Tốc độ 1.8 - 2.2 từ/giây, ngắt nghỉ sâu (Cảnh 4s bắt buộc 7-9 từ; Cảnh 6s bắt buộc 11-13 từ; Cảnh 8s bắt buộc 15-18 từ).
+    5. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
+    6. ĐẠO DIỄN NGỮ ĐIỆU: Bắt buộc định dạng chuẩn: 'Giọng Nữ Miền Bắc (chuẩn)' hoặc 'Giọng Nam Miền Bắc (chuẩn)', kèm mô tả biểu cảm khớp với lời thoại và nhịp độ.
+    7. PHÂN TÍCH CHUYỂN CẢNH LOGIC:
+       - Nếu cảnh đổi góc máy, đổi ý -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
+       - Chỉ khi hành động diễn ra liên tục liền mạch không đứt đoạn -> Mới dùng "Cảnh nối tiếp (Dùng lại ảnh cuối)" kèm lệnh `holding the final frame steady as a reference anchor`.
+    8. KHỚP THÔNG SỐ SẢN PHẨM 100%: Mọi tính năng nêu trong kịch bản phải chuẩn xác tuyệt đối với dữ liệu sản phẩm gốc, không tự bịa đặt.
+    9. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rules):
@@ -207,11 +213,19 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
     
     time_ctx = get_dynamic_realtime_context()
     is_on_camera = "On-camera" in narrator_mode
+    prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
+    dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
     prompt = f"""
     {time_ctx}
+    DỮ LIỆU SẢN PHẨM THỰC TẾ (BẮT BUỘC BÁM SÁT 100% TRONG THOẠI): {prod_data_ctx}
+    PHÂN TÍCH DNA: {dna_data_ctx}
+    
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('target_hook')}. Bối cảnh: {outline.get('setting_style')}.
     THUYẾT MINH: {'Nhân vật xuất hiện trực tiếp, lip-sync' if is_on_camera else 'Lồng tiếng ngoài khung hình'}.
+    
+    LƯU Ý ĐẶC BIỆT DÀNH CHO PROMPT VEO 3 / IMAGEN 3:
+    BẮT BUỘC gắn thêm câu lệnh bảo vệ sản phẩm vào TẤT CẢ image_prompt và video_prompt: "NO generated text, NO subtitles, NO floating logos. Maintain 100% exact original product proportions, shape, colors, and details without any distortion."
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
@@ -223,22 +237,22 @@ def create_scene_details(target_id, mode, style, aspect, narrator_mode, char_rul
             {{
                 "scene_number": 1, "duration": "4s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", 
                 "scene_setting": "Mô tả bối cảnh góc máy...",
-                "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn) — Tông giọng cụ thể...", 
-                "voiceover_vi": "Lời thoại số lượng từ chuẩn xác khớp WPM (KHÔNG CHỨA GIÁ TIỀN)...",
+                "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn) — Tông giọng cụ thể, mục đích tác động tâm lý...", 
+                "voiceover_vi": "Lời thoại liền mạch truyện, đếm chính xác số từ khớp với chuẩn tốc độ WPM (KHÔNG CHỨA GIÁ TIỀN)...",
                 "image_prompt": "Cinematic vertical 9:16 photo... Maintain EXACT original product colors, textures, and details. DO NOT apply any color grading or lighting filters that alter the true colors. NO generated text, NO subtitles, NO floating logos.", 
                 "video_prompt": "Vertical 9:16 video... {'character talking directly to camera, speaking the Vietnamese line: [Điền nguyên văn lời thoại] with perfect lip-sync...' if is_on_camera else 'off-screen voiceover...'} Maintain EXACT original product colors. NO generated text, NO floating logos."
             }},
             {{
-                "scene_number": 2, "duration": "6s", "transition_type": "<AI 'Chuyển 'Cảnh Cảnh HOẶC HÀNH LIỀN MẠCH Mới' NẾU Nối Tiếp' ĐỘNG>", 
+                "scene_number": 2, "duration": "6s", "transition_type": "<AI 'Chuyển 'Cảnh HOẶC cảnh mới' nối phân tiếp' tích: tự>", 
                 "scene_setting": "...",
                 "voice_director_vn": "...", 
-                "voiceover_vi": "...",
-                "image_prompt": "<Nếu Dùng cuối cảnh của ghi: nối thì tiếp trước... ảnh>", 
-                "video_prompt": "<Nếu a anchor... as chèn final frame holding lệnh: nối reference steady the tiếp>"
+                "voiceover_vi": "<Tiếp 1... cảnh liền logic mạch nối truyện từ và>",
+                "image_prompt": "<Nếu Dùng cuối cảnh của ghi: là nối thì tiếp trước... ảnh>", 
+                "video_prompt": "<Nếu a anchor... as chèn cảnh final frame holding là lệnh: nối reference steady the tiếp>"
             }}
         ]
     }}
-    Lưu ý: "duration" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". CẤM BÁO GIÁ CỤ THỂ VÀ BẢO VỆ MÀU SẢN PHẨM TUYỆT ĐỐI. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON.
+    Lưu ý: Các "duration" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". TUYỆT ĐỐI CẤM BÁO GIÁ CỤ THỂ VÀ VI PHẠM Y TẾ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON.
     """
     res = call_gemini([prompt], get_sys_inst_details(mode, style, aspect, narrator_mode, char_rules))
     if not res or "scenes" not in res:
@@ -263,7 +277,7 @@ def clone_script(script_id):
     {time_ctx}
     DỮ LIỆU SẢN PHẨM GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
-    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới tuân thủ tuyệt đối chính sách (KHÔNG BÁO GIÁ TIỀN, không vi phạm y tế/mẹ bé), có đầy đủ dấu câu ngắt nghỉ cảm xúc. 
+    Dựa BẮT BUỘC vào dữ liệu Sản phẩm Gốc ở trên, tạo chính xác 5 biến thể mới tuân thủ tuyệt đối chính sách (KHÔNG BÁO GIÁ TIỀN, không vi phạm y tế/mẹ bé), có đầy đủ dấu câu ngắt nghỉ cảm xúc. Đảm bảo thông số khớp 100%.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "script_outlines": [
@@ -271,11 +285,11 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt diễn biến kịch bản và câu thoại Hook mở đầu an toàn chính sách, tuyệt đối không có con số giá tiền"
+                "target_hook": "Viết 2-3 câu tóm tắt diễn biến kịch bản và câu thoại Hook tâm lý (không chứa giá tiền, không cam kết láo)"
             }}
         ]
     }}
-    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
+    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, aspect, narrator, char_rules))
     if not res or "script_outlines" not in res:
@@ -305,10 +319,10 @@ def generate_more_scripts(angle, num_chars):
     {db_ctx}
     {dna_ctx}
     
-    🛑 YÊU CẦU MỞ RỘNG:
-    1. GIỮ NGUYÊN SẢN PHẨM GỐC. CẤM BÁO GIÁ TIỀN CỤ THỂ VÀ CẤM VI PHẠM Y TẾ / MẸ BÉ / TRẺ EM.
-    2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'.
-    3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
+    🛑 YÊU CẦU MỞ RỘNG (BẮT BUỘC TUÂN THỦ CHÍNH SÁCH):
+    1. GIỮ NGUYÊN SẢN PHẨM GỐC & KHỚP 100% THÔNG SỐ. CẤM BÁO GIÁ TIỀN CỤ THỂ BẰNG CON SỐ VÀ CẤM VI PHẠM Y TẾ / MẸ BÉ / TRẺ EM.
+    2. ĐỊNH HƯỚNG CHIẾN LƯỢC: '{angle}'. Đánh mạnh tâm lý học.
+    3. THỜI GIAN THỰC & CẢM XÚC: Kịch bản phải phù hợp với thời điểm hiện tại, có dấu câu ngắt nghỉ rõ ràng.
     4. SỐ LƯỢNG DIỄN VIÊN: {num_chars} nhân vật.
     5. BẮT BUỘC TẠO CHÍNH XÁC 5 KỊCH BẢN MỚI TRONG MẢNG `script_outlines`.
     
@@ -319,7 +333,7 @@ def generate_more_scripts(angle, num_chars):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản chuẩn chiến lược",
                 "setting_style": "Bối cảnh thực tế",
-                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu an toàn không báo giá"
+                "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản theo đúng chiến lược '{angle}' kèm câu thoại Hook mở đầu sắc bén, đánh đúng nỗi đau/khao khát, an toàn nền tảng"
             }}
         ]
     }}
@@ -363,26 +377,26 @@ with st.sidebar:
         
         btn_login_ph = st.empty()
         if btn_login_ph.button("🔑 Đăng Nhập", type="primary"):
-            btn_login_ph.empty()
-            with st.spinner("⏳ Đang xác thực..."):
-                email_check = email_input.strip()
-                if email_check in st.session_state.licensed_accounts:
-                    acc_info = st.session_state.licensed_accounts[email_check]
-                    exp_date_str = acc_info.get("expires_at", "2099-12-31")
-                    try:
-                        exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
-                        if datetime.now() > exp_date:
-                            st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
-                            st.stop()
-                    except: pass
-                    
-                    st.session_state.is_logged_in = True
-                    st.session_state.current_email = email_check
-                    st.toast("✅ Đăng nhập thành công!")
-                    time.sleep(0.5)
-                    st.rerun()
-                else: 
-                    st.error("Tài khoản chưa được cấp quyền!")
+            with btn_login_ph.container():
+                with st.spinner("⏳ Đang xác thực..."):
+                    email_check = email_input.strip()
+                    if email_check in st.session_state.licensed_accounts:
+                        acc_info = st.session_state.licensed_accounts[email_check]
+                        exp_date_str = acc_info.get("expires_at", "2099-12-31")
+                        try:
+                            exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
+                            if datetime.now() > exp_date:
+                                st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
+                                st.stop()
+                        except: pass
+                        
+                        st.session_state.is_logged_in = True
+                        st.session_state.current_email = email_check
+                        st.toast("✅ Đăng nhập thành công!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    else: 
+                        st.error("Tài khoản chưa được cấp quyền!")
     else:
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
@@ -397,45 +411,45 @@ with st.sidebar:
         st.markdown("### 🗂 LÀM VIỆC")
         btn_new_proj_ph = st.empty()
         if btn_new_proj_ph.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True):
-            btn_new_proj_ph.empty()
-            with st.spinner("⏳ Đang khởi tạo dự án mới..."):
-                st.session_state.all_scripts, st.session_state.cloned_scripts, st.session_state.expanded_scripts = [], [], []
-                st.session_state.generated_details, st.session_state.content_analysis = {}, None
-                st.session_state.active_script_id = None
-                st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
-                st.session_state.current_input_context = ""
-                st.session_state.current_product_data_saved = None
-                st.session_state.character_profiles = []
-                st.session_state.current_project_id = None
-                st.session_state.reset_key += 1 
-                st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
-                time.sleep(0.5)
-                st.rerun()
+            with btn_new_proj_ph.container():
+                with st.spinner("⏳ Đang khởi tạo..."):
+                    st.session_state.all_scripts, st.session_state.cloned_scripts, st.session_state.expanded_scripts = [], [], []
+                    st.session_state.generated_details, st.session_state.content_analysis = {}, None
+                    st.session_state.active_script_id = None
+                    st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+                    st.session_state.current_input_context = ""
+                    st.session_state.current_product_data_saved = None
+                    st.session_state.character_profiles = []
+                    st.session_state.current_project_id = None
+                    st.session_state.reset_key += 1 
+                    st.toast("✅ Đã dọn dẹp và mở dự án mới sạch sẽ!")
+                    time.sleep(0.5)
+                    st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", st.session_state.active_project_title)
         
         btn_save_proj_ph = st.empty()
         if btn_save_proj_ph.button("💾 Lưu Dự Án Này", use_container_width=True):
-            btn_save_proj_ph.empty()
-            with st.spinner("⏳ Đang lưu dữ liệu dự án vào Database... Vui lòng đợi..."):
-                all_com = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
-                if not all_com: 
-                    st.warning("⚠️ Chưa có kịch bản nào để lưu!")
-                else:
-                    payload = {
-                        "content_analysis": st.session_state.content_analysis,
-                        "all_scripts": st.session_state.all_scripts,
-                        "cloned_scripts": st.session_state.cloned_scripts,
-                        "expanded_scripts": st.session_state.expanded_scripts,
-                        "generated_details": st.session_state.generated_details,
-                        "character_profiles": st.session_state.character_profiles,
-                        "current_input_context": st.session_state.current_input_context
-                    }
-                    save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
-                    if save_result is True:
-                        st.toast("✅ Đã cập nhật và lưu dự án thành công!")
+            with btn_save_proj_ph.container():
+                with st.spinner("⏳ Đang lưu dữ liệu..."):
+                    all_com = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
+                    if not all_com: 
+                        st.warning("⚠️ Chưa có kịch bản nào để lưu!")
                     else:
-                        st.error(f"❌ {save_result}")
+                        payload = {
+                            "content_analysis": st.session_state.content_analysis,
+                            "all_scripts": st.session_state.all_scripts,
+                            "cloned_scripts": st.session_state.cloned_scripts,
+                            "expanded_scripts": st.session_state.expanded_scripts,
+                            "generated_details": st.session_state.generated_details,
+                            "character_profiles": st.session_state.character_profiles,
+                            "current_input_context": st.session_state.current_input_context
+                        }
+                        save_result = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
+                        if save_result is True:
+                            st.toast("✅ Đã cập nhật và lưu dự án thành công!")
+                        else:
+                            st.error(f"❌ {save_result}")
         
         st.markdown("---")
         st.markdown("### 📂 KHO LƯU TRỮ")
@@ -464,41 +478,41 @@ with st.sidebar:
                         with col_open:
                             btn_open_ph = st.empty()
                             if btn_open_ph.button("📂 Mở", key=f"open_{p['id']}", use_container_width=True):
-                                btn_open_ph.empty()
-                                with st.spinner("⏳ Đang khôi phục dữ liệu dự án..."):
-                                    saved_data = p.get("script_content", {})
-                                    if isinstance(saved_data, dict) and "all_scripts" in saved_data:
-                                        st.session_state.content_analysis = saved_data.get("content_analysis")
-                                        st.session_state.all_scripts = saved_data.get("all_scripts", [])
-                                        st.session_state.cloned_scripts = saved_data.get("cloned_scripts", [])
-                                        st.session_state.expanded_scripts = saved_data.get("expanded_scripts", [])
-                                        raw_details = saved_data.get("generated_details", {})
-                                        st.session_state.generated_details = {int(k): v for k, v in raw_details.items()} if raw_details else {}
-                                        st.session_state.character_profiles = saved_data.get("character_profiles", [])
-                                        st.session_state.current_input_context = saved_data.get("current_input_context", "")
-                                    elif isinstance(saved_data, list):
-                                        st.session_state.all_scripts = saved_data
-                                        st.session_state.content_analysis = None
-                                        st.session_state.cloned_scripts = []
-                                        st.session_state.expanded_scripts = []
-                                        st.session_state.generated_details = {}
-                                    
-                                    st.session_state.current_project_id = p['id']
-                                    st.session_state.active_project_title = p['project_title']
-                                    st.session_state.active_script_id = None
-                                    st.session_state.reset_key += 1
-                                    st.session_state.scroll_to_top = True
-                                    st.toast("✅ Đã khôi phục toàn bộ không gian dự án!")
-                                    time.sleep(0.5)
-                                    st.rerun()
+                                with btn_open_ph.container():
+                                    with st.spinner("⏳ Khôi phục..."):
+                                        saved_data = p.get("script_content", {})
+                                        if isinstance(saved_data, dict) and "all_scripts" in saved_data:
+                                            st.session_state.content_analysis = saved_data.get("content_analysis")
+                                            st.session_state.all_scripts = saved_data.get("all_scripts", [])
+                                            st.session_state.cloned_scripts = saved_data.get("cloned_scripts", [])
+                                            st.session_state.expanded_scripts = saved_data.get("expanded_scripts", [])
+                                            raw_details = saved_data.get("generated_details", {})
+                                            st.session_state.generated_details = {int(k): v for k, v in raw_details.items()} if raw_details else {}
+                                            st.session_state.character_profiles = saved_data.get("character_profiles", [])
+                                            st.session_state.current_input_context = saved_data.get("current_input_context", "")
+                                        elif isinstance(saved_data, list):
+                                            st.session_state.all_scripts = saved_data
+                                            st.session_state.content_analysis = None
+                                            st.session_state.cloned_scripts = []
+                                            st.session_state.expanded_scripts = []
+                                            st.session_state.generated_details = {}
+                                        
+                                        st.session_state.current_project_id = p['id']
+                                        st.session_state.active_project_title = p['project_title']
+                                        st.session_state.active_script_id = None
+                                        st.session_state.reset_key += 1
+                                        st.session_state.scroll_to_top = True
+                                        st.toast("✅ Đã khôi phục toàn bộ không gian dự án!")
+                                        time.sleep(0.5)
+                                        st.rerun()
                         with col_del:
                             btn_del_ph = st.empty()
                             if btn_del_ph.button("🗑️ Xóa", key=f"del_{p['id']}", type="secondary", use_container_width=True):
-                                btn_del_ph.empty()
-                                supabase.table("saved_projects").delete().eq("id", p['id']).execute()
-                                st.toast("✅ Đã xóa dự án!")
-                                time.sleep(0.5)
-                                st.rerun()
+                                with btn_del_ph.container():
+                                    supabase.table("saved_projects").delete().eq("id", p['id']).execute()
+                                    st.toast("✅ Đã xóa dự án!")
+                                    time.sleep(0.5)
+                                    st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
 
         # QUẢN TRỊ ADMIN
@@ -581,12 +595,12 @@ with st.sidebar:
                             with col_del:
                                 btn_del_acc_ph = st.empty()
                                 if btn_del_acc_ph.button(f"🗑 Xóa", key=f"del_acc_{acc}", type="secondary", use_container_width=True):
-                                    btn_del_acc_ph.empty()
-                                    del st.session_state.licensed_accounts[acc]
-                                    save_licensed_accounts(st.session_state.licensed_accounts)
-                                    st.toast("✅ Đã xóa tài khoản!")
-                                    time.sleep(0.5)
-                                    st.rerun()
+                                    with btn_del_acc_ph.container():
+                                        del st.session_state.licensed_accounts[acc]
+                                        save_licensed_accounts(st.session_state.licensed_accounts)
+                                        st.toast("✅ Đã xóa tài khoản!")
+                                        time.sleep(0.5)
+                                        st.rerun()
                         
                         if st.session_state.get("editing_acc_email") == acc:
                             with st.form(f"update_form_{acc}" ):
@@ -629,11 +643,11 @@ with st.sidebar:
         st.success(f"Đang dùng: {st.session_state.current_email}")
         btn_logout_ph = st.empty()
         if btn_logout_ph.button("🚪 Đăng Xuất"):
-            btn_logout_ph.empty()
-            st.session_state.is_logged_in = False
-            st.toast("✅ Đăng xuất!")
-            time.sleep(0.5)
-            st.rerun()
+            with btn_logout_ph.container():
+                st.session_state.is_logged_in = False
+                st.toast("✅ Đăng xuất!")
+                time.sleep(0.5)
+                st.rerun()
 
 if not st.session_state.is_logged_in:
     st.info("👈 Vui lòng đăng nhập ở thanh công cụ bên trái.")
@@ -698,76 +712,76 @@ custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI:", key=f"note_m
 
 btn_gen_main_ph = st.empty()
 if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
-    btn_gen_main_ph.empty()
-    with st.spinner("⏳ Đạo diễn AI đang phân tích dữ liệu sản phẩm, tâm lý khách hàng và sinh 5 kịch bản chuẩn chiến lược... Vui lòng đợi..."):
-        try:
-            st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
-            char_rules = generate_char_rules_string(st.session_state.character_profiles)
-            st.session_state.last_mode = mode
-            st.session_state.last_style = style
-            st.session_state.last_aspect = aspect
-            st.session_state.last_narrator = narrator_mode
-            st.session_state.current_input_context = custom_note
-            st.session_state.current_product_data_saved = st.session_state.get("current_product_data")
-            st.session_state.current_project_id = None
-            
-            time_ctx = get_dynamic_realtime_context()
-            prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.get('current_product_data'), ensure_ascii=False)}" if st.session_state.get("current_product_data") else ""
-            prompt = f"""
-            {time_ctx}
-            {prod_ctx}
-            GHI CHÚ DỰ ÁN: {custom_note}
-            BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON CHUẨN GỒM CÁC KEY SAU:
-            {{
-                "content_analysis": {{
-                    "primary_target_audience": "Nhận diện TỆP KHÁCH HÀNG",
-                    "mechanical_and_accessories": "Kiểu dáng, chất liệu",
-                    "customer_pain_points": "Nỗi đau khách hàng",
-                    "core_desires": "Mong muốn cốt lõi",
-                    "emotional_or_usp_hook": "USP độc quyền",
-                    "visual_physics_rules": "Quy chuẩn vật lý",
-                    "prompt_dna_lock": "Khóa thị giác"
-                }},
-                "script_outlines": [ 
-                    {{
-                        "id": 1, 
-                        "title": "Tên kịch bản", 
-                        "setting_style": "Bối cảnh thực tế", 
-                        "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu an toàn (cấm báo giá)"
-                    }} 
-                ]
-            }}
-            YÊU CẦU: Tạo chính xác 5 kịch bản khác nhau phù hợp với thời điểm hiện tại.
-            LƯU Ý CỰC KỲ QUAN TRỌNG: TUYỆT ĐỐI CẤM BÁO GIÁ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
-            """
-            
-            payload = []
-            if up_files:
-                payload.append("ẢNH SẢN PHẨM / VẬT THỂ THAM CHIẾU:")
-                for f in up_files: payload.append(types.Part.from_bytes(data=f.getvalue(), mime_type=f.type if f.type else "image/jpeg"))
-            if char_inputs:
-                for c in char_inputs:
-                    payload.append(f"ẢNH NHÂN VẬT THAM CHIẾU {c['id']} - VAI TRÒ: {c['role']}:")
-                    payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
-            payload.append(prompt)
-            
-            res = call_gemini(payload, get_sys_inst_outlines(mode, style, aspect, narrator_mode, char_rules))
-            
-            if not res or "script_outlines" not in res:
-                st.error("❌ AI không trả về đúng định dạng JSON. Vui lòng thử lại!")
-            else:
-                st.session_state.content_analysis = res.get("content_analysis")
-                st.session_state.all_scripts = res.get("script_outlines", [])
-                st.session_state.cloned_scripts = []
-                st.session_state.expanded_scripts = []
-                st.session_state.generated_details = {}
-                st.session_state.active_script_id = None
-                st.session_state.scroll_to_top = True
-                st.toast("✅ Đã sinh xong 5 kịch bản và phân tích DNA!")
-                time.sleep(0.5)
-                st.rerun()
-        except Exception as e:
-            st.error(f"❌ Lỗi xử lý AI: {str(e)}")
+    with btn_gen_main_ph.container():
+        with st.spinner("⏳ Đạo diễn AI đang phân tích dữ liệu sản phẩm, tâm lý khách hàng và sinh 5 kịch bản chuẩn chiến lược... Vui lòng đợi..."):
+            try:
+                st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
+                char_rules = generate_char_rules_string(st.session_state.character_profiles)
+                st.session_state.last_mode = mode
+                st.session_state.last_style = style
+                st.session_state.last_aspect = aspect
+                st.session_state.last_narrator = narrator_mode
+                st.session_state.current_input_context = custom_note
+                st.session_state.current_product_data_saved = st.session_state.get("current_product_data")
+                st.session_state.current_project_id = None
+                
+                time_ctx = get_dynamic_realtime_context()
+                prod_ctx = f"SẢN PHẨM: {json.dumps(st.session_state.get('current_product_data'), ensure_ascii=False)}" if st.session_state.get("current_product_data") else ""
+                prompt = f"""
+                {time_ctx}
+                {prod_ctx}
+                GHI CHÚ DỰ ÁN: {custom_note}
+                BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON CHUẨN GỒM CÁC KEY SAU:
+                {{
+                    "content_analysis": {{
+                        "primary_target_audience": "Nhận diện TỆP KHÁCH HÀNG",
+                        "mechanical_and_accessories": "Kiểu dáng, chất liệu",
+                        "customer_pain_points": "Nỗi đau khách hàng",
+                        "core_desires": "Mong muốn cốt lõi",
+                        "emotional_or_usp_hook": "USP độc quyền",
+                        "visual_physics_rules": "Quy chuẩn vật lý",
+                        "prompt_dna_lock": "Khóa thị giác"
+                    }},
+                    "script_outlines": [ 
+                        {{
+                            "id": 1, 
+                            "title": "Tên kịch bản", 
+                            "setting_style": "Bối cảnh thực tế", 
+                            "target_hook": "Viết 2-3 câu tóm tắt chi tiết diễn biến kịch bản và câu thoại Hook mở đầu an toàn (cấm báo giá)"
+                        }} 
+                    ]
+                }}
+                YÊU CẦU: Tạo chính xác 5 kịch bản khác nhau phù hợp với thời điểm hiện tại.
+                LƯU Ý CỰC KỲ QUAN TRỌNG: TUYỆT ĐỐI CẤM BÁO GIÁ. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE BÊN TRONG CÁC GIÁ TRỊ STRING JSON.
+                """
+                
+                payload = []
+                if up_files:
+                    payload.append("ẢNH SẢN PHẨM / VẬT THỂ THAM CHIẾU:")
+                    for f in up_files: payload.append(types.Part.from_bytes(data=f.getvalue(), mime_type=f.type if f.type else "image/jpeg"))
+                if char_inputs:
+                    for c in char_inputs:
+                        payload.append(f"ẢNH NHÂN VẬT THAM CHIẾU {c['id']} - VAI TRÒ: {c['role']}:")
+                        payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
+                payload.append(prompt)
+                
+                res = call_gemini(payload, get_sys_inst_outlines(mode, style, aspect, narrator_mode, char_rules))
+                
+                if not res or "script_outlines" not in res:
+                    st.error("❌ AI không trả về đúng định dạng JSON. Vui lòng thử lại!")
+                else:
+                    st.session_state.content_analysis = res.get("content_analysis")
+                    st.session_state.all_scripts = res.get("script_outlines", [])
+                    st.session_state.cloned_scripts = []
+                    st.session_state.expanded_scripts = []
+                    st.session_state.generated_details = {}
+                    st.session_state.active_script_id = None
+                    st.session_state.scroll_to_top = True
+                    st.toast("✅ Đã sinh xong 5 kịch bản và phân tích DNA!")
+                    time.sleep(0.5)
+                    st.rerun()
+            except Exception as e:
+                st.error(f"❌ Lỗi xử lý AI: {str(e)}")
 
 # ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
 if st.session_state.content_analysis and isinstance(st.session_state.content_analysis, dict):
@@ -825,7 +839,7 @@ if all_combined_scripts_list:
         for idx, scene in enumerate(scenes, 1):
             trans_type = scene.get('transition_type', 'Chuyển cảnh mới (Tạo ảnh mới)')
             st.markdown(f"#### 📍 Phân cảnh {idx} ({scene.get('duration', '8s')}) — [ {trans_type} ]")
-            st.markdown(f"🏛️ **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
+            st.markdown(f"🏛️️ **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
             st.markdown(f"**🎙️ Đạo diễn ngữ điệu & SFX:** *{scene.get('voice_director_vn', '')}*")
             st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
             
@@ -865,7 +879,7 @@ if all_combined_scripts_list:
                 with col_btn1:
                     if not is_current:
                         btn_rev_ph = st.empty()
-                        if btn_rev_ph.button("👁️️ Xem lại", key=f"btn_rev_{sc_id}", use_container_width=True):
+                        if btn_rev_ph.button("👁 Xem lại", key=f"btn_rev_{sc_id}", use_container_width=True):
                             btn_rev_ph.empty()
                             st.session_state.active_script_id = sc_id
                             st.session_state.scroll_to_top = True
@@ -873,17 +887,17 @@ if all_combined_scripts_list:
                 with col_btn2:
                     btn_clone_ph = st.empty()
                     if btn_clone_ph.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
-                        btn_clone_ph.empty()
-                        with st.spinner(f"⏳ Đang phân tích và nhân bản biến thể từ Kịch bản #{sc_id}... Vui lòng đợi trong giây lát..."):
-                            try:
-                                new_clones = clone_script(sc_id)
-                                st.session_state.cloned_scripts.extend(new_clones)
-                                st.session_state.scroll_to_top = True
-                                st.toast("✅ Đã nhân bản kịch bản thành công!")
-                                time.sleep(0.5)
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"❌ Lỗi khi nhân bản kịch bản: {e}")
+                        with btn_clone_ph.container():
+                            with st.spinner(f"⏳ Đang phân tích và nhân bản biến thể từ Kịch bản #{sc_id}... Vui lòng đợi trong giây lát..."):
+                                try:
+                                    new_clones = clone_script(sc_id)
+                                    st.session_state.cloned_scripts.extend(new_clones)
+                                    st.session_state.scroll_to_top = True
+                                    st.toast("✅ Đã nhân bản kịch bản thành công!")
+                                    time.sleep(0.5)
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"❌ Lỗi khi nhân bản kịch bản: {e}")
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### ⏳ **2. Kịch Bản Đang Chờ Tạo Chi Tiết**")
@@ -902,18 +916,18 @@ if all_combined_scripts_list:
                 with col_a2:
                     btn_cre_ph = st.empty()
                     if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                        btn_cre_ph.empty()
-                        with st.spinner(f"⏳ Đang dựng chi tiết phân cảnh và tính toán WPM cho kịch bản #{sc_id}... Vui lòng đợi trong giây lát..."):
-                            try:
-                                char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
-                                create_scene_details(sc_id, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
-                                st.session_state.active_script_id = sc_id
-                                st.session_state.scroll_to_top = True
-                                st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
-                                time.sleep(0.5)
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"❌ Lỗi khi tạo chi tiết: {e}")
+                        with btn_cre_ph.container():
+                            with st.spinner(f"⏳ Đang dựng chi tiết phân cảnh và đồng bộ WPM cho kịch bản #{sc_id}... Vui lòng đợi..."):
+                                try:
+                                    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+                                    create_scene_details(sc_id, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
+                                    st.session_state.active_script_id = sc_id
+                                    st.session_state.scroll_to_top = True
+                                    st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
+                                    time.sleep(0.5)
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"❌ Lỗi khi tạo chi tiết: {e}")
 
     st.markdown("---")
     st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
@@ -937,14 +951,14 @@ if all_combined_scripts_list:
     with c_btn:
         btn_more_ph = st.empty()
         if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
-            btn_more_ph.empty()
-            with st.spinner("⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới... Vui lòng đợi trong giây lát..."):
-                try:
-                    new_scripts = generate_more_scripts(chosen_angle, chosen_chars)
-                    st.session_state.expanded_scripts.extend(new_scripts)
-                    st.session_state.scroll_to_top = True
-                    st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
-                    time.sleep(0.5)
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"❌ Lỗi khi gọi thêm kịch bản: {e}")
+            with btn_more_ph.container():
+                with st.spinner("⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới... Vui lòng đợi trong giây lát..."):
+                    try:
+                        new_scripts = generate_more_scripts(chosen_angle, chosen_chars)
+                        st.session_state.expanded_scripts.extend(new_scripts)
+                        st.session_state.scroll_to_top = True
+                        st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Lỗi khi gọi thêm kịch bản: {e}")
