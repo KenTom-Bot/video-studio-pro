@@ -590,6 +590,36 @@ if not st.session_state.is_logged_in:
     st.stop()
 
 # ==============================================================================
+# 4. XỬ LÝ SỰ KIỆN NÚT BẤM TRỰC TIẾP (CLICK-TO-ACTION)
+# ==============================================================================
+if st.session_state.get("action_trigger"):
+    action = st.session_state.action_trigger
+    param = st.session_state.action_param
+    st.session_state.action_trigger = None
+    
+    try:
+        if action == "create_detail":
+            with st.spinner(f"⏳ Đang dựng chi tiết phân cảnh và đồng bộ Lips-sync cho kịch bản #{param}... Vui lòng đợi trong giây lát..."):
+                char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+                create_scene_details(param, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
+                st.session_state.active_script_id = param
+                st.session_state.scroll_to_top = True
+                st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
+                time.sleep(0.5)
+                st.rerun()
+                
+        elif action == "clone_script":
+            with st.spinner(f"⏳ Đang phân tích và nhân bản biến thể từ Kịch bản #{param}... Vui lòng đợi trong giây lát..."):
+                new_clones = clone_script(param)
+                st.session_state.cloned_scripts.extend(new_clones)
+                st.session_state.scroll_to_top = True
+                st.toast("✅ Đã nhân bản kịch bản thành công!")
+                time.sleep(0.5)
+                st.rerun()
+    except Exception as e:
+        st.error(f"❌ Có lỗi xảy ra trong quá trình xử lý AI. Vui lòng thử lại. Lỗi chi tiết: {e}")
+
+# ==============================================================================
 # 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
@@ -836,23 +866,35 @@ if all_combined_scripts_list:
                     st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                 with col_a2:
                     if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                        st.session_state.action_trigger = "create_detail"
-                        st.session_state.action_param = sc_id
-                        st.rerun()
+                        with st.spinner(f"⏳ Đang dựng chi tiết phân cảnh cho kịch bản #{sc_id}... Vui lòng đợi..."):
+                            char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+                            create_scene_details(sc_id, st.session_state.get("last_mode", ""), st.session_state.get("last_style", ""), st.session_state.get("last_aspect", ""), st.session_state.get("last_narrator", ""), char_rules)
+                            st.session_state.active_script_id = sc_id
+                            st.session_state.scroll_to_top = True
+                            st.toast("✅ Đã tạo kịch bản chi tiết thành công!")
+                            time.sleep(0.5)
+                            st.rerun()
 
     st.markdown("---")
     with st.container(border=True):
         st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
         col_g1, col_g2 = st.columns([2, 1])
         with col_g1:
-            st.session_state.extra_angle_type = st.selectbox("Định hướng chiến lược:", ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"], key=f"extra_angle_selectbox_main_{st.session_state.reset_key}")
+            chosen_angle = st.selectbox("Định hướng chiến lược:", ["⚡ Flash Sale & Deal hời (Tập trung chốt đơn)", "🎭 Tình huống đời sống / Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Mẹo vặt / Chia sẻ", "😂 Tình huống hài hước"], key=f"extra_angle_selectbox_main_{st.session_state.reset_key}")
         with col_g2:
-            st.session_state.extra_num_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
+            chosen_chars = st.number_input("Số diễn viên:", min_value=1, max_value=8, value=1, step=1, key=f"extra_num_chars_main_{st.session_state.reset_key}")
         
         st.markdown("<br>", unsafe_allow_html=True)
-        # Căn chỉnh nút bấm ra chính giữa màn hình
         c_l, c_btn, c_r = st.columns([1, 2, 1])
         with c_btn:
             if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_add_main", type="primary", use_container_width=True):
-                st.session_state.action_trigger = "generate_more"
-                st.rerun()
+                with st.spinner("⏳ Đang sáng tạo và gọi thêm 5 kịch bản mới... Vui lòng đợi trong giây lát..."):
+                    try:
+                        new_scripts = generate_more_scripts(chosen_angle, chosen_chars)
+                        st.session_state.expanded_scripts.extend(new_scripts)
+                        st.session_state.scroll_to_top = True
+                        st.toast("✅ Đã sinh thêm 5 kịch bản mới thành công!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Lỗi khi gọi thêm kịch bản: {e}")
