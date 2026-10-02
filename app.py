@@ -143,7 +143,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP
+# 2. HÀM AI LÕI & LUẬT THÉP (ĐỒNG NHẤT OUTFIT ĐA LỚP)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -175,9 +175,9 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
 def generate_char_rules_string(profiles):
     if not profiles: 
         return "🔹 KHÓA ĐỒNG NHẤT NHÂN VẬT (KHÔNG CÓ ẢNH GỐC): AI BẮT BUỘC TỰ SÁNG TẠO diện mạo nhân vật (mô tả rõ độ tuổi, khuôn mặt, kiểu tóc, vóc dáng) VÀ GHI NHỚ MÔ TẢ NÀY. Bắt buộc dán nguyên văn mô tả này vào mọi prompt của tất cả các cảnh để giữ cho nhân vật đồng nhất 100%."
-    rules = "🔹 KHÓA SINH TRẮC HỌC & GIẢI PHÓNG TRANG PHỤC:\n"
+    rules = "🔹 KHÓA SINH TRẮC HỌC & GIẢI PHÓNG TRANG PHỤC ĐA LỚP:\n"
     for p in profiles: 
-        rules += f"   + Nhân vật {p['id']} ({p['role']}): BẮT BUỘC trích xuất và khóa chặt KHUÔN MẶT, KIỂU TÓC, VÓC DÁNG từ ảnh tham chiếu. TUYỆT ĐỐI BỎ QUA trang phục trong ảnh. AI tự thiết kế trang phục mới phù hợp với bối cảnh kịch bản và ghim rắc-co trang phục đó xuyên suốt video.\n"
+        rules += f"   + Nhân vật {p['id']} ({p['role']}): BẮT BUỘC trích xuất và khóa chặt KHUÔN MẶT, KIỂU TÓC, VÓC DÁNG từ ảnh tham chiếu. TUYỆT ĐỐI BỎ QUA trang phục trong ảnh. AI phải tự thiết kế 1 bộ trang phục mới đa lớp (mô tả rõ áo ngoài, áo trong, quần) phù hợp với bối cảnh và ghim rắc-co bộ đồ đó xuyên suốt video.\n"
     return rules
 
 def get_dynamic_realtime_context(mode):
@@ -219,7 +219,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars):
     {mode_rules}
     🛑 CÁC QUY TẮC BỔ SUNG TUÂN THỦ 100%:
     1. SỐ LƯỢNG NHÂN VẬT CHUẨN XÁC: Kịch bản BẮT BUỘC thiết kế cho ĐÚNG {num_chars} nhân vật tương tác với nhau.
-    2. AN TOÀN NỀN TẢNG: Tuân thủ tuyệt đối quy định cộng đồng.
+    2. ĐỒNG NHẤT TRANG PHỤC TOÀN DIỆN: Giữ nguyên trang phục ĐA LỚP (áo ngoài, áo trong), vóc dáng, kiểu tóc xuyên suốt video.
     3. {char_rules}
     """
 
@@ -236,9 +236,8 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG:
     1. BẢO VỆ SẢN PHẨM & CHỐNG TEXT RÁC:
        - BẮT BUỘC chèn lệnh: "Maintain EXACT original product details. NO generated text, NO subtitles, NO floating logos."
-    2. DYNAMIC OUTFIT (TRANG PHỤC THÍCH ỨNG): 
-       - KHÓA CHẶT 100% khuôn mặt.
-       - TRANG PHỤC: AI tự động thiết kế trang phục phù hợp với bối cảnh kịch bản và ghim rắc-co trang phục đó. Bắt buộc mô tả trang phục bằng TIẾNG VIỆT để hiển thị cho người dùng.
+    2. ĐỒNG NHẤT XUYÊN SUỐT TOÀN DIỆN: 
+       - Giữ nguyên tuyệt đối 100% khuôn mặt, kiểu tóc, vóc dáng, TRANG PHỤC ĐA LỚP (phải mô tả rõ áo khoác ngoài, áo mặc trong, quần/váy, phụ kiện) và BỐI CẢNH ở mọi cảnh quay. KHÔNG được thay đổi kiểu dáng hay thiết kế của bất kỳ lớp quần áo nào trong quá trình chuyển cảnh.
     3. TÍNH TOÁN THỜI LƯỢNG:
        - {duration_instruction}
        - BẠN BẮT BUỘC PHẢI TẠO RA ĐỦ SỐ LƯỢNG PHÂN CẢNH (mỗi cảnh 4s, 6s, 8s) ĐỂ KHỚP 100% VỚI YÊU CẦU TRÊN.
@@ -247,10 +246,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     5. THOẠI MƯỢT MÀ VÀ LIỀN MẠCH THÀNH 1 KHỐI: 
        - Kịch bản phải có ĐÚNG {num_chars} nhân vật tương tác.
        - Câu thoại giữa các cảnh phải nối tiếp logic, phân tích sâu, mang lại giá trị cao cho người xem. KHÔNG lủng củng sáo rỗng. Phải giống y như chuyên gia hoặc KOC đời thực đang nói chuyện.
-    6. LOGIC CHUYỂN CẢNH KẾT HỢP (QUAN TRỌNG):
-       - Chuyển cảnh mới (Tạo ảnh mới): Dùng khi đổi không gian/đổi thời gian/đổi ý chính. 
-       - Cảnh nối tiếp (Dùng lại ảnh cuối): Dùng khi hành động đang diễn ra liên tục, liền mạch. (Kèm lệnh `holding the final frame steady as a reference anchor`). 
-       - BẮT BUỘC phải kết hợp hài hòa cả 2 loại chuyển cảnh này để video hấp dẫn, logic nhất.
+    6. LOGIC CHUYỂN CẢNH KẾT HỢP:
+       - Chuyển cảnh mới (Tạo ảnh mới): Dùng khi đổi góc quay xa/cận, đổi ý chính. 
+       - Cảnh nối tiếp (Dùng lại ảnh cuối): Dùng khi hành động đang diễn ra liên tục. 
     7. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
     8. {char_rules}
     """
@@ -269,7 +267,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC phải chèn đoạn lệnh: Audio: "[Điền chính xác nguyên văn lời thoại tiếng Việt của cảnh này vào đây]" để Veo 3 tạo giọng nói khớp khẩu hình.' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
-    video_prompt_example_1 = 'Vertical 9:16 video... character talking directly to camera. Audio: \\"[Chèn đúng nguyên văn lời thoại tiếng Việt vào đây]\\". Maintain EXACT original colors. NO generated text.' if is_on_camera else 'Vertical 9:16 video... off-screen voiceover... Maintain EXACT original colors. NO generated text.'
+    video_prompt_example_1 = 'Vertical 9:16 video... character talking directly to camera. Audio: \\"[Chèn đúng nguyên văn lời thoại tiếng Việt vào đây]\\". Wearing EXACT SAME [Chèn tiếng Anh trang phục đa lớp]. Maintain EXACT original colors. NO generated text.' if is_on_camera else 'Vertical 9:16 video... off-screen voiceover... Maintain EXACT original colors. NO generated text.'
     video_prompt_example_2 = '<Nếu a anchor as chèn cảnh final for frame holding là lệnh next nối reference shot steady the tiếp>. Audio: \\"[Chèn đúng lời thoại tiếng Việt vào đây]\\"' if is_on_camera else '<Nếu a anchor as chèn cảnh final for frame holding là lệnh next nối reference shot steady the tiếp>.'
 
     prompt = f"""
@@ -280,28 +278,28 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('target_hook')}. Bối cảnh: {outline.get('setting_style')}.
     THUYẾT MINH: {audio_instruction}
     
-    LƯU Ý VỀ DIỆN MẠO & TRANG PHỤC: Trong trường `script_outfit_setup`, BẮT BUỘC TRÌNH BÀY BẰNG TIẾNG VIỆT thật rõ ràng, dễ hiểu (Ví dụ: Nữ chuyên gia 31 tuổi, mặc áo khoác len màu be...). Cụm từ khóa bằng Tiếng Anh sẽ chỉ được chèn vào `image_prompt`.
+    LƯU Ý VỀ DIỆN MẠO & TRANG PHỤC ĐA LỚP: Trong trường `script_outfit_setup`, BẮT BUỘC TRÌNH BÀY BẰNG TIẾNG VIỆT thật chi tiết từng lớp quần áo (Ví dụ: Nữ chuyên gia 31 tuổi, mặc áo khoác blazer màu be bên ngoài, áo thun trắng ôm sát bên trong...). Cụm từ khóa bằng Tiếng Anh của TẤT CẢ LỚP TRANG PHỤC NÀY phải được dịch và chèn CỐ ĐỊNH vào `image_prompt` và `video_prompt` của TỪNG PHÂN CẢNH, tuyệt đối không được thiếu sót áo trong hay áo ngoài để tránh sai lệch rắc-co.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
         "title": "{outline.get('title')}",
         "total_estimated_duration": "Tổng thời gian khớp với yêu cầu",
-        "script_outfit_setup": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC, BỐI CẢNH BẰNG TIẾNG VIỆT DỄ HIỂU (YÊU CẦU GIỮ NGUYÊN RẮC-CO CHO TẤT CẢ CÁC CẢNH QUAY)",
+        "script_outfit_setup": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP (ÁO NGOÀI, ÁO TRONG, QUẦN/VÁY) BẰNG TIẾNG VIỆT (YÊU CẦU GIỮ NGUYÊN RẮC-CO CHO TẤT CẢ CÁC CẢNH QUAY)",
         "voice_profile": {{"gender": "Nam/Nữ", "tone": "nhịp độ chuẩn theo thời lượng, giọng Miền Bắc (chuẩn)"}},
         "scenes": [
             {{
                 "scene_number": 1, "duration": "4s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", 
-                "scene_setting": "Mô tả bối cảnh và trang phục phù hợp tình huống hiện tại...",
+                "scene_setting": "Mô tả bối cảnh góc máy...",
                 "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn)...", 
-                "voiceover_vi": "Lời thoại tự nhiên, mượt mà, đúng số lượng từ WPM, KHÔNG văn vở sáo rỗng...",
-                "image_prompt": "Cinematic vertical 9:16 photo... [DỊCH MÔ TẢ TRANG PHỤC SANG TIẾNG ANH VÀ CHÈN VÀO ĐÂY]. Maintain EXACT facial identity. NO generated text.", 
+                "voiceover_vi": "Lời thoại tự nhiên, mượt mà, đúng số lượng từ WPM, KHÔNG nhồi nhét sáo rỗng...",
+                "image_prompt": "Cinematic vertical 9:16 photo... [DỊCH MÔ TẢ ĐA LỚP TRANG PHỤC SANG TIẾNG ANH VÀ CHÈN CỐ ĐỊNH VÀO ĐÂY]. Maintain EXACT facial identity, identical outer jacket and inner shirt. NO generated text.", 
                 "video_prompt": "{video_prompt_example_1}"
             }},
             {{
                 "scene_number": 2, "duration": "6s", "transition_type": "<AI 'Chuyển 'Cảnh HOẶC chọn: cảnh hành logic mới' nối tiếp' tùy tự động>", 
                 "scene_setting": "...",
                 "voice_director_vn": "...", 
-                "voiceover_vi": "<Câu câu logic, lạc mạch nối thoại tiếp trước... trực từ>",
+                "voiceover_vi": "<Câu chuyện chỉnh... câu hoàn logic, mượt mạch một nối thoại thành tiếp trực từ>",
                 "image_prompt": "<Nếu Dùng Không cuối cảnh cần của ghi: prompt thì trước ảnh ảnh...>", 
                 "video_prompt": "{video_prompt_example_2}"
             }}
@@ -363,14 +361,12 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     cur_len = len(all_combined)
     
     time_ctx = get_dynamic_realtime_context(mode)
-    prod_ctx = f"THÔNG TIN NGƯỜI DÙNG NHẬP: {st.session_state.current_input_context}"
-    db_ctx = f"DỮ LIỆU (DB): {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
+    prod_ctx = f"THÔNG TIN DỮ LIỆU: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
     dna_ctx = f"DNA GỐC: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
     
     prompt = f"""
     {time_ctx}
     {prod_ctx}
-    {db_ctx}
     {dna_ctx}
     
     🛑 YÊU CẦU MỞ RỘNG TỪ NGƯỜI DÙNG:
@@ -395,7 +391,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     payload = []
     if extra_char_inputs:
         for c in extra_char_inputs:
-            payload.append(f"ẢNH NHÂN VẬT {c['id']} - VAI TRÒ: {c['role']}:")
+            payload.append(f"ẢNH NHÂN VẬT THAM CHIẾU {c['id']} - VAI TRÒ: {c['role']}:")
             payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
     payload.append(prompt)
     
@@ -1098,6 +1094,7 @@ if all_combined_scripts_list:
                             st.rerun()
                 with col_btn2:
                     btn_clone_ph = st.empty()
+                    spin_clone_ph = st.empty()
                     if btn_clone_ph.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
                         btn_clone_ph.empty()
                         lock_ui()
@@ -1121,6 +1118,7 @@ if all_combined_scripts_list:
                     st.caption(f"⚡ **Tóm tắt & Hook:** *{hook_val}*")
                 with col_a2:
                     btn_cre_ph = st.empty()
+                    spin_cre_ph = st.empty()
                     if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
                         btn_cre_ph.empty()
                         lock_ui()
@@ -1181,6 +1179,7 @@ if all_combined_scripts_list:
     
     with c_btn:
         btn_more_ph = st.empty()
+        spin_more_ph = st.empty()
         if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
             btn_more_ph.empty()
             lock_ui()
@@ -1190,9 +1189,6 @@ if all_combined_scripts_list:
             else:
                 st.session_state.target_duration_instruction = "TỔNG THỜI LƯỢNG YÊU CẦU: Tự động (Khoảng 3 đến 5 phân cảnh, tổng 15-30 giây)."
 
-            if extra_char_inputs:
-                st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in extra_char_inputs]
-            
             st.session_state.last_narrator = narrator_mode_more
             
             st.session_state.action_trigger = "generate_more"
