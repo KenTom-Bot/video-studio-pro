@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 # ==============================================================================
 # 1. CẤU HÌNH GIAO DIỆN & KẾT NỐI
 # ==============================================================================
-st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
+st.set_page_config(page_title="Bình Nguyên AI", page_icon="🎬", layout="wide")
 
 def lock_ui():
     st.markdown("""
