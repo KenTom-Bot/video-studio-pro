@@ -874,7 +874,7 @@ if st.session_state.get("action_trigger"):
 # ==============================================================================
 # 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Bình Nguyên AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
 current_acc_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
 allowed_categories = [m for m in ALL_MODULES if m in current_acc_info.get("roles", ALL_MODULES)]
