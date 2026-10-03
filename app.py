@@ -143,7 +143,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (LOGIC MẠCH THOẠI, CHUYỂN CẢNH, WPM KHẮT KHE)
+# 2. HÀM AI LÕI & LUẬT THÉP (CẤM RÁC NGÔN TỪ, BẢO VỆ CHỐNG BIẾN DẠNG VẬT THỂ)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -232,20 +232,25 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     {time_ctx}
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO (BẮT BUỘC TUÂN THỦ 100%):
-    1. ĐỒNG NHẤT XUYÊN SUỐT TOÀN DIỆN: Giữ nguyên tuyệt đối 100% khuôn mặt, TRANG PHỤC ĐA LỚP (mô tả rõ áo khoác ngoài, áo trong) và BỐI CẢNH ở mọi cảnh quay. 
-    2. TOÁN HỌC WPM (BẮT BUỘC ĐẾM TỪNG TỪ TRONG LỜI THOẠI): 
-       - Lời thoại không được quá dài so với số giây. 
-       - Nếu Cảnh 4s: Lời thoại TỐI ĐA 12 - 16 từ.
-       - Nếu Cảnh 6s: Lời thoại TỐI ĐA 18 - 24 từ.
-       - Nếu Cảnh 8s: Lời thoại TỐI ĐA 25 - 32 từ.
-    3. VĂN PHONG "THÔI MIÊN" & TỰ NHIÊN (CHỐNG RÔ BỐT):
-       - CẤM NHỒI NHÉT: Tuyệt đối không bê nguyên si danh sách thông số kỹ thuật khô khan vào 1 câu thoại. Bắt buộc chuyển hóa thông số thành ngôn ngữ đời sống tự nhiên (Ví dụ: Thay vì nói 'công suất 1000W đun 3 phút', hãy nói 'chưa kịp tán dóc xong nồi lẩu đã sôi sùng sục rồi').
-       - LIỀN MẠCH THÀNH 1 DÒNG CHẢY: Lời thoại từ Cảnh 1 sang Cảnh 2 phải là một mạch logic liên tục. Không được đột ngột chuyển chủ đề (ví dụ đang nói cảnh ăn lẩu, cảnh sau tự nhiên nhảy sang nói về khóa vi áp là sai logic).
-    4. LOGIC ĐỒNG BỘ CHUYỂN CẢNH (VISUAL-AUDIO SYNC):
-       - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại và hành động đang diễn ra liên tục không ngắt quãng (Ví dụ: Cảnh 1 gắp thịt -> Cảnh 2 cho vào miệng). Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor` cho cảnh này.
-       - NẾU LỜI THOẠI CHUYỂN Ý (ví dụ từ kể chuyện sang show cận cảnh sản phẩm/tính năng) -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-    5. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
-    6. {char_rules}
+    1. BẢO VỆ VẬT THỂ & CHỐNG BIẾN DẠNG (ANTI-MORPHING TỐI QUAN TRỌNG):
+       - BẮT BUỘC chèn đoạn mã lệnh này vào đuôi của MỌI `video_prompt`: "Maintain EXACT product geometry, scale, and details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text, NO floating logos."
+    2. TỐI ƯU GÓC MÁY QUAY (CAMERA ANGLES):
+       - CHỈ DÙNG các góc máy tĩnh hoặc chuyển động cực chậm để không làm méo vật thể: "Static Shot", "Slow Pan", "Slight push-in", "Subtle movement", "Macro static shot".
+       - TUYỆT ĐỐI CẤM SỬ DỤNG: "Fast Pan", "Quick Zoom", "360-degree rotation", "Dynamic camera", "Fast motion".
+    3. ĐỒNG NHẤT XUYÊN SUỐT TOÀN DIỆN: Giữ nguyên tuyệt đối 100% khuôn mặt, TRANG PHỤC ĐA LỚP (mô tả rõ áo khoác ngoài, áo trong) và BỐI CẢNH ở mọi cảnh quay.
+    4. TOÁN HỌC WPM (BẮT BUỘC ĐẾM TỪNG TỪ TRONG LỜI THOẠI): 
+       - Lời thoại KHÔNG ĐƯỢC QUÁ DÀI.
+       - Cảnh 4s: Lời thoại TỐI ĐA 12 - 16 từ.
+       - Cảnh 6s: Lời thoại TỐI ĐA 18 - 24 từ.
+       - Cảnh 8s: Lời thoại TỐI ĐA 25 - 32 từ.
+    5. VĂN PHONG "THÔI MIÊN" & TỰ NHIÊN (CHỐNG RÔ BỐT):
+       - CẤM NHỒI NHÉT: Bắt buộc chuyển hóa thông số khô khan thành ngôn ngữ đời sống tự nhiên (Ví dụ: 'công suất 1000W đun 3 phút' phải viết thành 'chưa kịp tán dóc xong nồi lẩu đã sôi sùng sục rồi').
+       - Lời thoại từ Cảnh 1 sang Cảnh 2 phải là một mạch logic liên tục.
+    6. LOGIC ĐỒNG BỘ CHUYỂN CẢNH (VISUAL-AUDIO SYNC):
+       - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại và hành động đang diễn ra liên tục không ngắt quãng (Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor. Start exactly from the provided reference image`).
+       - NẾU LỜI THOẠI CHUYỂN Ý -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
+    7. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
+    8. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
@@ -260,10 +265,10 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     num_chars = outline.get("actor_count", st.session_state.get("extra_num_chars", 1))
     
-    audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]" để Veo 3 tạo giọng nói khớp khẩu hình.' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
+    audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
-    video_prompt_example_1 = 'Vertical 9:16 video... character talking directly to camera. Audio: \\"[Chèn nguyên văn lời thoại tiếng Việt vào đây]\\". Wearing EXACT SAME [Chèn tiếng Anh trang phục đa lớp]. Maintain EXACT original colors. NO generated text.' if is_on_camera else 'Vertical 9:16 video... off-screen voiceover... Maintain EXACT original colors. NO generated text.'
-    video_prompt_example_2 = '<Nếu anchor as chèn: final frame holding hành liên reference steady tục, động>. Audio: \\"[Chèn lời thoại tiếng Việt]\\"' if is_on_camera else '<Nếu anchor as chèn: final frame holding hành liên reference steady tục, động>.'
+    video_prompt_example_1 = 'Vertical 9:16 video. Static shot... character talking directly to camera. Audio: \\"[Chèn nguyên văn lời thoại tiếng Việt vào đây]\\". Wearing EXACT SAME [Chèn tiếng Anh trang phục đa lớp]. [CHÈN NGUYÊN VĂN product_visual_dna_en VÀO ĐÂY]. Maintain EXACT product geometry, scale, and details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text.' if is_on_camera else 'Vertical 9:16 video. Slow pan... off-screen voiceover... [CHÈN NGUYÊN VĂN product_visual_dna_en VÀO ĐÂY]. Maintain EXACT product geometry, NO morphing. NO generated text.'
+    video_prompt_example_2 = '<Nếu Start anchor as chèn: exactly final frame from holding hành image liên provided reference steady the tục,>. [CHÈN product_visual_dna_en]. Maintain EXACT product geometry, NO morphing. Audio: \\"[Chèn lời thoại tiếng Việt]\\"' if is_on_camera else '<Nếu Start anchor as chèn: exactly final frame from holding hành image liên provided reference steady the tục,>. [CHÈN product_visual_dna_en]. Maintain EXACT product geometry, NO morphing.'
 
     prompt = f"""
     {time_ctx}
@@ -273,21 +278,26 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('target_hook')}. Bối cảnh: {outline.get('setting_style')}.
     THUYẾT MINH: {audio_instruction}
     
-    LƯU Ý ĐẶC BIỆT: Hãy đếm chính xác số từ của lời thoại. Không viết dài quá số giây cho phép. Lời thoại và sự chuyển cảnh phải LOGIC, TỰ NHIÊN, CẤM NHỒI NHÉT thông số như rô bốt.
+    LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
+    - ĐẾM ĐÚNG SỐ TỪ THEO CHUẨN WPM.
+    - CẤM NHỒI NHÉT THÔNG SỐ KHÔ KHAN (chuyển hóa thành cảm xúc/lợi ích).
+    - Mạch thoại 100% tự nhiên, liền mạch.
+    - GÓC MÁY AN TOÀN: Chỉ dùng Static Shot, Slow Pan. CẤM Fast Pan, xoay 360 độ.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
         "title": "{outline.get('title')}",
         "total_estimated_duration": "Tổng thời gian khớp với yêu cầu",
-        "script_outfit_setup": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP (ÁO NGOÀI, ÁO TRONG) BẰNG TIẾNG VIỆT ĐỂ GIỮ NGUYÊN RẮC-CO",
+        "script_outfit_setup": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP (ÁO NGOÀI, ÁO TRONG) BẰNG TIẾNG VIỆT",
+        "product_visual_dna_en": "Mô tả siêu ngắn gọn hình dáng, cấu trúc, chi tiết vật lý của sản phẩm bằng TIẾNG ANH (Ví dụ: Sleek silver 1000W multi-cooker, ceramic inner pot, geometric shape). NẾU KHÔNG CÓ SẢN PHẨM THÌ ĐỂ TRỐNG.",
         "voice_profile": {{"gender": "Nam/Nữ", "tone": "nhịp độ chuẩn theo thời lượng, giọng Miền Bắc (chuẩn)"}},
         "scenes": [
             {{
                 "scene_number": 1, "duration": "4s", "transition_type": "Chuyển cảnh mới (Tạo ảnh mới)", 
-                "scene_setting": "Mô tả bối cảnh góc máy...",
+                "scene_setting": "Mô tả bối cảnh góc máy AN TOÀN (Static/Slow)...",
                 "voice_director_vn": "Giọng Nam/Nữ Miền Bắc (chuẩn)...", 
                 "voiceover_vi": "Lời thoại TỰ NHIÊN, đi thẳng vào vấn đề, ĐÚNG SỐ TỪ WPM, không nhồi nhét sáo rỗng...",
-                "image_prompt": "Cinematic vertical 9:16 photo... [DỊCH MÔ TẢ ĐA LỚP TRANG PHỤC SANG TIẾNG ANH VÀ CHÈN VÀO ĐÂY]. Maintain EXACT facial identity, identical outer jacket and inner shirt. NO generated text.", 
+                "image_prompt": "Cinematic vertical 9:16 photo. Static shot... [DỊCH MÔ TẢ ĐA LỚP TRANG PHỤC SANG TIẾNG ANH]. [CHÈN CỐ ĐỊNH NGUYÊN VĂN product_visual_dna_en VÀO ĐÂY]. Maintain EXACT facial identity, identical outer jacket and inner shirt. NO generated text.", 
                 "video_prompt": "{video_prompt_example_1}"
             }},
             {{
@@ -784,11 +794,11 @@ if st.session_state.get("action_trigger"):
                 payload = []
                 if up_files_temp:
                     payload.append("ẢNH THAM CHIẾU:")
-                    for f in up_files_temp: payload.append(types.Part.from_bytes(data=f.getvalue(), mime_type=f.type if f.type else "image/jpeg"))
+                    for f in up_files_temp: payload.append(types.Part.from_bytes(data=f["bytes"], mime_type=f["mime_type"]))
                 if char_inputs_temp:
                     for c in char_inputs_temp:
                         payload.append(f"ẢNH NHÂN VẬT THAM CHIẾU {c['id']} - VAI TRÒ: {c['role']}:")
-                        payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
+                        payload.append(types.Part.from_bytes(data=c["bytes"], mime_type=c["mime_type"]))
                 payload.append(prompt)
                 
                 res = call_gemini(payload, get_sys_inst_outlines(param["mode"], param["style"], param["narrator_mode"], char_rules, num_c))
@@ -975,6 +985,10 @@ btn_gen_main_ph = st.empty()
 if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
     btn_gen_main_ph.empty()
     lock_ui()
+    
+    safe_char_inputs = [{"id": c["id"], "role": c["role"], "mime_type": c["file"].type, "bytes": c["file"].getvalue()} for c in char_inputs]
+    safe_up_files = [{"mime_type": f.type, "bytes": f.getvalue()} for f in up_files] if up_files else []
+    
     st.session_state.action_trigger = "generate_main"
     st.session_state.action_param = {
         "mode": mode, "style": style, "narrator_mode": narrator_mode, 
@@ -983,8 +997,8 @@ if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TR
         "channel_persona": viral_persona if is_viral_mode else "",
         "video_topic": viral_topic if is_viral_mode else ""
     }
-    st.session_state.temp_char_inputs = char_inputs
-    st.session_state.temp_up_files = up_files
+    st.session_state.temp_char_inputs = safe_char_inputs
+    st.session_state.temp_up_files = safe_up_files
     st.rerun()
 
 # ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
@@ -1179,6 +1193,8 @@ if all_combined_scripts_list:
             btn_more_ph.empty()
             lock_ui()
             
+            safe_extra_char_inputs = [{"id": c["id"], "role": c["role"], "mime_type": c["file"].type, "bytes": c["file"].getvalue()} for c in extra_char_inputs]
+            
             if duration_choice_more.startswith("Tùy chỉnh"):
                 st.session_state.target_duration_instruction = f"TỔNG THỜI LƯỢNG YÊU CẦU: Chính xác {custom_sec_more} giây. Bạn PHẢI tạo ra số lượng phân cảnh đủ nhiều (mỗi cảnh 4s, 6s, 8s) sao cho tổng thời gian cộng lại bằng ĐÚNG {custom_sec_more} giây."
             else:
@@ -1188,5 +1204,5 @@ if all_combined_scripts_list:
             
             st.session_state.action_trigger = "generate_more"
             st.session_state.action_param = {"angle": chosen_angle, "chars": chosen_chars}
-            st.session_state.temp_extra_char_inputs = extra_char_inputs
+            st.session_state.temp_extra_char_inputs = safe_extra_char_inputs
             st.rerun()
