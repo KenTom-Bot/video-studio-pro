@@ -174,7 +174,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V3 (ĐỒNG NHẤT 100%)
+# 2. HÀM AI LÕI & LUẬT THÉP V3 (TỐI ƯU COPYWRITING & SYSTEM OVERRIDE)
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -184,7 +184,7 @@ def get_dynamic_realtime_context(mode):
     elif month in [6, 7, 8]: season_desc = "thời tiết nắng nóng"
     else: season_desc = "thời tiết mát mẻ, se lạnh"
     
-    return f"BỐI CẢNH: {season_desc}. CẤM nhắc trực tiếp tên mùa một cách máy móc. Hãy dùng cảm giác thời tiết để chuyển ý tự nhiên."
+    return f"BỐI CẢNH: {season_desc}. LƯU Ý: CẤM nhắc trực tiếp đến tên mùa hay thời tiết một cách máy móc. KHÔNG ĐƯỢC tự ý thêm thời tiết vào kịch bản trừ khi sản phẩm thực sự cần thiết."
 
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -224,32 +224,41 @@ def generate_char_rules_string(profiles):
 def get_mode_specific_rules(mode):
     if "Viral" in mode:
         return """
-    🎯 ĐỊNH HƯỚNG: VIRAL & XÂY KÊNH (CHUYÊN GIA / KIẾN THỨC)
-    - MỤC TIÊU LÕI: Chia sẻ kiến thức, mẹo hay hoặc kể chuyện logic để KÉO LƯỢT FOLLOW. CẤM CHỐT ĐƠN.
+    🎯 ĐỊNH HƯỚNG CỐT LÕI: VIRAL & XÂY KÊNH (CHUYÊN GIA / KIẾN THỨC)
+    - MỤC TIÊU: Chia sẻ kiến thức, mẹo hay hoặc kể chuyện cảm xúc để KÉO LƯỢT FOLLOW. CẤM CHỐT ĐƠN.
     - VĂN PHONG (TONE): Dân dã, tự nhiên, chuyên nghiệp. Không nói rườm rà.
         """
     else:
         return """
-    🎯 ĐỊNH HƯỚNG: TIKTOK SHOP & BÁN HÀNG (AFFILIATE THỰC CHIẾN)
-    - MỤC TIÊU LÕI: Đánh trúng Nỗi đau (Pain points), làm nổi bật USP để CHỐT ĐƠN.
-    - CƠ CHẾ KÊU GỌI (CTA): Giục khách mua ngay, chớp deal hời. Nhưng CHỈ XUẤT HIỆN Ở CẢNH CUỐI.
+    🎯 ĐỊNH HƯỚNG CỐT LÕI: TIKTOK SHOP & BÁN HÀNG (AFFILIATE THỰC CHIẾN)
+    - MỤC TIÊU: Đánh trúng Nỗi đau, làm nổi bật USP để CHỐT ĐƠN.
+    - CƠ CHẾ KÊU GỌI (CTA): Giục khách mua ngay, chớp deal hời. NHƯNG CHỈ XUẤT HIỆN Ở CẢNH CUỐI. CẤM CTA Ở CẢNH 1.
         """
 
-def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars):
+def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
     time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
+    
+    if "Tự động" in angle:
+        strat_cmd = "ĐỊNH HƯỚNG SÁNG TẠO: Tự động phân tích sản phẩm và tạo 5 kịch bản với 5 GÓC ĐỘ ĐA DẠNG KHÁC NHAU."
+    elif "Giữ nguyên" in angle:
+        strat_cmd = "ĐỊNH HƯỚNG SÁNG TẠO: Bám sát và GIỮ NGUYÊN chiến lược cốt lõi của kịch bản gốc."
+    else:
+        strat_cmd = f"🛑 LỆNH ĐIỀU HƯỚNG TUYỆT ĐỐI: TOÀN BỘ CÁC KỊCH BẢN TẠO RA PHẢI TUÂN THỦ NGHIÊM NGẶT CHIẾN LƯỢC: '{angle}'. Mọi kịch bản phải bám sát định hướng này (VD: Nếu chọn Flash Sale, tất cả phải mang không khí dồn dập săn sale)."
+
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
     {time_ctx}
     {mode_rules}
+    {strat_cmd}
+    
     🛑 CÁC QUY TẮC BỔ SUNG TUÂN THỦ 100%:
-    1. SỐ LƯỢNG NHÂN VẬT & BỐI CẢNH: Đúng {num_chars} nhân vật tương tác với nhau. Giữ BỐI CẢNH ĐỒNG NHẤT.
-    2. LÁCH LUẬT CẤM: TUYỆT ĐỐI CẤM dùng các từ: "Cam kết", "Chữa trị", "Đúng", "Chính xác 100%", "Trị dứt điểm". Dùng từ nói giảm nói tránh như "Khoảng...", "Hỗ trợ...", "Giúp cải thiện...". CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ.
-    3. CẤM NHẮC THỜI TIẾT: CẤM nhắc đến thời tiết hay mùa vụ (như mùa đông, mùa thu) vào kịch bản để tránh khiên cưỡng.
-    4. ĐỒNG NHẤT 100%: Giữ nguyên bối cảnh, trang phục ĐA LỚP, vóc dáng, kiểu tóc xuyên suốt video. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
-    5. XƯNG HÔ THÔNG MINH: Phân tích tệp khách hàng. Nếu nữ -> xưng "chị em". Nam -> xưng "anh em". Chung -> xưng "anh chị". CẤM dùng "Hội", "Mấy bạn", "Dân nghiện...".
-    6. QUY TẮC HOOK: Hook mở đầu KHÔNG ĐƯỢC chứa lời kêu gọi mua hàng/giỏ hàng. Cảnh 1 chỉ để đồng cảm.
-    7. {char_rules}
+    1. SỐ LƯỢNG NHÂN VẬT & BỐI CẢNH: Đúng {num_chars} nhân vật. Giữ BỐI CẢNH ĐỒNG NHẤT.
+    2. LÁCH LUẬT CẤM: TUYỆT ĐỐI CẤM dùng: "Cam kết", "Chữa trị", "Đúng", "Chính xác 100%". Dùng từ nói giảm: "Khoảng...", "Hỗ trợ...", "Giúp cải thiện...". CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ.
+    3. ĐỒNG NHẤT 100%: Giữ nguyên bối cảnh, trang phục ĐA LỚP, vóc dáng, kiểu tóc. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
+    4. XƯNG HÔ & NGÔN TỪ THỰC TẾ: Tự phân tích khách hàng (Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị"). CẤM dùng từ lóng giả tạo ("Hội", "Mấy bạn", "Dân nghiện..."). CẤM dùng từ lố bịch ("Thèm nồi lẩu" -> Sửa thành bối cảnh thực tế: "Gia đình quây quần ăn lẩu", "Anh chị nào hay...").
+    5. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi mua hàng/bấm giỏ hàng. Chỉ khơi gợi sự đồng cảm.
+    6. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
@@ -261,26 +270,25 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
-    1. ANTI-MORPHING: BẮT BUỘC chèn đoạn mã lệnh này vào đuôi của MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text."
-    2. CHÍNH SÁCH KIỂM DUYỆT: Cấm các từ "Cam kết", "Đúng", "Chữa trị". Thay bằng "Khoảng", "Hỗ trợ", "Giúp cải thiện". Cấm báo giá bằng số cụ thể.
+    1. ANTI-MORPHING & HIỆN THỰC SẢN PHẨM: BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent."
+    2. CHÍNH SÁCH KIỂM DUYỆT: Cấm "Cam kết", "Đúng 100%", "Chữa trị". Dùng "Hỗ trợ", "Giúp cải thiện". Cấm báo giá bằng số cụ thể.
     3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): {duration_instruction}. 
-       - Cảnh 4s = Tối đa 16 âm tiết. 
-       - Cảnh 6s = Tối đa 24 âm tiết. 
-       - Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
+       - Cảnh 4s = Tối đa 16 âm tiết. Cảnh 6s = Tối đa 24 âm tiết. Cảnh 8s = Tối đa 32 âm tiết.
     4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
-       - Dùng từ chuẩn xác: Hầm thịt thì dùng "chín mềm" (không dùng "mọng nước"), lau chùi thì dùng "dễ lau chùi" (không dùng "siêu khỏe"). 
-       - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ vào thoại.
-       - Tự phân tích sản phẩm: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM dùng "Mấy bạn", "Hội", "Dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
-    5. NGỮ PHÁP & SEAMLESS FLOW:
-       - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) để tạo quãng nghỉ giúp giọng đọc AI có cảm xúc.
-       - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC phải ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà, dân dã, tự nhiên. KHÔNG hô khẩu hiệu cụt lủn.
+       - Xưng hô chuẩn xác: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM dùng "Mấy bạn", "Hội", "Dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
+       - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm" (không dùng "mọng nước"), lau chùi thì là "dễ lau chùi" (không dùng "siêu khỏe"). 
+       - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo ("Thèm nồi lẩu nghi ngút").
+    5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
+       - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
+       - BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ, tạo nhịp điệu và cảm xúc như người thật.
+       - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC phải ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà. KHÔNG hô khẩu hiệu cụt lủn.
     6. CẤU TRÚC HOOK & CTA:
-       - Cảnh 1 (Hook): Chỉ dùng để đồng cảm vấn đề. CẤM kêu gọi bấm giỏ hàng/mua ngay ở Cảnh 1.
-       - Cảnh cuối cùng: ĐÂY MỚI LÀ NƠI chốt đơn, gọi "bấm góc trái/mua ngay".
+       - Cảnh 1 (Hook): Chỉ khơi gợi đồng cảm. CẤM kêu gọi bấm giỏ hàng/mua ngay ở Cảnh 1.
+       - Cảnh cuối cùng: ĐÂY MỚI LÀ NƠI chốt đơn "bấm góc trái/rinh ngay".
     7. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
-       - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH CHO Ý TRƯỚC ĐÓ và hành động đang diễn ra liên tục. (Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor`).
-       - NẾU LỜI THOẠI CHUYỂN Ý MỚI -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-    8. ĐỒNG NHẤT 100%: Phải giữ Bối cảnh (Setting) thống nhất, trang phục đa lớp không đổi từ cảnh 1 đến cuối.
+       - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" + lệnh `holding the final frame steady as a reference anchor` KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH LIÊN TỤC CHO Ý TRƯỚC ĐÓ.
+       - NẾU CHUYỂN Ý MỚI -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
+    8. ĐỒNG NHẤT 100%: Giữ Bối cảnh (Setting) thống nhất, trang phục đa lớp không đổi từ cảnh 1 đến cuối.
     9. {narrator_instruction}
     10. {char_rules}
     """
@@ -299,9 +307,9 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
     if "Viral" in mode:
-        voice_hint = "Giọng đọc CẢM XÚC, CHÂN THẬT, GẦN GŨI để tạo sự đồng cảm và giữ chân người xem. Tốc độ vừa phải (1.8-2.2 từ/s)."
+        voice_hint = "Giọng đọc CẢM XÚC, CHÂN THẬT, GẦN GŨI để tạo sự đồng cảm sâu sắc và giữ chân người xem. Tốc độ vừa phải (1.8-2.2 từ/s)."
     else:
-        voice_hint = "Giọng đọc MẠNH MẼ, NHANH, NĂNG LƯỢNG CAO để cuốn hút người xem và tạo chuyển đổi chốt sale dồn dập (3.5-4 từ/s)."
+        voice_hint = "Giọng đọc MẠNH MẼ, NHANH, NĂNG LƯỢNG CAO để cuốn hút người xem và tạo chuyển đổi chốt sale (3.5-4 từ/s)."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx}
@@ -311,10 +319,10 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     THUYẾT MINH: {audio_instruction}
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
-    - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ lời thoại của các cảnh phải ghép lại thành 1 đoạn văn DÂN DÃ, ĐỜI THƯỜNG duy nhất.
-    - XƯNG HÔ THÔNG MINH: Dùng "chị em" hoặc "anh em" hoặc "anh chị". CẤM xưng "Hội", "Mấy bạn".
-    - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh (VD không dùng "mọng nước" cho đồ hầm). CẤM nhắc mùa vụ/thời tiết.
-    - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA mua hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
+    - LIỀN KHỐI & NGỮ PHÁP: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác để ngắt nghỉ có cảm xúc. Không cụt lủn.
+    - XƯNG HÔ THÔNG MINH: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM xưng "Hội", "Mấy bạn".
+    - NGÔN TỪ THỰC TẾ: Dùng từ bối cảnh sinh hoạt chân thật (VD: "Gia đình quây quần ăn lẩu", "Anh chị nào hay..."). CẤM dùng từ thèm thuồng lố bịch ("Thèm nồi lẩu").
+    - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
     - ĐẾM ĐÚNG SỐ ÂM TIẾT WPM. 4s <= 16 âm tiết, 6s <= 24 âm tiết. KHÔNG DÙNG TỪ CẤM.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
@@ -329,14 +337,14 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
                 "scene": 1, "dur": "4s", "trans": "Chuyển cảnh mới (Tạo ảnh mới)", 
                 "setting": "Mô tả bối cảnh góc máy AN TOÀN (Static/Slow)...",
                 "director": "Mô tả biểu cảm nhấn nhá cảm xúc...", 
-                "voiceover": "GỌI TÊN KHÁCH (Anh chị/Chị em). Khơi gợi vấn đề. CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA Ở ĐÂY. ĐÚNG WPM...",
+                "voiceover": "Xưng hô chuẩn xác (Anh chị/Chị em). Khơi gợi bối cảnh tự nhiên. CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY. ĐÚNG WPM...",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot... [ENG OUTFIT]. [prod_dna]. Maintain EXACT facial identity, identical outer jacket and inner shirt. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot... character talking to camera. Audio: \\"[exact vi dialogue]\\". Wearing EXACT SAME [ENG OUTFIT]. [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
             }},
             {{
                 "scene": 2, "dur": "6s", "trans": "<Cảnh Chuyển HOẶC cảnh mới nối tiếp>", 
                 "setting": "...", "director": "...", 
-                "voiceover": "<Nối 1. Câu Cảnh WPM chữ có dân dã, dấu mạch nghỉ. ngắt phẩy thường, từ ĐÚNG đời>",
+                "voiceover": "<Nối WPM. có dấu mạch nghỉ. ngắt nhiên, phẩy thoại tự ĐÚNG>",
                 "img_p": "<Nếu KHÔNG MỚI TẠO nối thì tiếp>", 
                 "vid_p": "<Nếu Audio: EXACT Maintain NO Start [prod_dna]. \\"[dialogue]\\" anchor. as exactly final frame from geometry, holding image, morphing. nối product provided reference steady tiếp:>"
             }}
@@ -365,7 +373,7 @@ def clone_script(script_id):
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
     Dựa BẮT BUỘC vào dữ liệu Gốc ở trên, tạo chính xác 5 biến thể mới. 
-    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em", "anh em". CẤM nhắc thời tiết/mùa. CẤM xưng "Mấy bạn". LÁCH MỌI TỪ KHÓA BỊ CẤM.
+    YÊU CẦU ĐẶC BIỆT: Hook CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em". KHÔNG nhắc thời tiết. KHÔNG xưng "Mấy bạn". CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "outlines": [
@@ -373,14 +381,14 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản",
                 "setting": "Bối cảnh thực tế",
-                "hook": "Gọi tên khách hàng tự nhiên & Hook dẫn dắt tâm lý đời thường (KHÔNG CTA, KHÔNG nói cụt lủn)",
+                "hook": "Xưng hô chuẩn xác & Hook dẫn dắt tâm lý đời thực (KHÔNG CTA ở đây, KHÔNG nói cụt lủn)",
                 "actors": {num_chars}
             }}
         ]
     }}
     LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars))
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars, "Giữ nguyên chiến lược của kịch bản gốc"))
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     clones = res.get("outlines", res.get("script_outlines", []))
     for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
@@ -399,11 +407,8 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     prompt = f"""
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
-    🛑 CRITICAL STRATEGY OVERRIDE: '{angle}'. 
-    Bạn PHẢI viết 5 kịch bản mới TUÂN THỦ TUYỆT ĐỐI chiến lược này. Bẻ giọng điệu sao cho phù hợp với '{angle}'.
-
     SỐ DIỄN VIÊN: CHÍNH XÁC {num_chars}.
-    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng "anh chị", "chị em", "anh em". Không nói cụt lủn hô khẩu hiệu. CẤM NHẮC THỜI TIẾT MÁY MÓC.
+    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG. Xưng "anh chị", "chị em". Không nói cụt lủn. CẤM NHẮC THỜI TIẾT. CẤM KÊU GỌI MUA HÀNG Ở HOOK.
 
     STRICT JSON:
     {{
@@ -412,7 +417,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
                 "id": {cur_len+1},
                 "title": "...",
                 "setting": "...",
-                "hook": "Gọi tên KH & Hook tâm lý mượt mà (Không có CTA ở cảnh 1), CHUẨN XÁC CHIẾN LƯỢC",
+                "hook": "Xưng hô chuẩn xác & Hook tâm lý sinh hoạt đời thường (Không có CTA mua hàng), CHUẨN XÁC CHIẾN LƯỢC, có dấu phẩy ngắt nghỉ",
                 "actors": {num_chars}
             }}
         ]
@@ -425,7 +430,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
             payload.append(types.Part.from_bytes(data=c["bytes"], mime_type=c["mime_type"]))
     payload.append(prompt)
     
-    res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars))
+    res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle))
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
@@ -999,16 +1004,10 @@ if st.session_state[gen_main_key]:
         angle_str = initial_angle
         num_c = num_chars
         
-        if "Tự động" in angle_str:
-            strat_override = f"STRATEGY: Tự động phân tích và tạo 5 kịch bản với 5 góc độ đa dạng."
-        else:
-            strat_override = f"🛑 CRITICAL STRATEGY OVERRIDE: '{angle_str}'. YOU MUST WRITE ALL 5 SCRIPTS STRICTLY FOLLOWING THIS EXACT STRATEGY."
-            
         prompt = f"""
         {time_ctx}
         {prod_ctx}
         NOTES: {custom_note}
-        {strat_override}
         
         STRICT JSON REQUIRED:
         {{
@@ -1025,12 +1024,11 @@ if st.session_state[gen_main_key]:
                     "id": 1, 
                     "title": "Tên kịch bản", 
                     "setting": "Bối cảnh thực tế", 
-                    "hook": "HOOK BẮT BUỘC: Phân tích tệp KH để xưng hô (anh chị/chị em/anh em). Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng/giỏ hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'.",
+                    "hook": "HOOK BẮT BUỘC: Phân tích tệp KH để xưng hô (anh chị/chị em). Nêu bối cảnh tự nhiên (VD: 'Gia đình quây quần ăn lẩu', 'Anh chị nào hay...'). CẤM dùng từ 'Thèm'. KHÔNG nhắc mua hàng/giỏ hàng ở đây. KHÔNG xưng 'Hội', 'Mấy bạn'. Lách luật cấm.",
                     "actors": {num_c}
                 }} 
             ]
         }}
-        CREATE EXACTLY 5 SCRIPTS. INTERACTION FOR {num_c} ACTORS.
         """
         
         payload = []
@@ -1043,7 +1041,7 @@ if st.session_state[gen_main_key]:
                 payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
         payload.append(prompt)
         
-        res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_c))
+        res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_c, angle_str))
         
         if not res or ("outlines" not in res and "script_outlines" not in res):
             st.error("❌ AI không trả về đúng định dạng JSON. Vui lòng thử lại!")
