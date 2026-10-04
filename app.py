@@ -174,7 +174,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (CẤM RÁC NGÔN TỪ, LOGIC NỐI TIẾP)
+# 2. HÀM AI LÕI & LUẬT THÉP CẢI TIẾN
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -272,16 +272,16 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     2. CHÍNH SÁCH KIỂM DUYỆT & LÁCH LUẬT:
        - KHÔNG DÙNG TỪ CẤM: Bỏ ngay các từ "Cam kết", "Đúng", "Chữa trị". Thay bằng "Khoảng", "Hỗ trợ", "Giúp cải thiện". Cấm báo giá cụ thể bằng con số.
     3. TỐI ƯU GÓC MÁY QUAY (CAMERA ANGLES):
-       - CHỈ DÙNG các góc máy tĩnh hoặc chuyển động cực chậm: "Static Shot", "Slow Pan", "Slight push-in". CẤM DÙNG: "Fast Pan", "Quick Zoom", "360-degree rotation".
+       - CHỈ DÙNG các góc máy tĩnh hoặc chuyển động cực chậm để không làm méo vật thể: "Static Shot", "Slow Pan", "Slight push-in". CẤM DÙNG: "Fast Pan", "Quick Zoom", "360-degree rotation".
     4. TÍNH TOÁN THỜI LƯỢNG & TOÁN HỌC WPM (ĐẾM THEO ÂM TIẾT TIẾNG VIỆT):
        - {duration_instruction}
        - AI BẮT BUỘC PHẢI ĐẾM SỐ ÂM TIẾT TRONG LỜI THOẠI ĐỂ KHỚP THỜI GIAN:
-         + Cảnh 4s: TỐI ĐA 12 - 16 âm tiết.
+         + Cảnh 4s: TỐI ĐA 12 - 16 âm tiết (Ví dụ: "Deal cực hời hôm nay nha các bà" là 8 âm tiết).
          + Cảnh 6s: TỐI ĐA 18 - 24 âm tiết.
          + Cảnh 8s: TỐI ĐA 25 - 32 âm tiết.
     5. KỸ THUẬT VIẾT THOẠI "THÔI MIÊN" & LIỀN MẠCH TUYỆT ĐỐI (STORYTELLING):
        - KHÔNG VIẾT RỜI RẠC: Toàn bộ lời thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC phải là MỘT ĐOẠN VĂN DUY NHẤT được cắt nhỏ ra. Câu thoại của cảnh sau phải nối tiếp ngay lập tức ý của cảnh trước bằng các từ nối tự nhiên (VD: "Mà cái đỉnh nhất là...", "Chưa hết đâu nha...", "Bởi vậy cho nên...").
-       - CẤM NHỒI NHÉT NHƯ RÔ BỐT: Bắt buộc chuyển hóa thông số khô khan thành ngôn ngữ đời sống. 
+       - CẤM NHỒI NHÉT NHƯ RÔ BỐT: Bắt buộc chuyển hóa thông số khô khan thành ngôn ngữ đời sống tự nhiên.
     6. LOGIC ĐỒNG BỘ CHUYỂN CẢNH (VISUAL-AUDIO SYNC):
        - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH CHO Ý TRƯỚC ĐÓ và hành động đang diễn ra liên tục không ngắt quãng. Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor`.
        - NẾU LỜI THOẠI CHUYỂN Ý MỚI (ví dụ: chuyển từ kể chuyện sang khoe tính năng sản phẩm) -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
@@ -904,7 +904,7 @@ up_files = []
 custom_note = ""
 
 if is_viral_mode:
-    st.markdown("#### 🌟 Thông tin Kênh & Chủ đề")
+    st.markdown("#### 🌟 Thông thông Kênh & Chủ đề")
     col_v1, col_v2 = st.columns(2)
     with col_v1:
         viral_persona = st.text_input("👤 Định vị Kênh / Người nói (Tùy chọn):", placeholder="Nhập định vị (VD: Bác sĩ da liễu, Mẹ bỉm sữa 3 con, Góc nhìn GenZ...)", key=f"viral_persona_{st.session_state.reset_key}")
