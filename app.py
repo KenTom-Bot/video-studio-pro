@@ -65,16 +65,49 @@ api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
 client = genai.Client(api_key=api_key) if api_key else None
 
 def load_licensed_accounts():
+    accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "is_trial": False}}
     if os.path.exists(ACCOUNTS_FILE):
         try:
-            with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f: return json.load(f)
+            with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f: 
+                data = json.load(f)
+                for k, v in data.items():
+                    # Cập nhật tự động khách cũ
+                    if "password" not in v: v["password"] = v.get("phone", "123456")
+                    if "is_trial" not in v: v["is_trial"] = False # Khách cũ mặc định là VIP
+                    if "daily_usage_count" not in v: v["daily_usage_count"] = 0
+                    if "last_generation_date" not in v: v["last_generation_date"] = ""
+                    accs[k] = v
         except: pass
-    return {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31"}}
+    return accs
 
 def save_licensed_accounts(acc_dict):
     try:
         with open(ACCOUNTS_FILE, "w", encoding="utf-8") as f: json.dump(acc_dict, f, ensure_ascii=False, indent=2)
     except: pass
+
+def check_usage_limit(email):
+    if email == ADMIN_EMAIL: return True, ""
+    accs = st.session_state.licensed_accounts
+    acc = accs.get(email)
+    if not acc: return False, "Lỗi xác thực tài khoản."
+    
+    exp_date = datetime.strptime(acc.get("expires_at", "2099-12-31"), "%Y-%m-%d")
+    if datetime.now() > exp_date:
+        return False, "Tài khoản của bạn đã hết hạn. Vui lòng liên hệ Admin để gia hạn!"
+        
+    if acc.get("is_trial", False):
+        today = datetime.now().strftime("%Y-%m-%d")
+        if acc.get("last_generation_date") != today:
+            acc["daily_usage_count"] = 0
+            acc["last_generation_date"] = today
+        
+        if acc.get("daily_usage_count", 0) >= 5:
+            return False, "Bạn đã dùng hết 5/5 lượt tạo kịch bản của hôm nay! Vui lòng quay lại vào ngày mai hoặc mua gói VIP để không giới hạn."
+        
+        acc["daily_usage_count"] += 1
+        save_licensed_accounts(accs)
+        
+    return True, ""
 
 def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt"):
     b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
@@ -142,7 +175,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (CẤM RÁC NGÔN TỪ, LOGIC NỐI TIẾP)
+# 2. HÀM AI LÕI & LUẬT THÉP
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -249,10 +282,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
          + Cảnh 8s: TỐI ĐA 25 - 32 âm tiết.
     5. KỸ THUẬT VIẾT THOẠI "THÔI MIÊN" & LIỀN MẠCH TUYỆT ĐỐI (STORYTELLING):
        - KHÔNG VIẾT RỜI RẠC: Toàn bộ lời thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC phải là MỘT ĐOẠN VĂN DUY NHẤT được cắt nhỏ ra. Câu thoại của cảnh sau phải nối tiếp ngay lập tức ý của cảnh trước bằng các từ nối tự nhiên (VD: "Mà cái đỉnh nhất là...", "Chưa hết đâu nha...", "Bởi vậy cho nên...").
-       - CẤM NHỒI NHÉT NHƯ RÔ BỐT: Bắt buộc chuyển hóa thông số khô khan thành ngôn ngữ đời sống (Ví dụ: Đừng viết 'công suất 1000W đun 3 phút', hãy viết 'chưa kịp tán dóc xong nồi lẩu đã sôi sùng sục rồi'). 
+       - CẤM NHỒI NHÉT NHƯ RÔ BỐT: Bắt buộc chuyển hóa thông số khô khan thành ngôn ngữ đời sống. 
     6. LOGIC ĐỒNG BỘ CHUYỂN CẢNH (VISUAL-AUDIO SYNC):
        - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH CHO Ý TRƯỚC ĐÓ và hành động đang diễn ra liên tục không ngắt quãng. Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor`.
-       - NẾU LỜI THOẠI CHUYỂN Ý MỚI (ví dụ: chuyển từ kể chuyện sang khoe tính năng sản phẩm) -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
+       - NẾU LỜI THOẠI CHUYỂN Ý MỚI -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
     7. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
     8. {char_rules}
     """
@@ -288,7 +321,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     THUYẾT MINH: {audio_instruction}
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
-    - KẾT DÍNH LỜI THOẠI 1 KHỐI: Toàn bộ lời thoại của các cảnh phải ghép lại thành 1 đoạn văn mượt mà duy nhất, sử dụng từ nối (Mà đỉnh nhất là, Chưa hết đâu nha, Vì thế nên...).
+    - KẾT DÍNH LỜI THOẠI 1 KHỐI: Toàn bộ lời thoại của các cảnh phải ghép lại thành 1 đoạn văn mượt mà duy nhất, sử dụng từ nối.
     - ĐẾM ĐÚNG SỐ ÂM TIẾT TIẾNG VIỆT THEO CHUẨN WPM. Cảnh 4s không quá 16 âm tiết.
     - KHÔNG DÙNG TỪ CẤM (Cam kết, Chữa trị, Đúng 100%, báo giá bằng số).
     - Trong `script_outfit_setup`, BẮT BUỘC TRÌNH BÀY 100% BẰNG TIẾNG VIỆT thật chi tiết trang phục đa lớp.
@@ -297,7 +330,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     {{
         "title": "{outline.get('title')}",
         "total_estimated_duration": "Tổng thời gian khớp với yêu cầu",
-        "script_outfit_setup": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP (ÁO NGOÀI, ÁO TRONG) BẰNG TIẾNG VIỆT",
+        "script_outfit_setup": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP BẰNG TIẾNG VIỆT",
         "product_visual_dna_en": "Mô tả siêu ngắn gọn hình dáng, cấu trúc, chi tiết vật lý của sản phẩm bằng TIẾNG ANH. NẾU KHÔNG CÓ SẢN PHẨM THÌ ĐỂ TRỐNG.",
         "voice_profile": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
@@ -358,7 +391,6 @@ def clone_script(script_id):
             }}
         ]
     }}
-    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars))
     if not res or "script_outlines" not in res:
@@ -441,43 +473,93 @@ def save_project_to_db(email, title, payload_data, project_id=None):
         return err_msg
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN
+# 3. THANH BÊN (SIDEBAR) & TÀI KHOẢN (AUTH & LEAD GEN)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
-        st.markdown("### 🔐 ĐĂNG NHẬP")
-        email_input = st.text_input("Nhập Email:", placeholder="Nhập email tài khoản của bạn...", key="login_email_input")
+        tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký Dùng Thử"])
         
-        btn_login_ph = st.empty()
-        login_key = "loading_login"
-        if login_key not in st.session_state: st.session_state[login_key] = False
-        
-        if st.session_state[login_key]:
-            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang xác thực...</div>", unsafe_allow_html=True)
-            email_check = email_input.strip()
-            if email_check in st.session_state.licensed_accounts:
-                acc_info = st.session_state.licensed_accounts[email_check]
-                exp_date_str = acc_info.get("expires_at", "2099-12-31")
-                try:
-                    exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
-                    if datetime.now() > exp_date:
-                        st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
+        with tabs[0]:
+            email_input = st.text_input("Email:", placeholder="Nhập email của bạn...", key="login_email_input")
+            pass_input = st.text_input("Mật khẩu:", type="password", placeholder="Nhập mật khẩu...", key="login_pass_input")
+            
+            btn_login_ph = st.empty()
+            login_key = "loading_login"
+            if login_key not in st.session_state: st.session_state[login_key] = False
+            
+            if st.session_state[login_key]:
+                st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang xác thực...</div>", unsafe_allow_html=True)
+                email_check = email_input.strip()
+                pass_check = pass_input.strip()
+                
+                if email_check in st.session_state.licensed_accounts:
+                    acc_info = st.session_state.licensed_accounts[email_check]
+                    
+                    if acc_info.get("password") == pass_check or email_check == ADMIN_EMAIL:
+                        exp_date_str = acc_info.get("expires_at", "2099-12-31")
+                        try:
+                            exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
+                            if datetime.now() > exp_date:
+                                st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
+                                st.session_state[login_key] = False
+                                st.stop()
+                        except: pass
+                        st.session_state.is_logged_in = True
+                        st.session_state.current_email = email_check
                         st.session_state[login_key] = False
-                        st.stop()
-                except: pass
-                st.session_state.is_logged_in = True
-                st.session_state.current_email = email_check
-                st.session_state[login_key] = False
-                st.toast("✅ Đăng nhập thành công!")
-                time.sleep(0.5)
-                st.rerun()
-            else: 
-                st.error("Tài khoản chưa được cấp quyền!")
-                st.session_state[login_key] = False
-        else:
-            if btn_login_ph.button("🔑 Đăng Nhập", type="primary"):
-                st.session_state[login_key] = True
-                st.rerun()
+                        st.toast("✅ Đăng nhập thành công!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    else:
+                        st.error("Sai mật khẩu!")
+                        st.session_state[login_key] = False
+                else: 
+                    st.error("Tài khoản chưa được cấp quyền!")
+                    st.session_state[login_key] = False
+            else:
+                if btn_login_ph.button("🔑 Đăng Nhập", type="primary"):
+                    st.session_state[login_key] = True
+                    st.rerun()
+                    
+        with tabs[1]:
+            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI với <b>3 ngày dùng thử miễn phí (5 lượt/ngày)</b>.</p>", unsafe_allow_html=True)
+            reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...", key="reg_email")
+            reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...", key="reg_phone")
+            reg_pass = st.text_input("Mật khẩu mới:", type="password", placeholder="Tạo mật khẩu...", key="reg_pass")
+            
+            btn_reg_ph = st.empty()
+            reg_key = "loading_reg"
+            if reg_key not in st.session_state: st.session_state[reg_key] = False
+            
+            if st.session_state[reg_key]:
+                st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang khởi tạo tài khoản...</div>", unsafe_allow_html=True)
+                email_check = reg_email.strip()
+                if email_check in st.session_state.licensed_accounts:
+                    st.error("Email này đã tồn tại trong hệ thống!")
+                elif not email_check or not reg_phone.strip() or not reg_pass.strip():
+                    st.error("Vui lòng điền đầy đủ thông tin!")
+                else:
+                    exp_date = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
+                    st.session_state.licensed_accounts[email_check] = {
+                        "roles": ALL_MODULES,
+                        "phone": reg_phone.strip(),
+                        "password": reg_pass.strip(),
+                        "expires_at": exp_date,
+                        "is_trial": True,
+                        "daily_usage_count": 0,
+                        "last_generation_date": ""
+                    }
+                    save_licensed_accounts(st.session_state.licensed_accounts)
+                    st.session_state.is_logged_in = True
+                    st.session_state.current_email = email_check
+                    st.toast("✅ Đăng ký Dùng thử thành công!")
+                    time.sleep(0.5)
+                    st.rerun()
+                st.session_state[reg_key] = False
+            else:
+                if btn_reg_ph.button("🚀 Kích Hoạt Dùng Thử 3 Ngày", type="secondary", use_container_width=True):
+                    st.session_state[reg_key] = True
+                    st.rerun()
     else:
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
@@ -522,7 +604,7 @@ with st.sidebar:
         if save_proj_key not in st.session_state: st.session_state[save_proj_key] = False
         
         if st.session_state[save_proj_key]:
-            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang lưu dữ liệu...</div>", unsafe_allow_html=True)
+            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang lưu dữ liệu lên Cloud...</div>", unsafe_allow_html=True)
             lock_ui()
             all_com = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
             if not all_com: st.warning("⚠️ Chưa có kịch bản nào để lưu!")
@@ -572,6 +654,7 @@ with st.sidebar:
                         
                         col_open, col_del = st.columns(2)
                         with col_open:
+                            btn_open_ph = st.empty()
                             open_state_key = f"open_loading_{p['id']}"
                             if open_state_key not in st.session_state: st.session_state[open_state_key] = False
                             
@@ -606,11 +689,12 @@ with st.sidebar:
                                 time.sleep(0.5)
                                 st.rerun()
                             else:
-                                if st.button("📂 Mở", key=f"btn_open_{p['id']}", use_container_width=True):
+                                if btn_open_ph.button("📂 Mở", key=f"btn_open_{p['id']}", use_container_width=True):
                                     st.session_state[open_state_key] = True
                                     st.rerun()
                                     
                         with col_del:
+                            btn_del_ph = st.empty()
                             del_state_key = f"del_loading_{p['id']}"
                             if del_state_key not in st.session_state: st.session_state[del_state_key] = False
                             
@@ -623,7 +707,7 @@ with st.sidebar:
                                 time.sleep(0.5)
                                 st.rerun()
                             else:
-                                if st.button("🗑️ Xóa", key=f"btn_del_{p['id']}", type="secondary", use_container_width=True):
+                                if btn_del_ph.button("🗑️️ Xóa", key=f"btn_del_{p['id']}", type="secondary", use_container_width=True):
                                     st.session_state[del_state_key] = True
                                     st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -631,40 +715,64 @@ with st.sidebar:
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
+            
+            # Phân tách Khách VIP & Khách Trial
+            st.markdown("##### 🚨 Thông Báo & Cảnh Báo")
             expired_or_soon = []
             for acc, info in st.session_state.licensed_accounts.items():
                 if acc == ADMIN_EMAIL: continue
                 exp_str = info.get("expires_at", "2099-12-31")
+                is_trial_user = info.get("is_trial", False)
+                today_str = datetime.now().strftime("%Y-%m-%d")
+                usage = info.get("daily_usage_count", 0) if info.get("last_generation_date") == today_str else 0
+                
                 try:
                     exp_dt = datetime.strptime(exp_str, "%Y-%m-%d")
                     d_left = (exp_dt - datetime.now()).days
-                    if d_left <= 7: expired_or_soon.append((acc, info.get('phone', ''), d_left, exp_str))
+                    if d_left <= 7 or (is_trial_user and usage >= 5): 
+                        expired_or_soon.append((acc, info, d_left, exp_str, usage))
                 except: pass
             
             if expired_or_soon:
-                for cust, phone, d_left, exp_str in expired_or_soon:
-                    status_text = f"Đã quá hạn {abs(d_left)} ngày" if d_left < 0 else (f"Hết hạn hôm nay!" if d_left == 0 else f"Còn {d_left} ngày")
+                for cust, info, d_left, exp_str, usage in expired_or_soon:
+                    is_trial_user = info.get("is_trial", False)
+                    phone = info.get('phone', '')
+                    
+                    if d_left < 0: status_text = f"Đã quá hạn {abs(d_left)} ngày"
+                    elif d_left == 0: status_text = "Hết hạn hôm nay!"
+                    else: status_text = f"Còn {d_left} ngày"
+                    
+                    alert_reason = "⚠️ " + status_text
+                    if is_trial_user and usage >= 5:
+                        alert_reason += " | 🔥 ĐÃ DÙNG HẾT LƯỢT TRONG NGÀY"
+                    
                     with st.container(border=True):
-                        st.markdown(f"**👤 {cust}**")
-                        st.caption(f"📞 SĐT: {phone or 'Chưa có'}<br>⚠️ Trạng thái: <b>{status_text}</b> ({exp_str})", unsafe_allow_html=True)
+                        st.markdown(f"**👤 {cust}** <span style='font-size: 11px; padding: 2px 6px; background: {'#fde047' if is_trial_user else '#86efac'}; border-radius: 4px; font-weight: bold;'>{'TRIAL' if is_trial_user else 'VIP'}</span>", unsafe_allow_html=True)
+                        st.caption(f"📞 SĐT: {phone or 'Chưa có'} | 🔑 Pass: `{info.get('password', 'N/A')}`<br><b style='color:#d90429;'>{alert_reason}</b>", unsafe_allow_html=True)
                         if phone:
                             clean_phone = re.sub(r'\D', '', phone)
-                            st.markdown(f"<a href='[https://zalo.me/](https://zalo.me/){clean_phone}' target='_blank' style='background:#0068ff; color:white; padding:5px 12px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700; display:inline-block; margin-top:5px;'>💬 Nhắn Zalo nhắc hạn</a>", unsafe_allow_html=True)
-            else: st.caption("✅ Không có khách nào sắp hết hạn trong 7 ngày tới.")
+                            st.markdown(f"<a href='[https://zalo.me/](https://zalo.me/){clean_phone}' target='_blank' style='background:#0068ff; color:white; padding:5px 12px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700; display:inline-block; margin-top:5px;'>💬 Nhắn Zalo Chốt Sale</a>", unsafe_allow_html=True)
+            else: st.caption("✅ Không có cảnh báo nào.")
             
             st.markdown("---")
             with st.form("add_license"):
                 st.markdown("##### ➕ Cấp Quyền Khách Hàng Mới")
-                new_acc = st.text_input("Email khách hàng:", placeholder="Nhập email khách hàng cần cấp quyền...")
-                new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Vd: 0968484369")
+                new_acc = st.text_input("Email khách hàng:")
+                new_phone = st.text_input("Số điện thoại (SĐT):")
+                new_pass = st.text_input("Mật khẩu:", value="123456")
+                acc_type = st.radio("Loại Tài Khoản:", ["Gói VIP (Không giới hạn)", "Dùng thử (Giới hạn 5 lần/ngày)"], index=0)
                 assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
-                duration_opt = st.selectbox("Thời hạn:", ["Dùng thử 3 ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "3 Năm", "5 Năm", "10 Năm", "Vĩnh viễn (Trọn đời)"])
-                btn_add_lic = st.form_submit_button("💾 Cấp Quyền & Lưu SĐT")
+                duration_opt = st.selectbox("Thời hạn:", ["1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "3 Ngày (Dùng thử)", "Vĩnh viễn (Trọn đời)"])
+                btn_add_lic = st.form_submit_button("💾 Cấp Quyền & Lưu")
                 if btn_add_lic:
                     with st.spinner("⏳ Đang cấp quyền..."):
-                        exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=3 if "Dùng thử" in duration_opt else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730, "3 Năm": 1095, "5 Năm": 1825, "10 Năm": 3650}.get(duration_opt, 30))).strftime("%Y-%m-%d")
+                        is_trial = "Dùng thử" in acc_type
+                        days_add = 3 if is_trial else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "Vĩnh viễn (Trọn đời)": 3650}.get(duration_opt, 30)
+                        exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=days_add)).strftime("%Y-%m-%d")
+                        
                         st.session_state.licensed_accounts[new_acc.strip()] = {
-                            "roles": assigned_modules, "phone": new_phone.strip(), "expires_at": exp_date
+                            "roles": assigned_modules, "phone": new_phone.strip(), "password": new_pass.strip(), 
+                            "expires_at": exp_date, "is_trial": is_trial, "daily_usage_count": 0, "last_generation_date": ""
                         }
                         save_licensed_accounts(st.session_state.licensed_accounts)
                         st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
@@ -680,14 +788,16 @@ with st.sidebar:
                 st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
                 for acc, info in filtered_accs:
                     with st.container(border=True):
-                        st.markdown(f"**👤 {acc}**")
+                        is_trial = info.get("is_trial", False)
+                        st.markdown(f"**👤 {acc}** <span style='font-size: 11px; padding: 2px 6px; background: {'#fde047' if is_trial else '#86efac'}; border-radius: 4px; font-weight: bold;'>{'TRIAL' if is_trial else 'VIP'}</span>", unsafe_allow_html=True)
                         phone_val = info.get('phone', '')
+                        pass_val = info.get('password', '')
                         roles_val = info.get('roles', ALL_MODULES)
                         exp_val = info.get('expires_at', '2099-12-31')
-                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'}<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val}", unsafe_allow_html=True)
-                        if phone_val:
-                            clean_p = re.sub(r'\D', '', phone_val)
-                            st.markdown(f"<a href='[https://zalo.me/](https://zalo.me/){clean_p}' target='_blank' style='background:#0068ff; color:white; padding:4px 10px; border-radius:4px; text-decoration:none; font-size:11px; font-weight:700; display:inline-block; margin-bottom:5px;'>💬 Nhắn Zalo</a>", unsafe_allow_html=True)
+                        today_str = datetime.now().strftime("%Y-%m-%d")
+                        usage = info.get("daily_usage_count", 0) if info.get("last_generation_date") == today_str else 0
+                        
+                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'} | 🔑 Pass: `{pass_val}`<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val} <br>• Lượt dùng hôm nay: {usage}/5", unsafe_allow_html=True)
                         
                         col_up, col_del = st.columns(2)
                         with col_up:
@@ -706,13 +816,18 @@ with st.sidebar:
                         if st.session_state.get("editing_acc_email") == acc:
                             with st.form(f"update_form_{acc}" ):
                                 st.markdown(f"**Cập nhật cho: {acc}**")
-                                upd_phone = st.text_input("SĐT mới:", value=phone_val, placeholder="Cập nhật số điện thoại...", key=f"upd_p_{acc}")
-                                upd_roles = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=roles_val, key=f"upd_r_{acc}")
-                                upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val, placeholder="YYYY-MM-DD", key=f"upd_e_{acc}")
+                                upd_phone = st.text_input("SĐT mới:", value=phone_val)
+                                upd_pass = st.text_input("Mật khẩu:", value=pass_val)
+                                upd_trial = st.checkbox("Là tài khoản Dùng thử (Giới hạn 5 lượt/ngày)", value=is_trial)
+                                upd_roles = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=roles_val)
+                                upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val)
                                 btn_save_upd = st.form_submit_button("💾 Lưu Cập Nhật")
                                 if btn_save_upd:
                                     with st.spinner("⏳ Đang lưu..."):
-                                        st.session_state.licensed_accounts[acc] = {"roles": upd_roles, "phone": upd_phone.strip(), "expires_at": upd_exp.strip()}
+                                        st.session_state.licensed_accounts[acc].update({
+                                            "roles": upd_roles, "phone": upd_phone.strip(), "password": upd_pass.strip(), 
+                                            "expires_at": upd_exp.strip(), "is_trial": upd_trial
+                                        })
                                         save_licensed_accounts(st.session_state.licensed_accounts)
                                         st.session_state.editing_acc_email = None
                                         st.toast("✅ Đã cập nhật tài khoản thành công!")
@@ -737,8 +852,18 @@ with st.sidebar:
         
         st.markdown("---")
         st.markdown("### 🔐 TÀI KHOẢN")
-        st.success(f"Đang dùng: {st.session_state.current_email}")
         
+        user_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
+        if st.session_state.current_email == ADMIN_EMAIL:
+            st.success("Tài khoản: ADMIN (Không giới hạn)")
+        elif user_info.get("is_trial", False):
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            used = user_info.get("daily_usage_count", 0) if user_info.get("last_generation_date") == today_str else 0
+            st.info(f"**GÓI DÙNG THỬ 3 NGÀY**\n\n• Email: {st.session_state.current_email}\n• Đã dùng: **{used}/5** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
+        else:
+            st.success(f"**GÓI VIP** (Không giới hạn)\n\n• Email: {st.session_state.current_email}\n• Hết hạn: {user_info.get('expires_at')}")
+
+        btn_logout_ph = st.empty()
         logout_key = "loading_logout"
         if logout_key not in st.session_state: st.session_state[logout_key] = False
         
@@ -751,12 +876,12 @@ with st.sidebar:
             time.sleep(0.5)
             st.rerun()
         else:
-            if st.button("🚪 Đăng Xuất"):
+            if btn_logout_ph.button("🚪 Đăng Xuất"):
                 st.session_state[logout_key] = True
                 st.rerun()
 
 if not st.session_state.is_logged_in:
-    st.info("👈 Vui lòng đăng nhập ở thanh công cụ bên trái.")
+    st.info("👈 Vui lòng đăng nhập hoặc đăng ký dùng thử ở thanh công cụ bên trái.")
     st.stop()
 
 # ==============================================================================
@@ -809,7 +934,7 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
     up_files = st.file_uploader("📦 Upload Ảnh SP / Bối cảnh (Sẽ được AI giữ nguyên màu/thiết kế 100%):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_main_files_s_{st.session_state.reset_key}")
-    custom_note = st.text_area("✍️️ Ghi chú đặc biệt cho AI (Tùy chọn):", placeholder="Nhập yêu cầu nhấn mạnh tính năng, kịch bản mẫu, hoặc ý tưởng cụ thể của bạn vào đây...", key=f"note_main_s_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍️ Ghi chú đặc biệt cho AI (Tùy chọn):", placeholder="Nhập yêu cầu nhấn mạnh tính năng, kịch bản mẫu, hoặc ý tưởng cụ thể của bạn vào đây...", key=f"note_main_s_{st.session_state.reset_key}")
 
 st.markdown("---")
 st.markdown("### 🎥 Đạo Diễn, Góc Quay & Thời Lượng")
@@ -978,8 +1103,11 @@ if st.session_state[gen_main_key]:
     st.rerun()
 else:
     if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
-        st.session_state[gen_main_key] = True
-        st.rerun()
+        can_run, msg = check_usage_limit(st.session_state.current_email)
+        if not can_run: st.error(f"❌ {msg}")
+        else:
+            st.session_state[gen_main_key] = True
+            st.rerun()
 
 # ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
 if st.session_state.content_analysis and isinstance(st.session_state.content_analysis, dict):
@@ -1010,7 +1138,9 @@ if all_combined_scripts_list:
     pending_scripts = [sc for sc in all_combined_scripts_list if int(sc.get("id", 0)) not in st.session_state.generated_details]
 
     if st.session_state.active_script_id is not None:
-        if st.button("⬅ Thu gọn và Quay lại danh sách tổng"):
+        btn_collapse_ph = st.empty()
+        if btn_collapse_ph.button("⬅ Thu gọn và Quay lại danh sách tổng"):
+            btn_collapse_ph.empty()
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
@@ -1039,7 +1169,7 @@ if all_combined_scripts_list:
             st.markdown(f"#### 📍 Phân cảnh {idx} ({scene.get('duration', '8s')}) — [ {trans_type} ]")
             st.markdown(f"🏛 **Bối cảnh & Miêu tả:** *{scene.get('scene_setting', '')}*")
             st.markdown(f"**🎙️ Đạo diễn ngữ điệu & SFX:** *{scene.get('voice_director_vn', '')}*")
-            st.markdown(f"**💬 Thoại & Âm thanh:** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
+            st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover_vi', '')}</span>", unsafe_allow_html=True)
             
             img_p = scene.get('image_prompt', '')
             is_linked_scene = "nối tiếp" in trans_type.lower() or "dùng lại ảnh cuối" in img_p.lower() or "tham chiếu" in img_p.lower() or "không cần" in img_p.lower()
@@ -1098,8 +1228,11 @@ if all_combined_scripts_list:
                         st.rerun()
                     else:
                         if st.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
-                            st.session_state[clone_key] = True
-                            st.rerun()
+                            can_run, msg = check_usage_limit(st.session_state.current_email)
+                            if not can_run: st.error(f"❌ {msg}")
+                            else:
+                                st.session_state[clone_key] = True
+                                st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### ⏳ **2. Kịch Bản Đang Chờ Tạo Chi Tiết**")
@@ -1135,8 +1268,11 @@ if all_combined_scripts_list:
                         st.rerun()
                     else:
                         if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                            st.session_state[cre_key] = True
-                            st.rerun()
+                            can_run, msg = check_usage_limit(st.session_state.current_email)
+                            if not can_run: st.error(f"❌ {msg}")
+                            else:
+                                st.session_state[cre_key] = True
+                                st.rerun()
 
     st.markdown("---")
     st.markdown("##### ➕ **Tùy Chỉnh & Gọi Thêm Kịch Bản Mới**")
@@ -1219,5 +1355,8 @@ if all_combined_scripts_list:
             st.rerun()
         else:
             if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
-                st.session_state[more_key] = True
-                st.rerun()
+                can_run, msg = check_usage_limit(st.session_state.current_email)
+                if not can_run: st.error(f"❌ {msg}")
+                else:
+                    st.session_state[more_key] = True
+                    st.rerun()
