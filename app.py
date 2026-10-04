@@ -174,8 +174,18 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP CẢI TIẾN
+# 2. HÀM AI LÕI & LUẬT THÉP (ĐÃ FIX LỖI FUNCTION NOT DEFINED)
 # ==============================================================================
+def get_dynamic_realtime_context(mode):
+    now = datetime.now()
+    month = now.month
+    if month in [12, 1, 2]: season_desc = "thời tiết lạnh giá"
+    elif month in [3, 4, 5]: season_desc = "thời tiết giao mùa, ấm áp"
+    elif month in [6, 7, 8]: season_desc = "thời tiết nắng nóng"
+    else: season_desc = "thời tiết mát mẻ, se lạnh"
+    
+    return f"BỐI CẢNH: {season_desc}. CẤM nhắc trực tiếp tên mùa một cách máy móc. Hãy dùng cảm giác thời tiết để chuyển ý tự nhiên."
+
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
@@ -226,9 +236,11 @@ def get_mode_specific_rules(mode):
         """
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars):
+    time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
+    {time_ctx}
     {mode_rules}
     🛑 CÁC QUY TẮC BỔ SUNG TUÂN THỦ 100%:
     1. SỐ LƯỢNG NHÂN VẬT: Đúng {num_chars} nhân vật tương tác với nhau.
@@ -241,12 +253,14 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars):
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
+    time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     is_on_camera = "On-camera" in narrator_mode
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính. YÊU CẦU TỐI QUAN TRỌNG CHO VEO 3: BẮT BUỘC chèn lệnh `Audio: \"[Nguyên văn lời thoại tiếng Việt]\"` vào tất cả các `video_prompt`." if is_on_camera else "Lồng tiếng ngoài khung hình. KHÔNG đưa phần Audio vào `video_prompt`."
     
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
+    {time_ctx}
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
     1. ANTI-MORPHING: BẮT BUỘC chèn đoạn mã lệnh này vào đuôi của MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text."
@@ -301,7 +315,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     THUYẾT MINH: {audio_instruction}
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
-    - ĐOẠN VĂN LIỀN KHỐI: Lời thoại của các cảnh phải ghép lại thành 1 đoạn văn DÂN DÃ, ĐỜI THƯỜNG. Có đầy đủ chủ ngữ, vị ngữ, dấu phẩy ngắt nghỉ.
+    - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ lời thoại của các cảnh phải ghép lại thành 1 đoạn văn DÂN DÃ, ĐỜI THƯỜNG duy nhất.
     - XƯNG HÔ THÔNG MINH: Dùng "chị em" hoặc "anh em" hoặc "anh chị". CẤM xưng "Hội", "Mấy bạn".
     - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh (VD không dùng "mọng nước" cho đồ hầm). CẤM nhắc mùa vụ/thời tiết.
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA mua hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
@@ -1107,7 +1121,7 @@ if all_combined_scripts_list:
         st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(active_sc.get('title', 'KỊCH BẢN')).upper()}**")
         st.markdown(f"""
         <div class='detail-header-box'>
-            ⏱️️ Thời lượng: <b>{active_sc.get('total_dur', active_sc.get('total_estimated_duration', '24s'))}</b> | 
+            ⏱ Thời lượng: <b>{active_sc.get('total_dur', active_sc.get('total_estimated_duration', '24s'))}</b> | 
             🎙 Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', 'nhịp độ chuẩn')})</b> | 
             👔 Trang phục & Bối cảnh: <b>{active_sc.get('outfit_vi', active_sc.get('script_outfit_setup', 'Mặc định'))}</b> | 
             📐 Khung hình: <b>{HARDCODED_ASPECT}</b>
@@ -1121,7 +1135,7 @@ if all_combined_scripts_list:
             dur = scene.get('dur', scene.get('duration', '8s'))
             st.markdown(f"#### 📍 Phân cảnh {idx} ({dur}) — [ {trans_type} ]")
             st.markdown(f"🏛 **Bối cảnh & Miêu tả:** *{scene.get('setting', scene.get('scene_setting', ''))}*")
-            st.markdown(f"**🎙️️ Đạo diễn ngữ điệu & SFX:** *{scene.get('director', scene.get('voice_director_vn', ''))}*")
+            st.markdown(f"**🎙 Đạo diễn ngữ điệu & SFX:** *{scene.get('director', scene.get('voice_director_vn', ''))}*")
             st.markdown(f"**💬 Thoại & Âm thanh (Chuẩn chính tả):** <span class='voiceover-text'>{scene.get('voiceover', scene.get('voiceover_vi', ''))}</span>", unsafe_allow_html=True)
             
             img_p = scene.get('img_p', scene.get('image_prompt', ''))
