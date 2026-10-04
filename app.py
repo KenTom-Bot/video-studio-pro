@@ -174,7 +174,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP
+# 2. HÀM AI LÕI & LUẬT THÉP (CẤM RÁC NGÔN TỪ, LOGIC NỐI TIẾP)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -563,12 +563,15 @@ with st.sidebar:
     else:
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
-        if current_acc and st.session_state.current_email != ADMIN_EMAIL:
+        is_trial = current_acc.get("is_trial", False)
+        
+        # Chỉ hiện cảnh báo sắp hết hạn cho KHÁCH VIP
+        if current_acc and st.session_state.current_email != ADMIN_EMAIL and not is_trial:
             try:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
                 if 0 <= days_left <= 7:
-                    st.warning(f"⚠️️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Liên hệ hotline để gia hạn!")
+                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Liên hệ hotline để gia hạn!")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -689,7 +692,7 @@ with st.sidebar:
                                 time.sleep(0.5)
                                 st.rerun()
                             else:
-                                if btn_open_ph.button("📂 Mở", key=f"btn_open_{p['id']}", use_container_width=True):
+                                if btn_open_ph.button("📂 Mở", key=f"open_{p['id']}", use_container_width=True):
                                     st.session_state[open_state_key] = True
                                     st.rerun()
                                     
@@ -707,7 +710,7 @@ with st.sidebar:
                                 time.sleep(0.5)
                                 st.rerun()
                             else:
-                                if btn_del_ph.button("🗑️ Xóa", key=f"btn_del_{p['id']}", type="secondary", use_container_width=True):
+                                if btn_del_ph.button("🗑️ Xóa", key=f"del_{p['id']}", type="secondary", use_container_width=True):
                                     st.session_state[del_state_key] = True
                                     st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -851,7 +854,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
         
         st.markdown("---")
-        st.markdown("### 🔐 TÀI KHOẢN")
+        st.markdown("### 🔐 Thông Tin Tài Khoản")
         
         user_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         if st.session_state.current_email == ADMIN_EMAIL:
