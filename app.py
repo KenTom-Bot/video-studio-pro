@@ -71,9 +71,8 @@ def load_licensed_accounts():
             with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f: 
                 data = json.load(f)
                 for k, v in data.items():
-                    # Cập nhật tự động khách cũ
                     if "password" not in v: v["password"] = v.get("phone", "123456")
-                    if "is_trial" not in v: v["is_trial"] = False # Khách cũ mặc định là VIP
+                    if "is_trial" not in v: v["is_trial"] = False 
                     if "daily_usage_count" not in v: v["daily_usage_count"] = 0
                     if "last_generation_date" not in v: v["last_generation_date"] = ""
                     accs[k] = v
@@ -285,7 +284,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
        - CẤM NHỒI NHÉT NHƯ RÔ BỐT: Bắt buộc chuyển hóa thông số khô khan thành ngôn ngữ đời sống. 
     6. LOGIC ĐỒNG BỘ CHUYỂN CẢNH (VISUAL-AUDIO SYNC):
        - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH CHO Ý TRƯỚC ĐÓ và hành động đang diễn ra liên tục không ngắt quãng. Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor`.
-       - NẾU LỜI THOẠI CHUYỂN Ý MỚI -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
+       - NẾU LỜI THOẠI CHUYỂN Ý MỚI (ví dụ: chuyển từ kể chuyện sang khoe tính năng sản phẩm) -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
     7. HÌNH THỨC THUYẾT MINH: {narrator_instruction}
     8. {char_rules}
     """
@@ -391,6 +390,7 @@ def clone_script(script_id):
             }}
         ]
     }}
+    LƯU Ý: TRẢ VỀ ĐÚNG 5 PHẦN TỬ TRONG MẢNG `script_outlines`. KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE.
     """
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars))
     if not res or "script_outlines" not in res:
@@ -477,7 +477,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
-        tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký Dùng Thử"])
+        tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký"])
         
         with tabs[0]:
             email_input = st.text_input("Email:", placeholder="Nhập email của bạn...", key="login_email_input")
@@ -522,7 +522,7 @@ with st.sidebar:
                     st.rerun()
                     
         with tabs[1]:
-            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI với <b>3 ngày dùng thử miễn phí (5 lượt/ngày)</b>.</p>", unsafe_allow_html=True)
+            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI <b>(Tặng 3 ngày trải nghiệm, 5 lượt/ngày)</b>.</p>", unsafe_allow_html=True)
             reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...", key="reg_email")
             reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...", key="reg_phone")
             reg_pass = st.text_input("Mật khẩu mới:", type="password", placeholder="Tạo mật khẩu...", key="reg_pass")
@@ -552,12 +552,12 @@ with st.sidebar:
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.session_state.is_logged_in = True
                     st.session_state.current_email = email_check
-                    st.toast("✅ Đăng ký Dùng thử thành công!")
+                    st.toast("✅ Đăng ký tài khoản thành công!")
                     time.sleep(0.5)
                     st.rerun()
                 st.session_state[reg_key] = False
             else:
-                if btn_reg_ph.button("🚀 Kích Hoạt Dùng Thử 3 Ngày", type="secondary", use_container_width=True):
+                if btn_reg_ph.button("🚀 Đăng Ký Tài Khoản", type="secondary", use_container_width=True):
                     st.session_state[reg_key] = True
                     st.rerun()
     else:
@@ -568,7 +568,7 @@ with st.sidebar:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
                 if 0 <= days_left <= 7:
-                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Liên hệ hotline để gia hạn!")
+                    st.warning(f"⚠️️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Liên hệ hotline để gia hạn!")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -707,7 +707,7 @@ with st.sidebar:
                                 time.sleep(0.5)
                                 st.rerun()
                             else:
-                                if btn_del_ph.button("🗑️️ Xóa", key=f"btn_del_{p['id']}", type="secondary", use_container_width=True):
+                                if btn_del_ph.button("🗑️ Xóa", key=f"btn_del_{p['id']}", type="secondary", use_container_width=True):
                                     st.session_state[del_state_key] = True
                                     st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -859,7 +859,7 @@ with st.sidebar:
         elif user_info.get("is_trial", False):
             today_str = datetime.now().strftime("%Y-%m-%d")
             used = user_info.get("daily_usage_count", 0) if user_info.get("last_generation_date") == today_str else 0
-            st.info(f"**GÓI DÙNG THỬ 3 NGÀY**\n\n• Email: {st.session_state.current_email}\n• Đã dùng: **{used}/5** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
+            st.info(f"**GÓI TRẢI NGHIỆM TÂN THỦ**\n\n• Email: {st.session_state.current_email}\n• Đã dùng: **{used}/5** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
         else:
             st.success(f"**GÓI VIP** (Không giới hạn)\n\n• Email: {st.session_state.current_email}\n• Hết hạn: {user_info.get('expires_at')}")
 
@@ -881,7 +881,7 @@ with st.sidebar:
                 st.rerun()
 
 if not st.session_state.is_logged_in:
-    st.info("👈 Vui lòng đăng nhập hoặc đăng ký dùng thử ở thanh công cụ bên trái.")
+    st.info("👈 Vui lòng đăng nhập hoặc đăng ký ở thanh công cụ bên trái.")
     st.stop()
 
 # ==============================================================================
