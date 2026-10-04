@@ -174,7 +174,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP CẢI TIẾN (TOKEN OPTIMIZATION)
+# 2. HÀM AI LÕI & LUẬT THÉP (TỐI ƯU TOÀN DIỆN CHO MỌI NGÀNH HÀNG)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -205,7 +205,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
 
 def generate_char_rules_string(profiles):
     if not profiles: 
-        return "CHAR_LOCK: AI creates face/hair/body and copies exactly to all scenes."
+        return "CHAR_LOCK: AI creates face/hair/body and copies EXACTLY to all scenes. 100% consistent."
     rules = "MULTI-LAYER OUTFIT & BIO LOCK:\n"
     for p in profiles: 
         rules += f" - Actor {p['id']} ({p['role']}): Extract Face/Body/Hair from image. IGNORE original clothes. Design NEW multi-layer outfit (outer + inner) and LOCK exactly across all scenes.\n"
@@ -221,32 +221,33 @@ def get_dynamic_realtime_context(mode):
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars):
     time_ctx = get_dynamic_realtime_context(mode)
-    strat = "SHARE VALUE for followers. NO SELLING." if "Viral" in mode else "PAIN POINTS -> USP -> BUY CTA. High energy."
-    return f"""ROLE: Elite Virtual Director for Veo 3 & Imagen 3. STYLE: {style}. ASPECT RATIO: {HARDCODED_ASPECT}.
+    strat = "VIRAL METRICS: Maximize watch time, high curiosity hook, share pure value. NO direct selling." if "Viral" in mode else "CONVERSION METRICS: Aggressive pain point agitation, irresistible USP, strong urgency CTA."
+    return f"""ROLE: Elite Virtual Director & Copywriter. STYLE: {style}. ASPECT RATIO: {HARDCODED_ASPECT}.
 {time_ctx}
-STRATEGY: {strat}
-CRITICAL RULES:
+CORE GOAL: {strat}
+CRITICAL RULES FOR ALL NICHES (INCLUDING HEALTH/BABY):
 1. ACTORS: Exactly {num_chars}.
-2. POLICY BYPASS: NO banned words (Cam kết, Chữa trị, Đúng 100%). Use soft words (Khoảng, Hỗ trợ). NO exact prices (use 'deal hời').
+2. PLATFORM SAFETY: NEVER use banned words (Cam kết, Chữa trị, Trị dứt điểm, 100% hiệu quả). ALWAYS use safe terms (Hỗ trợ, Dịu nhẹ, Giúp cải thiện). NO exact numerical prices.
 3. VISUAL LOCK: 100% consistent multi-layer outfits, face, hair.
-4. {char_rules}"""
+4. PRODUCT REALISM: Product must be exactly as real life. NO color change, NO size change.
+5. {char_rules}"""
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
     time_ctx = get_dynamic_realtime_context(mode)
-    strat = "SHARE VALUE for followers. NO SELLING." if "Viral" in mode else "PAIN POINTS -> USP -> BUY CTA. High energy."
+    strat = "VIRAL METRICS: Maximize watch time, high curiosity hook, share pure value. NO direct selling." if "Viral" in mode else "CONVERSION METRICS: Aggressive pain point agitation, irresistible USP, strong urgency CTA."
     audio_instr = 'MUST include `Audio: "[Vietnamese exact text]"` in ALL video_prompts.' if "On-camera" in narrator_mode else 'Off-screen voice. NO Audio tag in video_prompt.'
     
-    return f"""ROLE: Elite Virtual Director for Veo 3 & Imagen 3. STYLE: {style}. ASPECT RATIO: {HARDCODED_ASPECT}.
+    return f"""ROLE: Elite Virtual Director & Copywriter. STYLE: {style}. ASPECT RATIO: {HARDCODED_ASPECT}.
 {time_ctx}
-STRATEGY: {strat}
+CORE GOAL: {strat}
 RULES:
-1. ANTI-MORPHING: End ALL video_prompts with: "Maintain EXACT product geometry, scale, and details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text."
-2. POLICY BYPASS: NO banned words (Cam kết, Chữa trị, Đúng 100%). Use soft words (Khoảng, Hỗ trợ). NO exact prices.
+1. ANTI-MORPHING & REALISM: End ALL video_prompts with: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text."
+2. PLATFORM SAFETY: NEVER use banned words (Cam kết, Chữa trị, Trị dứt điểm). ALWAYS use safe terms (Hỗ trợ, Dịu nhẹ, Cải thiện). NO exact prices.
 3. CAMERA LIMITS: "Static Shot", "Slow Pan", "Slight push-in" ONLY. NO "Fast Pan" or "360".
-4. SYLLABLE LIMITS (WPM): 4s = max 16 syllables. 6s = max 24. 8s = max 32.
-5. COHESIVE MONOLOGUE: Dialogues MUST flow as ONE continuous speech. Use conversational bridges ('Mà đỉnh nhất là...', 'Chưa hết đâu...'). Convert dry specs to natural benefits. NO robotic lists.
+4. SYLLABLE LIMITS (WPM): 4s = max 16 syllables. 6s = max 24 syllables. 8s = max 32 syllables. (Count Vietnamese syllables strictly!).
+5. COHESIVE MONOLOGUE: Dialogues MUST flow as ONE continuous, highly-engaging speech. Use conversational bridges ('Mà đỉnh nhất là...', 'Chưa hết đâu...'). Convert dry specs to emotional benefits. 
 6. TRANSITIONS: Use "Cảnh nối tiếp (Dùng lại ảnh cuối)" + `holding the final frame steady as a reference anchor` IF speech/action seamlessly continues. Use "Chuyển cảnh mới" ONLY IF changing topic/angle.
-7. AUDIO: {audio_instr}
+7. AUDIO & VOCAL TONE: {audio_instr}. Vocal instructions must match the strategy (Urgency/Energy for sales, Calm/Expert for viral).
 8. {char_rules}"""
 
 def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
@@ -260,7 +261,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     
     audio_instruction = 'On-camera. MUST add Audio: "[Vietnamese text]" in vid_p.' if is_on_camera else 'Off-screen. NO Audio in vid_p.'
-    voice_hint = "Điềm tĩnh, chuyên gia, kể chuyện cuốn hút, 1.8-2.2 từ/s." if "Viral" in mode else "Năng lượng cao, biểu cảm mạnh mẽ, chốt sale, 3.5-4 từ/s."
+    voice_hint = "Điềm tĩnh, chuyên gia, kể chuyện cuốn hút, 1.8-2.2 từ/s." if "Viral" in mode else "Năng lượng cao, biểu cảm mạnh mẽ, chốt sale dồn dập, 3.5-4 từ/s."
 
     prompt = f"""
 INPUT: {prod_data_ctx}
@@ -281,14 +282,14 @@ STRICT JSON FORMAT:
             "scene": 1, "dur": "4s", "trans": "Chuyển cảnh mới", 
             "setting": "Mô tả bối cảnh góc máy AN TOÀN (Static/Slow)...",
             "director": "...", 
-            "voiceover": "TỰ NHIÊN, LIỀN MẠCH Khối 1, ĐÚNG SỐ ÂM TIẾT WPM, lách luật...",
+            "voiceover": "TỰ NHIÊN, LIỀN MẠCH, Khúc chiết, ĐÚNG SỐ ÂM TIẾT WPM, Lách luật 100%...",
             "img_p": "Cinematic vertical 9:16 photo. Static shot... [ENG OUTFIT]. [prod_dna]. Maintain EXACT facial identity, identical outer jacket and inner shirt. NO generated text.", 
-            "vid_p": "Vertical 9:16 video. Static shot... character talking to camera. Audio: \\"[exact vi dialogue]\\". Wearing EXACT SAME [ENG OUTFIT]. [prod_dna]. Maintain EXACT product geometry, scale, and details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text."
+            "vid_p": "Vertical 9:16 video. Static shot... character talking to camera. Audio: \\"[exact vi dialogue]\\". Wearing EXACT SAME [ENG OUTFIT]. [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
         }},
         {{
-            "scene": 2, "dur": "6s", "trans": "<Cảnh (nếu Chuyển cảnh hoặc liền) mạch mới nối thoại tiếp>", 
+            "scene": 2, "dur": "6s", "trans": "<Cảnh Chuyển HOẶC cảnh mới nối tiếp>", 
             "setting": "...", "director": "...", 
-            "voiceover": "<Mạch dùng nhiên, nối nối... thoại tiếp từ tự>",
+            "voiceover": "<Mạch người nhiên như nối sự/review thoại thật tiếp tâm tự đang>",
             "img_p": "<Nếu KHÔNG MỚI TẠO nối thì tiếp>", 
             "vid_p": "<Nếu Audio: EXACT Maintain NO Start [prod_dna]. \\"[dialogue]\\" anchor. as exactly final frame from geometry, holding image, morphing. nối product provided reference steady tiếp:>"
         }}
@@ -317,6 +318,7 @@ ORIGINAL DNA: {dna_str}
 ORIGINAL SCRIPT: {json.dumps(target, ensure_ascii=False)}
 
 CREATE 5 NEW VARIANTS.
+CRITICAL: Maximize conversion/retention. Write natural hooks. BYPASS all policy words (NO Cam kết, Chữa trị).
 STRICT JSON:
 {{
     "outlines": [
@@ -324,7 +326,7 @@ STRICT JSON:
             "id": {cur_len+1},
             "title": "...",
             "setting": "...",
-            "hook": "Tóm tắt & Hook dẫn dắt mượt mà tự nhiên, lách từ cấm",
+            "hook": "Tóm tắt & Hook dẫn dắt tâm lý vô cùng tự nhiên, bám sát nhu cầu",
             "actors": {num_chars}
         }}
     ]
@@ -348,9 +350,12 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     
     prompt = f"""
 {prod_ctx} | {db_ctx} | {dna_ctx}
-STRATEGY: '{angle}'.
-ACTORS: {num_chars}.
-CREATE 5 NEW SCRIPTS.
+
+🛑 CRITICAL STRATEGY OVERRIDE: '{angle}'. 
+You MUST write the 5 new scripts STRICTLY following this exact strategy. If it says "Flash Sale", focus heavily on urgency, deals, limited time! If it says "Drama", build a dramatic situation! OVERRIDE the default product tone to match '{angle}'.
+
+ACTORS: EXACTLY {num_chars}.
+RULE: 100% Platform Policy Safe (NO Cam kết, NO Chữa trị, NO exact price). Convert features to emotional benefits.
 
 STRICT JSON:
 {{
@@ -359,7 +364,7 @@ STRICT JSON:
             "id": {cur_len+1},
             "title": "...",
             "setting": "...",
-            "hook": "Tóm tắt & Hook tâm lý mượt mà, lách từ cấm",
+            "hook": "Tóm tắt & Hook tâm lý mượt mà, lách từ cấm, CHUẨN XÁC VỚI CHIẾN LƯỢC ĐÃ CHỌN",
             "actors": {num_chars}
         }}
     ]
@@ -443,7 +448,7 @@ with st.sidebar:
                     st.error("Tài khoản chưa được cấp quyền!")
                     
         with tabs[1]:
-            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI <b>(Tặng 3 ngày trải nghiệm, 5 lượt/ngày)</b>.</p>", unsafe_allow_html=True)
+            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI (Tặng 3 ngày trải nghiệm, 5 lượt/ngày).</p>", unsafe_allow_html=True)
             with st.form("register_form", border=False):
                 reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...")
                 reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...")
@@ -524,7 +529,7 @@ with st.sidebar:
         if save_proj_key not in st.session_state: st.session_state[save_proj_key] = False
         
         if st.session_state[save_proj_key]:
-            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang lưu dữ liệu...</div>", unsafe_allow_html=True)
+            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang lưu dữ liệu lên Cloud...</div>", unsafe_allow_html=True)
             lock_ui()
             all_com = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
             if not all_com: st.warning("⚠️ Chưa có kịch bản nào để lưu!")
@@ -636,7 +641,6 @@ with st.sidebar:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             
-            # Phân tách Khách VIP & Khách Trial
             st.markdown("##### 🚨 Thông Báo & Cảnh Báo")
             expired_or_soon = []
             for acc, info in st.session_state.licensed_accounts.items():
