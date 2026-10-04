@@ -174,7 +174,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (ĐÃ FIX LỖI FUNCTION NOT DEFINED)
+# 2. HÀM AI LÕI & LUẬT THÉP V3 (ĐỒNG NHẤT 100%)
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -243,24 +243,22 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars):
     {time_ctx}
     {mode_rules}
     🛑 CÁC QUY TẮC BỔ SUNG TUÂN THỦ 100%:
-    1. SỐ LƯỢNG NHÂN VẬT: Đúng {num_chars} nhân vật tương tác với nhau.
+    1. SỐ LƯỢNG NHÂN VẬT & BỐI CẢNH: Đúng {num_chars} nhân vật tương tác với nhau. Giữ BỐI CẢNH ĐỒNG NHẤT.
     2. LÁCH LUẬT CẤM: TUYỆT ĐỐI CẤM dùng các từ: "Cam kết", "Chữa trị", "Đúng", "Chính xác 100%", "Trị dứt điểm". Dùng từ nói giảm nói tránh như "Khoảng...", "Hỗ trợ...", "Giúp cải thiện...". CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ.
     3. CẤM NHẮC THỜI TIẾT: CẤM nhắc đến thời tiết hay mùa vụ (như mùa đông, mùa thu) vào kịch bản để tránh khiên cưỡng.
-    4. ĐỒNG NHẤT 100%: Giữ nguyên trang phục ĐA LỚP, vóc dáng, kiểu tóc xuyên suốt video. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
+    4. ĐỒNG NHẤT 100%: Giữ nguyên bối cảnh, trang phục ĐA LỚP, vóc dáng, kiểu tóc xuyên suốt video. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
     5. XƯNG HÔ THÔNG MINH: Phân tích tệp khách hàng. Nếu nữ -> xưng "chị em". Nam -> xưng "anh em". Chung -> xưng "anh chị". CẤM dùng "Hội", "Mấy bạn", "Dân nghiện...".
     6. QUY TẮC HOOK: Hook mở đầu KHÔNG ĐƯỢC chứa lời kêu gọi mua hàng/giỏ hàng. Cảnh 1 chỉ để đồng cảm.
     7. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
-    time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     is_on_camera = "On-camera" in narrator_mode
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính. YÊU CẦU TỐI QUAN TRỌNG CHO VEO 3: BẮT BUỘC chèn lệnh `Audio: \"[Nguyên văn lời thoại tiếng Việt]\"` vào tất cả các `video_prompt`." if is_on_camera else "Lồng tiếng ngoài khung hình. KHÔNG đưa phần Audio vào `video_prompt`."
     
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
-    {time_ctx}
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
     1. ANTI-MORPHING: BẮT BUỘC chèn đoạn mã lệnh này vào đuôi của MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text."
@@ -282,8 +280,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     7. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
        - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH CHO Ý TRƯỚC ĐÓ và hành động đang diễn ra liên tục. (Bắt buộc chèn lệnh `holding the final frame steady as a reference anchor`).
        - NẾU LỜI THOẠI CHUYỂN Ý MỚI -> BẮT BUỘC dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-    8. {narrator_instruction}
-    9. {char_rules}
+    8. ĐỒNG NHẤT 100%: Phải giữ Bối cảnh (Setting) thống nhất, trang phục đa lớp không đổi từ cảnh 1 đến cuối.
+    9. {narrator_instruction}
+    10. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
@@ -303,9 +302,6 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
         voice_hint = "Giọng đọc CẢM XÚC, CHÂN THẬT, GẦN GŨI để tạo sự đồng cảm và giữ chân người xem. Tốc độ vừa phải (1.8-2.2 từ/s)."
     else:
         voice_hint = "Giọng đọc MẠNH MẼ, NHANH, NĂNG LƯỢNG CAO để cuốn hút người xem và tạo chuyển đổi chốt sale dồn dập (3.5-4 từ/s)."
-
-    video_prompt_example_1 = 'Vertical 9:16 video. Static shot... character talking directly to camera. Audio: \\"[Chèn nguyên văn lời thoại tiếng Việt vào đây]\\". Wearing EXACT SAME [Chèn tiếng Anh trang phục đa lớp]. [CHÈN NGUYÊN VĂN product_visual_dna_en VÀO ĐÂY]. Maintain EXACT product geometry, scale, and details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent. NO generated text.' if is_on_camera else 'Vertical 9:16 video. Slow pan... off-screen voiceover... [CHÈN NGUYÊN VĂN product_visual_dna_en VÀO ĐÂY]. Maintain EXACT product geometry, NO morphing. NO generated text.'
-    video_prompt_example_2 = '<Nếu Start anchor as chèn: exactly final frame from holding hành image liên provided reference steady the tục,>. [CHÈN product_visual_dna_en]. Maintain EXACT product geometry, NO morphing. Audio: \\"[Chèn lời thoại tiếng Việt]\\"' if is_on_camera else '<Nếu Start anchor as chèn: exactly final frame from holding hành image liên provided reference steady the tục,>. [CHÈN product_visual_dna_en]. Maintain EXACT product geometry, NO morphing.'
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx}
@@ -369,7 +365,7 @@ def clone_script(script_id):
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
     Dựa BẮT BUỘC vào dữ liệu Gốc ở trên, tạo chính xác 5 biến thể mới. 
-    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em", "anh em". KHÔNG nhắc thời tiết/mùa. KHÔNG xưng "Mấy bạn". LÁCH MỌI TỪ KHÓA BỊ CẤM.
+    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em", "anh em". CẤM nhắc thời tiết/mùa. CẤM xưng "Mấy bạn". LÁCH MỌI TỪ KHÓA BỊ CẤM.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "outlines": [
@@ -1003,10 +999,16 @@ if st.session_state[gen_main_key]:
         angle_str = initial_angle
         num_c = num_chars
         
+        if "Tự động" in angle_str:
+            strat_override = f"STRATEGY: Tự động phân tích và tạo 5 kịch bản với 5 góc độ đa dạng."
+        else:
+            strat_override = f"🛑 CRITICAL STRATEGY OVERRIDE: '{angle_str}'. YOU MUST WRITE ALL 5 SCRIPTS STRICTLY FOLLOWING THIS EXACT STRATEGY."
+            
         prompt = f"""
         {time_ctx}
         {prod_ctx}
         NOTES: {custom_note}
+        {strat_override}
         
         STRICT JSON REQUIRED:
         {{
@@ -1028,7 +1030,7 @@ if st.session_state[gen_main_key]:
                 }} 
             ]
         }}
-        CREATE EXACTLY 5 SCRIPTS. STRATEGY: '{angle_str}'. INTERACTION FOR {num_c} ACTORS.
+        CREATE EXACTLY 5 SCRIPTS. INTERACTION FOR {num_c} ACTORS.
         """
         
         payload = []
