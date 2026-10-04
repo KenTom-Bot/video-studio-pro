@@ -27,9 +27,9 @@ st.markdown("""
 <style>
     .header-container { text-align: center; padding: 1.2rem; background: radial-gradient(circle, rgba(255,75,75,0.08) 0%, rgba(255,255,255,0) 70%); border-radius: 16px; margin-bottom: 1rem; }
     .main-title { font-size: 2.2rem !important; font-weight: 900 !important; background: linear-gradient(90deg, #ff0050 0%, #ff5252 50%, #ff7300 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    div[data-testid="stButton"] > button[kind="primary"] { background: linear-gradient(135deg, #e63946 0%, #d90429 100%) !important; color: white !important; border-radius: 8px !important; font-weight: bold; width: 100%; }
-    div[data-testid="stButton"] > button[kind="secondary"] { background: linear-gradient(135deg, #ff4b4b 0%, #ff7300 100%) !important; color: #ffffff !important; box-shadow: 0 3px 8px rgba(255, 75, 75, 0.35) !important; padding: 0.55rem 1rem !important; font-weight: bold !important; border: none !important; }
-    div[data-testid="stButton"] > button[kind="secondary"]:hover { transform: translateY(-1px) !important; box-shadow: 0 5px 14px rgba(255, 75, 75, 0.5) !important; }
+    div[data-testid="stButton"] > button[kind="primary"], div[data-testid="stFormSubmitButton"] > button[kind="primary"] { background: linear-gradient(135deg, #e63946 0%, #d90429 100%) !important; color: white !important; border-radius: 8px !important; font-weight: bold; width: 100%; }
+    div[data-testid="stButton"] > button[kind="secondary"], div[data-testid="stFormSubmitButton"] > button[kind="secondary"] { background: linear-gradient(135deg, #ff4b4b 0%, #ff7300 100%) !important; color: #ffffff !important; box-shadow: 0 3px 8px rgba(255, 75, 75, 0.35) !important; padding: 0.55rem 1rem !important; font-weight: bold !important; border: none !important; width: 100%; }
+    div[data-testid="stButton"] > button[kind="secondary"]:hover, div[data-testid="stFormSubmitButton"] > button[kind="secondary"]:hover { transform: translateY(-1px) !important; box-shadow: 0 5px 14px rgba(255, 75, 75, 0.5) !important; }
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #bbf7d0; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
@@ -407,15 +407,14 @@ with st.sidebar:
         tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký"])
         
         with tabs[0]:
-            email_input = st.text_input("Email:", placeholder="Nhập email của bạn...", key="login_email_input")
-            pass_input = st.text_input("Mật khẩu:", type="password", placeholder="Nhập mật khẩu...", key="login_pass_input")
+            with st.form("login_form", border=False):
+                email_input = st.text_input("Email:", placeholder="Nhập email...")
+                pass_input = st.text_input("Mật khẩu:", type="password", placeholder="Nhập mật khẩu...")
+                submitted = st.form_submit_button("🔑 Đăng Nhập", type="primary", use_container_width=True)
             
-            btn_login_ph = st.empty()
-            login_key = "loading_login"
-            if login_key not in st.session_state: st.session_state[login_key] = False
-            
-            if st.session_state[login_key]:
-                st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang xác thực...</div>", unsafe_allow_html=True)
+            if submitted:
+                ph = st.empty()
+                ph.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang xác thực...</div>", unsafe_allow_html=True)
                 email_check = email_input.strip()
                 pass_check = pass_input.strip()
                 
@@ -427,43 +426,39 @@ with st.sidebar:
                         try:
                             exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                             if datetime.now() > exp_date:
+                                ph.empty()
                                 st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
-                                st.session_state[login_key] = False
                                 st.stop()
                         except: pass
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_check
-                        st.session_state[login_key] = False
                         st.toast("✅ Đăng nhập thành công!")
                         time.sleep(0.5)
                         st.rerun()
                     else:
+                        ph.empty()
                         st.error("Sai mật khẩu!")
-                        st.session_state[login_key] = False
                 else: 
+                    ph.empty()
                     st.error("Tài khoản chưa được cấp quyền!")
-                    st.session_state[login_key] = False
-            else:
-                if btn_login_ph.button("🔑 Đăng Nhập", type="primary"):
-                    st.session_state[login_key] = True
-                    st.rerun()
                     
         with tabs[1]:
             st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI <b>(Tặng 3 ngày trải nghiệm, 5 lượt/ngày)</b>.</p>", unsafe_allow_html=True)
-            reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...", key="reg_email")
-            reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...", key="reg_phone")
-            reg_pass = st.text_input("Mật khẩu mới:", type="password", placeholder="Tạo mật khẩu...", key="reg_pass")
+            with st.form("register_form", border=False):
+                reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...")
+                reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...")
+                reg_pass = st.text_input("Mật khẩu mới:", type="password", placeholder="Tạo mật khẩu...")
+                reg_submitted = st.form_submit_button("🚀 Đăng Ký Tài Khoản", type="secondary", use_container_width=True)
             
-            btn_reg_ph = st.empty()
-            reg_key = "loading_reg"
-            if reg_key not in st.session_state: st.session_state[reg_key] = False
-            
-            if st.session_state[reg_key]:
-                st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang khởi tạo tài khoản...</div>", unsafe_allow_html=True)
+            if reg_submitted:
+                ph_reg = st.empty()
+                ph_reg.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang khởi tạo tài khoản...</div>", unsafe_allow_html=True)
                 email_check = reg_email.strip()
                 if email_check in st.session_state.licensed_accounts:
+                    ph_reg.empty()
                     st.error("Email này đã tồn tại trong hệ thống!")
                 elif not email_check or not reg_phone.strip() or not reg_pass.strip():
+                    ph_reg.empty()
                     st.error("Vui lòng điền đầy đủ thông tin!")
                 else:
                     exp_date = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
@@ -482,16 +477,12 @@ with st.sidebar:
                     st.toast("✅ Đăng ký tài khoản thành công!")
                     time.sleep(0.5)
                     st.rerun()
-                st.session_state[reg_key] = False
-            else:
-                if btn_reg_ph.button("🚀 Đăng Ký Tài Khoản", type="secondary", use_container_width=True):
-                    st.session_state[reg_key] = True
-                    st.rerun()
     else:
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
         is_trial = current_acc.get("is_trial", False)
         
+        # Chỉ hiện cảnh báo sắp hết hạn cho KHÁCH VIP
         if current_acc and st.session_state.current_email != ADMIN_EMAIL and not is_trial:
             try:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
@@ -533,7 +524,7 @@ with st.sidebar:
         if save_proj_key not in st.session_state: st.session_state[save_proj_key] = False
         
         if st.session_state[save_proj_key]:
-            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang lưu dữ liệu lên Cloud...</div>", unsafe_allow_html=True)
+            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang lưu dữ liệu...</div>", unsafe_allow_html=True)
             lock_ui()
             all_com = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
             if not all_com: st.warning("⚠️ Chưa có kịch bản nào để lưu!")
@@ -645,6 +636,7 @@ with st.sidebar:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             
+            # Phân tách Khách VIP & Khách Trial
             st.markdown("##### 🚨 Thông Báo & Cảnh Báo")
             expired_or_soon = []
             for acc, info in st.session_state.licensed_accounts.items():
