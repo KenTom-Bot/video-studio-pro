@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 # ==============================================================================
 # 1. CẤU HÌNH GIAO DIỆN & KẾT NỐI
 # ==============================================================================
-st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
+st.set_page_config(page_title="Đạo Diễn AI", page_icon="🎬", layout="wide")
 
 def lock_ui():
     st.markdown("""
@@ -1018,7 +1018,7 @@ if not st.session_state.is_logged_in:
 # ==============================================================================
 # 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo diễn AI - Hệ Thống Tạo Kịch Bản Và Prompt Pro</div></div>""", unsafe_allow_html=True)
 
 current_acc_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
 allowed_categories = [m for m in ALL_MODULES if m in current_acc_info.get("roles", ALL_MODULES)]
