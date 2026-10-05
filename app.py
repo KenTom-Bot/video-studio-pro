@@ -203,7 +203,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V4 (KHÓA STRATEGY & VISUAL DNA)
+# 2. HÀM AI LÕI & LUẬT THÉP V4.1
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -288,7 +288,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     4. XƯNG HÔ THÔNG MINH: Tự phân tích khách hàng. Nữ/Đồ gia dụng/Chung -> xưng "chị em". Nam/Đồ công nghệ -> xưng "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân nghiện".
     5. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, khí hậu, mùa vụ (mùa đông, mùa thu) vào câu thoại trừ khi sản phẩm đặc thù.
     6. NGỮ PHÁP TỰ NHIÊN: CÂU CÓ ĐẦY ĐỦ CHỦ NGỮ, VỊ NGỮ. KHÔNG nói cụt lủn hô khẩu hiệu. 
-    7. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi bấm giỏ hàng/mua ngay. Nếu là Flash Sale thì khơi gợi sự khan hiếm/săn deal một cách tự nhiên.
+    7. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi mua hàng/bấm giỏ hàng. Chỉ khơi gợi sự đồng cảm.
     8. SỐ LƯỢNG KỊCH BẢN: Lệnh bắt buộc là phải trả về ĐÚNG 5 kịch bản khác nhau.
     9. {char_rules}
     """
@@ -303,26 +303,30 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
     1. ANTI-MORPHING & HIỆN THỰC SẢN PHẨM: BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent."
-    2. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): {duration_instruction}. Tốc độ tối đa 4 âm tiết/giây. VIẾT LỐ SẼ GÂY LỖI ÂM THANH.
-    3. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
+    2. ĐẢM BẢO TỔNG THỜI GIAN VIDEO: {duration_instruction} NẾU YÊU CẦU 30 GIÂY THÌ TỔNG SỐ GIÂY CỦA TẤT CẢ PHÂN CẢNH PHẢI ĐÚNG BẰNG 30 GIÂY. HÃY PHÂN BỔ THỜI GIAN THEO TỪNG CẢNH (VD: 4s, 6s, 8s) ĐỂ ĐẠT ĐƯỢC TỔNG THỜI GIAN ĐÓ.
+    3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): Tốc độ tối đa 4 âm tiết/giây. 
+       - Cảnh 4s = Tối đa 16 âm tiết.
+       - Cảnh 6s = Tối đa 24 âm tiết.
+       - Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
+    4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
        - Xưng hô chuẩn xác: Nữ/Đồ gia dụng/Chung -> "chị em". Nam/Công nghệ -> "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
        - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm" (không dùng "mọng nước"), lau chùi thì là "dễ lau chùi" (không dùng "siêu khỏe"). 
        - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo.
-    4. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
+    5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
        - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
        - BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ, tạo nhịp điệu và cảm xúc như người thật.
        - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC nối tiếp logic, ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà. KHÔNG hô khẩu hiệu cụt lủn.
-    5. CẤU TRÚC HOOK & CTA:
+    6. CẤU TRÚC HOOK & CTA:
        - Cảnh 1 (Hook): Chỉ khơi gợi đồng cảm hoặc khoe deal hời tự nhiên. CẤM kêu gọi bấm giỏ hàng/mua ngay ở Cảnh 1.
        - Cảnh cuối cùng: ĐÂY MỚI LÀ NƠI DUY NHẤT kêu gọi chốt đơn "bấm góc trái/rinh ngay".
-    6. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
+    7. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
        - CHỈ DÙNG "Cảnh nối tiếp" + lệnh `holding the final frame steady as a reference anchor` KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH LIÊN TỤC CHO Ý TRƯỚC ĐÓ.
        - NẾU CHUYỂN Ý MỚI -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-    7. ĐỒNG NHẤT TUYỆT ĐỐI HÌNH ẢNH:
+    8. ĐỒNG NHẤT TUYỆT ĐỐI HÌNH ẢNH:
        - Bạn phải sinh ra 2 biến `global_outfit_en` và `global_setting_en` đại diện cho diện mạo đa lớp và bối cảnh chuẩn của kịch bản này.
        - TẤT CẢ các phân cảnh BẮT BUỘC phải copy y nguyên 2 biến này vào Prompt, đảm bảo hình ảnh không đổi.
-    8. {narrator_instruction}
-    9. {char_rules}
+    9. {narrator_instruction}
+    10. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
@@ -333,6 +337,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
+    duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
@@ -352,13 +357,13 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
     - XƯNG HÔ THÔNG MINH: CHỈ DÙNG "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
     - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết. CẤM dùng từ "Thèm".
-    - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi bấm giỏ hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
-    - AI TỰ TÍNH TOÁN THỜI GIAN: Dựa vào thoại viết ra, AI tự điền "dur" là 4s, 6s, hay 8s sao cho khớp WPM (Tối đa 4 âm tiết/giây). KHÔNG DÙNG TỪ CẤM.
+    - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
+    - AI TỰ TÍNH TOÁN THỜI GIAN: Dựa vào thoại viết ra, AI tự điền "dur" là 4s, 6s, hay 8s sao cho khớp WPM (Tối đa 4 âm tiết/giây). TỔNG ĐỘ DÀI CÁC CẢNH PHẢI ĐÚNG VỚI YÊU CẦU: {duration_instruction}.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
         "title": "{outline.get('title')}",
-        "total_dur": "Tổng thời gian của các cảnh cộng lại",
+        "total_dur": "Tổng thời gian của các cảnh cộng lại (Phải đúng yêu cầu)",
         "outfit_vi": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP BẰNG TIẾNG VIỆT",
         "global_outfit_en": "Exact English description of Face, Hair, Body + Newly Designed Multi-layer Outfit. Must lock this exact string.",
         "global_setting_en": "Exact English description of the background setting. Must remain static.",
@@ -371,7 +376,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
                 "trans": "Chuyển cảnh mới (Tạo ảnh mới)", 
                 "setting": "Mô tả bối cảnh góc máy AN TOÀN (Static/Slow)...",
                 "director": "Mô tả biểu cảm nhấn nhá cảm xúc...", 
-                "voiceover": "Xưng hô chuẩn xác ('chị em'/'anh em'). CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA BẤM GIỎ HÀNG Ở ĐÂY. ĐÚNG WPM...",
+                "voiceover": "Xưng hô chuẩn xác ('chị em'/'anh em'). Khơi gợi bối cảnh tự nhiên. CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY. ĐÚNG WPM...",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_outfit_en]. Product: [prod_dna]. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_outfit_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
             }},
@@ -388,7 +393,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     }}
     Lưu ý: "dur" CHỈ ĐƯỢC LÀ "4s", "6s", hoặc "8s". KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON. Cảnh cuối cùng mới được chốt đơn!
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, outline.get("actor_count", 1), "Tự động phân bổ độ dài cảnh dựa trên độ dài thoại (Tối đa 4 âm tiết/giây)."))
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, outline.get("actor_count", 1), f"ĐẢM BẢO TỔNG THỜI GIAN YÊU CẦU LÀ: {duration_instruction}"))
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
@@ -446,6 +451,9 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     
     prompt = f"""
     {prod_ctx} | {db_ctx} | {dna_ctx}
+
+    🛑 CRITICAL STRATEGY OVERRIDE: '{angle}'. 
+    Bạn PHẢI viết 5 kịch bản mới TUÂN THỦ TUYỆT ĐỐI chiến lược này. Bẻ giọng điệu sao cho phù hợp với '{angle}'.
 
     SỐ DIỄN VIÊN: CHÍNH XÁC {num_chars}.
     LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng "chị em", "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". Không nói cụt lủn hô khẩu hiệu. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM CTA BẤM GIỎ HÀNG Ở HOOK.
@@ -1073,9 +1081,9 @@ with col_opt2:
     duration_choice = st.selectbox("⏳ Thời lượng video:", ["Tự động (AI Tối ưu ~20-30s)", "Tùy chỉnh (Nhập số giây)"], key=f"dur_choice_{st.session_state.reset_key}")
     if duration_choice.startswith("Tùy chỉnh"):
         custom_seconds = st.number_input("Nhập số giây mong muốn:", min_value=10, max_value=300, value=60, step=5, key=f"dur_sec_{st.session_state.reset_key}")
-        st.session_state.target_duration_instruction = f"TỔNG THỜI LƯỢNG YÊU CẦU: Chính xác {custom_seconds} giây. Bạn PHẢI tạo ra số lượng phân cảnh đủ nhiều (mỗi cảnh 4s, 6s, 8s) sao cho tổng thời gian cộng lại bằng ĐÚNG {custom_seconds} giây."
+        st.session_state.target_duration_instruction = f"Chính xác {custom_seconds} giây."
     else:
-        st.session_state.target_duration_instruction = "TỔNG THỜI LƯỢNG YÊU CẦU: Tự động (Khoảng 3 đến 5 phân cảnh, tổng 15-30 giây)."
+        st.session_state.target_duration_instruction = "Tự động phân bổ (Khoảng 15-30 giây)."
 
     narrator_mode = st.selectbox("🎙 Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙 Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], key=f"narrator_sel_{st.session_state.reset_key}")
 
@@ -1404,6 +1412,9 @@ if all_combined_scripts_list:
         duration_choice_more = st.selectbox("⏳ Thời lượng video mới:", ["Tự động (AI Tối ưu ~20-30s)", "Tùy chỉnh (Nhập số giây)"], key=f"dur_choice_more_{st.session_state.reset_key}")
         if duration_choice_more.startswith("Tùy chỉnh"):
             custom_sec_more = st.number_input("Nhập số giây:", min_value=10, max_value=300, value=60, step=5, key=f"dur_sec_more_{st.session_state.reset_key}")
+            target_duration_instruction_more = f"Chính xác {custom_sec_more} giây."
+        else:
+            target_duration_instruction_more = "Tự động phân bổ (Khoảng 15-30 giây)."
     with col_g4:
         idx_narrator = 0 if st.session_state.get("last_narrator") == "Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)" else 1
         narrator_mode_more = st.selectbox("🎙 Thuyết minh & Nhân vật:", ["Nhân vật xuất hiện nói chuyện (On-camera, Lip-sync)", "🎙 Lồng tiếng ngoài (Off-screen, Show sản phẩm)"], index=idx_narrator, key=f"narrator_more_{st.session_state.reset_key}")
@@ -1434,10 +1445,7 @@ if all_combined_scripts_list:
             st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 12px; border-radius: 8px; color: #d90429; text-align: center; font-size: 16px; font-weight: bold;'>⏳ Đang sáng tạo 5 kịch bản mới... Vui lòng đợi!</div>", unsafe_allow_html=True)
             lock_ui()
             try:
-                if duration_choice_more.startswith("Tùy chỉnh"):
-                    st.session_state.target_duration_instruction = f"TỔNG THỜI LƯỢNG YÊU CẦU: Chính xác {custom_sec_more} giây. Bạn PHẢI tạo ra số lượng phân cảnh đủ nhiều (mỗi cảnh 4s, 6s, 8s) sao cho tổng thời gian cộng lại bằng ĐÚNG {custom_sec_more} giây."
-                else:
-                    st.session_state.target_duration_instruction = "TỔNG THỜI LƯỢNG YÊU CẦU: Tự động (Khoảng 3 đến 5 phân cảnh, tổng 15-30 giây)."
+                st.session_state.target_duration_instruction = target_duration_instruction_more
 
                 if extra_char_inputs:
                     st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in extra_char_inputs]
