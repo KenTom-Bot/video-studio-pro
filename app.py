@@ -794,7 +794,6 @@ with st.sidebar:
                 new_phone = st.text_input("Số điện thoại (SĐT):")
                 new_pass = st.text_input("Mật khẩu:", value="123456")
                 
-                # TUYỆT ĐỐI KHỚP THEO THỨ TỰ YÊU CẦU
                 acc_type = st.radio("Loại Tài Khoản:", [
                     "Gói Trải nghiệm (3 lượt/ngày)",
                     "Gói Cơ bản (10 lượt/ngày)",
@@ -803,7 +802,13 @@ with st.sidebar:
                 ], index=0)
                 
                 assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
-                duration_opt = st.selectbox("Thời hạn:", ["1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "3 Ngày (Dùng thử)", "Vĩnh viễn (Trọn đời)"])
+                
+                col_dur1, col_dur2 = st.columns(2)
+                with col_dur1:
+                    duration_opt = st.selectbox("Thời hạn chọn nhanh:", ["3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "Vĩnh viễn (Trọn đời)"], index=0)
+                with col_dur2:
+                    custom_exp = st.text_input("Hoặc nhập tay ngày (YYYY-MM-DD):", placeholder="Ưu tiên nếu điền")
+                
                 btn_add_lic = st.form_submit_button("💾 Cấp Quyền & Lưu")
                 if btn_add_lic:
                     with st.spinner("⏳ Đang cấp quyền..."):
@@ -814,8 +819,15 @@ with st.sidebar:
                             "Gói VIP (Không giới hạn)": "VIP"
                         }
                         selected_plan = plan_map.get(acc_type, "Trial")
-                        days_add = 3 if selected_plan == "Trial" else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "Vĩnh viễn (Trọn đời)": 3650}.get(duration_opt, 30)
-                        exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=days_add)).strftime("%Y-%m-%d")
+                        
+                        if custom_exp.strip():
+                            exp_date = custom_exp.strip()
+                        else:
+                            if "Vĩnh viễn" in duration_opt: 
+                                exp_date = "2099-12-31"
+                            else:
+                                days_add = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}.get(duration_opt, 3)
+                                exp_date = (datetime.now() + timedelta(days=days_add)).strftime("%Y-%m-%d")
                         
                         st.session_state.licensed_accounts[new_acc.strip()] = {
                             "roles": assigned_modules, "phone": new_phone.strip(), "password": new_pass.strip(), 
@@ -879,7 +891,13 @@ with st.sidebar:
                                 ], index=plan_idx)
                                 
                                 upd_roles = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=roles_val)
-                                upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val)
+                                
+                                col_u1, col_u2 = st.columns(2)
+                                with col_u1:
+                                    upd_duration_opt = st.selectbox("Gia hạn nhanh (Từ hôm nay):", ["Giữ nguyên ngày cũ", "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "Vĩnh viễn (Trọn đời)"], index=0)
+                                with col_u2:
+                                    upd_exp = st.text_input("Hoặc nhập ngày (YYYY-MM-DD):", value=exp_val)
+                                    
                                 btn_save_upd = st.form_submit_button("💾 Lưu Cập Nhật")
                                 if btn_save_upd:
                                     with st.spinner("⏳ Đang lưu..."):
@@ -889,9 +907,19 @@ with st.sidebar:
                                             "Gói Nâng cao (20 lượt/ngày)": "Advanced",
                                             "Gói VIP (Không giới hạn)": "VIP"
                                         }
+                                        
+                                        if upd_duration_opt != "Giữ nguyên ngày cũ":
+                                            if "Vĩnh viễn" in upd_duration_opt: 
+                                                final_exp = "2099-12-31"
+                                            else:
+                                                d_add = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}.get(upd_duration_opt, 30)
+                                                final_exp = (datetime.now() + timedelta(days=d_add)).strftime("%Y-%m-%d")
+                                        else:
+                                            final_exp = upd_exp.strip()
+                                            
                                         st.session_state.licensed_accounts[acc].update({
                                             "roles": upd_roles, "phone": upd_phone.strip(), "password": upd_pass.strip(), 
-                                            "expires_at": upd_exp.strip(), "plan_type": p_map.get(upd_plan, "Trial")
+                                            "expires_at": final_exp, "plan_type": p_map.get(upd_plan, "Trial")
                                         })
                                         save_licensed_accounts(st.session_state.licensed_accounts)
                                         st.session_state.editing_acc_email = None
@@ -1254,7 +1282,7 @@ if all_combined_scripts_list:
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             st.markdown("---")
 
-    st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Xuất & Nhân Bản)**")
+    st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Ở Xuất & Nhân Bản)**")
     if not completed_scripts:
         st.info("💡 Chưa có kịch bản nào được tạo chi tiết.")
     else:
