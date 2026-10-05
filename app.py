@@ -9,6 +9,7 @@ import os
 import re
 import time
 import ast
+import uuid
 from datetime import datetime, timedelta
 
 # ==============================================================================
@@ -65,16 +66,18 @@ api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
 client = genai.Client(api_key=api_key) if api_key else None
 
 def load_licensed_accounts():
-    accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "is_trial": False}}
+    accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
     if os.path.exists(ACCOUNTS_FILE):
         try:
             with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f: 
                 data = json.load(f)
                 for k, v in data.items():
                     if "password" not in v: v["password"] = v.get("phone", "123456")
-                    if "is_trial" not in v: v["is_trial"] = False 
+                    if "plan_type" not in v: 
+                        v["plan_type"] = "Trial" if v.get("is_trial") else "VIP"
                     if "daily_usage_count" not in v: v["daily_usage_count"] = 0
                     if "last_generation_date" not in v: v["last_generation_date"] = ""
+                    if "active_session_id" not in v: v["active_session_id"] = ""
                     accs[k] = v
         except: pass
     return accs
@@ -94,17 +97,23 @@ def check_usage_limit(email):
     if datetime.now() > exp_date:
         return False, "Tài khoản của bạn đã hết hạn. Vui lòng liên hệ Admin để gia hạn!"
         
-    if acc.get("is_trial", False):
-        today = datetime.now().strftime("%Y-%m-%d")
-        if acc.get("last_generation_date") != today:
-            acc["daily_usage_count"] = 0
-            acc["last_generation_date"] = today
+    plan = acc.get("plan_type", "Trial")
+    if plan == "VIP":
+        return True, ""
         
-        if acc.get("daily_usage_count", 0) >= 5:
-            return False, "Bạn đã dùng hết 5/5 lượt tạo kịch bản của hôm nay! Vui lòng quay lại vào ngày mai hoặc mua gói VIP để không giới hạn."
+    limit_map = {"Advanced": 20, "Basic": 10, "Trial": 3}
+    limit = limit_map.get(plan, 3)
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    if acc.get("last_generation_date") != today:
+        acc["daily_usage_count"] = 0
+        acc["last_generation_date"] = today
         
-        acc["daily_usage_count"] += 1
-        save_licensed_accounts(accs)
+    if acc.get("daily_usage_count", 0) >= limit:
+        return False, f"Bạn đã dùng hết {limit}/{limit} lượt của hôm nay! Vui lòng quay lại vào ngày mai hoặc nâng cấp gói cước."
+        
+    acc["daily_usage_count"] += 1
+    save_licensed_accounts(accs)
         
     return True, ""
 
@@ -144,6 +153,8 @@ def format_analysis_field(field_val) -> str:
     return "".join(formatted) if formatted else text
 
 # Khởi tạo Session State
+if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
+
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
@@ -156,6 +167,19 @@ for key, default_val in [
     ("editing_acc_email", None), ("current_project_id", None)
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
+
+# Khóa thiết bị đồng thời
+if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMAIL:
+    current_acc_lock = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
+    if current_acc_lock.get("active_session_id") != st.session_state.session_id:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.error("🚨 **CẢNH BÁO: TÀI KHOẢN ĐANG ĐƯỢC SỬ DỤNG Ở NƠI KHÁC**")
+        st.info("Hệ thống phát hiện tài khoản của bạn đang được đăng nhập trên một thiết bị hoặc trình duyệt khác. Để bảo mật, mỗi tài khoản chỉ được phép sử dụng trên **1 thiết bị duy nhất** tại cùng một thời điểm.")
+        if st.button("🔌 Sử dụng trên thiết bị này (Đăng xuất thiết bị kia)", type="primary"):
+            st.session_state.licensed_accounts[st.session_state.current_email]["active_session_id"] = st.session_state.session_id
+            save_licensed_accounts(st.session_state.licensed_accounts)
+            st.rerun()
+        st.stop()
 
 if st.session_state.scroll_to_top:
     components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0)
@@ -174,8 +198,18 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V3 (KHÓA LỖI SINH 1 KỊCH BẢN, LOẠI BỎ THỜI TIẾT, FIX BỐI CẢNH)
+# 2. HÀM AI LÕI & LUẬT THÉP V3
 # ==============================================================================
+def get_dynamic_realtime_context(mode):
+    now = datetime.now()
+    month = now.month
+    if month in [12, 1, 2]: season_desc = "thời tiết lạnh giá"
+    elif month in [3, 4, 5]: season_desc = "thời tiết giao mùa, ấm áp"
+    elif month in [6, 7, 8]: season_desc = "thời tiết nắng nóng"
+    else: season_desc = "thời tiết mát mẻ, se lạnh"
+    
+    return f"BỐI CẢNH: {season_desc}. LƯU Ý: CẤM nhắc trực tiếp đến tên mùa hay thời tiết một cách máy móc. KHÔNG ĐƯỢC tự ý thêm thời tiết vào kịch bản trừ khi sản phẩm thực sự cần thiết."
+
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
@@ -222,10 +256,11 @@ def get_mode_specific_rules(mode):
         return """
     🎯 ĐỊNH HƯỚNG CỐT LÕI: TIKTOK SHOP & BÁN HÀNG (AFFILIATE THỰC CHIẾN)
     - MỤC TIÊU: Đánh trúng Nỗi đau, làm nổi bật USP để CHỐT ĐƠN.
-    - CƠ CHẾ KÊU GỌI (CTA): Giục khách mua ngay, chớp deal hời. NHƯNG CHỈ XUẤT HIỆN Ở CẢNH CUỐI CÙNG.
+    - CƠ CHẾ KÊU GỌI (CTA): Giục khách mua ngay, chớp deal hời. NHƯNG CHỈ XUẤT HIỆN Ở CẢNH CUỐI. CẤM CTA Ở CẢNH 1.
         """
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
+    time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     
     if "Tự động" in angle:
@@ -237,16 +272,18 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
+    {time_ctx}
     {mode_rules}
     {strat_cmd}
     
     🛑 CÁC QUY TẮC BỔ SUNG TUÂN THỦ 100%:
-    1. LÁCH LUẬT CẤM: TUYỆT ĐỐI CẤM dùng: "Cam kết", "Chữa trị", "Đúng", "Chính xác 100%". Dùng từ nói giảm: "Khoảng...", "Hỗ trợ...", "Giúp cải thiện...". CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ.
-    2. ĐỒNG NHẤT 100%: Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước). 
-    3. XƯNG HÔ & NGÔN TỪ THỰC TẾ: Tự phân tích khách hàng (Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị"). CẤM dùng từ lóng giả tạo ("Hội", "Mấy bạn", "Dân nghiện..."). CẤM dùng từ lố bịch ("Thèm nồi lẩu").
-    4. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, khí hậu, mùa vụ (mùa đông, mùa thu) vào câu thoại.
+    1. SỐ LƯỢNG NHÂN VẬT & BỐI CẢNH: Đúng {num_chars} nhân vật. Giữ BỐI CẢNH ĐỒNG NHẤT.
+    2. LÁCH LUẬT CẤM: TUYỆT ĐỐI CẤM dùng: "Cam kết", "Chữa trị", "Đúng", "Chính xác 100%". Dùng từ nói giảm: "Khoảng...", "Hỗ trợ...", "Giúp cải thiện...". CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ.
+    3. ĐỒNG NHẤT 100%: Giữ nguyên bối cảnh, trang phục ĐA LỚP, vóc dáng, kiểu tóc. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
+    4. XƯNG HÔ & NGÔN TỪ THỰC TẾ: Tự phân tích khách hàng (Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị"). CẤM dùng từ lóng giả tạo ("Hội", "Mấy bạn", "Dân nghiện..."). CẤM dùng từ lố bịch ("Thèm nồi lẩu" -> Sửa thành bối cảnh thực tế: "Gia đình quây quần ăn lẩu", "Anh chị nào hay...").
     5. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi mua hàng/bấm giỏ hàng. Chỉ khơi gợi sự đồng cảm.
-    6. SỐ LƯỢNG KỊCH BẢN: Lệnh bắt buộc là phải trả về ĐÚNG 5 kịch bản khác nhau.
+    6. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, khí hậu, mùa vụ (mùa đông, mùa thu) vào câu thoại.
+    7. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
@@ -260,13 +297,15 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
     1. ANTI-MORPHING & HIỆN THỰC SẢN PHẨM: BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent."
     2. CHÍNH SÁCH KIỂM DUYỆT: Cấm "Cam kết", "Đúng 100%", "Chữa trị". Dùng "Hỗ trợ", "Giúp cải thiện". Cấm báo giá bằng số cụ thể.
-    3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): {duration_instruction}. Cảnh 4s = Tối đa 16 âm tiết. Cảnh 6s = Tối đa 24 âm tiết. Cảnh 8s = Tối đa 32 âm tiết.
+    3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): {duration_instruction}. 
+       - Cảnh 4s = Tối đa 16 âm tiết. Cảnh 6s = Tối đa 24 âm tiết. Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
     4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
        - Xưng hô chuẩn xác: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM dùng "Mấy bạn", "Hội", "Dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
        - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm" (không dùng "mọng nước"), lau chùi thì là "dễ lau chùi" (không dùng "siêu khỏe"). 
-       - TUYỆT ĐỐI CẤM nhắc đến thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo ("Thèm nồi lẩu nghi ngút").
+       - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo.
     5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
-       - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ, tạo nhịp điệu và cảm xúc như người thật.
+       - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
+       - BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ, tạo nhịp điệu và cảm xúc như người thật.
        - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC phải ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà. KHÔNG hô khẩu hiệu cụt lủn.
     6. CẤU TRÚC HOOK & CTA:
        - Cảnh 1 (Hook): Chỉ khơi gợi đồng cảm. CẤM kêu gọi bấm giỏ hàng/mua ngay ở Cảnh 1.
@@ -307,7 +346,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
     - XƯNG HÔ THÔNG MINH: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM xưng "Hội", "Mấy bạn".
-    - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết. CẤM dùng từ "Thèm".
+    - NGÔN TỪ THỰC TẾ: Dùng từ bối cảnh sinh hoạt chân thật (VD: "Gia đình quây quần ăn lẩu", "Anh chị nào hay..."). CẤM dùng từ thèm thuồng lố bịch. CẤM nhắc thời tiết máy móc.
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
     - ĐẾM ĐÚNG SỐ ÂM TIẾT WPM. 4s <= 16 âm tiết, 6s <= 24 âm tiết. KHÔNG DÙNG TỪ CẤM.
     
@@ -359,7 +398,7 @@ def clone_script(script_id):
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
     Dựa BẮT BUỘC vào dữ liệu Gốc ở trên, tạo chính xác 5 biến thể mới. 
-    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em", "anh em". KHÔNG nhắc thời tiết. KHÔNG xưng "Mấy bạn". CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
+    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em". KHÔNG nhắc thời tiết. KHÔNG xưng "Mấy bạn". CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "outlines": [
@@ -367,7 +406,7 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
                 "setting": "Bối cảnh thực tế 1",
-                "hook": "Gọi tên khách hàng tự nhiên & Hook dẫn dắt tâm lý đời thường (KHÔNG CTA, KHÔNG nói cụt lủn)",
+                "hook": "Xưng hô chuẩn xác & Hook dẫn dắt tâm lý đời thực (KHÔNG CTA ở đây, KHÔNG nói cụt lủn)",
                 "actors": {num_chars}
             }},
             {{
@@ -498,6 +537,10 @@ with st.sidebar:
                                 st.error(f"❌ Tài khoản đã hết hạn vào ngày {exp_date_str}! Vui lòng liên hệ Admin để gia hạn.")
                                 st.stop()
                         except: pass
+                        
+                        st.session_state.licensed_accounts[email_check]["active_session_id"] = st.session_state.session_id
+                        save_licensed_accounts(st.session_state.licensed_accounts)
+                        
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_check
                         st.toast("✅ Đăng nhập thành công!")
@@ -511,7 +554,7 @@ with st.sidebar:
                     st.error("Tài khoản chưa được cấp quyền!")
                     
         with tabs[1]:
-            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI (Tặng 3 ngày trải nghiệm, 5 lượt/ngày).</p>", unsafe_allow_html=True)
+            st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI (Tặng trải nghiệm 3 lượt/ngày).</p>", unsafe_allow_html=True)
             with st.form("register_form", border=False):
                 reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...")
                 reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...")
@@ -535,9 +578,10 @@ with st.sidebar:
                         "phone": reg_phone.strip(),
                         "password": reg_pass.strip(),
                         "expires_at": exp_date,
-                        "is_trial": True,
+                        "plan_type": "Trial",
                         "daily_usage_count": 0,
-                        "last_generation_date": ""
+                        "last_generation_date": "",
+                        "active_session_id": st.session_state.session_id
                     }
                     save_licensed_accounts(st.session_state.licensed_accounts)
                     st.session_state.is_logged_in = True
@@ -548,10 +592,10 @@ with st.sidebar:
     else:
         current_acc = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         exp_date_str = current_acc.get("expires_at", "2099-12-31")
-        is_trial = current_acc.get("is_trial", False)
+        plan = current_acc.get("plan_type", "Trial")
         
-        # Chỉ hiện cảnh báo sắp hết hạn cho KHÁCH VIP
-        if current_acc and st.session_state.current_email != ADMIN_EMAIL and not is_trial:
+        # Chỉ hiện cảnh báo sắp hết hạn cho KHÁCH VIP/CÓ PHÍ
+        if current_acc and st.session_state.current_email != ADMIN_EMAIL and plan != "Trial":
             try:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
@@ -709,20 +753,19 @@ with st.sidebar:
             for acc, info in st.session_state.licensed_accounts.items():
                 if acc == ADMIN_EMAIL: continue
                 exp_str = info.get("expires_at", "2099-12-31")
-                is_trial_user = info.get("is_trial", False)
+                acc_plan = info.get("plan_type", "Trial")
                 today_str = datetime.now().strftime("%Y-%m-%d")
                 usage = info.get("daily_usage_count", 0) if info.get("last_generation_date") == today_str else 0
                 
                 try:
                     exp_dt = datetime.strptime(exp_str, "%Y-%m-%d")
                     d_left = (exp_dt - datetime.now()).days
-                    if d_left <= 7 or (is_trial_user and usage >= 5): 
-                        expired_or_soon.append((acc, info, d_left, exp_str, usage))
+                    if d_left <= 7 or (acc_plan == "Trial" and usage >= 3) or (acc_plan == "Basic" and usage >= 10) or (acc_plan == "Advanced" and usage >= 20): 
+                        expired_or_soon.append((acc, info, d_left, exp_str, usage, acc_plan))
                 except: pass
             
             if expired_or_soon:
-                for cust, info, d_left, exp_str, usage in expired_or_soon:
-                    is_trial_user = info.get("is_trial", False)
+                for cust, info, d_left, exp_str, usage, acc_plan in expired_or_soon:
                     phone = info.get('phone', '')
                     
                     if d_left < 0: status_text = f"Đã quá hạn {abs(d_left)} ngày"
@@ -730,11 +773,14 @@ with st.sidebar:
                     else: status_text = f"Còn {d_left} ngày"
                     
                     alert_reason = "⚠️ " + status_text
-                    if is_trial_user and usage >= 5:
-                        alert_reason += " | 🔥 ĐÃ DÙNG HẾT LƯỢT TRONG NGÀY"
+                    if acc_plan == "Trial" and usage >= 3: alert_reason += " | 🔥 HẾT LƯỢT (3/3)"
+                    if acc_plan == "Basic" and usage >= 10: alert_reason += " | 🔥 HẾT LƯỢT (10/10)"
+                    if acc_plan == "Advanced" and usage >= 20: alert_reason += " | 🔥 HẾT LƯỢT (20/20)"
+                    
+                    badge_color = "#fde047" if acc_plan == "Trial" else "#93c5fd" if acc_plan == "Basic" else "#c4b5fd" if acc_plan == "Advanced" else "#86efac"
                     
                     with st.container(border=True):
-                        st.markdown(f"**👤 {cust}** <span style='font-size: 11px; padding: 2px 6px; background: {'#fde047' if is_trial_user else '#86efac'}; border-radius: 4px; font-weight: bold;'>{'TRIAL' if is_trial_user else 'VIP'}</span>", unsafe_allow_html=True)
+                        st.markdown(f"**👤 {cust}** <span style='font-size: 11px; padding: 2px 6px; background: {badge_color}; border-radius: 4px; font-weight: bold;'>{acc_plan.upper()}</span>", unsafe_allow_html=True)
                         st.caption(f"📞 SĐT: {phone or 'Chưa có'} | 🔑 Pass: `{info.get('password', 'N/A')}`<br><b style='color:#d90429;'>{alert_reason}</b>", unsafe_allow_html=True)
                         if phone:
                             clean_phone = re.sub(r'\D', '', phone)
@@ -747,19 +793,33 @@ with st.sidebar:
                 new_acc = st.text_input("Email khách hàng:")
                 new_phone = st.text_input("Số điện thoại (SĐT):")
                 new_pass = st.text_input("Mật khẩu:", value="123456")
-                acc_type = st.radio("Loại Tài Khoản:", ["Gói VIP (Không giới hạn)", "Dùng thử (Giới hạn 5 lần/ngày)"], index=0)
+                
+                # TUYỆT ĐỐI KHỚP THEO THỨ TỰ YÊU CẦU
+                acc_type = st.radio("Loại Tài Khoản:", [
+                    "Gói Trải nghiệm (3 lượt/ngày)",
+                    "Gói Cơ bản (10 lượt/ngày)",
+                    "Gói Nâng cao (20 lượt/ngày)",
+                    "Gói VIP (Không giới hạn)"
+                ], index=0)
+                
                 assigned_modules = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=ALL_MODULES)
                 duration_opt = st.selectbox("Thời hạn:", ["1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "3 Ngày (Dùng thử)", "Vĩnh viễn (Trọn đời)"])
                 btn_add_lic = st.form_submit_button("💾 Cấp Quyền & Lưu")
                 if btn_add_lic:
                     with st.spinner("⏳ Đang cấp quyền..."):
-                        is_trial = "Dùng thử" in acc_type
-                        days_add = 3 if is_trial else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "Vĩnh viễn (Trọn đời)": 3650}.get(duration_opt, 30)
+                        plan_map = {
+                            "Gói Trải nghiệm (3 lượt/ngày)": "Trial",
+                            "Gói Cơ bản (10 lượt/ngày)": "Basic",
+                            "Gói Nâng cao (20 lượt/ngày)": "Advanced",
+                            "Gói VIP (Không giới hạn)": "VIP"
+                        }
+                        selected_plan = plan_map.get(acc_type, "Trial")
+                        days_add = 3 if selected_plan == "Trial" else {"1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "Vĩnh viễn (Trọn đời)": 3650}.get(duration_opt, 30)
                         exp_date = "2099-12-31" if "Vĩnh viễn" in duration_opt else (datetime.now() + timedelta(days=days_add)).strftime("%Y-%m-%d")
                         
                         st.session_state.licensed_accounts[new_acc.strip()] = {
                             "roles": assigned_modules, "phone": new_phone.strip(), "password": new_pass.strip(), 
-                            "expires_at": exp_date, "is_trial": is_trial, "daily_usage_count": 0, "last_generation_date": ""
+                            "expires_at": exp_date, "plan_type": selected_plan, "daily_usage_count": 0, "last_generation_date": "", "active_session_id": ""
                         }
                         save_licensed_accounts(st.session_state.licensed_accounts)
                         st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
@@ -775,16 +835,19 @@ with st.sidebar:
                 st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
                 for acc, info in filtered_accs:
                     with st.container(border=True):
-                        is_trial = info.get("is_trial", False)
-                        st.markdown(f"**👤 {acc}** <span style='font-size: 11px; padding: 2px 6px; background: {'#fde047' if is_trial else '#86efac'}; border-radius: 4px; font-weight: bold;'>{'TRIAL' if is_trial else 'VIP'}</span>", unsafe_allow_html=True)
+                        acc_plan = info.get("plan_type", "Trial")
+                        badge_color = "#fde047" if acc_plan == "Trial" else "#93c5fd" if acc_plan == "Basic" else "#c4b5fd" if acc_plan == "Advanced" else "#86efac"
+                        st.markdown(f"**👤 {acc}** <span style='font-size: 11px; padding: 2px 6px; background: {badge_color}; border-radius: 4px; font-weight: bold;'>{acc_plan.upper()}</span>", unsafe_allow_html=True)
                         phone_val = info.get('phone', '')
                         pass_val = info.get('password', '')
                         roles_val = info.get('roles', ALL_MODULES)
                         exp_val = info.get('expires_at', '2099-12-31')
                         today_str = datetime.now().strftime("%Y-%m-%d")
                         usage = info.get("daily_usage_count", 0) if info.get("last_generation_date") == today_str else 0
+                        limit_val = "Không giới hạn" if acc_plan == "VIP" else ("20" if acc_plan == "Advanced" else ("10" if acc_plan == "Basic" else "3"))
+                        usage_text = f"{usage}/{limit_val}" if limit_val != "Không giới hạn" else usage
                         
-                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'} | 🔑 Pass: `{pass_val}`<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val} <br>• Lượt dùng hôm nay: {usage}/5", unsafe_allow_html=True)
+                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'} | 🔑 Pass: `{pass_val}`<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val} <br>• Lượt dùng hôm nay: {usage_text}", unsafe_allow_html=True)
                         
                         col_up, col_del = st.columns(2)
                         with col_up:
@@ -805,15 +868,30 @@ with st.sidebar:
                                 st.markdown(f"**Cập nhật cho: {acc}**")
                                 upd_phone = st.text_input("SĐT mới:", value=phone_val)
                                 upd_pass = st.text_input("Mật khẩu:", value=pass_val)
-                                upd_trial = st.checkbox("Là tài khoản Dùng thử (Giới hạn 5 lượt/ngày)", value=is_trial)
+                                
+                                plan_idx_map = {"Trial": 0, "Basic": 1, "Advanced": 2, "VIP": 3}
+                                plan_idx = plan_idx_map.get(acc_plan, 0)
+                                upd_plan = st.radio("Loại Tài Khoản:", [
+                                    "Gói Trải nghiệm (3 lượt/ngày)",
+                                    "Gói Cơ bản (10 lượt/ngày)",
+                                    "Gói Nâng cao (20 lượt/ngày)",
+                                    "Gói VIP (Không giới hạn)"
+                                ], index=plan_idx)
+                                
                                 upd_roles = st.multiselect("Phân quyền thể loại:", options=ALL_MODULES, default=roles_val)
                                 upd_exp = st.text_input("Ngày hết hạn (YYYY-MM-DD):", value=exp_val)
                                 btn_save_upd = st.form_submit_button("💾 Lưu Cập Nhật")
                                 if btn_save_upd:
                                     with st.spinner("⏳ Đang lưu..."):
+                                        p_map = {
+                                            "Gói Trải nghiệm (3 lượt/ngày)": "Trial",
+                                            "Gói Cơ bản (10 lượt/ngày)": "Basic",
+                                            "Gói Nâng cao (20 lượt/ngày)": "Advanced",
+                                            "Gói VIP (Không giới hạn)": "VIP"
+                                        }
                                         st.session_state.licensed_accounts[acc].update({
                                             "roles": upd_roles, "phone": upd_phone.strip(), "password": upd_pass.strip(), 
-                                            "expires_at": upd_exp.strip(), "is_trial": upd_trial
+                                            "expires_at": upd_exp.strip(), "plan_type": p_map.get(upd_plan, "Trial")
                                         })
                                         save_licensed_accounts(st.session_state.licensed_accounts)
                                         st.session_state.editing_acc_email = None
@@ -843,12 +921,17 @@ with st.sidebar:
         user_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         if st.session_state.current_email == ADMIN_EMAIL:
             st.success("Tài khoản: ADMIN (Không giới hạn)")
-        elif user_info.get("is_trial", False):
+        else:
+            plan = user_info.get("plan_type", "Trial")
             today_str = datetime.now().strftime("%Y-%m-%d")
             used = user_info.get("daily_usage_count", 0) if user_info.get("last_generation_date") == today_str else 0
-            st.info(f"**GÓI TRẢI NGHIỆM TÂN THỦ**\n\n• Email: {st.session_state.current_email}\n• Đã dùng: **{used}/5** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
-        else:
-            st.success(f"**GÓI VIP** (Không giới hạn)\n\n• Email: {st.session_state.current_email}\n• Hết hạn: {user_info.get('expires_at')}")
+            
+            if plan == "VIP":
+                st.success(f"**GÓI VIP** (Không giới hạn)\n\n• Email: {st.session_state.current_email}\n• Hết hạn: {user_info.get('expires_at')}")
+            else:
+                plan_name = "GÓI NÂNG CAO" if plan == "Advanced" else ("GÓI CƠ BẢN" if plan == "Basic" else "GÓI TRẢI NGHIỆM TÂN THỦ")
+                limit = 20 if plan == "Advanced" else (10 if plan == "Basic" else 3)
+                st.info(f"**{plan_name}**\n\n• Email: {st.session_state.current_email}\n• Đã dùng: **{used}/{limit}** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
 
         btn_logout_ph = st.empty()
         logout_key = "loading_logout"
