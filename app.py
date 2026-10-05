@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN, KẾT NỐI & GOOGLE ANALYTICS
+# 1. CẤU HÌNH GIAO DIỆN & KẾT NỐI
 # ==============================================================================
 st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
 
@@ -598,7 +598,7 @@ with st.sidebar:
                 if email_check in st.session_state.licensed_accounts:
                     acc_info = st.session_state.licensed_accounts[email_check]
                     
-                    if acc_info.get("password") == pass_check or email_check == ADMIN_EMAIL:
+                    if acc_info.get("password") == pass_check:
                         exp_date_str = acc_info.get("expires_at", "2099-12-31")
                         try:
                             exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
