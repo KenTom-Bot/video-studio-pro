@@ -1210,24 +1210,24 @@ if st.session_state[gen_main_key]:
             st.session_state.generated_details = {}
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
-            st.toast("✅ Đã sinh xong 5 kịch bản và phân tích DNA!")
+            st.toast("✅ Đã sinh xong 5 kịch bản và phân tích sản phẩm!")
     except Exception as e:
         st.error(f"❌ Lỗi xử lý AI: {str(e)}")
         time.sleep(2)
     st.session_state[gen_main_key] = False
     st.rerun()
 else:
-    if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
+    if btn_gen_main_ph.button("🚀 PHÂN TÍCH DỮ LIỆU VÀ TẠO KỊCH BẢN", type="primary", use_container_width=True):
         can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
         if not can_run: st.error(f"❌ {msg}")
         else:
             st.session_state[gen_main_key] = True
             st.rerun()
 
-# ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
+# ==================== HIỂN THỊ PHÂN TÍCH DỮ LIỆU ====================
 if st.session_state.content_analysis and isinstance(st.session_state.content_analysis, dict):
     st.divider()
-    st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Đa Tầng**")
+    st.markdown(f"### 🔍 **Phân Tích Sản Phẩm Chi Tiết Đa Tầng**")
     ca = st.session_state.content_analysis
     
     ca_target = ca.get('target_audience', ca.get('primary_target_audience', 'N/A'))
