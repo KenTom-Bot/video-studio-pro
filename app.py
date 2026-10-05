@@ -65,6 +65,11 @@ supabase = init_supabase()
 api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
 client = genai.Client(api_key=api_key) if api_key else None
 
+def is_valid_phone(phone):
+    """Kiểm tra số điện thoại chỉ chứa chữ số và độ dài từ 9 đến 11 ký tự."""
+    phone = phone.strip()
+    return phone.isdigit() and 9 <= len(phone) <= 11
+
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
     if os.path.exists(ACCOUNTS_FILE):
@@ -328,7 +333,6 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
-    duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
@@ -346,8 +350,8 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
-    - XƯNG HÔ THÔNG MINH: CHỈ DÙNG "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
-    - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết. CẤM dùng từ "Thèm".
+    - XƯNG HÔ THÔNG MINH: Nữ -> "chị em", Nam -> "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
+    - NGÔN TỪ THỰC TẾ: Dùng từ bối cảnh sinh hoạt chân thật. CẤM dùng từ thèm thuồng lố bịch. CẤM nhắc thời tiết máy móc.
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
     - AI TỰ TÍNH TOÁN THỜI GIAN: Dựa vào thoại viết ra, AI tự điền "dur" là 4s, 6s, hay 8s sao cho khớp WPM (Tối đa 4 âm tiết/giây). KHÔNG DÙNG TỪ CẤM.
     
@@ -564,25 +568,27 @@ with st.sidebar:
             st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI (Tặng trải nghiệm 3 lượt/ngày).</p>", unsafe_allow_html=True)
             with st.form("register_form", border=False):
                 reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...")
-                reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Nhập SĐT có Zalo...")
+                reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Chỉ nhập số (9-11 số)...")
                 reg_pass = st.text_input("Mật khẩu mới:", type="password", placeholder="Tạo mật khẩu...")
                 reg_submitted = st.form_submit_button("🚀 Đăng Ký Tài Khoản", type="secondary", use_container_width=True)
             
             if reg_submitted:
                 ph_reg = st.empty()
-                ph_reg.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang khởi tạo tài khoản...</div>", unsafe_allow_html=True)
                 email_check = reg_email.strip()
-                if email_check in st.session_state.licensed_accounts:
-                    ph_reg.empty()
-                    st.error("Email này đã tồn tại trong hệ thống!")
-                elif not email_check or not reg_phone.strip() or not reg_pass.strip():
-                    ph_reg.empty()
-                    st.error("Vui lòng điền đầy đủ thông tin!")
+                phone_check = reg_phone.strip()
+                
+                if not email_check or not phone_check or not reg_pass.strip():
+                    ph_reg.error("Vui lòng điền đầy đủ thông tin!")
+                elif not is_valid_phone(phone_check):
+                    ph_reg.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số (từ 9 đến 11 số).")
+                elif email_check in st.session_state.licensed_accounts:
+                    ph_reg.error("Email này đã tồn tại trong hệ thống!")
                 else:
+                    ph_reg.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang khởi tạo tài khoản...</div>", unsafe_allow_html=True)
                     exp_date = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
                     st.session_state.licensed_accounts[email_check] = {
                         "roles": ALL_MODULES,
-                        "phone": reg_phone.strip(),
+                        "phone": phone_check,
                         "password": reg_pass.strip(),
                         "expires_at": exp_date,
                         "plan_type": "Trial",
@@ -798,7 +804,7 @@ with st.sidebar:
             with st.form("add_license"):
                 st.markdown("##### ➕ Cấp Quyền Khách Hàng Mới")
                 new_acc = st.text_input("Email khách hàng:")
-                new_phone = st.text_input("Số điện thoại (SĐT):")
+                new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Chỉ nhập số...")
                 new_pass = st.text_input("Mật khẩu:", value="123456")
                 
                 acc_type = st.radio("Loại Tài Khoản:", [
@@ -818,32 +824,37 @@ with st.sidebar:
                 
                 btn_add_lic = st.form_submit_button("💾 Cấp Quyền & Lưu")
                 if btn_add_lic:
-                    with st.spinner("⏳ Đang cấp quyền..."):
-                        plan_map = {
-                            "Gói Trải nghiệm (3 lượt/ngày)": "Trial",
-                            "Gói Cơ bản (10 lượt/ngày)": "Basic",
-                            "Gói Nâng cao (20 lượt/ngày)": "Advanced",
-                            "Gói VIP (Không giới hạn)": "VIP"
-                        }
-                        selected_plan = plan_map.get(acc_type, "Trial")
-                        
-                        if custom_exp.strip():
-                            exp_date = custom_exp.strip()
-                        else:
-                            if "Vĩnh viễn" in duration_opt: 
-                                exp_date = "2099-12-31"
+                    if not new_acc.strip() or not new_phone.strip() or not new_pass.strip():
+                        st.error("Vui lòng điền đủ Email, SĐT và Mật khẩu!")
+                    elif not is_valid_phone(new_phone):
+                        st.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số (từ 9 đến 11 ký tự).")
+                    else:
+                        with st.spinner("⏳ Đang cấp quyền..."):
+                            plan_map = {
+                                "Gói Trải nghiệm (3 lượt/ngày)": "Trial",
+                                "Gói Cơ bản (10 lượt/ngày)": "Basic",
+                                "Gói Nâng cao (20 lượt/ngày)": "Advanced",
+                                "Gói VIP (Không giới hạn)": "VIP"
+                            }
+                            selected_plan = plan_map.get(acc_type, "Trial")
+                            
+                            if custom_exp.strip():
+                                exp_date = custom_exp.strip()
                             else:
-                                days_add = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}.get(duration_opt, 3)
-                                exp_date = (datetime.now() + timedelta(days=days_add)).strftime("%Y-%m-%d")
-                        
-                        st.session_state.licensed_accounts[new_acc.strip()] = {
-                            "roles": assigned_modules, "phone": new_phone.strip(), "password": new_pass.strip(), 
-                            "expires_at": exp_date, "plan_type": selected_plan, "daily_usage_count": 0, "last_generation_date": "", "active_session_id": ""
-                        }
-                        save_licensed_accounts(st.session_state.licensed_accounts)
-                        st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
-                        time.sleep(0.5)
-                        st.rerun()
+                                if "Vĩnh viễn" in duration_opt: 
+                                    exp_date = "2099-12-31"
+                                else:
+                                    days_add = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}.get(duration_opt, 3)
+                                    exp_date = (datetime.now() + timedelta(days=days_add)).strftime("%Y-%m-%d")
+                            
+                            st.session_state.licensed_accounts[new_acc.strip()] = {
+                                "roles": assigned_modules, "phone": new_phone.strip(), "password": new_pass.strip(), 
+                                "expires_at": exp_date, "plan_type": selected_plan, "daily_usage_count": 0, "last_generation_date": "", "active_session_id": ""
+                            }
+                            save_licensed_accounts(st.session_state.licensed_accounts)
+                            st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
+                            time.sleep(0.5)
+                            st.rerun()
             
             search_cust = st.text_input("🔍 Tìm kiếm khách hàng:", placeholder="Nhập Email hoặc SĐT", key="search_cust_input")
             filtered_accs = list(st.session_state.licensed_accounts.items())
@@ -853,6 +864,7 @@ with st.sidebar:
                 st.markdown(f"##### 📋 Danh sách Khách hàng ({len(filtered_accs)})")
                 st.markdown("<div class='scrollable-sidebar-container'>", unsafe_allow_html=True)
                 for acc, info in filtered_accs:
+                    if acc == ADMIN_EMAIL: continue
                     with st.container(border=True):
                         acc_plan = info.get("plan_type", "Trial")
                         badge_color = "#fde047" if acc_plan == "Trial" else "#93c5fd" if acc_plan == "Basic" else "#c4b5fd" if acc_plan == "Advanced" else "#86efac"
@@ -907,32 +919,35 @@ with st.sidebar:
                                     
                                 btn_save_upd = st.form_submit_button("💾 Lưu Cập Nhật")
                                 if btn_save_upd:
-                                    with st.spinner("⏳ Đang lưu..."):
-                                        p_map = {
-                                            "Gói Trải nghiệm (3 lượt/ngày)": "Trial",
-                                            "Gói Cơ bản (10 lượt/ngày)": "Basic",
-                                            "Gói Nâng cao (20 lượt/ngày)": "Advanced",
-                                            "Gói VIP (Không giới hạn)": "VIP"
-                                        }
-                                        
-                                        if upd_duration_opt != "Giữ nguyên ngày cũ":
-                                            if "Vĩnh viễn" in upd_duration_opt: 
-                                                final_exp = "2099-12-31"
-                                            else:
-                                                d_add = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}.get(upd_duration_opt, 30)
-                                                final_exp = (datetime.now() + timedelta(days=d_add)).strftime("%Y-%m-%d")
-                                        else:
-                                            final_exp = upd_exp.strip()
+                                    if not upd_phone.strip() or not is_valid_phone(upd_phone):
+                                        st.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số (từ 9 đến 11 ký tự).")
+                                    else:
+                                        with st.spinner("⏳ Đang lưu..."):
+                                            p_map = {
+                                                "Gói Trải nghiệm (3 lượt/ngày)": "Trial",
+                                                "Gói Cơ bản (10 lượt/ngày)": "Basic",
+                                                "Gói Nâng cao (20 lượt/ngày)": "Advanced",
+                                                "Gói VIP (Không giới hạn)": "VIP"
+                                            }
                                             
-                                        st.session_state.licensed_accounts[acc].update({
-                                            "roles": upd_roles, "phone": upd_phone.strip(), "password": upd_pass.strip(), 
-                                            "expires_at": final_exp, "plan_type": p_map.get(upd_plan, "Trial")
-                                        })
-                                        save_licensed_accounts(st.session_state.licensed_accounts)
-                                        st.session_state.editing_acc_email = None
-                                        st.toast("✅ Đã cập nhật tài khoản thành công!")
-                                        time.sleep(0.5)
-                                        st.rerun()
+                                            if upd_duration_opt != "Giữ nguyên ngày cũ":
+                                                if "Vĩnh viễn" in upd_duration_opt: 
+                                                    final_exp = "2099-12-31"
+                                                else:
+                                                    d_add = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}.get(upd_duration_opt, 30)
+                                                    final_exp = (datetime.now() + timedelta(days=d_add)).strftime("%Y-%m-%d")
+                                            else:
+                                                final_exp = upd_exp.strip()
+                                                
+                                            st.session_state.licensed_accounts[acc].update({
+                                                "roles": upd_roles, "phone": upd_phone.strip(), "password": upd_pass.strip(), 
+                                                "expires_at": final_exp, "plan_type": p_map.get(upd_plan, "Trial")
+                                            })
+                                            save_licensed_accounts(st.session_state.licensed_accounts)
+                                            st.session_state.editing_acc_email = None
+                                            st.toast("✅ Đã cập nhật tài khoản thành công!")
+                                            time.sleep(0.5)
+                                            st.rerun()
                     st.markdown("---")
                 st.markdown("</div>", unsafe_allow_html=True)
 
