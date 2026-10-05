@@ -87,7 +87,7 @@ def save_licensed_accounts(acc_dict):
         with open(ACCOUNTS_FILE, "w", encoding="utf-8") as f: json.dump(acc_dict, f, ensure_ascii=False, indent=2)
     except: pass
 
-def check_usage_limit(email):
+def check_usage_limit(email, is_detailing=False):
     if email == ADMIN_EMAIL: return True, ""
     accs = st.session_state.licensed_accounts
     acc = accs.get(email)
@@ -109,11 +109,11 @@ def check_usage_limit(email):
         acc["daily_usage_count"] = 0
         acc["last_generation_date"] = today
         
-    if acc.get("daily_usage_count", 0) >= limit:
-        return False, f"Bạn đã dùng hết {limit}/{limit} lượt của hôm nay! Vui lòng quay lại vào ngày mai hoặc nâng cấp gói cước."
-        
-    acc["daily_usage_count"] += 1
-    save_licensed_accounts(accs)
+    if is_detailing:
+        if acc.get("daily_usage_count", 0) >= limit:
+            return False, f"Bạn đã dùng hết {limit}/{limit} lượt tạo chi tiết kịch bản của hôm nay! Vui lòng nâng cấp gói cước để tạo thêm."
+        acc["daily_usage_count"] += 1
+        save_licensed_accounts(accs)
         
     return True, ""
 
@@ -198,8 +198,18 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V3.1 (TỐI ƯU COPYWRITING & FIX ĐỒNG NHẤT HÌNH ẢNH)
+# 2. HÀM AI LÕI & LUẬT THÉP V3.1
 # ==============================================================================
+def get_dynamic_realtime_context(mode):
+    now = datetime.now()
+    month = now.month
+    if month in [12, 1, 2]: season_desc = "thời tiết lạnh giá"
+    elif month in [3, 4, 5]: season_desc = "thời tiết giao mùa, ấm áp"
+    elif month in [6, 7, 8]: season_desc = "thời tiết nắng nóng"
+    else: season_desc = "thời tiết mát mẻ, se lạnh"
+    
+    return f"BỐI CẢNH: {season_desc}. LƯU Ý: CẤM nhắc trực tiếp đến tên mùa hay thời tiết một cách máy móc. KHÔNG ĐƯỢC tự ý thêm thời tiết vào kịch bản trừ khi sản phẩm thực sự cần thiết."
+
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
@@ -250,6 +260,7 @@ def get_mode_specific_rules(mode):
         """
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
+    time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     
     if "Tự động" in angle:
@@ -261,6 +272,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
+    {time_ctx}
     {mode_rules}
     {strat_cmd}
     
@@ -316,6 +328,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
+    duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
@@ -363,7 +376,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
                 "dur": "<AI 4s, 6s 8s TỰ hoặc ĐIỀN:>", 
                 "trans": "<Cảnh Chuyển HOẶC cảnh mới nối tiếp>", 
                 "setting": "...", "director": "...", 
-                "voiceover": "<Nối WPM. có dấu mạch nghỉ. ngắt nhiên, phẩy thoại tự ĐÚNG>",
+                "voiceover": "<Nối Câu WPM. chữ có dân dã, dấu mạch nghỉ. ngắt nhiên, phẩy thoại thường tự ĐÚNG đời>",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_outfit_en]. Product: [prod_dna]. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_outfit_en]. Audio: \\"[dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
             }}
@@ -371,7 +384,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     }}
     Lưu ý: "dur" CHỈ ĐƯỢC LÀ "4s", "6s", hoặc "8s". KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON. Cảnh cuối cùng mới được chốt đơn!
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, "Tự động phân bổ độ dài cảnh dựa trên độ dài thoại (Tối đa 4 âm tiết/giây)."))
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, outline.get("actor_count", 1), "Tự động phân bổ độ dài cảnh dựa trên độ dài thoại (Tối đa 4 âm tiết/giây)."))
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
@@ -440,7 +453,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     Bạn PHẢI viết 5 kịch bản mới TUÂN THỦ TUYỆT ĐỐI chiến lược này. Bẻ giọng điệu sao cho phù hợp với '{angle}'.
 
     SỐ DIỄN VIÊN: CHÍNH XÁC {num_chars}.
-    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng "chị em", "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". Không nói cụt lủn. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM CTA Ở HOOK.
+    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng "chị em", "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". Không nói cụt lủn hô khẩu hiệu. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM CTA Ở HOOK.
 
     STRICT JSON REQUIRED:
     {{
@@ -853,7 +866,7 @@ with st.sidebar:
                         limit_val = "Không giới hạn" if acc_plan == "VIP" else ("20" if acc_plan == "Advanced" else ("10" if acc_plan == "Basic" else "3"))
                         usage_text = f"{usage}/{limit_val}" if limit_val != "Không giới hạn" else usage
                         
-                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'} | 🔑 Pass: `{pass_val}`<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val} <br>• Lượt dùng hôm nay: {usage_text}", unsafe_allow_html=True)
+                        st.caption(f"📞 SĐT: {phone_val or 'Chưa có'} | 🔑 Pass: `{pass_val}`<br>• Quyền: {', '.join(roles_val)}<br>• Hết hạn: {exp_val} <br>• Lượt tạo chi tiết: {usage_text}", unsafe_allow_html=True)
                         
                         col_up, col_del = st.columns(2)
                         with col_up:
@@ -953,7 +966,7 @@ with st.sidebar:
             else:
                 plan_name = "GÓI NÂNG CAO" if plan == "Advanced" else ("GÓI CƠ BẢN" if plan == "Basic" else "GÓI TRẢI NGHIỆM TÂN THỦ")
                 limit = 20 if plan == "Advanced" else (10 if plan == "Basic" else 3)
-                st.info(f"**{plan_name}**\n\n• Email: {st.session_state.current_email}\n• Đã dùng: **{used}/{limit}** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
+                st.info(f"**{plan_name}**\n\n• Email: {st.session_state.current_email}\n• Tạo chi tiết: **{used}/{limit}** lượt hôm nay\n• Hết hạn: {user_info.get('expires_at')}")
 
         btn_logout_ph = st.empty()
         logout_key = "loading_logout"
@@ -1178,7 +1191,7 @@ if st.session_state[gen_main_key]:
     st.rerun()
 else:
     if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
-        can_run, msg = check_usage_limit(st.session_state.current_email)
+        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
         if not can_run: st.error(f"❌ {msg}")
         else:
             st.session_state[gen_main_key] = True
@@ -1304,7 +1317,7 @@ if all_combined_scripts_list:
                         st.rerun()
                     else:
                         if st.button("🚀 Nhân bản (Clone)", key=f"btn_clone_{sc_id}", type="primary", use_container_width=True):
-                            can_run, msg = check_usage_limit(st.session_state.current_email)
+                            can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
                             if not can_run: st.error(f"❌ {msg}")
                             else:
                                 st.session_state[clone_key] = True
@@ -1344,7 +1357,7 @@ if all_combined_scripts_list:
                         st.rerun()
                     else:
                         if st.button("✨ Tạo chi tiết ngay", key=f"btn_cre_{sc_id}", type="secondary", use_container_width=True):
-                            can_run, msg = check_usage_limit(st.session_state.current_email)
+                            can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
                             if not can_run: st.error(f"❌ {msg}")
                             else:
                                 st.session_state[cre_key] = True
@@ -1431,7 +1444,7 @@ if all_combined_scripts_list:
             st.rerun()
         else:
             if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", key="btn_execute_more_scripts", type="primary", use_container_width=True):
-                can_run, msg = check_usage_limit(st.session_state.current_email)
+                can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
                 if not can_run: st.error(f"❌ {msg}")
                 else:
                     st.session_state[more_key] = True
