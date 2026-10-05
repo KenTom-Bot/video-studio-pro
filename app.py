@@ -225,7 +225,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V5.0 (CÔ LẬP TRẠNG THÁI NGỮ CẢNH DỰ ÁN)
+# 2. HÀM AI LÕI & LUẬT THÉP V4.9 (THÊM PHÂN TÍCH CHUYỂN ĐỘNG VẬT LÝ NẮP/NÚT)
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -286,7 +286,7 @@ def get_mode_specific_rules(mode):
     - CƠ CHẾ KÊU GỌI (CTA): Chỉ được phép kêu gọi chớp deal hời ở CẢNH CUỐI CÙNG. CẤM CÓ CTA Ở CẢNH 1.
         """
 
-def get_sys_inst_outlines(mode, style, char_rules, num_chars, angle):
+def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
     time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     
@@ -321,7 +321,7 @@ def get_sys_inst_outlines(mode, style, char_rules, num_chars, angle):
     10. {char_rules}
     """
 
-def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
+def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
     mode_rules = get_mode_specific_rules(mode)
     is_on_camera = "On-camera" in narrator_mode
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính. BẮT BUỘC chèn lệnh `Audio: \"[Nguyên văn thoại tiếng Việt]\"` vào tất cả các `video_prompt`." if is_on_camera else "Lồng tiếng ngoài khung hình. KHÔNG đưa phần Audio vào `video_prompt`."
@@ -332,44 +332,43 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
     1. ANTI-MORPHING & BẢO TOÀN VẬT LÝ SẢN PHẨM: 
        - BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts."
-       - NẾU CÓ HÀNH ĐỘNG MỞ NẮP/TƯƠNG TÁC: Phải miêu tả rõ cách thức vật lý dựa trên `product_physics_motion`. CẤM AI tự chế cách mở nắp sai thực tế.
-       - QUY TẮC MẸ VÀ BÉ: Nếu có mẹ bầu/thai nhi, TUYỆT ĐỐI KHÔNG xuất hiện em bé thật (chưa sinh). Thai nhi CHỈ ĐƯỢC PHÉP xuất hiện qua hình ảnh siêu âm.
+       - NẾU CÓ HÀNH ĐỘNG MỞ NẮP/TƯƠNG TÁC (Nồi cơm, hộp đựng): Phải miêu tả rõ cách thức vật lý dựa trên `product_physics_motion` (VD: "bật nắp lên trên theo bản lề cố định" hoặc "kéo nắp rời ra ngoài"). CẤM để AI tự chế cách mở nắp sai thực tế.
+       - QUY TẮC MẸ VÀ BÉ: Nếu kịch bản có mẹ bầu/thai nhi, TUYỆT ĐỐI KHÔNG xuất hiện em bé thật (chưa sinh). Thai nhi CHỈ ĐƯỢC PHÉP xuất hiện qua hình ảnh siêu âm.
     2. ĐẢM BẢO TỔNG THỜI GIAN VIDEO: {duration_instruction} TỔNG SỐ GIÂY CỦA TẤT CẢ PHÂN CẢNH PHẢI ĐÚNG BẰNG THỜI LƯỢNG ĐÃ YÊU CẦU. Hãy phân bổ dur theo từng cảnh (4s, 6s, 8s).
-    3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): Tốc độ tối đa 4 âm tiết/giây. Cảnh 4s = Tối đa 16 âm tiết, 6s = 24 âm tiết, 8s = 32 âm tiết.
-    4. NGÔN TỪ, VÙNG MIỀN & XƯNG HÔ THÔNG MINH: 
-       - KHÓA TỪ VỰNG MIỀN BẮC: BẮT BUỘC dùng văn phong miền Bắc chuẩn. CẤM TUYỆT ĐỐI các hư từ miền Nam ("nha", "nè", "nghen", "vô", "nhấn vô").
-       - Xưng hô chuẩn xác: Mẹ bầu -> "mẹ bầu", Trẻ em -> "các mẹ", Nữ/Chung -> "chị em", Nam -> "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn". 
-       - CẤM dùng từ lố bịch giả tạo ("Thèm nồi lẩu nghi ngút").
+    3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): Tốc độ tối đa 4 âm tiết/giây. 
+       - Cảnh 4s = Tối đa 16 âm tiết.
+       - Cảnh 6s = Tối đa 24 âm tiết.
+       - Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
+    4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
+       - Xưng hô chuẩn xác: Mẹ bầu -> "mẹ bầu", Trẻ em -> "các mẹ", Nữ/Gia dụng/Chung -> "chị em", Nam/Công nghệ -> "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
+       - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm", lau chùi thì là "dễ lau chùi". 
+       - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo.
     5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
        - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
-       - BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ.
-       - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC nối tiếp logic, ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà.
+       - BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ, tạo nhịp điệu và cảm xúc như người thật.
+       - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC nối tiếp logic, ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà. KHÔNG hô khẩu hiệu cụt lủn.
     6. CẤU TRÚC HOOK & CTA:
        - Cảnh 1 (Hook): Chỉ khơi gợi đồng cảm hoặc khoe deal hời tự nhiên. CẤM kêu gọi bấm giỏ hàng/mua ngay ở Cảnh 1.
        - Cảnh cuối cùng: ĐÂY MỚI LÀ NƠI DUY NHẤT kêu gọi chốt đơn "bấm góc trái/rinh ngay".
     7. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
-       - CHỈ DÙNG "Cảnh nối tiếp" + lệnh `holding the final frame steady as a reference anchor` KHI lời thoại ĐANG GIẢI THÍCH LIÊN TỤC CHO Ý TRƯỚC ĐÓ.
+       - CHỈ DÙNG "Cảnh nối tiếp" + lệnh `holding the final frame steady as a reference anchor` KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH LIÊN TỤC CHO Ý TRƯỚC ĐÓ.
        - NẾU CHUYỂN Ý MỚI -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
     8. ĐỒNG NHẤT TUYỆT ĐỐI HÌNH ẢNH:
-       - TẤT CẢ các phân cảnh BẮT BUỘC copy y nguyên biến `global_identity_en` và `outfit_en`/`setting_en` (nếu không đổi địa điểm) vào Prompt.
+       - Bạn phải sinh ra 2 biến `global_outfit_en` và `global_setting_en` đại diện cho diện mạo đa lớp và bối cảnh chuẩn của kịch bản này.
+       - TẤT CẢ các phân cảnh BẮT BUỘC phải copy y nguyên 2 biến này vào Prompt, đảm bảo hình ảnh không đổi.
     9. {narrator_instruction}
     10. {char_rules}
     """
 
-def create_scene_details(target_id, mode, style):
+def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     outline = next((sc for sc in all_combined if sc["id"] == target_id), None)
     if not outline: return
     
-    # Lấy CHÍNH XÁC ngữ cảnh được "đóng gói" trong từng kịch bản
-    narrator_mode = outline.get("narrator_mode", st.session_state.get("last_narrator", ""))
-    char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
-    char_rules = generate_char_rules_string(char_profiles)
-    duration_instruction = outline.get("duration_instruction", st.session_state.get("target_duration_instruction", "Tự động phân bổ 15-30 giây"))
-    
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
+    duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
@@ -387,12 +386,13 @@ def create_scene_details(target_id, mode, style):
     LOẠI KỊCH BẢN: {mode}
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
-    - KHÓA TỪ VỰNG MIỀN BẮC: Lời thoại TUYỆT ĐỐI KHÔNG chứa từ miền Nam (nha, nè, nghen). Chỉ dùng từ miền Bắc (nhé, này).
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
     - XƯNG HÔ THÔNG MINH: CHỈ DÙNG "mẹ bầu", "các mẹ", "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
-    - NGÔN TỪ THỰC TẾ: CẤM nhắc mùa vụ/thời tiết máy móc.
+    - VẬT LÝ SẢN PHẨM: Nếu kịch bản yêu cầu mở nắp/tương tác, hãy viết rõ cách mở (bật lên, kéo ra) vào Prompt Video dựa vào 'product_physics_motion'.
+    - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết máy móc. CẤM dùng từ "Thèm".
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
     - TỔNG THỜI GIAN VIDEO PHẢI ĐÚNG: {duration_instruction}
+    - ĐỒNG NHẤT HÌNH ẢNH THEO ĐỊA ĐIỂM: Hãy điền `outfit_en` và `setting_en` cho từng cảnh. Nếu vẫn ở cùng địa điểm, COPY Y NGUYÊN bối cảnh và trang phục.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
@@ -413,7 +413,7 @@ def create_scene_details(target_id, mode, style):
                 "director": "Chỉ đạo Voice: BẮT BUỘC ghi rõ 'Giọng Nam/Nữ Miền Bắc' | Nhịp độ: [Nhanh/Chậm...] | Cảm xúc: ... | Mục đích: [Tạo khan hiếm/Đồng cảm...]", 
                 "voiceover": "Xưng hô chuẩn xác ('mẹ bầu'/'các mẹ'/'chị em'/'anh em'). CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. GIỌNG BẮC CHUẨN. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Product: [prod_dna]. NO generated text.", 
-                "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry. NO morphing. Keep object rigid. NO generated text."
+                "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna] with specific lid-opening mechanics if needed. Maintain EXACT product geometry. NO morphing. Keep object rigid. NO generated text."
             }},
             {{
                 "scene": 2, 
@@ -431,24 +431,20 @@ def create_scene_details(target_id, mode, style):
     }}
     Lưu ý: "dur" CHỈ ĐƯỢC LÀ "4s", "6s", hoặc "8s". Cảnh cuối cùng mới được chốt đơn!
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"ĐẢM BẢO TỔNG THỜI GIAN LÀ: {duration_instruction}"))
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, outline.get("actor_count", 1), f"ĐẢM BẢO TỔNG THỜI GIAN YÊU CẦU LÀ: {duration_instruction}"))
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
 def clone_script(script_id):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
+    narrator = st.session_state.get("last_narrator", "On-camera")
+    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
     
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if sc["id"] == script_id), None)
     cur_len = len(all_combined)
     num_chars = target.get("actors", target.get("actor_count", 1))
-    
-    # Lấy cài đặt gốc của script bị clone
-    target_dur = target.get("duration_instruction", st.session_state.get("target_duration_instruction", ""))
-    target_narrator = target.get("narrator_mode", st.session_state.get("last_narrator", ""))
-    target_chars = target.get("character_profiles", st.session_state.get("character_profiles", []))
-    char_rules = generate_char_rules_string(target_chars)
     
     dna_str = json.dumps(st.session_state.content_analysis, ensure_ascii=False) if st.session_state.content_analysis else "N/A"
     
@@ -467,7 +463,13 @@ def clone_script(script_id):
                 "hook": "Xưng hô chuẩn xác & Hook dẫn dắt tâm lý đời thực (KHÔNG CTA BẤM GIỎ HÀNG ở đây, CÓ CHỦ VỊ, KHÔNG nói cụt lủn)",
                 "actors": {num_chars}
             }},
-            {{ "id": {cur_len+2}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
+            {{
+                "id": {cur_len+2},
+                "title": "Tên kịch bản 2",
+                "setting": "Bối cảnh thực tế 2",
+                "hook": "...",
+                "actors": {num_chars}
+            }},
             {{ "id": {cur_len+3}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
             {{ "id": {cur_len+4}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
             {{ "id": {cur_len+5}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }}
@@ -475,24 +477,26 @@ def clone_script(script_id):
     }}
     🛑 BẮT BUỘC TRẢ VỀ CHÍNH XÁC 5 KỊCH BẢN TRONG MẢNG `outlines`. KHÔNG THIẾU.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target_narrator, char_rules, num_chars, "Giữ nguyên chiến lược của kịch bản gốc"))
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars, "Giữ nguyên chiến lược của kịch bản gốc"))
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     clones = res.get("outlines", res.get("script_outlines", []))
-    for idx, cl in enumerate(clones): 
-        cl["id"] = cur_len + idx + 1
-        cl["duration_instruction"] = target_dur
-        cl["narrator_mode"] = target_narrator
-        cl["character_profiles"] = target_chars
+    for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
     return clones
 
-def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more, duration_inst, char_profiles):
+def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
-    char_rules = generate_char_rules_string(char_profiles)
+    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
     
     prod_ctx = f"INPUT: {st.session_state.current_input_context}"
-    db_ctx = f"DB: {json.dumps({'Kênh': st.session_state.get('viral_persona', ''), 'Chủ đề': st.session_state.get('viral_topic', '')}, ensure_ascii=False)}" if "Viral" in mode else (f"DB: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else "")
+    
+    # Chỉ truyền Chủ đề Kênh nếu là Viral, và chỉ truyền Data Sản phẩm nếu là Bán Hàng
+    if mode == "Viral":
+        db_ctx = f"DB: {json.dumps({'Kênh': st.session_state.get('viral_persona', ''), 'Chủ đề': st.session_state.get('viral_topic', '')}, ensure_ascii=False)}"
+    else:
+        db_ctx = f"DB: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
+        
     dna_ctx = f"DNA: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
     
     prompt = f"""
@@ -526,17 +530,13 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     if extra_char_inputs:
         for c in extra_char_inputs:
             payload.append(f"ACTOR {c['id']} ({c['role']}):")
-            payload.append(types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type if c['file'].type else "image/jpeg"))
+            payload.append(types.Part.from_bytes(data=c["bytes"], mime_type=c["mime_type"]))
     payload.append(prompt)
     
     res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle))
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     more_scripts = res.get("outlines", res.get("script_outlines", []))
-    for idx, sc in enumerate(more_scripts): 
-        sc["id"] = cur_len + idx + 1
-        sc["duration_instruction"] = duration_inst
-        sc["narrator_mode"] = narrator_mode_more
-        sc["character_profiles"] = char_profiles
+    for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
     return more_scripts
 
 def save_project_to_db(email, title, payload_data, project_id=None):
@@ -1196,7 +1196,7 @@ if st.session_state[gen_main_key]:
         STRICT JSON REQUIRED:
         {{
             "content_analysis": {{
-                "target_audience": "Nhận diện TỆP KHÁN GIẢ/KHÁCH HÀNG",
+                "target_audience": "Nhận diện TỆP KHÁN GIẢ/KHÁCH HÀNG (VD: Nữ -> chị em, Mẹ bầu -> mẹ bầu)",
                 "core_value": "Giá trị cốt lõi / mechanical specs",
                 "pain_points": "Nỗi đau khách hàng",
                 "hook_element": "Yếu tố giữ chân / Mong muốn cốt lõi",
@@ -1208,7 +1208,7 @@ if st.session_state[gen_main_key]:
                     "id": 1, 
                     "title": "Tên kịch bản 1", 
                     "setting": "Bối cảnh thực tế cho kịch bản 1", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'. VĂN PHONG MIỀN BẮC CHUẨN.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (chị em/anh em). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'. VĂN PHONG MIỀN BẮC CHUẨN.",
                     "actors": {num_c}
                 }},
                 {{ "id": 2, "title": "Tên kịch bản 2", "setting": "...", "hook": "...", "actors": {num_c} }},
