@@ -17,6 +17,29 @@ from datetime import datetime, timedelta
 # ==============================================================================
 st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
 
+# Chèn mã Google Analytics 4 (Chạy ngầm trên Header của Streamlit)
+ga_script = """
+<script>
+    if (!window.parent.document.getElementById('ga-script')) {
+        var script = document.createElement('script');
+        script.id = 'ga-script';
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
+        script.async = true;
+        window.parent.document.head.appendChild(script);
+
+        var script2 = document.createElement('script');
+        script2.innerHTML = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-19YJP7NJ6W');
+        `;
+        window.parent.document.head.appendChild(script2);
+    }
+</script>
+"""
+components.html(ga_script, width=0, height=0)
+
 def lock_ui():
     st.markdown("""
     <style>
@@ -53,7 +76,6 @@ st.markdown("""
 
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
-ACCOUNTS_FILE = "accounts.json"
 HARDCODED_ASPECT = "9:16 (Dọc TikTok/Reels)"
 
 @st.cache_resource
@@ -225,7 +247,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V4.9 (THÊM PHÂN TÍCH CHUYỂN ĐỘNG VẬT LÝ NẮP/NÚT)
+# 2. HÀM AI LÕI & LUẬT THÉP V5.1 (Sửa lỗi thiếu tham số & Cô lập ngữ cảnh)
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -360,15 +382,21 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     10. {char_rules}
     """
 
-def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
+def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     outline = next((sc for sc in all_combined if sc["id"] == target_id), None)
     if not outline: return
     
+    # Lấy thông tin bị "đóng băng" trong chính outline này
+    narrator_mode = outline.get("narrator_mode", st.session_state.get("last_narrator", "On-camera"))
+    char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
+    char_rules = generate_char_rules_string(char_profiles)
+    duration_instruction = outline.get("duration_instruction", st.session_state.get("target_duration_instruction", "Tự động phân bổ 15-30 giây"))
+    num_chars = outline.get("actors", outline.get("actor_count", 1))
+    
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
-    duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
@@ -431,20 +459,24 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     }}
     Lưu ý: "dur" CHỈ ĐƯỢC LÀ "4s", "6s", hoặc "8s". Cảnh cuối cùng mới được chốt đơn!
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, outline.get("actor_count", 1), f"ĐẢM BẢO TỔNG THỜI GIAN YÊU CẦU LÀ: {duration_instruction}"))
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, f"ĐẢM BẢO TỔNG THỜI GIAN YÊU CẦU LÀ: {duration_instruction}"))
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
 def clone_script(script_id):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
-    narrator = st.session_state.get("last_narrator", "On-camera")
-    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
     
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if sc["id"] == script_id), None)
     cur_len = len(all_combined)
     num_chars = target.get("actors", target.get("actor_count", 1))
+    
+    # Kế thừa trạng thái đóng băng của kịch bản gốc
+    target_dur = target.get("duration_instruction", st.session_state.get("target_duration_instruction", ""))
+    target_narrator = target.get("narrator_mode", st.session_state.get("last_narrator", ""))
+    target_chars = target.get("character_profiles", st.session_state.get("character_profiles", []))
+    char_rules = generate_char_rules_string(target_chars)
     
     dna_str = json.dumps(st.session_state.content_analysis, ensure_ascii=False) if st.session_state.content_analysis else "N/A"
     
@@ -463,13 +495,7 @@ def clone_script(script_id):
                 "hook": "Xưng hô chuẩn xác & Hook dẫn dắt tâm lý đời thực (KHÔNG CTA BẤM GIỎ HÀNG ở đây, CÓ CHỦ VỊ, KHÔNG nói cụt lủn)",
                 "actors": {num_chars}
             }},
-            {{
-                "id": {cur_len+2},
-                "title": "Tên kịch bản 2",
-                "setting": "Bối cảnh thực tế 2",
-                "hook": "...",
-                "actors": {num_chars}
-            }},
+            {{ "id": {cur_len+2}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
             {{ "id": {cur_len+3}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
             {{ "id": {cur_len+4}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
             {{ "id": {cur_len+5}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }}
@@ -477,21 +503,24 @@ def clone_script(script_id):
     }}
     🛑 BẮT BUỘC TRẢ VỀ CHÍNH XÁC 5 KỊCH BẢN TRONG MẢNG `outlines`. KHÔNG THIẾU.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator, char_rules, num_chars, "Giữ nguyên chiến lược của kịch bản gốc"))
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target_narrator, char_rules, num_chars, "Giữ nguyên chiến lược của kịch bản gốc"))
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     clones = res.get("outlines", res.get("script_outlines", []))
-    for idx, cl in enumerate(clones): cl["id"] = cur_len + idx + 1
+    for idx, cl in enumerate(clones): 
+        cl["id"] = cur_len + idx + 1
+        cl["duration_instruction"] = target_dur
+        cl["narrator_mode"] = target_narrator
+        cl["character_profiles"] = target_chars
     return clones
 
-def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more):
+def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more, duration_inst, char_profiles):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
-    char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
+    char_rules = generate_char_rules_string(char_profiles)
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
     
     prod_ctx = f"INPUT: {st.session_state.current_input_context}"
     
-    # Chỉ truyền Chủ đề Kênh nếu là Viral, và chỉ truyền Data Sản phẩm nếu là Bán Hàng
     if mode == "Viral":
         db_ctx = f"DB: {json.dumps({'Kênh': st.session_state.get('viral_persona', ''), 'Chủ đề': st.session_state.get('viral_topic', '')}, ensure_ascii=False)}"
     else:
@@ -536,7 +565,11 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle))
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     more_scripts = res.get("outlines", res.get("script_outlines", []))
-    for idx, sc in enumerate(more_scripts): sc["id"] = cur_len + idx + 1
+    for idx, sc in enumerate(more_scripts): 
+        sc["id"] = cur_len + idx + 1
+        sc["duration_instruction"] = duration_inst
+        sc["narrator_mode"] = narrator_mode_more
+        sc["character_profiles"] = char_profiles
     return more_scripts
 
 def save_project_to_db(email, title, payload_data, project_id=None):
