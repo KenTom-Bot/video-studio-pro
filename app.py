@@ -17,29 +17,6 @@ from datetime import datetime, timedelta
 # ==============================================================================
 st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
 
-# Chèn mã Google Analytics 4 (Chạy ngầm trên Header của Streamlit)
-ga_script = """
-<script>
-    if (!window.parent.document.getElementById('ga-script')) {
-        var script = document.createElement('script');
-        script.id = 'ga-script';
-        script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
-        script.async = true;
-        window.parent.document.head.appendChild(script);
-
-        var script2 = document.createElement('script');
-        script2.innerHTML = `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-19YJP7NJ6W');
-        `;
-        window.parent.document.head.appendChild(script2);
-    }
-</script>
-"""
-components.html(ga_script, width=0, height=0)
-
 def lock_ui():
     st.markdown("""
     <style>
@@ -76,6 +53,7 @@ st.markdown("""
 
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
+ACCOUNTS_FILE = "accounts.json"
 HARDCODED_ASPECT = "9:16 (Dọc TikTok/Reels)"
 
 @st.cache_resource
@@ -247,7 +225,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V4.9 (THÊM PHÂN TÍCH CHUYỂN ĐỘNG VẬT LÝ NẮP/NÚT)
+# 2. HÀM AI LÕI & LUẬT THÉP V4.9
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -512,7 +490,13 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
     
     prod_ctx = f"INPUT: {st.session_state.current_input_context}"
-    db_ctx = f"DB: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
+    
+    # Ép AI lấy ĐÚNG dữ liệu của chiến dịch hiện tại
+    if mode == "Viral":
+        db_ctx = f"DB: {json.dumps({'Kênh': st.session_state.get('viral_persona', ''), 'Chủ đề': st.session_state.get('viral_topic', '')}, ensure_ascii=False)}"
+    else:
+        db_ctx = f"DB: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else ""
+        
     dna_ctx = f"DNA: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
     
     prompt = f"""
@@ -1517,6 +1501,9 @@ if all_combined_scripts_list:
                     st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in extra_char_inputs]
                 
                 st.session_state.last_narrator = narrator_mode_more
+                
+                
+                db_ctx = f"DB: {json.dumps({'Kênh': st.session_state.get('viral_persona', ''), 'Chủ đề': st.session_state.get('viral_topic', '')}, ensure_ascii=False)}" if "Viral" in mode else (f"DB: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}" if st.session_state.current_product_data_saved else "")
                 
                 new_scripts = generate_more_scripts(chosen_angle, chosen_chars, extra_char_inputs, narrator_mode_more)
                 st.session_state.expanded_scripts.extend(new_scripts)
