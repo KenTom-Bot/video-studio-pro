@@ -198,18 +198,8 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V3
+# 2. HÀM AI LÕI & LUẬT THÉP V3.1 (TỐI ƯU COPYWRITING & FIX ĐỒNG NHẤT HÌNH ẢNH)
 # ==============================================================================
-def get_dynamic_realtime_context(mode):
-    now = datetime.now()
-    month = now.month
-    if month in [12, 1, 2]: season_desc = "thời tiết lạnh giá"
-    elif month in [3, 4, 5]: season_desc = "thời tiết giao mùa, ấm áp"
-    elif month in [6, 7, 8]: season_desc = "thời tiết nắng nóng"
-    else: season_desc = "thời tiết mát mẻ, se lạnh"
-    
-    return f"BỐI CẢNH: {season_desc}. LƯU Ý: CẤM nhắc trực tiếp đến tên mùa hay thời tiết một cách máy móc. KHÔNG ĐƯỢC tự ý thêm thời tiết vào kịch bản trừ khi sản phẩm thực sự cần thiết."
-
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
@@ -239,10 +229,10 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
 
 def generate_char_rules_string(profiles):
     if not profiles: 
-        return "CHAR_LOCK: AI creates face/hair/body and copies EXACTLY to all scenes. 100% consistent."
-    rules = "MULTI-LAYER OUTFIT & BIO LOCK:\n"
+        return "CHAR_LOCK: AI tự tạo Khuôn mặt, Kiểu tóc, Vóc dáng và 1 BỘ TRANG PHỤC ĐA LỚP cố định. BẮT BUỘC COPY Y HỆT miêu tả này vào MỌI phân cảnh. Bối cảnh cũng phải ĐỒNG NHẤT 100%."
+    rules = "KOC IMAGE EXTRACTION & BIO LOCK:\n"
     for p in profiles: 
-        rules += f" - Actor {p['id']} ({p['role']}): Extract Face/Body/Hair from image. IGNORE original clothes. Design NEW multi-layer outfit (outer + inner) and LOCK exactly across all scenes.\n"
+        rules += f" - Diễn viên {p['id']} ({p['role']}): TỪ ẢNH UPLOAD -> CHỈ trích xuất KHUÔN MẶT, KIỂU TÓC, VÓC DÁNG. TUYỆT ĐỐI BỎ QUA TRANG PHỤC GỐC TRONG ẢNH. Hãy tự thiết kế một bộ trang phục mới (đa lớp) phù hợp bối cảnh. GHI NHỚ: KHUÔN MẶT, KIỂU TÓC, VÓC DÁNG, TRANG PHỤC VÀ BỐI CẢNH NÀY PHẢI ĐƯỢC GHI VÀO BIẾN TOÀN CỤC VÀ KHÓA CỐ ĐỊNH XUYÊN SUỐT MỌI PHÂN CẢNH CỦA KỊCH BẢN NÀY.\n"
     return rules
 
 def get_mode_specific_rules(mode):
@@ -250,17 +240,16 @@ def get_mode_specific_rules(mode):
         return """
     🎯 ĐỊNH HƯỚNG CỐT LÕI: VIRAL & XÂY KÊNH (CHUYÊN GIA / KIẾN THỨC)
     - MỤC TIÊU: Chia sẻ kiến thức, mẹo hay hoặc kể chuyện cảm xúc để KÉO LƯỢT FOLLOW. CẤM CHỐT ĐƠN.
-    - VĂN PHONG (TONE): Dân dã, tự nhiên, chuyên nghiệp. Không nói rườm rà.
+    - VĂN PHONG: Dân dã, tự nhiên, đi thẳng vào vấn đề. CÂU THOẠI CÓ ĐẦY ĐỦ CHỦ NGỮ - VỊ NGỮ.
         """
     else:
         return """
     🎯 ĐỊNH HƯỚNG CỐT LÕI: TIKTOK SHOP & BÁN HÀNG (AFFILIATE THỰC CHIẾN)
     - MỤC TIÊU: Đánh trúng Nỗi đau, làm nổi bật USP để CHỐT ĐƠN.
-    - CƠ CHẾ KÊU GỌI (CTA): Giục khách mua ngay, chớp deal hời. NHƯNG CHỈ XUẤT HIỆN Ở CẢNH CUỐI. CẤM CTA Ở CẢNH 1.
+    - CƠ CHẾ KÊU GỌI (CTA): Chỉ được phép kêu gọi chớp deal hời ở CẢNH CUỐI CÙNG. CẤM CÓ CTA Ở CẢNH 1.
         """
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
-    time_ctx = get_dynamic_realtime_context(mode)
     mode_rules = get_mode_specific_rules(mode)
     
     if "Tự động" in angle:
@@ -272,50 +261,51 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
-    {time_ctx}
     {mode_rules}
     {strat_cmd}
     
     🛑 CÁC QUY TẮC BỔ SUNG TUÂN THỦ 100%:
-    1. SỐ LƯỢNG NHÂN VẬT & BỐI CẢNH: Đúng {num_chars} nhân vật. Giữ BỐI CẢNH ĐỒNG NHẤT.
+    1. SỐ LƯỢNG NHÂN VẬT & BỐI CẢNH: Đúng {num_chars} nhân vật. Thiết lập BỐI CẢNH ĐỒNG NHẤT cho mỗi kịch bản.
     2. LÁCH LUẬT CẤM: TUYỆT ĐỐI CẤM dùng: "Cam kết", "Chữa trị", "Đúng", "Chính xác 100%". Dùng từ nói giảm: "Khoảng...", "Hỗ trợ...", "Giúp cải thiện...". CẤM BÁO GIÁ CỤ THỂ BẰNG CON SỐ.
-    3. ĐỒNG NHẤT 100%: Giữ nguyên bối cảnh, trang phục ĐA LỚP, vóc dáng, kiểu tóc. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
-    4. XƯNG HÔ & NGÔN TỪ THỰC TẾ: Tự phân tích khách hàng (Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị"). CẤM dùng từ lóng giả tạo ("Hội", "Mấy bạn", "Dân nghiện..."). CẤM dùng từ lố bịch ("Thèm nồi lẩu" -> Sửa thành bối cảnh thực tế: "Gia đình quây quần ăn lẩu", "Anh chị nào hay...").
-    5. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi mua hàng/bấm giỏ hàng. Chỉ khơi gợi sự đồng cảm.
-    6. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, khí hậu, mùa vụ (mùa đông, mùa thu) vào câu thoại.
-    7. {char_rules}
+    3. ĐỒNG NHẤT 100%: Giữ nguyên bối cảnh, trang phục ĐA LỚP, vóc dáng, kiểu tóc trong cùng 1 kịch bản. Sản phẩm phải y hệt thực tế (KHÔNG đổi màu/kích thước).
+    4. XƯNG HÔ THÔNG MINH: Tự phân tích khách hàng. Nữ/Đồ gia dụng/Chung -> xưng "chị em". Nam/Đồ công nghệ -> xưng "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân nghiện".
+    5. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, khí hậu, mùa vụ (mùa đông, mùa thu) vào câu thoại trừ khi sản phẩm đặc thù.
+    6. NGỮ PHÁP TỰ NHIÊN: CÂU CÓ ĐẦY ĐỦ CHỦ NGỮ, VỊ NGỮ. KHÔNG nói cụt lủn hô khẩu hiệu ("Thèm nồi lẩu" -> "Chị em nào thích ăn lẩu tại nhà..."). 
+    7. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi mua hàng/bấm giỏ hàng. Chỉ khơi gợi sự đồng cảm.
+    8. SỐ LƯỢNG KỊCH BẢN: Lệnh bắt buộc là phải trả về ĐÚNG 5 kịch bản khác nhau.
+    9. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction):
     mode_rules = get_mode_specific_rules(mode)
     is_on_camera = "On-camera" in narrator_mode
-    narrator_instruction = f"Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính. YÊU CẦU TỐI QUAN TRỌNG CHO VEO 3: BẮT BUỘC chèn lệnh `Audio: \"[Nguyên văn lời thoại tiếng Việt]\"` vào tất cả các `video_prompt`." if is_on_camera else "Lồng tiếng ngoài khung hình. KHÔNG đưa phần Audio vào `video_prompt`."
+    narrator_instruction = f"Nhân vật xuất hiện trực tiếp nói chuyện trước ống kính. BẮT BUỘC chèn lệnh `Audio: \"[Nguyên văn thoại tiếng Việt]\"` vào tất cả các `video_prompt`." if is_on_camera else "Lồng tiếng ngoài khung hình. KHÔNG đưa phần Audio vào `video_prompt`."
     
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
     1. ANTI-MORPHING & HIỆN THỰC SẢN PHẨM: BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent."
-    2. CHÍNH SÁCH KIỂM DUYỆT: Cấm "Cam kết", "Đúng 100%", "Chữa trị". Dùng "Hỗ trợ", "Giúp cải thiện". Cấm báo giá bằng số cụ thể.
-    3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): {duration_instruction}. 
-       - Cảnh 4s = Tối đa 16 âm tiết. Cảnh 6s = Tối đa 24 âm tiết. Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
-    4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
-       - Xưng hô chuẩn xác: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM dùng "Mấy bạn", "Hội", "Dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
+    2. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): {duration_instruction}. Tốc độ tối đa 4 âm tiết/giây. VIẾT LỐ SẼ GÂY LỖI ÂM THANH.
+    3. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
+       - Xưng hô chuẩn xác: Nữ/Đồ gia dụng/Chung -> "chị em". Nam/Công nghệ -> "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
        - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm" (không dùng "mọng nước"), lau chùi thì là "dễ lau chùi" (không dùng "siêu khỏe"). 
        - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo.
-    5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
+    4. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
        - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
        - BẮT BUỘC dùng dấu phẩy (,) và dấu chấm (.) chính xác để AI Voice ngắt nghỉ, tạo nhịp điệu và cảm xúc như người thật.
-       - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC phải ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà. KHÔNG hô khẩu hiệu cụt lủn.
-    6. CẤU TRÚC HOOK & CTA:
+       - Các câu thoại từ Cảnh 1 đến Cảnh cuối BẮT BUỘC nối tiếp logic, ghép lại thành 1 ĐOẠN VĂN DUY NHẤT mượt mà. KHÔNG hô khẩu hiệu cụt lủn.
+    5. CẤU TRÚC HOOK & CTA:
        - Cảnh 1 (Hook): Chỉ khơi gợi đồng cảm. CẤM kêu gọi bấm giỏ hàng/mua ngay ở Cảnh 1.
-       - Cảnh cuối cùng: ĐÂY MỚI LÀ NƠI chốt đơn "bấm góc trái/rinh ngay".
-    7. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
-       - CHỈ DÙNG "Cảnh nối tiếp (Dùng lại ảnh cuối)" + lệnh `holding the final frame steady as a reference anchor` KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH LIÊN TỤC CHO Ý TRƯỚC ĐÓ.
+       - Cảnh cuối cùng: ĐÂY MỚI LÀ NƠI DUY NHẤT kêu gọi chốt đơn "bấm góc trái/rinh ngay".
+    6. LOGIC ĐỒNG BỘ CHUYỂN CẢNH:
+       - CHỈ DÙNG "Cảnh nối tiếp" + lệnh `holding the final frame steady as a reference anchor` KHI VÀ CHỈ KHI lời thoại ĐANG GIẢI THÍCH LIÊN TỤC CHO Ý TRƯỚC ĐÓ.
        - NẾU CHUYỂN Ý MỚI -> Dùng "Chuyển cảnh mới (Tạo ảnh mới)".
-    8. ĐỒNG NHẤT 100%: Giữ Bối cảnh (Setting) thống nhất, trang phục đa lớp không đổi từ cảnh 1 đến cuối.
-    9. {narrator_instruction}
-    10. {char_rules}
+    7. ĐỒNG NHẤT TUYỆT ĐỐI HÌNH ẢNH:
+       - Bạn phải sinh ra 2 biến `global_outfit_en` và `global_setting_en` đại diện cho diện mạo đa lớp và bối cảnh chuẩn của kịch bản này.
+       - TẤT CẢ các phân cảnh BẮT BUỘC phải copy y nguyên 2 biến này vào Prompt, đảm bảo hình ảnh không đổi.
+    8. {narrator_instruction}
+    9. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
@@ -326,8 +316,6 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
-    duration_instruction = st.session_state.get("target_duration_instruction", "Tự động phân bổ 3-5 phân cảnh.")
-    num_chars = outline.get("actor_count", st.session_state.get("extra_num_chars", 1))
     
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
@@ -345,39 +333,45 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
-    - XƯNG HÔ THÔNG MINH: Nữ -> "chị em", Nam -> "anh em", Chung -> "anh chị". CẤM xưng "Hội", "Mấy bạn".
-    - NGÔN TỪ THỰC TẾ: Dùng từ bối cảnh sinh hoạt chân thật (VD: "Gia đình quây quần ăn lẩu", "Anh chị nào hay..."). CẤM dùng từ thèm thuồng lố bịch. CẤM nhắc thời tiết máy móc.
+    - XƯNG HÔ THÔNG MINH: CHỈ DÙNG "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
+    - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết. CẤM dùng từ "Thèm".
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
-    - ĐẾM ĐÚNG SỐ ÂM TIẾT WPM. 4s <= 16 âm tiết, 6s <= 24 âm tiết. KHÔNG DÙNG TỪ CẤM.
+    - AI TỰ TÍNH TOÁN THỜI GIAN: Dựa vào thoại viết ra, AI tự điền "dur" là 4s, 6s, hay 8s sao cho khớp WPM (Tối đa 4 âm tiết/giây). KHÔNG DÙNG TỪ CẤM.
     
     TRẢ VỀ ĐÚNG 1 DICT JSON CẤU TRÚC SAU:
     {{
         "title": "{outline.get('title')}",
-        "total_dur": "Tổng thời gian khớp",
+        "total_dur": "Tổng thời gian của các cảnh cộng lại",
         "outfit_vi": "BẮT BUỘC MÔ TẢ DIỆN MẠO VÀ TRANG PHỤC ĐA LỚP BẰNG TIẾNG VIỆT",
+        "global_outfit_en": "Exact English description of Face, Hair, Body + Newly Designed Multi-layer Outfit. Must lock this exact string.",
+        "global_setting_en": "Exact English description of the background setting. Must remain static.",
         "prod_dna": "Mô tả ngắn gọn hình dáng, chi tiết vật lý sản phẩm bằng TIẾNG ANH. NẾU KHÔNG CÓ SẢN PHẨM ĐỂ TRỐNG.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
             {{
-                "scene": 1, "dur": "4s", "trans": "Chuyển cảnh mới (Tạo ảnh mới)", 
+                "scene": 1, 
+                "dur": "<AI 4 4s, 6s 8s TỰ dài hoặc max thoại, tùy âm/s ĐIỀN: độ>", 
+                "trans": "Chuyển cảnh mới (Tạo ảnh mới)", 
                 "setting": "Mô tả bối cảnh góc máy AN TOÀN (Static/Slow)...",
                 "director": "Mô tả biểu cảm nhấn nhá cảm xúc...", 
-                "voiceover": "Xưng hô chuẩn xác (Anh chị/Chị em). Khơi gợi bối cảnh tự nhiên. CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY. ĐÚNG WPM...",
-                "img_p": "Cinematic vertical 9:16 photo. Static shot... [ENG OUTFIT]. [prod_dna]. Maintain EXACT facial identity, identical outer jacket and inner shirt. NO generated text.", 
-                "vid_p": "Vertical 9:16 video. Static shot... character talking to camera. Audio: \\"[exact vi dialogue]\\". Wearing EXACT SAME [ENG OUTFIT]. [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
+                "voiceover": "Xưng hô chuẩn xác ('chị em'/'anh em'). Khơi gợi bối cảnh tự nhiên. CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY. ĐÚNG WPM...",
+                "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_outfit_en]. Product: [prod_dna]. NO generated text.", 
+                "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_outfit_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
             }},
             {{
-                "scene": 2, "dur": "6s", "trans": "<Cảnh Chuyển HOẶC cảnh mới nối tiếp>", 
+                "scene": 2, 
+                "dur": "<AI 4s, 6s 8s TỰ hoặc ĐIỀN:>", 
+                "trans": "<Cảnh Chuyển HOẶC cảnh mới nối tiếp>", 
                 "setting": "...", "director": "...", 
                 "voiceover": "<Nối WPM. có dấu mạch nghỉ. ngắt nhiên, phẩy thoại tự ĐÚNG>",
-                "img_p": "<Nếu KHÔNG MỚI TẠO nối thì tiếp>", 
-                "vid_p": "<Nếu Audio: EXACT Maintain NO Start [prod_dna]. \\"[dialogue]\\" anchor. as exactly final frame from geometry, holding image, morphing. nối product provided reference steady tiếp:>"
+                "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_outfit_en]. Product: [prod_dna]. NO generated text.", 
+                "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_outfit_en]. Audio: \\"[dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry, scale, color. NO morphing, NO distortion. Keep object rigid. NO generated text."
             }}
         ]
     }}
-    Lưu ý: Các "dur" CHỈ ĐƯỢC LÀ "4s", "6s", "8s". KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON. Cảnh cuối cùng mới được chốt đơn!
+    Lưu ý: "dur" CHỈ ĐƯỢC LÀ "4s", "6s", hoặc "8s". KHÔNG DÙNG DẤU NGOẶC KÉP CHƯA ESCAPE TRONG JSON. Cảnh cuối cùng mới được chốt đơn!
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, duration_instruction))
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, "Tự động phân bổ độ dài cảnh dựa trên độ dài thoại (Tối đa 4 âm tiết/giây)."))
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
@@ -398,7 +392,7 @@ def clone_script(script_id):
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
     Dựa BẮT BUỘC vào dữ liệu Gốc ở trên, tạo chính xác 5 biến thể mới. 
-    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "anh chị", "chị em". KHÔNG nhắc thời tiết. KHÔNG xưng "Mấy bạn". CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
+    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng "chị em", "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". CẤM nhắc thời tiết. CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "outlines": [
@@ -406,7 +400,7 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
                 "setting": "Bối cảnh thực tế 1",
-                "hook": "Xưng hô chuẩn xác & Hook dẫn dắt tâm lý đời thực (KHÔNG CTA ở đây, KHÔNG nói cụt lủn)",
+                "hook": "Xưng hô chuẩn xác & Hook dẫn dắt tâm lý đời thực (KHÔNG CTA ở đây, CÓ CHỦ VỊ, KHÔNG nói cụt lủn)",
                 "actors": {num_chars}
             }},
             {{
@@ -446,7 +440,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     Bạn PHẢI viết 5 kịch bản mới TUÂN THỦ TUYỆT ĐỐI chiến lược này. Bẻ giọng điệu sao cho phù hợp với '{angle}'.
 
     SỐ DIỄN VIÊN: CHÍNH XÁC {num_chars}.
-    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng "anh chị", "chị em", "anh em". Không nói cụt lủn hô khẩu hiệu. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM CTA Ở HOOK.
+    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng "chị em", "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". Không nói cụt lủn. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM CTA Ở HOOK.
 
     STRICT JSON REQUIRED:
     {{
@@ -1142,7 +1136,7 @@ if st.session_state[gen_main_key]:
                     "id": 1, 
                     "title": "Tên kịch bản 1", 
                     "setting": "Bối cảnh thực tế cho kịch bản 1", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (anh chị/chị em). Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (chị em/anh em). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'.",
                     "actors": {num_c}
                 }},
                 {{ "id": 2, "title": "Tên kịch bản 2", "setting": "...", "hook": "...", "actors": {num_c} }},
@@ -1196,22 +1190,11 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
     st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Đa Tầng**")
     ca = st.session_state.content_analysis
     
-    ca_target = ca.get('target_audience', ca.get('primary_target_audience', 'N/A'))
-    ca_pain = ca.get('pain_points', ca.get('customer_pain_points', ca.get('audience_pain_points', 'N/A')))
-    ca_core = ca.get('core_value', ca.get('mechanical_and_accessories', ca.get('core_value_or_message', 'N/A')))
-    ca_visual = ca.get('product_physics', ca.get('visual_rules', ca.get('visual_physics_rules', 'N/A')))
     ca_hook = ca.get('hook_element', ca.get('core_desires', ca.get('viral_hook_element', 'N/A')))
-    ca_usp = ca.get('usp', ca.get('emotional_or_usp_hook', 'N/A'))
     
     with st.container(border=True):
-        st.markdown("##### 🎯 **1. Chân dung Khán giả & Vấn đề:**")
-        st.markdown(f"<div style='line-height: 1.8;'>• <b>Tệp khán giả / khách hàng:</b> {format_analysis_field(ca_target)}<br>{format_analysis_field(ca_pain)}</div>", unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown("##### 🏭 **2. Yếu tố Cốt lõi & Vật lý:**")
-        st.markdown(f"<div style='line-height: 1.8;'>• <b>Giá trị / Thông số:</b> {format_analysis_field(ca_core)}<br>• <b>Đặc điểm Sản phẩm:</b> {format_analysis_field(ca_visual)}</div>", unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown("##### 💡 **3. Điểm thu hút & USP:**")
-        st.markdown(f"<div style='line-height: 1.8;'>• <b>Mong muốn / Sự đồng cảm:</b> {format_analysis_field(ca_hook)}<br>• <b>USP / Hook:</b> {format_analysis_field(ca_usp)}</div>", unsafe_allow_html=True)
+        st.markdown("##### 💡 **3. Điểm thu hút:**")
+        st.markdown(f"<div style='line-height: 1.8;'>• <b>Mong muốn / Sự đồng cảm:</b> {format_analysis_field(ca_hook)}</div>", unsafe_allow_html=True)
     
     dna_lock = str(ca.get('prompt_dna_lock', ''))
     if dna_lock:
@@ -1282,7 +1265,7 @@ if all_combined_scripts_list:
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             st.markdown("---")
 
-    st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Ở Xuất & Nhân Bản)**")
+    st.markdown("### 🎬 **1. Kịch Bản Đã Hoàn Thiện Chi Tiết (Sẵn Sàng Sản Xuất & Nhân Bản)**")
     if not completed_scripts:
         st.info("💡 Chưa có kịch bản nào được tạo chi tiết.")
     else:
