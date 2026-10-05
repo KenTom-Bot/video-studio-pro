@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 # ==============================================================================
 # 1. CẤU HÌNH GIAO DIỆN & KẾT NỐI
 # ==============================================================================
-st.set_page_config(page_title="Đạo Diễn AI", page_icon="🎬", layout="wide")
+st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
 
 def lock_ui():
     st.markdown("""
@@ -202,7 +202,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V4.7 (Mẹ & Bé + Xưng Hô Tuyệt Đối)
+# 2. HÀM AI LÕI & LUẬT THÉP V4.9 (THÊM PHÂN TÍCH CHUYỂN ĐỘNG VẬT LÝ NẮP/NÚT)
 # ==============================================================================
 def get_dynamic_realtime_context(mode):
     now = datetime.now()
@@ -307,8 +307,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL CHO VEO 3 VÀ IMAGEN 3. PHONG CÁCH: {style} | ĐỊNH DẠNG: {HARDCODED_ASPECT}
     {mode_rules}
     🛑 CÁC QUY TẮC KỸ THUẬT QUAY DỰNG ĐỈNH CAO:
-    1. ANTI-MORPHING & HIỆN THỰC SẢN PHẨM/HÌNH ẢNH: BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts. Keep the object rigid and consistent."
-       - QUY TẮC MẸ VÀ BÉ: Nếu kịch bản có mẹ bầu/thai nhi, TUYỆT ĐỐI KHÔNG xuất hiện em bé thật (chưa sinh). Thai nhi CHỈ ĐƯỢC PHÉP xuất hiện qua hình ảnh siêu âm (giấy siêu âm hoặc màn hình máy siêu âm).
+    1. ANTI-MORPHING & BẢO TOÀN VẬT LÝ SẢN PHẨM: 
+       - BẮT BUỘC chèn lệnh vào đuôi MỌI `video_prompt`: "Maintain EXACT product geometry, scale, color, and real-life details. NO morphing, NO distortion, NO hallucination of new parts."
+       - NẾU CÓ HÀNH ĐỘNG MỞ NẮP/TƯƠNG TÁC (Nồi cơm, hộp đựng): Phải miêu tả rõ cách thức vật lý dựa trên `product_physics_motion` (VD: "bật nắp lên trên theo bản lề cố định" hoặc "kéo nắp rời ra ngoài"). CẤM để AI tự chế cách mở nắp sai thực tế.
+       - QUY TẮC MẸ VÀ BÉ: Nếu kịch bản có mẹ bầu/thai nhi, TUYỆT ĐỐI KHÔNG xuất hiện em bé thật (chưa sinh). Thai nhi CHỈ ĐƯỢC PHÉP xuất hiện qua hình ảnh siêu âm.
     2. ĐẢM BẢO TỔNG THỜI GIAN VIDEO: {duration_instruction} TỔNG SỐ GIÂY CỦA TẤT CẢ PHÂN CẢNH PHẢI ĐÚNG BẰNG THỜI LƯỢNG ĐÃ YÊU CẦU. Hãy phân bổ dur theo từng cảnh (4s, 6s, 8s).
     3. WPM (ĐẾM CỰC KỲ CHÍNH XÁC): Tốc độ tối đa 4 âm tiết/giây. 
        - Cảnh 4s = Tối đa 16 âm tiết.
@@ -316,7 +318,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
        - Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
     4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
        - Xưng hô chuẩn xác: Mẹ bầu -> "mẹ bầu", Trẻ em -> "các mẹ", Nữ/Gia dụng/Chung -> "chị em", Nam/Công nghệ -> "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
-       - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm", lau chùi thì là "dễ lau chùi". 
+       - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm" (không dùng "mọng nước"), lau chùi thì là "dễ lau chùi" (không dùng "siêu khỏe"). 
        - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo.
     5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
        - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
@@ -348,9 +350,9 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     audio_instruction = 'Nhân vật xuất hiện trực tiếp. TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn lời thoại tiếng Việt]"' if is_on_camera else 'Lồng tiếng ngoài khung hình. KHÔNG chèn Audio vào video_prompt.'
     
     if "Viral" in mode:
-        voice_hint = "Giọng đọc CẢM XÚC, CHÂN THẬT, GẦN GŨI để tạo sự đồng cảm sâu sắc và giữ chân người xem. Tốc độ vừa phải (1.8-2.2 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ] MIỀN BẮC CHUẨN. Truyền cảm, chân thật, gần gũi (1.8-2.2 từ/s)."
     else:
-        voice_hint = "Giọng đọc MẠNH MẼ, NHANH, NĂNG LƯỢNG CAO để cuốn hút người xem và tạo chuyển đổi chốt sale (3.5-4 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ] MIỀN BẮC CHUẨN. Mạnh mẽ, nhanh, năng lượng cao chốt sale (3.5-4 từ/s)."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx}
@@ -362,7 +364,8 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
-    - XƯNG HÔ THÔNG MINH: Tùy tệp khách, CHỈ DÙNG "mẹ bầu", "các mẹ", "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
+    - XƯNG HÔ THÔNG MINH: CHỈ DÙNG "mẹ bầu", "các mẹ", "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
+    - VẬT LÝ SẢN PHẨM: Nếu kịch bản yêu cầu mở nắp/tương tác, hãy viết rõ cách mở (bật lên, kéo ra) vào Prompt Video dựa vào 'product_physics_motion'.
     - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết máy móc. CẤM dùng từ "Thèm".
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
     - TỔNG THỜI GIAN VIDEO PHẢI ĐÚNG: {duration_instruction}
@@ -384,10 +387,10 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
                 "setting": "Mô tả bối cảnh góc máy...",
                 "setting_en": "English desc of setting.",
                 "outfit_en": "English desc of multi-layer outfit.",
-                "director": "Mô tả biểu cảm...", 
-                "voiceover": "Xưng hô chuẩn xác ('mẹ bầu'/'các mẹ'/'chị em'/'anh em'). CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY.",
+                "director": "Chỉ đạo Voice: BẮT BUỘC ghi rõ 'Giọng Nam/Nữ Miền Bắc' | Nhịp độ: [Nhanh/Chậm...] | Cảm xúc: ... | Mục đích: [Tạo khan hiếm/Đồng cảm...]", 
+                "voiceover": "Xưng hô chuẩn xác ('mẹ bầu'/'các mẹ'/'chị em'/'anh em'). CÓ CHỦ VỊ, DẤU PHẨY NGẮT NGHỈ. GIỌNG BẮC CHUẨN. CẤM CÓ CTA BÁN HÀNG Ở ĐÂY.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Product: [prod_dna]. NO generated text.", 
-                "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry. NO morphing. Keep object rigid. NO generated text."
+                "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna] with specific lid-opening mechanics if needed. Maintain EXACT product geometry. NO morphing. Keep object rigid. NO generated text."
             }},
             {{
                 "scene": 2, 
@@ -396,7 +399,7 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
                 "setting": "...", 
                 "setting_en": "<Giữ Anh chưa nguyên nếu tiếng điểm địa đổi>",
                 "outfit_en": "<Giữ Anh chưa nguyên nếu tiếng điểm địa đổi>",
-                "director": "...", 
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ Miền Bắc | Nhịp độ: ... | Mục đích: ...", 
                 "voiceover": "<Nối WPM mạch nhiên, thoại tự ĐÚNG>",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Product: [prod_dna]. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Audio: \\"[dialogue]\\". Product: [prod_dna]. Maintain EXACT product geometry. NO morphing. Keep object rigid. NO generated text."
@@ -426,7 +429,7 @@ def clone_script(script_id):
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. 
     Dựa BẮT BUỘC vào dữ liệu Gốc ở trên, tạo chính xác 5 biến thể mới. 
-    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường. Xưng hô chuẩn xác ("mẹ bầu", "các mẹ", "chị em", "anh em"). TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". CẤM nhắc thời tiết. CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
+    YÊU CẦU ĐẶC BIỆT: Lời thoại tóm tắt phải CỰC KỲ dân dã, đời thường, CHUẨN GIỌNG MIỀN BẮC. Xưng hô chuẩn xác ("mẹ bầu", "các mẹ", "chị em", "anh em"). TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". CẤM nhắc thời tiết. CẤM dùng từ lóng miền Nam ("nha", "nè"). CẤM kêu gọi mua hàng ở Hook. LÁCH MỌI TỪ KHÓA BỊ CẤM.
     BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON GỒM CÁC KEY SAU:
     {{
         "outlines": [
@@ -474,7 +477,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     Bạn PHẢI viết 5 kịch bản mới TUÂN THỦ TUYỆT ĐỐI chiến lược này. Bẻ giọng điệu sao cho phù hợp với '{angle}'.
 
     SỐ DIỄN VIÊN: CHÍNH XÁC {num_chars}.
-    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, ĐỜI THƯỜNG, ĐẦY ĐỦ CHỦ VỊ. Xưng hô thông minh ("mẹ bầu", "các mẹ", "chị em", "anh em"). TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". Không nói cụt lủn hô khẩu hiệu. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM CTA BẤM GIỎ HÀNG Ở HOOK.
+    LUẬT: Lách từ cấm 100%. Lời thoại DÂN DÃ, CHUẨN GIỌNG MIỀN BẮC. Xưng hô thông minh ("mẹ bầu", "các mẹ", "chị em", "anh em"). TUYỆT ĐỐI CẤM xưng "anh chị", "mấy bạn". Không nói cụt lủn hô khẩu hiệu. CẤM NHẮC THỜI TIẾT MÁY MÓC. CẤM dùng từ miền Nam ("nha", "nè"). CẤM CTA BẤM GIỎ HÀNG Ở HOOK.
 
     STRICT JSON REQUIRED:
     {{
@@ -964,16 +967,16 @@ with st.sidebar:
 
         st.markdown("---")
         st.markdown("""
-       <div class="support-box">
-        <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
-        <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
-        <div style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
-            <a href="https://zalo.me/0869628316" target="_blank" style="background: #0068ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📱 Zalo</a>
-            <a href="https://facebook.com/your_facebook" target="_blank" style="background: #0866ff; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">📘 Facebook</a>
-            <a href="https://tiktok.com/@your_tiktok" target="_blank" style="background: #000000; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">🎵 TikTok</a>
+        <div class="support-box">
+            <b style="color: #166534; font-size: 0.95rem;">💬 Cần Hỗ Trợ / Mua Gói?</b><br>
+            <p style="font-size: 0.85rem; color: #15803d; margin: 6px 0 8px 0;">Kết nối ngay với chúng tôi:</p>
+            <div class="social-icons-container">
+                <a href="[https://zalo.me/0968484369](https://zalo.me/0968484369)" target="_blank" class="btn-zalo">Zalo</a>
+                <a href="[https://facebook.com/](https://facebook.com/)" target="_blank" class="btn-fb">f</a>
+                <a href="[https://tiktok.com/](https://tiktok.com/)" target="_blank" class="btn-tt">♪</a>
+            </div>
+            <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0968.484.369</div>
         </div>
-        <div style="font-weight: 700; color: #166534; font-size: 12px; margin-top: 8px;">📞 Hotline: 0869 628 316</div>
-    </div>
         """, unsafe_allow_html=True)
         
         st.markdown("---")
@@ -1018,7 +1021,7 @@ if not st.session_state.is_logged_in:
 # ==============================================================================
 # 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo diễn AI - Hệ Thống Tạo Kịch Bản Và Prompt Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
 
 current_acc_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
 allowed_categories = [m for m in ALL_MODULES if m in current_acc_info.get("roles", ALL_MODULES)]
@@ -1164,19 +1167,19 @@ if st.session_state[gen_main_key]:
         STRICT JSON REQUIRED:
         {{
             "content_analysis": {{
-                "target_audience": "Nhận diện TỆP KHÁN GIẢ/KHÁCH HÀNG (VD: Nữ -> chị em, Mẹ bầu -> mẹ bầu)",
+                "target_audience": "Nhận diện TỆP KHÁN GIẢ/KHÁCH HÀNG (VD: Nữ -> chị em, Nam -> anh em)",
                 "core_value": "Giá trị cốt lõi / mechanical specs",
                 "pain_points": "Nỗi đau khách hàng",
                 "hook_element": "Yếu tố giữ chân / Mong muốn cốt lõi",
-                "product_physics": "Đặc điểm vật lý CỐ ĐỊNH của SẢN PHẨM (Màu sắc, hình dáng).",
-                "prompt_dna_lock": "Viết 1 đoạn tiếng Anh siêu cô đọng gộp các đặc điểm 'product_physics' ở trên để làm khóa thị giác (Visual DNA Lock) cho Imagen3/Veo3."
+                "product_physics_motion": "Phân tích cách mở nắp/tương tác vật lý của sản phẩm (VD: Nồi cơm điện thì bật nắp lên trên, nồi hầm thì nhấc nắp rời ra). BẮT BUỘC ĐÚNG THỰC TẾ.",
+                "prompt_dna_lock": "Viết 1 đoạn tiếng Anh siêu cô đọng gộp hình dáng vật lý ở trên để làm khóa thị giác (Visual DNA Lock) cho Imagen3/Veo3."
             }},
             "outlines": [ 
                 {{
                     "id": 1, 
                     "title": "Tên kịch bản 1", 
                     "setting": "Bối cảnh thực tế cho kịch bản 1", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (mẹ bầu/các mẹ/chị em/anh em). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (chị em/anh em). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. Khơi gợi vấn đề tự nhiên. KHÔNG nhắc mua hàng ở đây. KHÔNG dùng 'Hội', 'Mấy bạn'. VĂN PHONG MIỀN BẮC CHUẨN.",
                     "actors": {num_c}
                 }},
                 {{ "id": 2, "title": "Tên kịch bản 2", "setting": "...", "hook": "...", "actors": {num_c} }},
@@ -1210,30 +1213,30 @@ if st.session_state[gen_main_key]:
             st.session_state.generated_details = {}
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
-            st.toast("✅ Đã sinh xong 5 kịch bản và phân tích sản phẩm!")
+            st.toast("✅ Đã sinh xong 5 kịch bản và phân tích DNA!")
     except Exception as e:
         st.error(f"❌ Lỗi xử lý AI: {str(e)}")
         time.sleep(2)
     st.session_state[gen_main_key] = False
     st.rerun()
 else:
-    if btn_gen_main_ph.button("🚀 PHÂN TÍCH DỮ LIỆU VÀ TẠO KỊCH BẢN", type="primary", use_container_width=True):
+    if btn_gen_main_ph.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True):
         can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
         if not can_run: st.error(f"❌ {msg}")
         else:
             st.session_state[gen_main_key] = True
             st.rerun()
 
-# ==================== HIỂN THỊ PHÂN TÍCH DỮ LIỆU ====================
+# ==================== HIỂN THỊ PHÂN TÍCH DNA ====================
 if st.session_state.content_analysis and isinstance(st.session_state.content_analysis, dict):
     st.divider()
-    st.markdown(f"### 🔍 **Phân Tích Sản Phẩm Chi Tiết Đa Tầng**")
+    st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Đa Tầng**")
     ca = st.session_state.content_analysis
     
     ca_target = ca.get('target_audience', ca.get('primary_target_audience', 'N/A'))
     ca_pain = ca.get('pain_points', ca.get('customer_pain_points', ca.get('audience_pain_points', 'N/A')))
     ca_core = ca.get('core_value', ca.get('mechanical_and_accessories', ca.get('core_value_or_message', 'N/A')))
-    ca_visual = ca.get('product_physics', ca.get('visual_rules', ca.get('visual_physics_rules', 'N/A')))
+    ca_visual = ca.get('product_physics_motion', ca.get('visual_rules', ca.get('visual_physics_rules', 'N/A')))
     ca_hook = ca.get('hook_element', ca.get('core_desires', ca.get('viral_hook_element', 'N/A')))
     
     with st.container(border=True):
@@ -1241,7 +1244,7 @@ if st.session_state.content_analysis and isinstance(st.session_state.content_ana
         st.markdown(f"<div style='line-height: 1.8;'>• <b>Tệp khán giả / khách hàng:</b> {format_analysis_field(ca_target)}<br>{format_analysis_field(ca_pain)}</div>", unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("##### 🏭 **2. Yếu tố Cốt lõi & Vật lý:**")
-        st.markdown(f"<div style='line-height: 1.8;'>• <b>Giá trị / Thông số:</b> {format_analysis_field(ca_core)}<br>• <b>Đặc điểm Sản phẩm:</b> {format_analysis_field(ca_visual)}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='line-height: 1.8;'>• <b>Giá trị / Thông số:</b> {format_analysis_field(ca_core)}<br>• <b>Cơ chế Vật lý:</b> {format_analysis_field(ca_visual)}</div>", unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("##### 💡 **3. Điểm thu hút:**")
         st.markdown(f"<div style='line-height: 1.8;'>• <b>Mong muốn / Sự đồng cảm:</b> {format_analysis_field(ca_hook)}</div>", unsafe_allow_html=True)
