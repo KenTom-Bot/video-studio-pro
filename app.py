@@ -13,9 +13,32 @@ import uuid
 from datetime import datetime, timedelta
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KẾT NỐI
+# 1. CẤU HÌNH GIAO DIỆN, KẾT NỐI & GOOGLE ANALYTICS
 # ==============================================================================
 st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
+
+# Chèn mã Google Analytics 4 (Chạy ngầm trên Header của Streamlit)
+ga_script = """
+<script>
+    if (!window.parent.document.getElementById('ga-script')) {
+        var script = document.createElement('script');
+        script.id = 'ga-script';
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
+        script.async = true;
+        window.parent.document.head.appendChild(script);
+
+        var script2 = document.createElement('script');
+        script2.innerHTML = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-19YJP7NJ6W');
+        `;
+        window.parent.document.head.appendChild(script2);
+    }
+</script>
+"""
+components.html(ga_script, width=0, height=0)
 
 def lock_ui():
     st.markdown("""
@@ -53,7 +76,6 @@ st.markdown("""
 
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
-ACCOUNTS_FILE = "accounts.json"
 HARDCODED_ASPECT = "9:16 (Dọc TikTok/Reels)"
 
 @st.cache_resource
@@ -71,25 +93,48 @@ def is_valid_phone(phone):
 
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
-    if os.path.exists(ACCOUNTS_FILE):
-        try:
-            with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f: 
-                data = json.load(f)
-                for k, v in data.items():
-                    if "password" not in v: v["password"] = v.get("phone", "123456")
-                    if "plan_type" not in v: 
-                        v["plan_type"] = "Trial" if v.get("is_trial") else "VIP"
-                    if "daily_usage_count" not in v: v["daily_usage_count"] = 0
-                    if "last_generation_date" not in v: v["last_generation_date"] = ""
-                    if "active_session_id" not in v: v["active_session_id"] = ""
-                    accs[k] = v
-        except: pass
+    if not supabase: return accs
+    try:
+        res = supabase.table("licensed_accounts").select("*").execute()
+        for row in res.data:
+            accs[row["email"]] = {
+                "roles": row.get("roles", ALL_MODULES),
+                "phone": row.get("phone", ""),
+                "password": row.get("password", ""),
+                "expires_at": row.get("expires_at", "2099-12-31"),
+                "plan_type": row.get("plan_type", "Trial"),
+                "daily_usage_count": row.get("daily_usage_count", 0),
+                "last_generation_date": row.get("last_generation_date", ""),
+                "active_session_id": row.get("active_session_id", "")
+            }
+    except Exception as e:
+        pass
     return accs
 
-def save_licensed_accounts(acc_dict):
+def save_single_account(email, acc_data):
+    if not supabase or email == ADMIN_EMAIL: return
     try:
-        with open(ACCOUNTS_FILE, "w", encoding="utf-8") as f: json.dump(acc_dict, f, ensure_ascii=False, indent=2)
-    except: pass
+        payload = {
+            "email": email,
+            "roles": acc_data.get("roles", ALL_MODULES),
+            "phone": acc_data.get("phone", ""),
+            "password": acc_data.get("password", ""),
+            "expires_at": acc_data.get("expires_at", "2099-12-31"),
+            "plan_type": acc_data.get("plan_type", "Trial"),
+            "daily_usage_count": acc_data.get("daily_usage_count", 0),
+            "last_generation_date": acc_data.get("last_generation_date", ""),
+            "active_session_id": acc_data.get("active_session_id", "")
+        }
+        supabase.table("licensed_accounts").upsert(payload).execute()
+    except Exception as e:
+        pass
+
+def delete_single_account(email):
+    if not supabase or email == ADMIN_EMAIL: return
+    try:
+        supabase.table("licensed_accounts").delete().eq("email", email).execute()
+    except Exception as e:
+        pass
 
 def check_usage_limit(email, is_detailing=False):
     if email == ADMIN_EMAIL: return True, ""
@@ -117,7 +162,7 @@ def check_usage_limit(email, is_detailing=False):
         if acc.get("daily_usage_count", 0) >= limit:
             return False, f"Bạn đã dùng hết {limit}/{limit} lượt tạo chi tiết kịch bản của hôm nay! Vui lòng nâng cấp gói cước để tạo thêm."
         acc["daily_usage_count"] += 1
-        save_licensed_accounts(accs)
+        save_single_account(email, acc)
         
     return True, ""
 
@@ -181,7 +226,7 @@ if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMA
         st.info("Hệ thống phát hiện tài khoản của bạn đang được đăng nhập trên một thiết bị hoặc trình duyệt khác. Để bảo mật, mỗi tài khoản chỉ được phép sử dụng trên **1 thiết bị duy nhất** tại cùng một thời điểm.")
         if st.button("🔌 Sử dụng trên thiết bị này (Đăng xuất thiết bị kia)", type="primary"):
             st.session_state.licensed_accounts[st.session_state.current_email]["active_session_id"] = st.session_state.session_id
-            save_licensed_accounts(st.session_state.licensed_accounts)
+            save_single_account(st.session_state.current_email, st.session_state.licensed_accounts[st.session_state.current_email])
             st.rerun()
         st.stop()
 
@@ -291,7 +336,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
        - Nam/Công nghệ -> xưng "anh em". 
        - TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân nghiện".
     5. QUY TẮC MẸ VÀ BÉ (VISUAL): Nếu kịch bản có thai nhi chưa sinh, tuyệt đối không tạo hình ảnh em bé thật, chỉ dùng hình ảnh siêu âm (giấy/màn hình siêu âm).
-    6. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, mùa vụ (mùa đông, mùa thu) vào câu thoại trừ khi sản phẩm đặc thù.
+    6. CẤM NHẮC THỜI TIẾT: CẤM TỰ Ý nhắc đến thời tiết, khí hậu, mùa vụ (mùa đông, mùa thu) vào câu thoại trừ khi sản phẩm đặc thù.
     7. NGỮ PHÁP TỰ NHIÊN: CÂU CÓ ĐẦY ĐỦ CHỦ NGỮ, VỊ NGỮ. KHÔNG nói cụt lủn hô khẩu hiệu. 
     8. QUY TẮC HOOK: Hook mở đầu CẤM kêu gọi mua hàng/bấm giỏ hàng. Chỉ khơi gợi sự đồng cảm.
     9. SỐ LƯỢNG KỊCH BẢN: Lệnh bắt buộc là phải trả về ĐÚNG 5 kịch bản khác nhau.
@@ -318,7 +363,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, num_chars, dura
        - Cảnh 8s = Tối đa 32 âm tiết. (VIẾT LỐ SẼ GÂY LỖI ÂM THANH).
     4. NGÔN TỪ THỰC TẾ & XƯNG HÔ THÔNG MINH (CỰC KỲ QUAN TRỌNG): 
        - Xưng hô chuẩn xác: Mẹ bầu -> "mẹ bầu", Trẻ em -> "các mẹ", Nữ/Gia dụng/Chung -> "chị em", Nam/Công nghệ -> "anh em". TUYỆT ĐỐI CẤM dùng "anh chị", "mấy bạn", "hội", "dân...". KHÔNG dùng "Cái nồi" -> chỉ dùng "Nồi".
-       - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm" (không dùng "mọng nước"), lau chùi thì là "dễ lau chùi" (không dùng "siêu khỏe"). 
+       - Dùng từ chuẩn thực tế: Hầm thịt thì là "chín mềm", lau chùi thì là "dễ lau chùi". 
        - TUYỆT ĐỐI CẤM nhồi nhét thời tiết, mùa vụ máy móc. CẤM dùng từ lố bịch giả tạo.
     5. NGỮ PHÁP, DẤU CÂU & SEAMLESS FLOW:
        - CÂU PHẢI CÓ ĐỦ CHỦ NGỮ - VỊ NGỮ. 
@@ -564,7 +609,7 @@ with st.sidebar:
                         except: pass
                         
                         st.session_state.licensed_accounts[email_check]["active_session_id"] = st.session_state.session_id
-                        save_licensed_accounts(st.session_state.licensed_accounts)
+                        save_single_account(email_check, st.session_state.licensed_accounts[email_check])
                         
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_check
@@ -610,7 +655,7 @@ with st.sidebar:
                         "last_generation_date": "",
                         "active_session_id": st.session_state.session_id
                     }
-                    save_licensed_accounts(st.session_state.licensed_accounts)
+                    save_single_account(email_check, st.session_state.licensed_accounts[email_check])
                     st.session_state.is_logged_in = True
                     st.session_state.current_email = email_check
                     st.toast("✅ Đăng ký tài khoản thành công!")
@@ -865,7 +910,7 @@ with st.sidebar:
                                 "roles": assigned_modules, "phone": new_phone.strip(), "password": new_pass.strip(), 
                                 "expires_at": exp_date, "plan_type": selected_plan, "daily_usage_count": 0, "last_generation_date": "", "active_session_id": ""
                             }
-                            save_licensed_accounts(st.session_state.licensed_accounts)
+                            save_single_account(new_acc.strip(), st.session_state.licensed_accounts[new_acc.strip()])
                             st.toast(f"✅ Đã lưu thông tin cho {new_acc}!")
                             time.sleep(0.5)
                             st.rerun()
@@ -903,7 +948,7 @@ with st.sidebar:
                             if st.button("🗑 Xóa", key=f"del_acc_{acc}", type="secondary", use_container_width=True):
                                 lock_ui()
                                 del st.session_state.licensed_accounts[acc]
-                                save_licensed_accounts(st.session_state.licensed_accounts)
+                                delete_single_account(acc)
                                 st.toast("✅ Đã xóa tài khoản!")
                                 time.sleep(0.5)
                                 st.rerun()
@@ -957,7 +1002,7 @@ with st.sidebar:
                                                 "roles": upd_roles, "phone": upd_phone.strip(), "password": upd_pass.strip(), 
                                                 "expires_at": final_exp, "plan_type": p_map.get(upd_plan, "Trial")
                                             })
-                                            save_licensed_accounts(st.session_state.licensed_accounts)
+                                            save_single_account(acc, st.session_state.licensed_accounts[acc])
                                             st.session_state.editing_acc_email = None
                                             st.toast("✅ Đã cập nhật tài khoản thành công!")
                                             time.sleep(0.5)
@@ -1167,12 +1212,12 @@ if st.session_state[gen_main_key]:
         STRICT JSON REQUIRED:
         {{
             "content_analysis": {{
-                "target_audience": "Nhận diện TỆP KHÁN GIẢ/KHÁCH HÀNG (VD: Nữ -> chị em, Nam -> anh em)",
+                "target_audience": "Nhận diện TỆP KHÁN GIẢ/KHÁCH HÀNG (VD: Nữ -> chị em, Mẹ bầu -> mẹ bầu)",
                 "core_value": "Giá trị cốt lõi / mechanical specs",
                 "pain_points": "Nỗi đau khách hàng",
                 "hook_element": "Yếu tố giữ chân / Mong muốn cốt lõi",
                 "product_physics_motion": "Phân tích cách mở nắp/tương tác vật lý của sản phẩm (VD: Nồi cơm điện thì bật nắp lên trên, nồi hầm thì nhấc nắp rời ra). BẮT BUỘC ĐÚNG THỰC TẾ.",
-                "prompt_dna_lock": "Viết 1 đoạn tiếng Anh siêu cô đọng gộp hình dáng vật lý ở trên để làm khóa thị giác (Visual DNA Lock) cho Imagen3/Veo3."
+                "prompt_dna_lock": "Viết 1 đoạn tiếng Anh siêu cô đọng gộp các đặc điểm 'product_physics' ở trên để làm khóa thị giác (Visual DNA Lock) cho Imagen3/Veo3."
             }},
             "outlines": [ 
                 {{
