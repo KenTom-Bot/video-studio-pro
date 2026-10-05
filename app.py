@@ -66,9 +66,9 @@ api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
 client = genai.Client(api_key=api_key) if api_key else None
 
 def is_valid_phone(phone):
-    """Kiểm tra số điện thoại chỉ chứa chữ số và độ dài từ 9 đến 11 ký tự."""
+    """Kiểm tra số điện thoại chỉ chứa chữ số, bắt đầu bằng 0 và độ dài từ 9 đến 11 ký tự."""
     phone = phone.strip()
-    return phone.isdigit() and 9 <= len(phone) <= 11
+    return phone.isdigit() and phone.startswith('0') and 9 <= len(phone) <= 11
 
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
@@ -350,8 +350,8 @@ def create_scene_details(target_id, mode, style, narrator_mode, char_rules):
     
     LƯU Ý ĐẶC BIỆT (PHẢI TUÂN THỦ TÙY TỪNG CHỮ):
     - ĐOẠN VĂN LIỀN KHỐI: Toàn bộ thoại phải ghép lại thành 1 đoạn văn DÂN DÃ. Có đủ CHỦ-VỊ, DẤU PHẨY, DẤU CHẤM chuẩn xác. Không cụt lủn.
-    - XƯNG HÔ THÔNG MINH: Nữ -> "chị em", Nam -> "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
-    - NGÔN TỪ THỰC TẾ: Dùng từ bối cảnh sinh hoạt chân thật. CẤM dùng từ thèm thuồng lố bịch. CẤM nhắc thời tiết máy móc.
+    - XƯNG HÔ THÔNG MINH: CHỈ DÙNG "chị em" hoặc "anh em". TUYỆT ĐỐI CẤM xưng "anh chị", "hội", "mấy bạn".
+    - NGÔN TỪ THỰC TẾ: Không dùng từ cường điệu sai ngữ cảnh. CẤM nhắc mùa vụ/thời tiết. CẤM dùng từ "Thèm".
     - HOOK & CTA: Cảnh 1 TUYỆT ĐỐI KHÔNG kêu gọi mua hàng. CTA bấm giỏ hàng CHỈ NẰM Ở CẢNH CUỐI CÙNG.
     - AI TỰ TÍNH TOÁN THỜI GIAN: Dựa vào thoại viết ra, AI tự điền "dur" là 4s, 6s, hay 8s sao cho khớp WPM (Tối đa 4 âm tiết/giây). KHÔNG DÙNG TỪ CẤM.
     
@@ -568,7 +568,7 @@ with st.sidebar:
             st.markdown("<p style='font-size: 13px; color: #475569;'>Đăng ký tài khoản để trải nghiệm toàn bộ sức mạnh của Đạo diễn AI (Tặng trải nghiệm 3 lượt/ngày).</p>", unsafe_allow_html=True)
             with st.form("register_form", border=False):
                 reg_email = st.text_input("Email đăng ký:", placeholder="Nhập email...")
-                reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Chỉ nhập số (9-11 số)...")
+                reg_phone = st.text_input("Số điện thoại (Bắt buộc):", placeholder="Bắt đầu bằng số 0, nhập 9-11 số...")
                 reg_pass = st.text_input("Mật khẩu mới:", type="password", placeholder="Tạo mật khẩu...")
                 reg_submitted = st.form_submit_button("🚀 Đăng Ký Tài Khoản", type="secondary", use_container_width=True)
             
@@ -580,7 +580,7 @@ with st.sidebar:
                 if not email_check or not phone_check or not reg_pass.strip():
                     ph_reg.error("Vui lòng điền đầy đủ thông tin!")
                 elif not is_valid_phone(phone_check):
-                    ph_reg.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số (từ 9 đến 11 số).")
+                    ph_reg.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số, bắt đầu bằng số 0 (độ dài 9-11 số).")
                 elif email_check in st.session_state.licensed_accounts:
                     ph_reg.error("Email này đã tồn tại trong hệ thống!")
                 else:
@@ -613,7 +613,7 @@ with st.sidebar:
                 exp_date = datetime.strptime(exp_date_str, "%Y-%m-%d")
                 days_left = (exp_date - datetime.now()).days
                 if 0 <= days_left <= 7:
-                    st.warning(f"⚠️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Liên hệ hotline để gia hạn!")
+                    st.warning(f"⚠️️ **CẢNH BÁO:** Tài khoản của bạn sẽ hết hạn sau **{days_left} ngày nữa** ({exp_date_str}). Liên hệ hotline để gia hạn!")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -804,7 +804,7 @@ with st.sidebar:
             with st.form("add_license"):
                 st.markdown("##### ➕ Cấp Quyền Khách Hàng Mới")
                 new_acc = st.text_input("Email khách hàng:")
-                new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Chỉ nhập số...")
+                new_phone = st.text_input("Số điện thoại (SĐT):", placeholder="Bắt đầu bằng số 0, nhập 9-11 số...")
                 new_pass = st.text_input("Mật khẩu:", value="123456")
                 
                 acc_type = st.radio("Loại Tài Khoản:", [
@@ -827,7 +827,7 @@ with st.sidebar:
                     if not new_acc.strip() or not new_phone.strip() or not new_pass.strip():
                         st.error("Vui lòng điền đủ Email, SĐT và Mật khẩu!")
                     elif not is_valid_phone(new_phone):
-                        st.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số (từ 9 đến 11 ký tự).")
+                        st.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số, bắt đầu bằng số 0 (độ dài 9-11 số).")
                     else:
                         with st.spinner("⏳ Đang cấp quyền..."):
                             plan_map = {
@@ -897,7 +897,7 @@ with st.sidebar:
                         if st.session_state.get("editing_acc_email") == acc:
                             with st.form(f"update_form_{acc}" ):
                                 st.markdown(f"**Cập nhật cho: {acc}**")
-                                upd_phone = st.text_input("SĐT mới:", value=phone_val)
+                                upd_phone = st.text_input("SĐT mới:", value=phone_val, placeholder="Bắt đầu bằng số 0...")
                                 upd_pass = st.text_input("Mật khẩu:", value=pass_val)
                                 
                                 plan_idx_map = {"Trial": 0, "Basic": 1, "Advanced": 2, "VIP": 3}
@@ -920,7 +920,7 @@ with st.sidebar:
                                 btn_save_upd = st.form_submit_button("💾 Lưu Cập Nhật")
                                 if btn_save_upd:
                                     if not upd_phone.strip() or not is_valid_phone(upd_phone):
-                                        st.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số (từ 9 đến 11 ký tự).")
+                                        st.error("Số điện thoại không hợp lệ! Vui lòng chỉ nhập số, bắt đầu bằng số 0 (độ dài 9-11 số).")
                                     else:
                                         with st.spinner("⏳ Đang lưu..."):
                                             p_map = {
