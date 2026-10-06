@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V26.0 (MULTI-PART COLOR OCR & LONG SCENE PRIORITY)
+# 2. HÀM AI LÕI & LUẬT THÉP V26.0 (TỐC ĐỘ 4.8-5.2 WPM & UI LOADING STATES)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -292,18 +292,23 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp trước ống kính. Chèn lệnh `Audio: \"[Thoại]\"` vào đuôi MỌI `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
     
     if "TikTok Shop" in mode:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI GỐC (CẤM TỪ MIỀN NAM). Tốc độ 4.0-4.5 từ/s."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ RẤT NHANH VÀ MẠNH MẼ (4.8-5.2 từ/s)."
     else:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI GỐC (CẤM TỪ MIỀN NAM). Tự nhiên (3.0-3.5 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm, Tự nhiên (3.5-4.0 từ/s)."
 
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
-    1. ƯU TIÊN PHÂN CẢNH DÀI & ĐẾM TỪ NGƯỢC (TỐC ĐỘ 4.0 - 4.5 TỪ/S):
-       - MỤC TIÊU LÀ NHỒI NHÉT NHIỀU THÔNG TIN. Hãy cố gắng viết các đoạn thoại dài (từ 32 đến 45 từ) để sử dụng các phân cảnh 8s hoặc 10s.
+    1. ƯU TIÊN PHÂN CẢNH DÀI & ĐẾM TỪ NGƯỢC (TỐC ĐỘ 4.8 - 5.2 TỪ/S):
+       - MỤC TIÊU LÀ ĐỌC XẢ LIÊN THANH, GIỌNG ĐIỆU MẠNH MẼ, DỒN DẬP.
        - Viết xong thoại, BẮT BUỘC bạn phải tự ĐẾM CHÍNH XÁC TỔNG SỐ TỪ. Điền vào 'word_count'.
-       - TỰ ĐỘNG TÍNH SỐ GIÂY bằng công thức: [Số từ chia cho 4.5] (làm tròn lên). Gán kết quả vào 'dur' (Ví dụ: 35 từ -> "8s", 42 từ -> "10s").
+       - TỰ ĐỘNG TÍNH SỐ GIÂY bằng công thức: [Số từ chia cho 5.0] (làm tròn lên hoặc xuống cho hợp lý). 
+       - HƯỚNG DẪN KHỚP TOÁN HỌC:
+         + 4s: Cần 19 - 21 từ.
+         + 6s: Cần 29 - 32 từ.
+         + 8s: Cần 39 - 42 từ.
+         + 10s: Cần 48 - 52 từ.
 
     2. KHÓA MÀU SẮC CHI TIẾT ĐA BỘ PHẬN (MULTI-PART COLOR LOCK):
        - Chú ý đến 'product_color_lock' để lấy màu của TỪNG BỘ PHẬN (thân, nắp, viền). Nhúng CHẾT vào 'prod_dna'.
@@ -340,7 +345,7 @@ def create_scene_details(target_id, mode, style):
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
     audio_instruction = 'TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn thoại tiếng Việt]"' if is_on_camera else 'KHÔNG chèn Audio vào video_prompt.'
-    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ (4.0-4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
+    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ (4.8-5.2 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | PHÂN TÍCH DNA: {dna_data_ctx}
@@ -349,11 +354,12 @@ def create_scene_details(target_id, mode, style):
     
     LƯU Ý ĐẶC BIỆT:
     - KHÓA BỐI CẢNH & TRANG PHỤC TOÀN CỤC: DÙNG CHUNG 'global_setting_en' và 'global_outfit_en' cho 100% các cảnh. 
-    - ƯU TIÊN THOẠI DÀI & ĐẾM TỪ: Ưu tiên viết các đoạn thoại dài (32-45 từ) để truyền tải nhiều thông tin. Viết xong ĐẾM CHÍNH XÁC SỐ TỪ điền vào 'word_count'. Sau đó tính 'dur' = Số từ / 4.5.
+    - ƯU TIÊN THOẠI DÀI, ĐỌC NHANH, MẠNH MẼ (4.8-5.2 từ/s): Ưu tiên viết các đoạn thoại dài (40-50 từ) để truyền tải nhiều thông tin. Viết xong ĐẾM CHÍNH XÁC SỐ TỪ điền vào 'word_count'. Sau đó tính 'dur' = Số từ / 5.0. 
+      + 4s cần 19-21 từ. 6s cần 29-32 từ. 8s cần 39-42 từ. 10s cần 48-52 từ.
     - CẤU TRÚC THOẠI HÀ NỘI: BẮT BUỘC NGẮT NGHỈ BẰNG DẤU PHẨY (,). Văn phong HÀ NỘI GỐC (Cấm: nha, nè, vô). Lách từ vi phạm nền tảng.
     - HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY CẢNH 1. Kèm theo CẦU NỐI LOGIC. BẮT BUỘC làm tròn số lên và dùng từ "CHƯA TỚI". CẤM đọc số lẻ.
     - KHÓA MÀU SẮC ĐA CHI TIẾT (Lid, Body...): Lấy màu chi tiết từng bộ phận từ 'product_color_lock' nhúng CHẾT vào 'prod_dna'. Bắt buộc thêm "Maintain EXACT original product colors for all parts" vào img_p và vid_p.
-    - VẬT LÝ NÂNG CAO: Gió tàng hình (invisible wind fluttering...). Nắp mở cơ học (lid springing open upwards).
+    - VẬT LÝ NÂNG CAO: Gió tàng hình (invisible wind fluttering...). Mở nắp phải tả khớp nối cơ học (lid springing open upwards).
     
     TRẢ VỀ JSON CHUẨN XÁC:
     {{
@@ -363,18 +369,18 @@ def create_scene_details(target_id, mode, style):
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
         "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
         "global_setting_en": "Exact English desc of the unified environment/setting. MUST BE LOCKED.",
-        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC TỪNG BỘ PHẬN (EXACT COLOR OF BODY, LID...). Neo không gian nếu SP to.",
+        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC (EXACT COLOR OF BODY, LID...). Neo không gian nếu SP to.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
             {{
                 "scene": 1, 
-                "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ. ƯU TIÊN SỐ TỪ CAO (30-45).",
-                "dur": "TÍNH TOÁN = word_count / 4.5 (Ví dụ: 8s, 10s)", 
+                "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ.",
+                "dur": "TÍNH TOÁN = word_count / 5.0 (Ví dụ: 8s, 10s)", 
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
                 "action_en": "Miêu tả hành động. Chú ý cơ học nắp mở, gió bay.",
-                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Nhịp độ: Dồn dập", 
-                "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,). ƯU TIÊN VIẾT DÀI ĐỂ CUNG CẤP NHIỀU THÔNG TIN. LÀM TRÒN GIÁ TIỀN. CẤM ĐỌC SỐ LẺ. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Nhịp độ: CỰC NHANH, MẠNH MẼ, DỒN DẬP", 
+                "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,). VIẾT DÀI ĐỂ ĐỌC XẢ LIÊN THANH. LÀM TRÒN GIÁ TIỀN. CẤM ĐỌC SỐ LẺ. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product colors for all parts (body, lid, details). NO generated text, NO subtitles, NO typography, NO watermarks.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. NO color shifting. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks."
             }}
@@ -621,7 +627,7 @@ with st.sidebar:
                         btn_o_ph = col_open.empty()
                         if st.session_state.get(open_key, False):
                             btn_o_ph.empty()
-                            st.markdown("<div style='background: #eff6ff; text-align: center; font-size: 12px;'>⏳ Đang khôi phục...</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='background: #eff6ff; color: #1e3a8a; border-radius: 6px; padding: 6px; text-align: center; font-size: 12px; font-weight: bold;'>⏳ Đang mở...</div>", unsafe_allow_html=True)
                             lock_ui()
                             sd = p.get("script_content", {})
                             if isinstance(sd, dict):
@@ -640,6 +646,7 @@ with st.sidebar:
                         btn_d_ph = col_del.empty()
                         if st.session_state.get(del_key, False):
                             btn_d_ph.empty()
+                            st.markdown("<div style='background: #fef2f2; color: #dc2626; border-radius: 6px; padding: 6px; text-align: center; font-size: 12px; font-weight: bold;'>⏳ Đang xóa...</div>", unsafe_allow_html=True)
                             lock_ui(); supabase.table("saved_projects").delete().eq("id", p['id']).execute()
                             st.session_state[del_key] = False; st.toast("✅ Đã xóa!"); time.sleep(0.5); st.rerun()
                         else:
@@ -775,7 +782,7 @@ if st.session_state.get("loading_gen_main", False):
             "outlines": [ 
                 {{
                     "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế (Nếu là Flash Sale thì bối cảnh BẮT BUỘC là Kho hàng, Showroom ngập sản phẩm)", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LÀ CÂU GHÉP DÀI. ƯU TIÊN THOẠI DÀI ĐỂ TRUYỀN TẢI NHIỀU THÔNG TIN. Nếu là Flash Sale thì BẮT BUỘC dùng kỹ thuật Neo giá giảm dần NGAY Ở CÂU ĐẦU TIÊN CỦA CẢNH 1.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LUÔN LÀ CÂU GHÉP DÀI CÓ DẤU PHẨY ĐỂ LẤY HƠI. CÓ CÂU NỐI LOGIC CHUYỂN Ý. NẾU BÁN HÀNG PHẢI LÀM TRÒN LÊN VÀ CHỐT LẤP LỬNG MỨC GIÁ TỪ ẢNH, CẤM ĐỌC SỐ LẺ.",
                     "actors": {num_chars}
                 }},
                 {{ "id": 2, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
@@ -864,7 +871,7 @@ if all_sc:
                 ck = f"load_clone_{sc_id}"
                 btn_clone_ph = c3.empty()
                 if st.session_state.get(ck, False):
-                    btn_clone_ph.empty()
+                    btn_clone_ph.markdown("<div style='background: #fef2f2; color: #dc2626; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
                     lock_ui(); 
                     try: st.session_state.cloned_scripts.extend(clone_script(sc_id)); st.toast("✅ Đã clone!")
                     except Exception as e: st.error(f"❌ Lỗi: {e}")
@@ -888,14 +895,16 @@ if all_sc:
                 ck = f"load_cre_{sc_id}"
                 btn_cre_ph = c2.empty()
                 if st.session_state.get(ck, False):
-                    btn_cre_ph.empty()
+                    btn_cre_ph.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang dựng...</div>", unsafe_allow_html=True)
                     lock_ui()
                     try:
                         create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
                         st.session_state.active_script_id = sc_id; st.session_state.scroll_to_detail = True; st.toast("✅ Hoàn tất dựng!")
                         time.sleep(0.5)
                         st.rerun()
-                    except Exception as e: st.error(f"❌ Lỗi: {e}")
+                    except Exception as e: 
+                        st.error(f"❌ Lỗi: {e}")
+                        st.session_state[ck] = False; st.rerun()
             
                 else:
                     if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True):
