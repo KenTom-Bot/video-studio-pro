@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V17.0 (OCR DIMENSIONS & THUẬT NGỮ ĐO LƯỜNG TIKTOK)
+# 2. HÀM AI LÕI & LUẬT THÉP V18.0 (KHÓA TRANG PHỤC ĐA LỚP TOÀN CỤC)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -332,7 +332,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
        - ĐỒNG NHẤT 100% Giọng Hà Nội chuẩn. Cấm tuyệt đối "nha, nè, nghen, dzậy, xài, vô". Thay bằng "nhé, này, thế, dùng, vào".
        - NẾU SP LÀ NỆM/THẢM, CẤM DÙNG TỪ "CHIỀU CAO", BẮT BUỘC DÙNG "ĐỘ DÀY" (Ví dụ: Nệm độ dày 20cm).
     
-    8. ĐỒNG NHẤT: Copy y nguyên `global_identity_en`, `outfit_en`, `setting_en` vào mọi Prompt nếu chưa đổi.
+    8. ĐỒNG NHẤT TRANG PHỤC ĐA LỚP: Phải định nghĩa biến `global_outfit_en` (gồm áo trong, áo ngoài, quần/váy) và copy y nguyên vào tất cả các phân cảnh. TUYỆT ĐỐI KHÔNG ĐƯỢC THAY ĐỔI TRANG PHỤC GIỮA CÁC CẢNH.
     9. {narrator_instruction}
     10. {char_rules}
     """
@@ -360,20 +360,22 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng, hoặc Showroom.
-    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng. Lấy thông số kỹ thuật (Dài Rộng Cao, Độ dày) từ `product_dimensions`. 
+    - KHÓA TRANG PHỤC TOÀN CỤC: Bắt buộc tạo 1 biến 'global_outfit_en' miêu tả chi tiết trang phục đa lớp (áo trong, khoác ngoài, quần/váy) và phải DÙNG CHUNG biến này cho TẤT CẢ các cảnh. KHÔNG ĐƯỢC để AI tự đổi quần áo.
+    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng, hoặc Showroom ngập tràn hàng hóa.
+    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng. Lấy thông số kỹ thuật (Dài Rộng Cao, Độ dày) từ 'product_dimensions'. 
     - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.0 - 4.5 từ/s): Cảnh 4s đạt 16-18 từ. Cảnh 6s đạt 24-27 từ. Cảnh 8s đạt 32-36 từ. Cảnh 10s đạt 40-45 từ. ĐẾM THẬT CHÍNH XÁC.
     - KỸ THUẬT CHỐT GIÁ LẤP LỬNG (TỪ ẢNH THỰC TẾ): Dùng giá trị từ 'detected_prices'. Áp dụng công thức: "Nếu ai bán giá [Tiền to] thì khoan vội chốt, hôm nay không phải [Tiền to], không phải [Tiền vừa]... CHƯA TỚI [Tiền nhỏ làm tròn]". CẤM bịa số khác nếu đã có 'detected_prices'. CẤM dùng từ "cành".
     - BỘ LỌC PHƯƠNG NGỮ: ĐỒNG NHẤT 100% Giọng Hà Nội chuẩn. Tuyệt đối loại bỏ các từ: nha, nè, vô, xài, dzậy.
     - BỘ LỌC TỪ VỰNG KÍCH THƯỚC: Nếu là Nệm/Thảm, TUYỆT ĐỐI KHÔNG DÙNG TỪ "Chiều cao", CHỈ ĐƯỢC DÙNG "Độ dày". 
-    - KHÓA MÀU SẮC SẢN PHẨM: Lấy màu sắc từ 'product_color_lock' ở bước trước, dịch sang tiếng Anh và nhúng CHẾT vào 'prod_dna'. AI tạo ảnh/video rất hay tự đổi màu, nên phải khóa chặt.
+    - KHÓA MÀU SẮC SẢN PHẨM: Lấy màu sắc từ 'product_color_lock' ở bước trước, dịch sang tiếng Anh và nhúng CHẾT vào 'prod_dna'. 
     
-    TRẢ VỀ JSON:
+    TRẢ VỀ JSON CHUẨN XÁC:
     {{
         "title": "{outline.get('title')}",
         "total_dur": "Tổng thời gian",
         "outfit_vi": "Tóm tắt trang phục",
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
+        "global_outfit_en": "Exact English desc of the FULL multi-layered outfit (e.g. white t-shirt, blue denim jacket, black pants). MUST BE LOCKED.",
         "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC (EXACT COLOR: ...). Neo không gian nếu SP to.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
@@ -383,14 +385,13 @@ def create_scene_details(target_id, mode, style):
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh (Kho hàng/Showroom nếu là Flash sale)...",
                 "setting_en": "English desc of setting.",
-                "outfit_en": "English desc of outfit.",
                 "action_en": "Medium shot, energetic hand gestures.",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI CHUẨN 100% | Nhịp độ: Dồn dập | Mục đích: ...", 
                 "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng DỰA TRÊN SỐ LIỆU TỪ ẢNH. ĐẾM ĐÚNG SỐ TỪ. KHÔNG DÙNG NHA/NÈ/VÔ. ĐÚNG THUẬT NGỮ ĐO LƯỜNG).",
-                "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product color. NO generated text, NO subtitles, NO typography, NO watermarks.", 
-                "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLOR. NO color shifting. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks."
+                "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product color. NO generated text, NO subtitles, NO typography, NO watermarks.", 
+                "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLOR. NO color shifting. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks."
             }}
-            // ... Tiếp tục các cảnh khác. NHỚ CHÈN lệnh Cấm Chữ và Khóa Màu vào mọi img_p và vid_p.
+            // ... Tiếp tục các cảnh khác. SỬ DỤNG LẠI [global_outfit_en]. NHỚ CHÈN lệnh Cấm Chữ và Khóa Màu vào mọi img_p và vid_p.
         ]
     }}
     """
@@ -553,7 +554,7 @@ with st.sidebar:
         if current_acc and st.session_state.current_email != ADMIN_EMAIL and current_acc.get("plan_type", "Trial") != "Trial":
             try:
                 days_left = (datetime.strptime(current_acc.get("expires_at", "2099-12-31"), "%Y-%m-%d") - datetime.now()).days
-                if 0 <= days_left <= 7: st.warning(f"⚠️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
+                if 0 <= days_left <= 7: st.warning(f"⚠️️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -694,7 +695,7 @@ else:
             col_a, col_b = st.columns(2)
             col_a.markdown(f"**💰 Hoa hồng:** <span style='color:#15803d; font-weight:900;'>{prod.get('commission_percent', 0)}%</span><br>**🎯 Tệp:** {prod.get('target_audience', '')}", unsafe_allow_html=True)
             col_b.markdown(f"**🧠 Insight:** {prod.get('product_insight', '')}<br>**💔 Nỗi đau:** {prod.get('pain_points', '')}", unsafe_allow_html=True)
-    up_files = st.file_uploader("📦 Upload Ảnh SP (Khuyên dùng 3-5 ảnh nét nhất):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh SP (AI sẽ đọc giá và neo MÀU SẮC từ ảnh):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
     custom_note = st.text_area("✍ Ghi chú AI:", key=f"ns_{st.session_state.reset_key}")
 
 st.markdown("---")
@@ -804,7 +805,7 @@ if all_sc:
         
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title')).upper()}**")
-        st.markdown(f"<div class='detail-header-box'>⏱ Thời lượng: <b>{asc.get('total_dur')}</b> | 🎙 Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', '')})</b> | 👔 Bối cảnh: <b>{asc.get('outfit_vi')}</b></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='detail-header-box'>⏱ Thời lượng: <b>{asc.get('total_dur')}</b> | 🎙 Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', '')})</b> | 👔 Bối cảnh chung: <b>{asc.get('outfit_vi')}</b></div>", unsafe_allow_html=True)
         
         scenes = asc.get("scenes", [])
         if isinstance(scenes, dict): scenes = [scenes]
