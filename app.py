@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V18.0 (KHÓA TRANG PHỤC ĐA LỚP TOÀN CỤC)
+# 2. HÀM AI LÕI & LUẬT THÉP V19.0 (CỖ MÁY ĐẾM TỪ CƯỠNG BỨC)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -293,7 +293,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
     is_on_camera = "On-camera" in narrator_mode
-    narrator_instruction = f"Nhân vật xuất hiện trực tiếp. Chèn lệnh `Audio: \"[Thoại]\"` vào đuôi MỌI `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
+    narrator_instruction = f"Nhân vật xuất hiện trực tiếp trước ống kính. Chèn lệnh `Audio: \"[Thoại]\"` vào đuôi MỌI `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
     
     if "TikTok Shop" in mode:
         voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ 4.0-4.5 từ/s."
@@ -304,12 +304,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
-    1. THOẠI CÂU GHÉP DÀI & TOÁN HỌC ĐẾM TỪ (Tốc độ 4.0 - 4.5 từ/giây):
-       - Cảnh 4s: Cần CHÍNH XÁC khoảng 16 - 18 từ.
-       - Cảnh 6s: Cần CHÍNH XÁC khoảng 24 - 27 từ.
-       - Cảnh 8s: Cần CHÍNH XÁC khoảng 32 - 36 từ.
-       - Cảnh 10s: Cần CHÍNH XÁC khoảng 40 - 45 từ.
-       - DỒN DẬP nhưng TUYỆT ĐỐI KHÔNG VƯỢT QUÁ SỐ TỪ NÀY để AI Voice đọc kịp.
+    1. THOẠI CÂU GHÉP DÀI & ĐẾM TỪ CHÍNH XÁC (CỰC KỲ QUAN TRỌNG - Tốc độ 4.0 - 4.5 từ/giây):
+       - BẠN LÀ MÁY ĐẾM TỪ. Trước khi viết xong `voiceover`, HÃY ĐẾM SỐ TỪ. NẾU VIẾT THỪA TỪ PHẦN MỀM SẼ BỊ LỖI!
+       - NẾU CHỌN CẢNH 4s: Lời thoại PHẢI CÓ CHÍNH XÁC TỪ 16 ĐẾN 18 TỪ.
+       - NẾU CHỌN CẢNH 6s: Lời thoại PHẢI CÓ CHÍNH XÁC TỪ 24 ĐẾN 27 TỪ.
+       - NẾU CHỌN CẢNH 8s: Lời thoại PHẢI CÓ CHÍNH XÁC TỪ 32 ĐẾN 36 TỪ.
+       - NẾU CHỌN CẢNH 10s: Lời thoại PHẢI CÓ CHÍNH XÁC TỪ 40 ĐẾN 45 TỪ.
+       - TUYỆT ĐỐI KHÔNG ĐƯỢC DÀI HƠN HOẶC NGẮN HƠN. HÃY ĐẾM ĐỦ SỐ TỪ RỒI MỚI CHUYỂN SANG CẢNH TIẾP THEO.
 
     2. KỸ THUẬT CHỐT GIÁ VÀ BỐI CẢNH UY TÍN (FLASH SALE):
        - Sử dụng mức giá từ `detected_prices` (nếu có) để tạo Neo giá. "Bình thường không dưới [Giá Gốc làm tròn], nhưng hôm nay không phải [Giá Gốc làm tròn], chẳng phải [Giá Gốc - 1]... mà CHƯA ĐẾN [Giá Sale làm tròn lên]". CẤM dùng từ "cành".
@@ -360,14 +361,14 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - KHÓA TRANG PHỤC TOÀN CỤC: Bắt buộc tạo 1 biến 'global_outfit_en' miêu tả chi tiết trang phục đa lớp (áo trong, khoác ngoài, quần/váy) và phải DÙNG CHUNG biến này cho TẤT CẢ các cảnh. KHÔNG ĐƯỢC để AI tự đổi quần áo.
-    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng, hoặc Showroom ngập tràn hàng hóa.
-    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng. Lấy thông số kỹ thuật (Dài Rộng Cao, Độ dày) từ 'product_dimensions'. 
-    - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.0 - 4.5 từ/s): Cảnh 4s đạt 16-18 từ. Cảnh 6s đạt 24-27 từ. Cảnh 8s đạt 32-36 từ. Cảnh 10s đạt 40-45 từ. ĐẾM THẬT CHÍNH XÁC.
-    - KỸ THUẬT CHỐT GIÁ LẤP LỬNG (TỪ ẢNH THỰC TẾ): Dùng giá trị từ 'detected_prices'. Áp dụng công thức: "Nếu ai bán giá [Tiền to] thì khoan vội chốt, hôm nay không phải [Tiền to], không phải [Tiền vừa]... CHƯA TỚI [Tiền nhỏ làm tròn]". CẤM bịa số khác nếu đã có 'detected_prices'. CẤM dùng từ "cành".
-    - BỘ LỌC PHƯƠNG NGỮ: ĐỒNG NHẤT 100% Giọng Hà Nội chuẩn. Tuyệt đối loại bỏ các từ: nha, nè, vô, xài, dzậy.
-    - BỘ LỌC TỪ VỰNG KÍCH THƯỚC: Nếu là Nệm/Thảm, TUYỆT ĐỐI KHÔNG DÙNG TỪ "Chiều cao", CHỈ ĐƯỢC DÙNG "Độ dày". 
-    - KHÓA MÀU SẮC SẢN PHẨM: Lấy màu sắc từ 'product_color_lock' ở bước trước, dịch sang tiếng Anh và nhúng CHẾT vào 'prod_dna'. 
+    - KHÓA TRANG PHỤC TOÀN CỤC: Bắt buộc tạo 1 biến 'global_outfit_en' miêu tả chi tiết trang phục đa lớp và phải DÙNG CHUNG biến này cho TẤT CẢ các cảnh.
+    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng, hoặc Showroom.
+    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Lấy thông số (Dài Rộng, Độ dày) từ 'product_dimensions'. 
+    - TOÁN HỌC ĐẾM TỪ (CƯỠNG BỨC 4.0 - 4.5 từ/s): BẠN PHẢI ĐẾM SỐ TỪ CỦA TỪNG CẢNH. Cảnh 4s CHỈ ĐƯỢC PHÉP 16-18 từ. Cảnh 6s CHỈ ĐƯỢC PHÉP 24-27 từ. Cảnh 8s CHỈ ĐƯỢC PHÉP 32-36 từ. Cảnh 10s CHỈ ĐƯỢC PHÉP 40-45 từ. TUYỆT ĐỐI KHÔNG VIẾT THỪA TỪ.
+    - KỸ THUẬT CHỐT GIÁ LẤP LỬNG (TỪ ẢNH THỰC TẾ): Dùng giá trị từ 'detected_prices'. CẤM dùng từ "cành".
+    - BỘ LỌC PHƯƠNG NGỮ: ĐỒNG NHẤT 100% Giọng Hà Nội chuẩn. Tuyệt đối loại bỏ: nha, nè, vô, xài, dzậy.
+    - BỘ LỌC TỪ VỰNG KÍCH THƯỚC: Nệm/Thảm TUYỆT ĐỐI KHÔNG DÙNG "Chiều cao", CHỈ DÙNG "Độ dày". 
+    - KHÓA MÀU SẮC SẢN PHẨM: Lấy màu sắc từ 'product_color_lock' dịch sang tiếng Anh và nhúng CHẾT vào 'prod_dna'. 
     
     TRẢ VỀ JSON CHUẨN XÁC:
     {{
@@ -375,7 +376,7 @@ def create_scene_details(target_id, mode, style):
         "total_dur": "Tổng thời gian",
         "outfit_vi": "Tóm tắt trang phục",
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
-        "global_outfit_en": "Exact English desc of the FULL multi-layered outfit (e.g. white t-shirt, blue denim jacket, black pants). MUST BE LOCKED.",
+        "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
         "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC (EXACT COLOR: ...). Neo không gian nếu SP to.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
@@ -387,7 +388,7 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "English desc of setting.",
                 "action_en": "Medium shot, energetic hand gestures.",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI CHUẨN 100% | Nhịp độ: Dồn dập | Mục đích: ...", 
-                "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng DỰA TRÊN SỐ LIỆU TỪ ẢNH. ĐẾM ĐÚNG SỐ TỪ. KHÔNG DÙNG NHA/NÈ/VÔ. ĐÚNG THUẬT NGỮ ĐO LƯỜNG).",
+                "voiceover": "Thoại CÂU GHÉP DÀI (BẠN PHẢI ĐẾM ĐỦ VÀ ĐÚNG SỐ TỪ. KHÔNG DÙNG NHA/NÈ/VÔ. ĐÚNG THUẬT NGỮ ĐO LƯỜNG).",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product color. NO generated text, NO subtitles, NO typography, NO watermarks.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLOR. NO color shifting. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks."
             }}
@@ -554,7 +555,7 @@ with st.sidebar:
         if current_acc and st.session_state.current_email != ADMIN_EMAIL and current_acc.get("plan_type", "Trial") != "Trial":
             try:
                 days_left = (datetime.strptime(current_acc.get("expires_at", "2099-12-31"), "%Y-%m-%d") - datetime.now()).days
-                if 0 <= days_left <= 7: st.warning(f"⚠️️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
+                if 0 <= days_left <= 7: st.warning(f"⚠️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -625,7 +626,7 @@ with st.sidebar:
                             lock_ui(); supabase.table("saved_projects").delete().eq("id", p['id']).execute()
                             st.session_state[del_key] = False; st.toast("✅ Đã xóa!"); time.sleep(0.5); st.rerun()
                         else:
-                            if col_del.button("🗑️ Xóa", key=f"btn_d_{p['id']}", type="secondary", use_container_width=True): st.session_state[del_key] = True; st.rerun()
+                            if col_del.button("🗑️️ Xóa", key=f"btn_d_{p['id']}", type="secondary", use_container_width=True): st.session_state[del_key] = True; st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
 
         if st.session_state.current_email == ADMIN_EMAIL:
@@ -695,7 +696,7 @@ else:
             col_a, col_b = st.columns(2)
             col_a.markdown(f"**💰 Hoa hồng:** <span style='color:#15803d; font-weight:900;'>{prod.get('commission_percent', 0)}%</span><br>**🎯 Tệp:** {prod.get('target_audience', '')}", unsafe_allow_html=True)
             col_b.markdown(f"**🧠 Insight:** {prod.get('product_insight', '')}<br>**💔 Nỗi đau:** {prod.get('pain_points', '')}", unsafe_allow_html=True)
-    up_files = st.file_uploader("📦 Upload Ảnh SP (AI sẽ đọc giá và neo MÀU SẮC từ ảnh):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh SP (Khuyên dùng 3-5 ảnh nét nhất):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
     custom_note = st.text_area("✍ Ghi chú AI:", key=f"ns_{st.session_state.reset_key}")
 
 st.markdown("---")
