@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V13.0 (BỔ SUNG 10S & KỶ LUẬT ĐẾM TỪ TOÁN HỌC)
+# 2. HÀM AI LÕI & LUẬT THÉP V14.0 (ĐẾM TỪ 4.0-4.5 WPM & BỘ LỌC HÀ NỘI CHUẨN ĐỒNG NHẤT)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -278,8 +278,8 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     
     🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
     1. SỐ NHÂN VẬT: {num_chars}.
-    2. CẤU TRÚC THOẠI CHUẨN TIKTOK: Thoại BẮT BUỘC phải là các CÂU GHÉP DÀI, DỒN DẬP. Sử dụng liên tục các từ nối. Mật độ thông tin phải DÀY ĐẶC để đọc xả liên thanh cực nhanh. CẤM viết câu ngắn.
-    3. TỪ VỰNG & GIỌNG ĐỌC: BẮT BUỘC dùng giọng HÀ NỘI CHUẨN 100%. Tuyệt đối cấm các từ địa phương miền Nam (nha, nè, nghen, vô, xài, dzậy).
+    2. CẤU TRÚC THOẠI CHUẨN TIKTOK: Thoại BẮT BUỘC phải là các CÂU GHÉP DÀI, DỒN DẬP. Sử dụng liên tục các từ nối. CẤM viết câu ngắn.
+    3. BỘ LỌC PHƯƠNG NGỮ (DIALECT FILTER): BẠN LÀ NGƯỜI HÀ NỘI GỐC. BẮT BUỘC dùng giọng HÀ NỘI CHUẨN 100%. TUYỆT ĐỐI CẤM SỬ DỤNG các từ địa phương miền Nam: "nha", "nè", "nghen", "vô", "xài", "dzậy", "hông". HÃY THAY THẾ bằng: "nhé", "này", "vào", "dùng", "thế", "không".
     4. LUẬT BÁO GIÁ VÀ BỐI CẢNH (NẾU BÁN HÀNG / FLASH SALE): 
        - GIÁ: CẤM dùng từ "cành". BẮT BUỘC áp dụng kỹ thuật "Neo giá giảm dần" bằng tiền thật (Nghìn/Triệu) và chốt lấp lửng (chưa tới...).
        - BỐI CẢNH: NẾU LÀ FLASH SALE / XẢ KHO, bối cảnh (setting) BẮT BUỘC phải là KHO HÀNG, XƯỞNG SẢN XUẤT HOẶC SHOWROOM ngập tràn sản phẩm. Cấm đặt bối cảnh phòng ngủ/phòng khách.
@@ -293,20 +293,20 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp trước ống kính. Chèn lệnh `Audio: \"[Thoại]\"` vào đuôi MỌI `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
     
     if "TikTok Shop" in mode:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM giọng Nam). Tốc độ SIÊU NHANH, LIÊN THANH (4.5-5.0 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ 4.0-4.5 từ/s."
     else:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM giọng Nam). Nhanh, Truyền cảm, Tự nhiên (3.0-3.5 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tự nhiên (3.0-3.5 từ/s)."
 
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
-    1. THOẠI CÂU GHÉP DÀI & ĐẾM TỪ TOÁN HỌC (Tốc độ 4.5 - 5.0 từ/s):
-       - Lời thoại phải DÀI, DỒN DẬP. Tự động chọn 4s, 6s, 8s, 10s sao cho phù hợp tổng thời lượng.
-       - Cảnh 4s: Cần 18-20 từ.
-       - Cảnh 6s: Cần 27-30 từ.
-       - Cảnh 8s: Cần 36-40 từ.
-       - Cảnh 10s: Cần 45-50 từ.
+    1. THOẠI CÂU GHÉP DÀI & TOÁN HỌC ĐẾM TỪ (Tốc độ 4.0 - 4.5 từ/giây):
+       - Cảnh 4s: Cần CHÍNH XÁC khoảng 16 - 18 từ.
+       - Cảnh 6s: Cần CHÍNH XÁC khoảng 24 - 27 từ.
+       - Cảnh 8s: Cần CHÍNH XÁC khoảng 32 - 36 từ.
+       - Cảnh 10s: Cần CHÍNH XÁC khoảng 40 - 45 từ.
+       - Lời thoại phải DÀI, DỒN DẬP nhưng TUYỆT ĐỐI KHÔNG VƯỢT QUÁ SỐ TỪ NÀY để AI Voice đọc kịp.
 
     2. KỸ THUẬT CHỐT GIÁ VÀ BỐI CẢNH UY TÍN (FLASH SALE):
        - CẤM TUYỆT ĐỐI dùng từ "cành".
@@ -326,7 +326,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     6. CHỈ ĐẠO HÀNH ĐỘNG (`action_en`):
        - Cảnh 1: Vung tay dứt khoát. Cảnh cuối: BẮT BUỘC chỉ tay xuống góc dưới bên trái.
 
-    7. TỪ VỰNG: Chuẩn giọng HÀ NỘI 100% (Cấm dùng: nha, nè, nghen, dzậy, xài). Thay bằng (nhé, này, thế, dùng).
+    7. BỘ LỌC PHƯƠNG NGỮ: Tất cả các cảnh ĐỒNG NHẤT 100% Giọng Hà Nội chuẩn. Cấm tuyệt đối "nha, nè, nghen, dzậy, xài, vô". Hãy thay bằng "nhé, này, thế, dùng, vào".
     8. ĐỒNG NHẤT: Copy y nguyên `global_identity_en`, `outfit_en`, `setting_en` vào mọi Prompt nếu chưa đổi bối cảnh.
     9. {narrator_instruction}
     10. {char_rules}
@@ -347,7 +347,7 @@ def create_scene_details(target_id, mode, style):
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
     audio_instruction = 'TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn thoại tiếng Việt]"' if is_on_camera else 'KHÔNG chèn Audio vào video_prompt.'
-    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100%. Tốc độ SIÊU NHANH, LIÊN THANH (4.5-5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100%. Nhanh, Truyền cảm (3-3.5 từ/s)."
+    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ (4.0-4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | PHÂN TÍCH DNA: {dna_data_ctx}
@@ -356,10 +356,11 @@ def create_scene_details(target_id, mode, style):
     
     LƯU Ý ĐẶC BIỆT:
     - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng, hoặc Showroom ngập tràn hàng hóa.
-    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Đọc xả liên thanh.
-    - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.5 - 5 từ/s): Cảnh 4s phải đạt 18-20 từ. Cảnh 6s đạt 27-30 từ. Cảnh 8s đạt 36-40 từ. Cảnh 10s đạt 45-50 từ. CẤM VIẾT NGẮN HƠN HOẶC DÀI HƠN.
+    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng vào 1 câu bằng từ nối.
+    - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.0 - 4.5 từ/s): Cảnh 4s đạt 16-18 từ. Cảnh 6s đạt 24-27 từ. Cảnh 8s đạt 32-36 từ. Cảnh 10s đạt 40-45 từ. ĐẾM THẬT CHÍNH XÁC VÀ KHỚP VỚI SỐ GIÂY BẠN CHỌN.
     - KỸ THUẬT CHỐT GIÁ LẤP LỬNG: TUYỆT ĐỐI KHÔNG đọc 1 giá chết, KHÔNG dùng "cành". Dùng công thức: "Nếu ai bán giá [Tiền to] thì khoan vội chốt, hôm nay không phải [Tiền to], không phải [Tiền vừa]... CHƯA TỚI [Tiền nhỏ]".
     - CẢNH B-ROLL CẬN CHẤT LIỆU: Bắt buộc KOC lấp ló khuôn mặt và bàn tay để giữ Rắc-co.
+    - BỘ LỌC PHƯƠNG NGỮ: ĐỒNG NHẤT TOÀN BỘ Các cảnh là Giọng Hà Nội Gốc. Tuyệt đối loại bỏ các từ: nha, nè, vô, xài, dzậy.
     
     TRẢ VỀ JSON:
     {{
@@ -378,8 +379,8 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "English desc of setting.",
                 "outfit_en": "English desc of outfit.",
                 "action_en": "Medium shot, energetic hand gestures.",
-                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI CHUẨN 100% | Nhịp độ: Cực Nhanh | Mục đích: ...", 
-                "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng bằng tiền thật. Cấm nha/nè. KHỚP TOÁN HỌC VỚI SỐ GIÂY).",
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI CHUẨN 100% | Nhịp độ: Dồn dập | Mục đích: ...", 
+                "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng bằng tiền thật. ĐẾM ĐÚNG SỐ TỪ ĐÃ YÊU CẦU CHO SỐ GIÂY CHỌN. KHÔNG DÙNG NHA/NÈ/VÔ).",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Product: [prod_dna]. NO generated text, NO subtitles, NO typography, NO watermarks.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale and rigid parts. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks."
             }}
@@ -409,7 +410,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     (NẾU YÊU CẦU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC CẢ 5 KỊCH BẢN ĐỀU PHẢI CÓ HOOK ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ BẰNG TIỀN THẬT VÀ BỐI CẢNH LÀ TỔNG KHO/SHOWROOM NGẬP SẢN PHẨM).
 
     SỐ DIỄN VIÊN: {num_chars}.
-    LUẬT: CÂU GHÉP DÀI, ĐỌC NHANH. Giọng HÀ NỘI CHUẨN (Cấm nha/nè/dzậy).
+    LUẬT: CÂU GHÉP DÀI. Giọng HÀ NỘI CHUẨN 100% (Cấm nha/nè/dzậy/vô).
 
     TRẢ VỀ JSON:
     {{
@@ -418,7 +419,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
                 "setting": "Bối cảnh thực tế (Bắt buộc là Tổng kho/Xưởng nếu là Flash Sale)",
-                "hook": "Xưng hô & Hook câu ghép dài (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ BẰNG TIỀN NẾU LÀ FLASH SALE)",
+                "hook": "Xưng hô & Hook câu ghép dài (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ BẰNG TIỀN NẾU LÀ FLASH SALE, KHÔNG TỪ MIỀN NAM)",
                 "actors": {num_chars}
             }}
             // Tạo đủ 5 kịch bản
@@ -461,7 +462,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Thoại CÂU GHÉP DÀI. Giọng HÀ NỘI CHUẨN 100%. Nếu bán hàng/Flash sale phải ĐẶT BỐI CẢNH TẠI KHO HÀNG và CHE GIÁ LẤP LỬNG BẰNG CÔNG THỨC NEO GIÁ TIỀN THẬT. Cấm dùng từ 'cành'.
+    LUẬT: Thoại CÂU GHÉP DÀI. Giọng HÀ NỘI CHUẨN 100% (Cấm nha/nè/nghen/dzậy/vô). Nếu bán hàng/Flash sale phải ĐẶT BỐI CẢNH TẠI KHO HÀNG và CHE GIÁ LẤP LỬNG BẰNG CÔNG THỨC NEO GIÁ TIỀN THẬT.
     TRẢ VỀ JSON:
     {{
         "outlines": [
