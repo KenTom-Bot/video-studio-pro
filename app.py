@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V25.0 (OCR SCAN, COMPLIANCE & ADVANCED PHYSICS)
+# 2. HÀM AI LÕI & LUẬT THÉP V26.0 (KỶ LUẬT THỜI GIAN/SỐ TỪ CỐ ĐỊNH & ĐẠO DIỄN VẬT LÝ NÂNG CAO)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -279,13 +279,14 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
     1. CHÍNH SÁCH NỀN TẢNG (Y TẾ, MẸ BÉ): 
        - Cấm các từ: "tuyệt đối", "hoàn toàn", "100%", "cam kết", "thuốc", "chữa bệnh", "đặc trị", "trị dứt điểm". Đổi thành: "cực kỳ", "rất", "sản phẩm", "hỗ trợ", "cải thiện".
-       - Trẻ em/Mẹ bầu: Trẻ em xuất hiện phải an toàn. Thai nhi/bầu bí chỉ dùng ảnh minh họa/siêu âm, cấm tạo em bé chân thực rủi ro.
+       - Trẻ em/Mẹ bầu: Trẻ em xuất hiện phải an toàn. Thai nhi/bầu bí chỉ dùng ảnh minh họa/siêu âm.
     2. PERSONA VÀ BỘ LỌC PHƯƠNG NGỮ: Bạn sinh ra và lớn lên ở Phố Cổ Hà Nội. Lời thoại BẮT BUỘC mang đậm chất văn phong Bắc Bộ (nhé, này, thế, dùng, không). CẤM TUYỆT ĐỐI từ địa phương miền Nam: "nha", "nè", "nghen", "vô", "xài", "dzậy", "hông".
     3. CẤU TRÚC THOẠI & DẤU CÂU: Thoại HÃY VIẾT DÀI, LIÊN THANH, CUỐN HÚT. BẮT BUỘC phải dùng dấu phẩy (,) ngắt sau mỗi 5-8 từ để diễn viên lấy hơi. 
     4. BỘ LỌC THUẬT NGỮ ĐO LƯỜNG: Nệm/Thảm/Mền BẮT BUỘC dùng từ "ĐỘ DÀY" (Cấm 'Chiều cao'). Chất lỏng dùng "DUNG TÍCH". Hạt/Bột dùng "TRỌNG LƯỢNG".
     5. CÔNG THỨC HOOK FLASH SALE: ĐƯA MỨC GIÁ LÊN NGAY CÂU THOẠI ĐẦU TIÊN KÈM CẦU NỐI LOGIC. (VD: "Đứng còng lưng giặt đồ thì sắm ngay máy giặt này nhé, ở ngoài bán [Giá Lớn], nay xả kho chưa tới [Giá Nhỏ làm tròn]"). CẤM đọc số lẻ. CẤM dùng từ "cành".
     6. BỐI CẢNH ĐỒNG NHẤT: BẮT BUỘC TOÀN BỘ KỊCH BẢN PHẢI DIỄN RA TẠI CÙNG 1 BỐI CẢNH. NẾU LÀ FLASH SALE, bối cảnh phải là KHO HÀNG, XƯỞNG HOẶC SHOWROOM.
-    7. {char_rules}
+    7. KHÔNG CHỮ TẠO TỪ AI: CẤM TUYỆT ĐỐI sự xuất hiện của chữ/text/subtitles nổi trên video/ảnh.
+    8. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
@@ -303,9 +304,14 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
     1. LÁCH TỪ VI PHẠM (Y TẾ/TIKTOK): Cấm "tuyệt đối", "hoàn toàn", "100%", "cam kết", "trị bệnh", "thuốc". Dùng "hỗ trợ", "cực kỳ".
     
-    2. CỖ MÁY TOÁN HỌC ĐẢO NGƯỢC (ĐẾM TỪ -> TÍNH GIÂY):
-       - Viết thoại xong, BẮT BUỘC bạn phải tự ĐẾM CHÍNH XÁC TỔNG SỐ TỪ. Điền vào 'word_count'.
-       - TỰ ĐỘNG TÍNH SỐ GIÂY bằng công thức: [Số từ chia cho 4.5] (làm tròn lên). Gán kết quả vào 'dur' (Ví dụ: 30 từ -> "7s").
+    2. KỶ LUẬT THỜI GIAN & SỐ TỪ (TỐC ĐỘ 4.0 - 4.5 TỪ/S):
+       - Đối với mỗi phân cảnh, BẠN CHỈ ĐƯỢC CHỌN 1 TRONG 4 mốc thời gian: "4s", "6s", "8s", hoặc "10s".
+       - Dựa vào mốc thời gian bạn đã chọn, lời thoại (`voiceover`) BẮT BUỘC phải khớp chính xác với số từ sau:
+         + Chọn cảnh "4s" ➔ Viết CHÍNH XÁC từ 16 đến 18 từ.
+         + Chọn cảnh "6s" ➔ Viết CHÍNH XÁC từ 24 đến 27 từ.
+         + Chọn cảnh "8s" ➔ Viết CHÍNH XÁC từ 32 đến 36 từ.
+         + Chọn cảnh "10s" ➔ Viết CHÍNH XÁC từ 40 đến 45 từ.
+       - Viết xong thoại, BẮT BUỘC tự đếm lại và xuất ra số từ ở biến `word_count` để đối chiếu. CẤM VIẾT SAI SỐ TỪ YÊU CẦU.
 
     3. NGỮ ĐIỆU VÀ DẤU CÂU (BẮT BUỘC ĐỂ LẤY HƠI):
        - BẮT BUỘC dùng dấu phẩy (,) ngắt nghỉ sau mỗi 5 - 8 từ. 
@@ -313,7 +319,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     4. CÔNG THỨC KHOE GIÁ LOGIC (FLASH SALE):
        - ĐƯA MỨC GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU TIÊN CỦA VIDEO. 
-       - THUẬT TOÁN LÀM TRÒN: CẤM đọc số lẻ. Bắt buộc làm tròn số lên và dùng từ "CHƯA TỚI" hoặc "CHƯA ĐẾN". CẤM dùng "cành".
+       - THUẬT TOÁN LÀM TRÒN: CẤM đọc số lẻ (VD: cấm đọc ba triệu năm trăm bảy mươi nghìn). Bắt buộc làm tròn số lên và dùng từ "CHƯA TỚI" hoặc "CHƯA ĐẾN". CẤM dùng "cành".
 
     5. ĐẠO DIỄN VẬT LÝ VÀ CƠ HỌC TỐI THƯỢNG (ADVANCED PHYSICS):
        - SP TO: Cấm bê vác. Neo SP vào không gian phù hợp.
@@ -352,8 +358,8 @@ def create_scene_details(target_id, mode, style):
     
     LƯU Ý ĐẶC BIỆT:
     - KHÓA BỐI CẢNH & TRANG PHỤC TOÀN CỤC: DÙNG CHUNG 'global_setting_en' và 'global_outfit_en' cho 100% các cảnh. 
-    - LÁCH TỪ VI PHẠM: Cấm dùng "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc".
-    - TOÁN HỌC ĐẢO NGƯỢC: Viết thoại DÀI, CUỐN HÚT. Đếm CHÍNH XÁC số từ điền vào 'word_count'. Sau đó tính số giây bằng (Số từ / 4.5) làm tròn lên, rồi gán vào 'dur'.
+    - LÁCH TỪ VI PHẠM TIKTOK: Cấm dùng "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc".
+    - KỶ LUẬT THỜI GIAN VÀ SỐ TỪ: Chọn 'dur' là 4s, 6s, 8s hoặc 10s. Tương ứng phải viết số từ CHUẨN XÁC (4s=16-18 từ, 6s=24-27 từ, 8s=32-36 từ, 10s=40-45 từ). Đếm số từ thực tế điền vào 'word_count'.
     - HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY CẢNH 1. Kèm theo CẦU NỐI LOGIC. BẮT BUỘC làm tròn số lên và dùng từ "CHƯA TỚI". CẤM đọc số lẻ.
     - KHÓA MÀU SẮC SP: Lấy màu từ 'product_color_lock' nhúng CHẾT vào 'prod_dna'. 
     - VẬT LÝ NÂNG CAO: Miêu tả Gió tàng hình (invisible wind fluttering...). Mở nắp phải tả khớp nối cơ học (lid springing open upwards).
@@ -371,13 +377,13 @@ def create_scene_details(target_id, mode, style):
         "scenes": [
             {{
                 "scene": 1, 
-                "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ.",
-                "dur": "TÍNH TOÁN = word_count / 4.5 (Ví dụ: 8s, 11s)", 
+                "dur": "4s/6s/8s/10s (Chỉ chọn 1 mốc)", 
+                "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ CỦA VOICEOVER BÊN DƯỚI.",
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
                 "action_en": "Miêu tả hành động. Nếu mở nắp phải tả cơ học (springing open). Nếu có gió tả hiệu ứng (fluttering).",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Nhịp độ: Dồn dập", 
-                "voiceover": "Thoại CÂU GHÉP CÓ CẦU NỐI LOGIC VÀ DẤU PHẨY (,). LÀM TRÒN GIÁ TIỀN (CHƯA TỚI...). CẤM ĐỌC SỐ LẺ. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
+                "voiceover": "Thoại CÂU GHÉP CÓ CẦU NỐI LOGIC VÀ DẤU PHẨY (,). LÀM TRÒN GIÁ TIỀN (CHƯA TỚI...). CẤM ĐỌC SỐ LẺ. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM. PHẢI KHỚP SỐ TỪ VỚI SỐ GIÂY.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product color. NO generated text, NO subtitles, NO typography, NO watermarks.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLOR. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks."
             }}
@@ -459,7 +465,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Thoại CÂU GHÉP DÀI CÓ DẤU PHẨY (,). Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "hoàn toàn". Nếu Flash sale phải ĐẶT BỐI CẢNH KHO HÀNG, CÓ CÂU NỐI LOGIC VÀ LÀM TRÒN CHE GIÁ (Cấm số lẻ).
+    LUẬT: CÂU GHÉP DÀI CÓ DẤU PHẨY (,). Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "hoàn toàn". Nếu Flash sale phải ĐẶT BỐI CẢNH KHO HÀNG, CÓ CÂU NỐI LOGIC VÀ LÀM TRÒN CHE GIÁ (Cấm số lẻ).
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -564,7 +570,7 @@ with st.sidebar:
         if current_acc and st.session_state.current_email != ADMIN_EMAIL and current_acc.get("plan_type", "Trial") != "Trial":
             try:
                 days_left = (datetime.strptime(current_acc.get("expires_at", "2099-12-31"), "%Y-%m-%d") - datetime.now()).days
-                if 0 <= days_left <= 7: st.warning(f"⚠️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
+                if 0 <= days_left <= 7: st.warning(f"⚠️️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -687,7 +693,9 @@ with st.sidebar:
         if st.session_state.get("loading_logout", False):
             btn_logout_ph.empty()
             lock_ui(); st.session_state.is_logged_in = False; st.session_state.loading_logout = False
-            st.toast("✅ Đăng xuất!"); time.sleep(0.5); st.rerun()
+            st.toast("✅ Đăng xuất!")
+            time.sleep(0.5)
+            st.rerun()
         else:
             if btn_logout_ph.button("🚪 Đăng Xuất"): 
                 st.session_state.loading_logout = True; st.rerun()
@@ -894,8 +902,10 @@ if all_sc:
                     try:
                         create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
                         st.session_state.active_script_id = sc_id; st.session_state.scroll_to_detail = True; st.toast("✅ Hoàn tất dựng!")
+                        time.sleep(0.5)
+                        st.rerun()
                     except Exception as e: st.error(f"❌ Lỗi: {e}")
-                    st.session_state[ck] = False; st.rerun()
+            
                 else:
                     if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True):
                         can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
