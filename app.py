@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V12.0 (QUAY LẠI BỐI CẢNH V10 VÀ CẤM CHỮ/TEXT TRÊN VIDEO)
+# 2. HÀM AI LÕI & LUẬT THÉP V13.0 (BỔ SUNG 10S & KỶ LUẬT ĐẾM TỪ TOÁN HỌC)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -278,7 +278,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     
     🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
     1. SỐ NHÂN VẬT: {num_chars}.
-    2. CẤU TRÚC THOẠI CHUẨN TIKTOK: Thoại BẮT BUỘC phải là các CÂU GHÉP DÀI, DỒN DẬP. Sử dụng liên tục các từ nối. Mật độ thông tin phải DÀY ĐẶC để đọc xả liên thanh. CẤM viết câu ngắn.
+    2. CẤU TRÚC THOẠI CHUẨN TIKTOK: Thoại BẮT BUỘC phải là các CÂU GHÉP DÀI, DỒN DẬP. Sử dụng liên tục các từ nối. Mật độ thông tin phải DÀY ĐẶC để đọc xả liên thanh cực nhanh. CẤM viết câu ngắn.
     3. TỪ VỰNG & GIỌNG ĐỌC: BẮT BUỘC dùng giọng HÀ NỘI CHUẨN 100%. Tuyệt đối cấm các từ địa phương miền Nam (nha, nè, nghen, vô, xài, dzậy).
     4. LUẬT BÁO GIÁ VÀ BỐI CẢNH (NẾU BÁN HÀNG / FLASH SALE): 
        - GIÁ: CẤM dùng từ "cành". BẮT BUỘC áp dụng kỹ thuật "Neo giá giảm dần" bằng tiền thật (Nghìn/Triệu) và chốt lấp lửng (chưa tới...).
@@ -301,13 +301,16 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
-    1. THOẠI CÂU GHÉP DÀI & ĐẾM TỪ TOÁN HỌC:
-       - Lời thoại phải DÀI, DỒN DẬP. Tốc độ thoại là 4.5 - 5.0 từ/giây. 
-       - Cảnh 4s: Cần 18-20 từ. Cảnh 6s: Cần 27-30 từ. Cảnh 8s: Cần 36-40 từ.
+    1. THOẠI CÂU GHÉP DÀI & ĐẾM TỪ TOÁN HỌC (Tốc độ 4.5 - 5.0 từ/s):
+       - Lời thoại phải DÀI, DỒN DẬP. Tự động chọn 4s, 6s, 8s, 10s sao cho phù hợp tổng thời lượng.
+       - Cảnh 4s: Cần 18-20 từ.
+       - Cảnh 6s: Cần 27-30 từ.
+       - Cảnh 8s: Cần 36-40 từ.
+       - Cảnh 10s: Cần 45-50 từ.
 
     2. KỸ THUẬT CHỐT GIÁ VÀ BỐI CẢNH UY TÍN (FLASH SALE):
        - CẤM TUYỆT ĐỐI dùng từ "cành".
-       - BẮT BUỘC dùng cấu trúc: "Bình thường không dưới [Giá A], nhưng hôm nay không phải [Giá A], chẳng phải [Giá B]... mà CHƯA ĐẾN [Giá C]".
+       - BẮT BUỘC dùng cấu trúc: "Bình thường không dưới [Giá A], nhưng hôm nay không phải [Giá A], chẳng phải [Giá B]... mà CHƯA ĐẾN [Giá C]". Luôn dùng từ "chưa tới", "chưa đến", "nhỉnh hơn".
        - BỐI CẢNH BẮT BUỘC (NẾU LÀ FLASH SALE): Kho hàng, xưởng sản xuất, hoặc Showroom chất đống sản phẩm. Cấm để không gian sơ sài.
 
     3. CẢNH B-ROLL CẬN CHẤT LIỆU (HYBRID SHOT):
@@ -352,9 +355,9 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng sản xuất, hoặc Showroom ngập tràn hàng hóa.
+    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Kho hàng, Xưởng, hoặc Showroom ngập tràn hàng hóa.
     - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Đọc xả liên thanh.
-    - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.5 - 5 từ/s): Cảnh 4s phải đạt 18-20 từ. Cảnh 6s đạt 27-30 từ. Cảnh 8s đạt 36-40 từ. CẤM VIẾT NGẮN HƠN.
+    - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.5 - 5 từ/s): Cảnh 4s phải đạt 18-20 từ. Cảnh 6s đạt 27-30 từ. Cảnh 8s đạt 36-40 từ. Cảnh 10s đạt 45-50 từ. CẤM VIẾT NGẮN HƠN HOẶC DÀI HƠN.
     - KỸ THUẬT CHỐT GIÁ LẤP LỬNG: TUYỆT ĐỐI KHÔNG đọc 1 giá chết, KHÔNG dùng "cành". Dùng công thức: "Nếu ai bán giá [Tiền to] thì khoan vội chốt, hôm nay không phải [Tiền to], không phải [Tiền vừa]... CHƯA TỚI [Tiền nhỏ]".
     - CẢNH B-ROLL CẬN CHẤT LIỆU: Bắt buộc KOC lấp ló khuôn mặt và bàn tay để giữ Rắc-co.
     
@@ -369,7 +372,7 @@ def create_scene_details(target_id, mode, style):
         "scenes": [
             {{
                 "scene": 1, 
-                "dur": "4s/6s/8s", 
+                "dur": "4s/6s/8s/10s", 
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh (Kho hàng/Showroom nếu là Flash sale)...",
                 "setting_en": "English desc of setting.",
@@ -403,7 +406,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
     🛑 LỆNH TẨY NÃO (OVERRIDE): BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO ĐÚNG ĐỊNH HƯỚNG NÀY: '{angle}'.
-    (NẾU YÊU CẦU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC CẢ 5 KỊCH BẢN ĐỀU PHẢI CÓ HOOK ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ BẰNG TIỀN THẬT VÀ BỐI CẢNH LÀ KHO HÀNG/SHOWROOM NGẬP SẢN PHẨM).
+    (NẾU YÊU CẦU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC CẢ 5 KỊCH BẢN ĐỀU PHẢI CÓ HOOK ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ BẰNG TIỀN THẬT VÀ BỐI CẢNH LÀ TỔNG KHO/SHOWROOM NGẬP SẢN PHẨM).
 
     SỐ DIỄN VIÊN: {num_chars}.
     LUẬT: CÂU GHÉP DÀI, ĐỌC NHANH. Giọng HÀ NỘI CHUẨN (Cấm nha/nè/dzậy).
@@ -414,7 +417,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
             {{
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
-                "setting": "Bối cảnh thực tế (Nếu là Flash Sale thì bối cảnh BẮT BUỘC là Tổng kho hàng, Xưởng sản xuất hoặc Showroom ngập sản phẩm)",
+                "setting": "Bối cảnh thực tế (Bắt buộc là Tổng kho/Xưởng nếu là Flash Sale)",
                 "hook": "Xưng hô & Hook câu ghép dài (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ BẰNG TIỀN NẾU LÀ FLASH SALE)",
                 "actors": {num_chars}
             }}
@@ -732,7 +735,7 @@ if st.session_state.get("loading_gen_main", False):
             }},
             "outlines": [ 
                 {{
-                    "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế (Nếu là Flash Sale thì bối cảnh BẮT BUỘC là Tổng kho hàng, Xưởng sản xuất hoặc Showroom ngập sản phẩm)", 
+                    "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế (Nếu là Flash Sale thì bối cảnh BẮT BUỘC là Kho hàng, Showroom ngập sản phẩm)", 
                     "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LUÔN LÀ CÂU GHÉP DÀI. Nếu là Flash Sale thì phải CHE GIÁ LẤP LỬNG bằng kỹ thuật neo giá giảm dần.",
                     "actors": {num_chars}
                 }},
