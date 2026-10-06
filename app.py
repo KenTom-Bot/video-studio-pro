@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V24.0 (ĐỘNG TÍNH THỜI GIAN, CHỐNG TỪ VI PHẠM & FIX UI)
+# 2. HÀM AI LÕI & LUẬT THÉP V25.0 (OCR SCAN, COMPLIANCE & ADVANCED PHYSICS)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -270,21 +270,22 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     if "Tự động mix" in angle:
         strat_cmd = "BẠN PHẢI MIX ĐA DẠNG 5 GÓC ĐỘ NỘI DUNG KHÁC NHAU."
     else:
-        strat_cmd = f"🛑 LỆNH TẨY NÃO: BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC SAU: '{angle}'. NẾU LÀ FLASH SALE, CẢ 5 KỊCH BẢN ĐỀU PHẢI ĐƯA GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU TIÊN CỦA VIDEO."
+        strat_cmd = f"🛑 LỆNH TẨY NÃO: BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC SAU: '{angle}'. NẾU LÀ FLASH SALE, ĐƯA GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU TIÊN KÈM CẦU NỐI LOGIC."
         
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL KÊNH TIKTOK. PHONG CÁCH: {style}
     {strat_cmd}
     
     🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
-    1. LÁCH TỪ VI PHẠM TIKTOK (CỰC KỲ QUAN TRỌNG): TUYỆT ĐỐI CẤM sử dụng các từ: "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "trị dứt điểm". Hãy dùng các từ an toàn như: "cực kỳ", "rất", "hỗ trợ", "tối ưu".
+    1. CHÍNH SÁCH NỀN TẢNG (Y TẾ, MẸ BÉ): 
+       - Cấm các từ: "tuyệt đối", "hoàn toàn", "100%", "cam kết", "thuốc", "chữa bệnh", "đặc trị", "trị dứt điểm". Đổi thành: "cực kỳ", "rất", "sản phẩm", "hỗ trợ", "cải thiện".
+       - Trẻ em/Mẹ bầu: Trẻ em xuất hiện phải an toàn. Thai nhi/bầu bí chỉ dùng ảnh minh họa/siêu âm, cấm tạo em bé chân thực rủi ro.
     2. PERSONA VÀ BỘ LỌC PHƯƠNG NGỮ: Bạn sinh ra và lớn lên ở Phố Cổ Hà Nội. Lời thoại BẮT BUỘC mang đậm chất văn phong Bắc Bộ (nhé, này, thế, dùng, không). CẤM TUYỆT ĐỐI từ địa phương miền Nam: "nha", "nè", "nghen", "vô", "xài", "dzậy", "hông".
-    3. CẤU TRÚC THOẠI & DẤU CÂU: Thoại HÃY VIẾT DÀI, LIÊN THANH, CUỐN HÚT. BẮT BUỘC phải dùng dấu phẩy (,) ngắt sau mỗi 5-8 từ để diễn viên lấy hơi. CẤM viết câu ngắn, chậm rãi.
+    3. CẤU TRÚC THOẠI & DẤU CÂU: Thoại HÃY VIẾT DÀI, LIÊN THANH, CUỐN HÚT. BẮT BUỘC phải dùng dấu phẩy (,) ngắt sau mỗi 5-8 từ để diễn viên lấy hơi. 
     4. BỘ LỌC THUẬT NGỮ ĐO LƯỜNG: Nệm/Thảm/Mền BẮT BUỘC dùng từ "ĐỘ DÀY" (Cấm 'Chiều cao'). Chất lỏng dùng "DUNG TÍCH". Hạt/Bột dùng "TRỌNG LƯỢNG".
-    5. CÔNG THỨC HOOK FLASH SALE: NẾU LÀ FLASH SALE, ĐƯA MỨC GIÁ LÊN NGAY CÂU THOẠI ĐẦU TIÊN KÈM CẦU NỐI LOGIC. (VD: "Đứng còng lưng giặt đồ thì sắm ngay máy giặt này nhé, ở ngoài bán [Giá Lớn], nay xả kho chưa tới [Giá Nhỏ làm tròn]"). CẤM đọc số lẻ. CẤM dùng từ "cành".
-    6. BỐI CẢNH ĐỒNG NHẤT: BẮT BUỘC TOÀN BỘ KỊCH BẢN PHẢI DIỄN RA TẠI CÙNG 1 BỐI CẢNH. NẾU LÀ FLASH SALE, bối cảnh phải là KHO HÀNG, XƯỞNG HOẶC SHOWROOM rộng lớn.
-    7. KHÔNG CHỮ TẠO TỪ AI: CẤM TUYỆT ĐỐI sự xuất hiện của chữ/text/subtitles nổi trên video/ảnh.
-    8. {char_rules}
+    5. CÔNG THỨC HOOK FLASH SALE: ĐƯA MỨC GIÁ LÊN NGAY CÂU THOẠI ĐẦU TIÊN KÈM CẦU NỐI LOGIC. (VD: "Đứng còng lưng giặt đồ thì sắm ngay máy giặt này nhé, ở ngoài bán [Giá Lớn], nay xả kho chưa tới [Giá Nhỏ làm tròn]"). CẤM đọc số lẻ. CẤM dùng từ "cành".
+    6. BỐI CẢNH ĐỒNG NHẤT: BẮT BUỘC TOÀN BỘ KỊCH BẢN PHẢI DIỄN RA TẠI CÙNG 1 BỐI CẢNH. NẾU LÀ FLASH SALE, bối cảnh phải là KHO HÀNG, XƯỞNG HOẶC SHOWROOM.
+    7. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
@@ -300,34 +301,31 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
-    1. LÁCH TỪ VI PHẠM TIKTOK: TUYỆT ĐỐI CẤM dùng "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "trị dứt điểm".
+    1. LÁCH TỪ VI PHẠM (Y TẾ/TIKTOK): Cấm "tuyệt đối", "hoàn toàn", "100%", "cam kết", "trị bệnh", "thuốc". Dùng "hỗ trợ", "cực kỳ".
     
     2. CỖ MÁY TOÁN HỌC ĐẢO NGƯỢC (ĐẾM TỪ -> TÍNH GIÂY):
-       - HÃY THỎA SỨC VIẾT THOẠI THẬT DÀI, DỒN DẬP, CUỐN HÚT ĐÚNG CHẤT TIKTOK. 
-       - Viết thoại xong, BẮT BUỘC bạn phải tự ĐẾM CHÍNH XÁC TỔNG SỐ TỪ của câu thoại đó. Điền vào 'word_count'.
-       - Sau đó, TỰ ĐỘNG TÍNH SỐ GIÂY bằng công thức: [Số từ chia cho 4.5] (làm tròn lên). Gán kết quả vào 'dur' (Ví dụ: 30 từ -> "7s"; 50 từ -> "11s"). KHÔNG BỊ GIỚI HẠN BỞI MỐC 4s/6s/8s NỮA.
+       - Viết thoại xong, BẮT BUỘC bạn phải tự ĐẾM CHÍNH XÁC TỔNG SỐ TỪ. Điền vào 'word_count'.
+       - TỰ ĐỘNG TÍNH SỐ GIÂY bằng công thức: [Số từ chia cho 4.5] (làm tròn lên). Gán kết quả vào 'dur' (Ví dụ: 30 từ -> "7s").
 
     3. NGỮ ĐIỆU VÀ DẤU CÂU (BẮT BUỘC ĐỂ LẤY HƠI):
        - BẮT BUỘC dùng dấu phẩy (,) ngắt nghỉ sau mỗi 5 - 8 từ. 
-       - Văn phong tự nhiên, thực tế. CẤM dùng từ địa phương Miền Nam (nha, nè, vô).
+       - Văn phong HÀ NỘI CHUẨN. CẤM dùng từ địa phương Miền Nam (nha, nè, vô).
 
     4. CÔNG THỨC KHOE GIÁ LOGIC (FLASH SALE):
        - ĐƯA MỨC GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU TIÊN CỦA VIDEO. 
-       - THUẬT TOÁN LÀM TRÒN: CẤM đọc số lẻ (VD cấm nói: ba triệu năm trăm bảy mươi nghìn). Bắt buộc làm tròn số lên và dùng từ "CHƯA TỚI" hoặc "CHƯA ĐẾN". (VD: Giá 3.570.000 -> phải nói 'chưa tới ba triệu sáu' hoặc 'chưa đến bốn triệu'). CẤM dùng "cành".
+       - THUẬT TOÁN LÀM TRÒN: CẤM đọc số lẻ. Bắt buộc làm tròn số lên và dùng từ "CHƯA TỚI" hoặc "CHƯA ĐẾN". CẤM dùng "cành".
 
-    5. CẢNH B-ROLL CẬN CHẤT LIỆU (HYBRID SHOT): BẮT BUỘC dùng góc máy "Qua vai" hoặc "Cận cảnh bàn tay chạm sản phẩm, KOC lấp ló khuôn mặt". Để AI Lip-sync nhận diện mặt.
-
-    6. BẢO TOÀN VẬT LÝ VÀ MÀU SẮC SP:
-       - SP TO (Đệm, Tủ lạnh...): Cấm bê vác. KOC chỉ đứng/ngồi cạnh. 
+    5. ĐẠO DIỄN VẬT LÝ VÀ CƠ HỌC TỐI THƯỢNG (ADVANCED PHYSICS):
+       - SP TO: Cấm bê vác. Neo SP vào không gian phù hợp.
+       - TƯƠNG TÁC CƠ HỌC CÓ BẢN LỀ: Với Nồi cơm/Tủ/Lò vi sóng, CẤM mở chung chung. BẮT BUỘC mô tả cơ học: "Hand pressing the button, the lid springing open upwards naturally along the hinge" hoặc "pulling handle, door swinging outward".
+       - HIỆN TƯỢNG GIÓ: CẤM vẽ luồng gió khói. BẮT BUỘC miêu tả hiệu ứng lên vật thể: "Invisible wind causing the fabric to flutter gently" hoặc "hair blowing in the wind".
        - Chèn vào cuối video_prompt: "Maintain exact absolute scale, rigid product geometry, and EXACT ORIGINAL COLOR. NO morphing."
 
-    7. KHÔNG CHỮ/SUBTITLE (ANTI-TEXT LOCK): BẮT BUỘC CHÈN lệnh "NO generated text, NO subtitles, NO typography, NO watermarks." vào CUỐI tất cả các `img_p` và `vid_p`.
-
-    8. CHỈ ĐẠO HÀNH ĐỘNG (`action_en`): Cảnh 1 vung tay dứt khoát. Cảnh cuối BẮT BUỘC chỉ tay xuống góc trái.
+    6. KHÔNG CHỮ/SUBTITLE (ANTI-TEXT LOCK): BẮT BUỘC CHÈN lệnh "NO generated text, NO subtitles, NO typography, NO watermarks." vào CUỐI tất cả `img_p` và `vid_p`.
     
-    9. ĐỒNG NHẤT KHÔNG GIAN VÀ TRANG PHỤC: Khóa chặt `global_outfit_en` và `global_setting_en` cho mọi phân cảnh. KHÔNG nhảy bối cảnh.
-    10. {narrator_instruction}
-    11. {char_rules}
+    7. ĐỒNG NHẤT KHÔNG GIAN VÀ TRANG PHỤC: Khóa chặt `global_outfit_en` và `global_setting_en` cho mọi phân cảnh. KHÔNG nhảy bối cảnh.
+    8. {narrator_instruction}
+    9. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style):
@@ -345,7 +343,7 @@ def create_scene_details(target_id, mode, style):
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
     audio_instruction = 'TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn thoại tiếng Việt]"' if is_on_camera else 'KHÔNG chèn Audio vào video_prompt.'
-    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ 4.0-4.5 từ/s." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
+    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ (4.0-4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | PHÂN TÍCH DNA: {dna_data_ctx}
@@ -353,12 +351,12 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - KHÓA BỐI CẢNH & TRANG PHỤC: DÙNG CHUNG 'global_setting_en' và 'global_outfit_en' cho 100% các phân cảnh. Nếu Flash Sale, setting phải là Kho hàng/Showroom.
-    - LÁCH TỪ VI PHẠM: Cấm dùng "tuyệt đối", "hoàn toàn", "100%", "chắc chắn".
-    - TOÁN HỌC ĐẢO NGƯỢC (LINH HOẠT THỜI GIAN): Hãy thoải mái viết thoại DÀI, DỒN DẬP. Viết xong đếm CHÍNH XÁC số từ điền vào 'word_count'. Sau đó tính số giây bằng (Số từ / 4.5) làm tròn lên, rồi gán vào 'dur' (Ví dụ "9s", "12s").
-    - CẤU TRÚC THOẠI HÀ NỘI: BẮT BUỘC NGẮT NGHỈ BẰNG DẤU PHẨY (,). Văn phong HÀ NỘI GỐC (Cấm: nha, nè, vô, xài).
-    - HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU TIÊN CỦA VIDEO. Phải có CẦU NỐI LOGIC giữa ngữ cảnh và giá. CẤM đọc số lẻ. BẮT BUỘC làm tròn số lên và dùng từ "CHƯA TỚI". CẤM dùng "cành".
-    - KHÓA MÀU SẮC SP: Lấy màu từ 'product_color_lock' dịch sang tiếng Anh và nhúng CHẾT vào 'prod_dna'. 
+    - KHÓA BỐI CẢNH & TRANG PHỤC TOÀN CỤC: DÙNG CHUNG 'global_setting_en' và 'global_outfit_en' cho 100% các cảnh. 
+    - LÁCH TỪ VI PHẠM: Cấm dùng "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc".
+    - TOÁN HỌC ĐẢO NGƯỢC: Viết thoại DÀI, CUỐN HÚT. Đếm CHÍNH XÁC số từ điền vào 'word_count'. Sau đó tính số giây bằng (Số từ / 4.5) làm tròn lên, rồi gán vào 'dur'.
+    - HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY CẢNH 1. Kèm theo CẦU NỐI LOGIC. BẮT BUỘC làm tròn số lên và dùng từ "CHƯA TỚI". CẤM đọc số lẻ.
+    - KHÓA MÀU SẮC SP: Lấy màu từ 'product_color_lock' nhúng CHẾT vào 'prod_dna'. 
+    - VẬT LÝ NÂNG CAO: Miêu tả Gió tàng hình (invisible wind fluttering...). Mở nắp phải tả khớp nối cơ học (lid springing open upwards).
     
     TRẢ VỀ JSON CHUẨN XÁC:
     {{
@@ -368,7 +366,7 @@ def create_scene_details(target_id, mode, style):
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
         "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
         "global_setting_en": "Exact English desc of the unified environment/setting. MUST BE LOCKED.",
-        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC (EXACT COLOR: ...). Neo không gian nếu SP to.",
+        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC. Neo không gian nếu SP to.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
             {{
@@ -377,7 +375,7 @@ def create_scene_details(target_id, mode, style):
                 "dur": "TÍNH TOÁN = word_count / 4.5 (Ví dụ: 8s, 11s)", 
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
-                "action_en": "Medium shot, energetic hand gestures.",
+                "action_en": "Miêu tả hành động. Nếu mở nắp phải tả cơ học (springing open). Nếu có gió tả hiệu ứng (fluttering).",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Nhịp độ: Dồn dập", 
                 "voiceover": "Thoại CÂU GHÉP CÓ CẦU NỐI LOGIC VÀ DẤU PHẨY (,). LÀM TRÒN GIÁ TIỀN (CHƯA TỚI...). CẤM ĐỌC SỐ LẺ. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product color. NO generated text, NO subtitles, NO typography, NO watermarks.", 
@@ -405,11 +403,11 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     prompt = f"""
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
-    🛑 LỆNH TẨY NÃO (OVERRIDE): BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO ĐÚNG ĐỊNH HƯỚNG NÀY: '{angle}'.
-    (NẾU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC ĐƯA GIÁ SỐC LÊN ĐẦU VIDEO, CÓ CÂU NỐI LOGIC, LÀM TRÒN LÊN VÀ BẢO 'CHƯA TỚI...'. CẤM ĐỌC SỐ LẺ).
+    🛑 LỆNH TẨY NÃO: BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO ĐÚNG ĐỊNH HƯỚNG NÀY: '{angle}'.
+    (NẾU LÀ FLASH SALE, BẮT BUỘC ĐƯA GIÁ SỐC LÊN ĐẦU VIDEO, CÓ CÂU NỐI LOGIC, LÀM TRÒN LÊN VÀ BẢO 'CHƯA TỚI...'. CẤM ĐỌC SỐ LẺ).
 
     SỐ DIỄN VIÊN: {num_chars}.
-    LUẬT: CÂU GHÉP DÀI CÓ DẤU PHẨY (,). Giọng HÀ NỘI CHUẨN (Cấm nha/nè). CẤM DÙNG TỪ: tuyệt đối, hoàn toàn, 100%. ĐỒNG NHẤT 1 BỐI CẢNH/KỊCH BẢN.
+    LUẬT: CÂU GHÉP DÀI CÓ DẤU PHẨY (,) NGẮT NGHỈ. Giọng HÀ NỘI CHUẨN (Cấm nha/nè). CẤM DÙNG TỪ: tuyệt đối, hoàn toàn, 100%, thuốc. ĐỒNG NHẤT 1 BỐI CẢNH/KỊCH BẢN.
 
     TRẢ VỀ JSON:
     {{
@@ -666,7 +664,9 @@ with st.sidebar:
                         exp = "2099-12-31" if "Vĩnh" in dur else (datetime.now() + timedelta(days={"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30}[dur])).strftime("%Y-%m-%d")
                         st.session_state.licensed_accounts[n_acc] = {"roles": roles, "phone": n_phone, "password": n_pass, "expires_at": exp, "plan_type": acc_type, "daily_usage_count": 0, "last_generation_date": "", "active_session_id": ""}
                         save_single_account(n_acc, st.session_state.licensed_accounts[n_acc])
-                        st.toast("✅ Đã cấp quyền!"); time.sleep(0.5); st.rerun()
+                        st.toast("✅ Đã cấp quyền!")
+                        time.sleep(0.5)
+                        st.rerun()
 
             for acc, info in list(st.session_state.licensed_accounts.items()):
                 if acc == ADMIN_EMAIL: continue
@@ -722,7 +722,7 @@ else:
             col_a, col_b = st.columns(2)
             col_a.markdown(f"**💰 Hoa hồng:** <span style='color:#15803d; font-weight:900;'>{prod.get('commission_percent', 0)}%</span><br>**🎯 Tệp:** {prod.get('target_audience', '')}", unsafe_allow_html=True)
             col_b.markdown(f"**🧠 Insight:** {prod.get('product_insight', '')}<br>**💔 Nỗi đau:** {prod.get('pain_points', '')}", unsafe_allow_html=True)
-    up_files = st.file_uploader("📦 Upload Ảnh SP (Khuyên dùng 3-5 ảnh nét nhất):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh SP (Quét OCR Tuyệt đối - Đọc Giá & Kích Thước):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
     custom_note = st.text_area("✍ Ghi chú AI:", key=f"ns_{st.session_state.reset_key}")
 
 st.markdown("---")
@@ -751,7 +751,7 @@ if num_chars > 0:
 btn_gen_main_ph = st.empty()
 if st.session_state.get("loading_gen_main", False):
     btn_gen_main_ph.empty()
-    st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 14px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đạo diễn AI đang phân tích dữ liệu ảnh đa tầng và sinh kịch bản... Vui lòng đợi!</div>", unsafe_allow_html=True)
+    st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 14px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đạo diễn AI đang quét OCR hình ảnh và sinh kịch bản... Vui lòng đợi!</div>", unsafe_allow_html=True)
     lock_ui()
     try:
         st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
@@ -767,16 +767,16 @@ if st.session_state.get("loading_gen_main", False):
                 "target_audience": "Nhận diện TỆP KHÁCH HÀNG",
                 "core_value": "Giá trị cốt lõi", "pain_points": "Nỗi đau", "hook_element": "Yếu tố giữ chân",
                 "product_size_class": "Phân loại kích thước SP. Phân tích cách tương tác vật lý KHÔNG ẢO GIÁC.",
-                "product_color_lock": "Phân tích và bóc tách MÀU SẮC CHÍNH XÁC của sản phẩm từ ảnh tải lên.",
-                "detected_prices": "Đọc kĩ ảnh tải lên để tìm Giá Gốc và Giá Sale (nếu có).",
-                "product_dimensions": "Quét ảnh tìm thông số kích thước thực tế. Nệm/Thảm BẮT BUỘC dùng từ 'Độ dày', TUYỆT ĐỐI KHÔNG dùng 'Chiều cao'.",
+                "product_color_lock": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Phân tích và bóc tách MÀU SẮC CHÍNH XÁC của sản phẩm từ ảnh tải lên.",
+                "detected_prices": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Đọc kĩ ảnh tải lên để tìm Giá Gốc và Giá Sale (nếu có). Trích xuất nguyên bản text.",
+                "product_dimensions": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Quét ảnh tìm thông số kích thước thực tế. Nệm/Thảm BẮT BUỘC dùng từ 'Độ dày', TUYỆT ĐỐI KHÔNG dùng 'Chiều cao'.",
                 "voice_gender": "Phân tích xem sản phẩm này hợp giọng Nam hay Nữ để đọc thoại",
                 "prompt_dna_lock": "Khóa thị giác (Visual DNA) cho AI sinh video."
             }},
             "outlines": [ 
                 {{
                     "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế (Nếu là Flash Sale thì bối cảnh BẮT BUỘC là Kho hàng, Showroom ngập sản phẩm)", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LUÔN LÀ CÂU GHÉP DÀI CÓ DẤU PHẨY ĐỂ LẤY HƠI. CÓ CÂU NỐI LOGIC CHUYỂN Ý. NẾU BÁN HÀNG PHẢI LÀM TRÒN LÊN VÀ CHỐT LẤP LỬNG MỨC GIÁ TỪ ẢNH, KHÔNG ĐƯỢC ĐỌC SỐ LẺ.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LUÔN LÀ CÂU GHÉP DÀI CÓ DẤU PHẨY ĐỂ LẤY HƠI. CÓ CÂU NỐI LOGIC CHUYỂN Ý. NẾU BÁN HÀNG PHẢI LÀM TRÒN LÊN VÀ CHỐT LẤP LỬNG MỨC GIÁ TỪ ẢNH, CẤM ĐỌC SỐ LẺ.",
                     "actors": {num_chars}
                 }},
                 {{ "id": 2, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
@@ -785,7 +785,7 @@ if st.session_state.get("loading_gen_main", False):
                 {{ "id": 5, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }}
             ]
         }}
-        🛑 NẾU CHIẾN LƯỢC LÀ TỰ ĐỘNG MIX THÌ BẠN HÃY MIX. CÒN NẾU CHIẾN LƯỢC LÀ '{initial_angle}', BẠN BẮT BUỘC PHẢI TRẢ VỀ CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC NÀY. KHÔNG ĐƯỢC MIX! CẤM XUẤT HIỆN CHỮ/SUBTITLES Ở HÌNH VÀ VIDEO.
+        🛑 NẾU CHIẾN LƯỢC LÀ TỰ ĐỘNG MIX THÌ BẠN HÃY MIX. CÒN NẾU CHIẾN LƯỢC LÀ '{initial_angle}', BẠN BẮT BUỘC PHẢI TRẢ VỀ CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC NÀY. KHÔNG ĐƯỢC MIX! CẤM XUẤT HIỆN CHỮ/SUBTITLES Ở HÌNH VÀ VIDEO. BẮT BUỘC TUÂN THỦ CHÍNH SÁCH TIKTOK (Cấm "tuyệt đối", cấm "chữa bệnh").
         """
         payload = ["REFERENCE IMAGES:"] + [types.Part.from_bytes(data=f.getvalue(), mime_type=f.type or "image/jpeg") for f in up_files] if up_files else []
         for c in char_inputs: payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type or "image/jpeg")])
@@ -840,7 +840,7 @@ if all_sc:
         if isinstance(scenes, dict): scenes = [scenes]
         for idx, scn in enumerate(scenes, 1):
             st.markdown(f"#### 📍 Phân cảnh {idx} ({scn.get('dur', '8s')}) — [ {scn.get('trans', 'Chuyển cảnh')} ]")
-            st.markdown(f"🏛 **Bối cảnh & Miêu tả:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & SFX:** *{scn.get('director')}*\n\n**💬 Thoại (Số từ: {scn.get('word_count', 'Không đếm')}):** <span class='voiceover-text'>{scn.get('voiceover')}</span>", unsafe_allow_html=True)
+            st.markdown(f"🏛 **Bối cảnh & Miêu tả:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & SFX:** *{scn.get('director')}*\n\n**💬 Thoại (Số từ thực tế: {scn.get('word_count', 'Không đếm')}):** <span class='voiceover-text'>{scn.get('voiceover')}</span>", unsafe_allow_html=True)
             
             img_p, vid_p = scn.get('img_p', ''), scn.get('vid_p', '')
             if "nối tiếp" in scn.get('trans', '').lower() or "dùng lại" in img_p.lower():
