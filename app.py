@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V8.0 (KỸ THUẬT NEO GIÁ & ĐẾM TỪ TOÁN HỌC)
+# 2. HÀM AI LÕI & LUẬT THÉP V9.0 (CÂU GHÉP DÀI LIÊN THANH & FIX HOÀN TOÀN CÔNG THỨC GIÁ)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -267,20 +267,22 @@ def generate_char_rules_string(profiles):
     return rules
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
-    strat_cmd = f"🛑 CHIẾN LƯỢC CẦN TẠO: '{angle}'. TUYỆT ĐỐI TUÂN THỦ!"
-    if "Flash Sale" in angle or "Bán Hàng" in mode:
-        strat_cmd += " -> LƯU Ý ĐẶC BIỆT KHI BÁN HÀNG: CẤM báo giá cụ thể bằng 1 con số. BẮT BUỘC áp dụng kỹ thuật 'Neo giá giảm dần' (VD: Không phải 500, không phải 400) và chốt 'Giá lấp lửng' (VD: chưa tới 300 cành, chỉ nhỉnh hơn 2 bát phở) ở các kịch bản tập trung chốt sale."
+    if "Tự động mix" in angle:
+        strat_cmd = "BẠN PHẢI MIX ĐA DẠNG 5 GÓC ĐỘ NỘI DUNG KHÁC NHAU."
+    else:
+        strat_cmd = f"🛑 LỆNH TẨY NÃO (OVERRIDE): BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC SAU: '{angle}'. NẾU LÀ FLASH SALE, CẢ 5 KỊCH BẢN ĐỀU PHẢI LÀ FLASH SALE KHOE GIÁ."
         
     return f"""
-    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL. PHONG CÁCH: {style}
+    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL KÊNH TIKTOK. PHONG CÁCH: {style}
     {strat_cmd}
     
-    🛑 QUY TẮC TUÂN THỦ:
+    🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
     1. SỐ NHÂN VẬT: {num_chars}.
-    2. XƯNG HÔ: SP Mẹ bầu->mẹ bầu; Trẻ em->các mẹ; Nữ->chị em; Nam->anh em. CẤM "anh chị", "mấy bạn".
+    2. CẤU TRÚC THOẠI CHUẨN TIKTOK: Thoại BẮT BUỘC phải là các CÂU GHÉP DÀI, DỒN DẬP. Sử dụng liên tục các từ nối (VD: kết hợp với, không những thế, thêm vào đó, cực kỳ...). Mật độ thông tin phải DÀY ĐẶC để đọc xả liên thanh cực nhanh. CẤM viết câu ngắn, ngắt quãng chậm rãi.
     3. TỪ VỰNG: Dùng giọng miền BẮC CHUẨN (Cấm dùng "nha", "nè", "nghen", "vô").
-    4. CẤM VI PHẠM: KHÔNG cam kết 100%. KHÔNG báo giá chết 1 con số. Bắt buộc dùng giá lấp lửng ("chưa đến...").
-    5. {char_rules}
+    4. LUẬT BÁO GIÁ (NẾU BÁN HÀNG): CẤM dùng từ "cành". CẤM báo 1 con số cụ thể. BẮT BUỘC áp dụng kỹ thuật "Neo giá giảm dần" bằng tiền thật (Nghìn/Triệu) và chốt lấp lửng. (VD: Nếu ai bán giá [Số Lớn] thì đừng tin, vì hôm nay không phải [Số Lớn], chẳng phải [Số Vừa] mà xả kho chưa tới [Số Nhỏ]).
+    5. XƯNG HÔ: SP Mẹ bầu->mẹ bầu; Trẻ em->các mẹ; Nữ->chị em; Nam->anh em. CẤM "anh chị", "mấy bạn".
+    6. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
@@ -290,36 +292,36 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     if "TikTok Shop" in mode:
         voice_hint = "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Tốc độ SIÊU NHANH, RẤT GẤP GÁP, CUỐN HÚT (4.5-5.0 từ/s)."
     else:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Truyền cảm, tự nhiên (2.5-3.0 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Nhanh, Truyền cảm, Tự nhiên (3.0-3.5 từ/s)."
 
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
-    🛑 QUY TẮC QUAY DỰNG VÀ KỊCH BẢN:
-    1. THỜI GIAN & ĐẾM TỪ NGHIÊM NGẶT (RẤT QUAN TRỌNG):
+    🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
+    1. THOẠI CÂU GHÉP DÀI & ĐẾM TỪ TOÁN HỌC:
+       - Lời thoại CỦA TẤT CẢ CÁC CHIẾN LƯỢC đều phải DÀI, DỒN DẬP. Sử dụng các câu ghép nối tiếp nhau để nhồi nhét tối đa thông tin (Ice-Silk mát lạnh kết hợp cùng Gel foam êm ái...). 
        - Tốc độ thoại là 4.5 - 5.0 từ/giây. 
-       - Cảnh 4s: BẮT BUỘC viết dưới 20 từ.
-       - Cảnh 6s: BẮT BUỘC viết dưới 30 từ.
-       - Cảnh 8s: BẮT BUỘC viết dưới 40 từ.
-       (Nếu bạn viết thoại dài hơn, phần mềm lồng tiếng sẽ bị cắt cụt).
+       - Cảnh 4s: Cần Khoảng 18-20 từ.
+       - Cảnh 6s: Cần Khoảng 27-30 từ.
+       - Cảnh 8s: Cần Khoảng 36-40 từ.
+       (Phải viết câu đủ dài để khớp số giây, nhưng không được vượt quá giới hạn trên).
 
     2. KỸ THUẬT CHỐT GIÁ (NEO GIÁ & LẤP LỬNG):
-       - CẤM TUYỆT ĐỐI báo giá chính xác 1 con số (VD: 199k).
-       - BẮT BUỘC dùng cấu trúc hạ giá: "Bình thường không dưới [Giá A], nhưng hôm nay không phải [Giá A], chẳng phải [Giá B]... mà CHƯA ĐẾN [Giá C]". Luôn dùng từ "chưa tới", "chưa đến", "nhỉnh hơn" để an toàn chính sách.
+       - CẤM TUYỆT ĐỐI dùng từ "cành". CẤM báo giá chính xác 1 con số.
+       - Khi khoe Deal, BẮT BUỘC dùng cấu trúc hạ giá: "Bình thường không dưới [Giá A], nhưng hôm nay không phải [Giá A], chẳng phải [Giá B]... mà CHƯA ĐẾN [Giá C]". Luôn dùng từ "chưa tới", "chưa đến", "nhỉnh hơn".
 
-    3. CẢNH B-ROLL CẬN CHẤT LIỆU (ON-CAMERA CLOSE-UP):
+    3. CẢNH B-ROLL CẬN CHẤT LIỆU (HYBRID SHOT):
        - Khi quay cận bề mặt/chất liệu sản phẩm, TUYỆT ĐỐI KHÔNG để sản phẩm đứng một mình.
        - BẮT BUỘC dùng góc máy "Qua vai" (Over-the-shoulder) hoặc "Cận cảnh bàn tay KOC chạm vào sản phẩm, lấp ló một phần khuôn mặt đang nói". Để AI Lip-sync nhận diện được mặt.
 
-    4. BẢO TOÀN VẬT LÝ SP:
-       - SP TO (Đệm, Tủ lạnh, Tivi...): Cấm bê vác, cấm thu nhỏ. Neo SP vào tường/sàn. KOC chỉ đứng cạnh mở nắp/mở cửa/chỉ trỏ.
+    4. BẢO TOÀN VẬT LÝ SP TO (Spatial Awareness):
+       - SP TO (Đệm, Tủ lạnh, Tivi...): Cấm bê vác. Neo SP vào tường/giường. KOC chỉ đứng/ngồi cạnh và tương tác bề mặt.
        - Chèn vào cuối video_prompt: "Maintain exact absolute scale and rigid product geometry. NO morphing."
 
     5. CHỈ ĐẠO HÀNH ĐỘNG (`action_en`):
-       - Cảnh 1: Vung tay dứt khoát.
-       - Cảnh cuối: BẮT BUỘC chỉ tay xuống góc dưới bên trái màn hình (hướng về giỏ hàng).
+       - Cảnh 1: Vung tay dứt khoát. Cảnh cuối: BẮT BUỘC chỉ tay xuống góc dưới bên trái màn hình.
 
-    6. TỪ VỰNG: Chuẩn giọng BẮC (Cấm dùng: nha, nè, nghen). Ngữ pháp đủ CHỦ-VỊ.
+    6. TỪ VỰNG: Chuẩn giọng BẮC (Cấm dùng: nha, nè, nghen). 
     7. ĐỒNG NHẤT: Copy y nguyên `global_identity_en`, `outfit_en`, `setting_en` vào mọi Prompt nếu chưa đổi bối cảnh.
     8. {narrator_instruction}
     9. {char_rules}
@@ -340,7 +342,7 @@ def create_scene_details(target_id, mode, style):
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
     audio_instruction = 'TRONG TẤT CẢ video_prompt BẮT BUỘC chèn lệnh: Audio: "[Điền nguyên văn thoại tiếng Việt]"' if is_on_camera else 'KHÔNG chèn Audio vào video_prompt.'
-    voice_hint = "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Tốc độ SIÊU NHANH (4.5-5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Truyền cảm (2.5-3 từ/s)."
+    voice_hint = "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Tốc độ SIÊU NHANH, LIÊN THANH (4.5-5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] MIỀN BẮC. Nhanh, Truyền cảm (3-3.5 từ/s)."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | PHÂN TÍCH DNA: {dna_data_ctx}
@@ -348,9 +350,10 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - ĐẾM TỪ: Cảnh 4s tuyệt đối < 20 từ. Cảnh 6s < 30 từ. Cảnh 8s < 40 từ. CẤM VIẾT DÀI HƠN.
-    - KỸ THUẬT CHỐT GIÁ LẤP LỬNG: TUYỆT ĐỐI KHÔNG đọc 1 giá chết. Dùng công thức: "Không phải [Giá A], không phải [Giá B]... hôm nay CHƯA TỚI [Giá C]".
-    - CẢNH B-ROLL CẬN CHẤT LIỆU: Bắt buộc vẫn phải có bóng dáng/bàn tay/khuôn mặt lấp ló của KOC đang nói. Cấm để sản phẩm đứng một mình.
+    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng vào 1 câu bằng từ nối (kết hợp với, siêu xịn...). Đọc xả liên thanh.
+    - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.5 - 5 từ/s): Cảnh 4s phải đạt 18-20 từ. Cảnh 6s đạt 27-30 từ. Cảnh 8s đạt 36-40 từ. CẤM VIẾT NGẮN HƠN, CẤM VIẾT DÀI HƠN.
+    - KỸ THUẬT CHỐT GIÁ LẤP LỬNG: TUYỆT ĐỐI KHÔNG đọc 1 giá chết, KHÔNG dùng "cành". Dùng công thức: "Nếu ai bán giá [Tiền to] thì khoan vội chốt, hôm nay không phải [Tiền to], không phải [Tiền vừa]... CHƯA TỚI [Tiền nhỏ]".
+    - CẢNH B-ROLL CẬN CHẤT LIỆU: Bắt buộc KOC lấp ló khuôn mặt và bàn tay để giữ Rắc-co.
     
     TRẢ VỀ JSON:
     {{
@@ -369,8 +372,8 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "English desc of setting.",
                 "outfit_en": "English desc of outfit.",
                 "action_en": "Medium shot, energetic hand gestures.",
-                "director": "Chỉ đạo Voice: Giọng Nam/Nữ Miền Bắc | Nhịp độ: Nhanh | Mục đích: ...", 
-                "voiceover": "Thoại tiếng Việt (Neo giá giảm dần, Cấm nha/nè. Hãy đếm từ để khớp số giây).",
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ Miền Bắc | Nhịp độ: Cực Nhanh | Mục đích: ...", 
+                "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng nếu chốt sale, Cấm nha/nè. KHỚP TOÁN HỌC VỚI SỐ GIÂY).",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Product: [prod_dna]. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale and rigid parts. NO morphing."
             }}
@@ -396,12 +399,11 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     prompt = f"""
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
-    🛑 LỆNH TẨY NÃO (OVERRIDE): HÃY BỎ QUA CHIẾN LƯỢC CỦA DỮ LIỆU CŨ.
-    BẠN BẮT BUỘC PHẢI VIẾT 5 KỊCH BẢN MỚI THEO ĐÚNG CHIẾN LƯỢC NÀY: '{angle}'.
-    (NẾU CHIẾN LƯỢC YÊU CẦU LÀ FLASH SALE HOẶC CHỐT ĐƠN, BẮT BUỘC CÂU HOOK ĐẦU TIÊN PHẢI ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ: KHÔNG PHẢI GIÁ A, KHÔNG PHẢI GIÁ B MÀ CHƯA TỚI GIÁ C).
+    🛑 LỆNH TẨY NÃO (OVERRIDE): BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO ĐÚNG ĐỊNH HƯỚNG NÀY: '{angle}'.
+    (NẾU YÊU CẦU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC CẢ 5 KỊCH BẢN ĐỀU PHẢI CÓ HOOK ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ: KHÔNG PHẢI [GIÁ TO] MÀ CHƯA TỚI [GIÁ NHỎ]. CẤM DÙNG TỪ CÀNH).
 
     SỐ DIỄN VIÊN: {num_chars}.
-    LUẬT: Giọng BẮC CHUẨN (Cấm nha/nè/vô). Xưng hô thông minh.
+    LUẬT: CÂU GHÉP DÀI, ĐỌC NHANH. Giọng BẮC CHUẨN (Cấm nha/nè/vô).
 
     TRẢ VỀ JSON:
     {{
@@ -410,7 +412,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
                 "setting": "Bối cảnh thực tế",
-                "hook": "Xưng hô & Hook dẫn dắt (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ LẤP LỬNG NẾU LÀ FLASH SALE)",
+                "hook": "Xưng hô & Hook câu ghép dài (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ LẤP LỬNG NẾU LÀ FLASH SALE)",
                 "actors": {num_chars}
             }}
             // Tạo đủ 5 kịch bản
@@ -453,7 +455,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Giọng BẮC CHUẨN (Cấm nha/nè/vô). Xưng hô chuẩn. Nếu bán hàng phải CHE GIÁ LẤP LỬNG.
+    LUẬT: Thoại CÂU GHÉP DÀI. Giọng BẮC CHUẨN (Cấm nha/nè/vô). Nếu bán hàng phải CHE GIÁ LẤP LỬNG BẰNG CÔNG THỨC NEO GIÁ GIẢM DẦN. Cấm dùng từ 'cành'.
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -687,7 +689,7 @@ st.markdown("### 🎥 Đạo Diễn, Góc Quay & Thời Lượng")
 col_opt1, col_opt2 = st.columns(2)
 
 style = col_opt1.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D", "Studio Tối Giản"], key=f"sty_{st.session_state.reset_key}")
-angle_options = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau", "🔍 Review", "💡 Chia sẻ", "😂 Hài hước"]
+angle_options = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước (Chốt sale)"]
 initial_angle = col_opt1.selectbox("🧭 Chiến lược:", angle_options, key=f"ang_{st.session_state.reset_key}")
 
 duration_choice = col_opt2.selectbox("⏳ Thời lượng video:", ["Tự động (AI Tối ưu ~20-30s)", "Tùy chỉnh (Nhập số giây)"], key=f"dur_{st.session_state.reset_key}")
@@ -728,7 +730,7 @@ if st.session_state.get("loading_gen_main", False):
             "outlines": [ 
                 {{
                     "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (chị em/anh em/mẹ bầu/các mẹ). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. CẤM CTA MUA HÀNG. VĂN PHONG BẮC CHUẨN. Nếu là Bán Hàng/Flash Sale thì phải CHE GIÁ LẤP LỬNG bằng kỹ thuật neo giá giảm dần.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LUÔN LÀ CÂU GHÉP DÀI. Nếu là Flash Sale thì phải CHE GIÁ LẤP LỬNG bằng kỹ thuật neo giá giảm dần.",
                     "actors": {num_chars}
                 }},
                 {{ "id": 2, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
@@ -737,7 +739,7 @@ if st.session_state.get("loading_gen_main", False):
                 {{ "id": 5, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }}
             ]
         }}
-        🛑 BẮT BUỘC TRẢ VỀ ĐÚNG 5 KỊCH BẢN.
+        🛑 NẾU CHIẾN LƯỢC LÀ TỰ ĐỘNG MIX THÌ BẠN HÃY MIX. CÒN NẾU CHIẾN LƯỢC LÀ '{initial_angle}', BẠN BẮT BUỘC PHẢI TRẢ VỀ CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC NÀY. KHÔNG ĐƯỢC MIX!
         """
         payload = ["REFERENCE IMAGES:"] + [types.Part.from_bytes(data=f.getvalue(), mime_type=f.type or "image/jpeg") for f in up_files] if up_files else []
         for c in char_inputs: payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type or "image/jpeg")])
@@ -852,7 +854,7 @@ if all_sc:
 
     st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
-    a_opts = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau", "🔍 Review", "💡 Chia sẻ", "😂 Hài hước"]
+    a_opts = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước (Chốt sale)"]
     c_ang = cg1.selectbox("🧭 Chiến lược:", a_opts, key=f"ea_{st.session_state.reset_key}")
     c_num = cg2.number_input("Số diễn viên:", 1, 8, 1, key=f"en_{st.session_state.reset_key}")
     c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Tự động (~20-30s)", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
