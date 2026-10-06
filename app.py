@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V9.0 (CÂU GHÉP DÀI LIÊN THANH & FIX HOÀN TOÀN CÔNG THỨC GIÁ)
+# 2. HÀM AI LÕI & LUẬT THÉP V10.0 (BỐI CẢNH UY TÍN TỔNG KHO CHO FLASH SALE)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -280,7 +280,9 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     1. SỐ NHÂN VẬT: {num_chars}.
     2. CẤU TRÚC THOẠI CHUẨN TIKTOK: Thoại BẮT BUỘC phải là các CÂU GHÉP DÀI, DỒN DẬP. Sử dụng liên tục các từ nối (VD: kết hợp với, không những thế, thêm vào đó, cực kỳ...). Mật độ thông tin phải DÀY ĐẶC để đọc xả liên thanh cực nhanh. CẤM viết câu ngắn, ngắt quãng chậm rãi.
     3. TỪ VỰNG: Dùng giọng miền BẮC CHUẨN (Cấm dùng "nha", "nè", "nghen", "vô").
-    4. LUẬT BÁO GIÁ (NẾU BÁN HÀNG): CẤM dùng từ "cành". CẤM báo 1 con số cụ thể. BẮT BUỘC áp dụng kỹ thuật "Neo giá giảm dần" bằng tiền thật (Nghìn/Triệu) và chốt lấp lửng. (VD: Nếu ai bán giá [Số Lớn] thì đừng tin, vì hôm nay không phải [Số Lớn], chẳng phải [Số Vừa] mà xả kho chưa tới [Số Nhỏ]).
+    4. LUẬT BÁO GIÁ VÀ BỐI CẢNH (NẾU LÀ BÁN HÀNG / FLASH SALE): 
+       - GIÁ: CẤM dùng từ "cành". CẤM báo 1 con số cụ thể. BẮT BUỘC áp dụng kỹ thuật "Neo giá giảm dần" bằng tiền thật (Nghìn/Triệu) và chốt lấp lửng. (VD: Nếu ai bán giá [Số Lớn] thì đừng tin, vì hôm nay không phải [Số Lớn], chẳng phải [Số Vừa] mà xả kho chưa tới [Số Nhỏ]).
+       - BỐI CẢNH: NẾU LÀ FLASH SALE / XẢ KHO, bối cảnh (setting) BẮT BUỘC phải là TỔNG KHO, XƯỞNG SẢN XUẤT, HOẶC SHOWROOM RỘNG LỚN ngập tràn hàng hóa để tăng uy tín tuyệt đối (Giống video bán điều hòa). CẤM đặt bối cảnh phòng ngủ/phòng khách.
     5. XƯNG HÔ: SP Mẹ bầu->mẹ bầu; Trẻ em->các mẹ; Nữ->chị em; Nam->anh em. CẤM "anh chị", "mấy bạn".
     6. {char_rules}
     """
@@ -306,16 +308,17 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
        - Cảnh 8s: Cần Khoảng 36-40 từ.
        (Phải viết câu đủ dài để khớp số giây, nhưng không được vượt quá giới hạn trên).
 
-    2. KỸ THUẬT CHỐT GIÁ (NEO GIÁ & LẤP LỬNG):
+    2. KỸ THUẬT CHỐT GIÁ VÀ BỐI CẢNH UY TÍN (FLASH SALE):
        - CẤM TUYỆT ĐỐI dùng từ "cành". CẤM báo giá chính xác 1 con số.
        - Khi khoe Deal, BẮT BUỘC dùng cấu trúc hạ giá: "Bình thường không dưới [Giá A], nhưng hôm nay không phải [Giá A], chẳng phải [Giá B]... mà CHƯA ĐẾN [Giá C]". Luôn dùng từ "chưa tới", "chưa đến", "nhỉnh hơn".
+       - BỐI CẢNH BẮT BUỘC (NẾU LÀ FLASH SALE): Settings của các phân cảnh phải diễn ra tại Tổng kho, xưởng sản xuất, hoặc Showroom chất đống sản phẩm. Cấm để không gian sơ sài.
 
     3. CẢNH B-ROLL CẬN CHẤT LIỆU (HYBRID SHOT):
        - Khi quay cận bề mặt/chất liệu sản phẩm, TUYỆT ĐỐI KHÔNG để sản phẩm đứng một mình.
        - BẮT BUỘC dùng góc máy "Qua vai" (Over-the-shoulder) hoặc "Cận cảnh bàn tay KOC chạm vào sản phẩm, lấp ló một phần khuôn mặt đang nói". Để AI Lip-sync nhận diện được mặt.
 
     4. BẢO TOÀN VẬT LÝ SP TO (Spatial Awareness):
-       - SP TO (Đệm, Tủ lạnh, Tivi...): Cấm bê vác. Neo SP vào tường/giường. KOC chỉ đứng/ngồi cạnh và tương tác bề mặt.
+       - SP TO (Đệm, Tủ lạnh, Tivi...): Cấm bê vác. Neo SP vào không gian phù hợp. KOC chỉ đứng/ngồi cạnh và tương tác bề mặt.
        - Chèn vào cuối video_prompt: "Maintain exact absolute scale and rigid product geometry. NO morphing."
 
     5. CHỈ ĐẠO HÀNH ĐỘNG (`action_en`):
@@ -350,7 +353,8 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng vào 1 câu bằng từ nối (kết hợp với, siêu xịn...). Đọc xả liên thanh.
+    - BỐI CẢNH FLASH SALE: Nếu kịch bản là Flash Sale, setting BẮT BUỘC là Tổng kho, Xưởng, hoặc Showroom ngập tràn hàng hóa.
+    - CẤU TRÚC THOẠI: Bắt buộc dùng CÂU GHÉP DÀI, LIÊN TỤC. Nhồi nhét nhiều tính năng vào 1 câu bằng từ nối. Đọc xả liên thanh.
     - TOÁN HỌC ĐẾM TỪ (Tốc độ 4.5 - 5 từ/s): Cảnh 4s phải đạt 18-20 từ. Cảnh 6s đạt 27-30 từ. Cảnh 8s đạt 36-40 từ. CẤM VIẾT NGẮN HƠN, CẤM VIẾT DÀI HƠN.
     - KỸ THUẬT CHỐT GIÁ LẤP LỬNG: TUYỆT ĐỐI KHÔNG đọc 1 giá chết, KHÔNG dùng "cành". Dùng công thức: "Nếu ai bán giá [Tiền to] thì khoan vội chốt, hôm nay không phải [Tiền to], không phải [Tiền vừa]... CHƯA TỚI [Tiền nhỏ]".
     - CẢNH B-ROLL CẬN CHẤT LIỆU: Bắt buộc KOC lấp ló khuôn mặt và bàn tay để giữ Rắc-co.
@@ -368,12 +372,12 @@ def create_scene_details(target_id, mode, style):
                 "scene": 1, 
                 "dur": "4s/6s/8s", 
                 "trans": "Chuyển cảnh mới", 
-                "setting": "Mô tả bối cảnh...",
+                "setting": "Mô tả bối cảnh (Tổng kho/Showroom nếu là Flash sale)...",
                 "setting_en": "English desc of setting.",
                 "outfit_en": "English desc of outfit.",
                 "action_en": "Medium shot, energetic hand gestures.",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ Miền Bắc | Nhịp độ: Cực Nhanh | Mục đích: ...", 
-                "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng nếu chốt sale, Cấm nha/nè. KHỚP TOÁN HỌC VỚI SỐ GIÂY).",
+                "voiceover": "Thoại CÂU GHÉP DÀI (Khoe giá lấp lửng bằng kỹ thuật đếm lùi tiền nếu chốt sale, Cấm nha/nè. KHỚP TOÁN HỌC VỚI SỐ GIÂY).",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Product: [prod_dna]. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale and rigid parts. NO morphing."
             }}
@@ -400,7 +404,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
     🛑 LỆNH TẨY NÃO (OVERRIDE): BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO ĐÚNG ĐỊNH HƯỚNG NÀY: '{angle}'.
-    (NẾU YÊU CẦU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC CẢ 5 KỊCH BẢN ĐỀU PHẢI CÓ HOOK ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ: KHÔNG PHẢI [GIÁ TO] MÀ CHƯA TỚI [GIÁ NHỎ]. CẤM DÙNG TỪ CÀNH).
+    (NẾU YÊU CẦU LÀ FLASH SALE/CHỐT ĐƠN, BẮT BUỘC CẢ 5 KỊCH BẢN ĐỀU PHẢI CÓ HOOK ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ BẰNG TIỀN THẬT VÀ BỐI CẢNH LÀ TỔNG KHO/SHOWROOM).
 
     SỐ DIỄN VIÊN: {num_chars}.
     LUẬT: CÂU GHÉP DÀI, ĐỌC NHANH. Giọng BẮC CHUẨN (Cấm nha/nè/vô).
@@ -411,8 +415,8 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
             {{
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
-                "setting": "Bối cảnh thực tế",
-                "hook": "Xưng hô & Hook câu ghép dài (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ LẤP LỬNG NẾU LÀ FLASH SALE)",
+                "setting": "Bối cảnh thực tế (Bắt buộc là Tổng kho/Xưởng nếu là Flash Sale)",
+                "hook": "Xưng hô & Hook câu ghép dài (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ BẰNG TIỀN NẾU LÀ FLASH SALE)",
                 "actors": {num_chars}
             }}
             // Tạo đủ 5 kịch bản
@@ -455,7 +459,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Thoại CÂU GHÉP DÀI. Giọng BẮC CHUẨN (Cấm nha/nè/vô). Nếu bán hàng phải CHE GIÁ LẤP LỬNG BẰNG CÔNG THỨC NEO GIÁ GIẢM DẦN. Cấm dùng từ 'cành'.
+    LUẬT: Thoại CÂU GHÉP DÀI. Giọng BẮC CHUẨN (Cấm nha/nè/vô). Nếu bán hàng/Flash sale phải ĐẶT BỐI CẢNH TẠI KHO HÀNG và CHE GIÁ LẤP LỬNG BẰNG CÔNG THỨC NEO GIÁ TIỀN THẬT. Cấm dùng từ 'cành'.
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -540,7 +544,7 @@ with st.sidebar:
         if current_acc and st.session_state.current_email != ADMIN_EMAIL and current_acc.get("plan_type", "Trial") != "Trial":
             try:
                 days_left = (datetime.strptime(current_acc.get("expires_at", "2099-12-31"), "%Y-%m-%d") - datetime.now()).days
-                if 0 <= days_left <= 7: st.warning(f"⚠️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
+                if 0 <= days_left <= 7: st.warning(f"⚠️️ Tài khoản hết hạn sau **{days_left} ngày nữa**.")
             except: pass
 
         st.markdown("### 🗂 LÀM VIỆC")
@@ -723,13 +727,13 @@ if st.session_state.get("loading_gen_main", False):
             "content_analysis": {{
                 "target_audience": "Nhận diện TỆP KHÁCH HÀNG",
                 "core_value": "Giá trị cốt lõi", "pain_points": "Nỗi đau", "hook_element": "Yếu tố giữ chân",
-                "product_size_class": "Phân loại SP: Nhỏ Cầm tay / Đồ Mặc / Nội thất To / Điện Máy. Phân tích cách tương tác vật lý KHÔNG ẢO GIÁC (VD: Tủ lạnh -> đứng cạnh mở cửa, Đệm -> ngồi lên mép, Son -> Cầm tay). TUYỆT ĐỐI CẤM bê vác đồ to.",
+                "product_size_class": "Phân loại SP: Nhỏ Cầm tay / Đồ Mặc / Nội thất To / Điện Máy. Phân tích cách tương tác vật lý KHÔNG ẢO GIÁC.",
                 "voice_gender": "Phân tích xem sản phẩm này hợp giọng Nam hay Nữ để đọc thoại",
                 "prompt_dna_lock": "Khóa thị giác (Visual DNA) cho AI sinh video."
             }},
             "outlines": [ 
                 {{
-                    "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế", 
+                    "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế (Nếu là Flash Sale thì bối cảnh BẮT BUỘC là kho hàng, showroom ngập sản phẩm)", 
                     "hook": "HOOK BẮT BUỘC: Xưng hô dân dã. CẤU TRÚC THOẠI LUÔN LÀ CÂU GHÉP DÀI. Nếu là Flash Sale thì phải CHE GIÁ LẤP LỬNG bằng kỹ thuật neo giá giảm dần.",
                     "actors": {num_chars}
                 }},
