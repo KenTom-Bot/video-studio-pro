@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V7.0 (GIỚI HẠN TỪ + CẬN CẢNH MẶT + GHI ĐÈ FLASH SALE)
+# 2. HÀM AI LÕI & LUẬT THÉP V8.0 (KỸ THUẬT NEO GIÁ & ĐẾM TỪ TOÁN HỌC)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -268,8 +268,8 @@ def generate_char_rules_string(profiles):
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
     strat_cmd = f"🛑 CHIẾN LƯỢC CẦN TẠO: '{angle}'. TUYỆT ĐỐI TUÂN THỦ!"
-    if "Flash Sale" in angle:
-        strat_cmd += " -> LƯU Ý ĐẶC BIỆT: Đây là kịch bản FLASH SALE. Hook đầu tiên BẮT BUỘC phải đập ngay vào giá rẻ, xả kho, deal sốc, hoặc khan hiếm. KHÔNG đi đường vòng kể lể dài dòng."
+    if "Flash Sale" in angle or "Bán Hàng" in mode:
+        strat_cmd += " -> LƯU Ý ĐẶC BIỆT KHI BÁN HÀNG: CẤM báo giá cụ thể bằng 1 con số. BẮT BUỘC áp dụng kỹ thuật 'Neo giá giảm dần' (VD: Không phải 500, không phải 400) và chốt 'Giá lấp lửng' (VD: chưa tới 300 cành, chỉ nhỉnh hơn 2 bát phở) ở các kịch bản tập trung chốt sale."
         
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL. PHONG CÁCH: {style}
@@ -279,7 +279,8 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     1. SỐ NHÂN VẬT: {num_chars}.
     2. XƯNG HÔ: SP Mẹ bầu->mẹ bầu; Trẻ em->các mẹ; Nữ->chị em; Nam->anh em. CẤM "anh chị", "mấy bạn".
     3. TỪ VỰNG: Dùng giọng miền BẮC CHUẨN (Cấm dùng "nha", "nè", "nghen", "vô").
-    4. {char_rules}
+    4. CẤM VI PHẠM: KHÔNG cam kết 100%. KHÔNG báo giá chết 1 con số. Bắt buộc dùng giá lấp lửng ("chưa đến...").
+    5. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
@@ -294,7 +295,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
-    🛑 QUY TẮC QUAY DỰNG:
+    🛑 QUY TẮC QUAY DỰNG VÀ KỊCH BẢN:
     1. THỜI GIAN & ĐẾM TỪ NGHIÊM NGẶT (RẤT QUAN TRỌNG):
        - Tốc độ thoại là 4.5 - 5.0 từ/giây. 
        - Cảnh 4s: BẮT BUỘC viết dưới 20 từ.
@@ -302,23 +303,26 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
        - Cảnh 8s: BẮT BUỘC viết dưới 40 từ.
        (Nếu bạn viết thoại dài hơn, phần mềm lồng tiếng sẽ bị cắt cụt).
 
-    2. CẢNH B-ROLL CẬN CHẤT LIỆU (ON-CAMERA CLOSE-UP):
-       - Khi miêu tả cận cảnh bề mặt/chất liệu sản phẩm, TUYỆT ĐỐI KHÔNG để sản phẩm đứng một mình.
-       - BẮT BUỘC dùng góc máy "Qua vai" (Over-the-shoulder) hoặc "Cận cảnh bàn tay KOC đang chạm vào sản phẩm, lấp ló một phần khuôn mặt miệng đang mấp máy nói".
-       - Việc giữ nhân vật trong khung hình là để phần mềm Lip-sync hoạt động đồng nhất, KHÔNG BỊ BIẾN THÀNH LỒNG TIẾNG NGOÀI (Voiceover).
+    2. KỸ THUẬT CHỐT GIÁ (NEO GIÁ & LẤP LỬNG):
+       - CẤM TUYỆT ĐỐI báo giá chính xác 1 con số (VD: 199k).
+       - BẮT BUỘC dùng cấu trúc hạ giá: "Bình thường không dưới [Giá A], nhưng hôm nay không phải [Giá A], chẳng phải [Giá B]... mà CHƯA ĐẾN [Giá C]". Luôn dùng từ "chưa tới", "chưa đến", "nhỉnh hơn" để an toàn chính sách.
 
-    3. BẢO TOÀN VẬT LÝ SP:
+    3. CẢNH B-ROLL CẬN CHẤT LIỆU (ON-CAMERA CLOSE-UP):
+       - Khi quay cận bề mặt/chất liệu sản phẩm, TUYỆT ĐỐI KHÔNG để sản phẩm đứng một mình.
+       - BẮT BUỘC dùng góc máy "Qua vai" (Over-the-shoulder) hoặc "Cận cảnh bàn tay KOC chạm vào sản phẩm, lấp ló một phần khuôn mặt đang nói". Để AI Lip-sync nhận diện được mặt.
+
+    4. BẢO TOÀN VẬT LÝ SP:
        - SP TO (Đệm, Tủ lạnh, Tivi...): Cấm bê vác, cấm thu nhỏ. Neo SP vào tường/sàn. KOC chỉ đứng cạnh mở nắp/mở cửa/chỉ trỏ.
        - Chèn vào cuối video_prompt: "Maintain exact absolute scale and rigid product geometry. NO morphing."
 
-    4. CHỈ ĐẠO HÀNH ĐỘNG (`action_en`):
+    5. CHỈ ĐẠO HÀNH ĐỘNG (`action_en`):
        - Cảnh 1: Vung tay dứt khoát.
        - Cảnh cuối: BẮT BUỘC chỉ tay xuống góc dưới bên trái màn hình (hướng về giỏ hàng).
 
-    5. TỪ VỰNG: Chuẩn giọng BẮC (Cấm dùng: nha, nè, nghen). Ngữ pháp đủ CHỦ-VỊ.
-    6. ĐỒNG NHẤT: Copy y nguyên `global_identity_en`, `outfit_en`, `setting_en` vào mọi Prompt nếu chưa đổi bối cảnh.
-    7. {narrator_instruction}
-    8. {char_rules}
+    6. TỪ VỰNG: Chuẩn giọng BẮC (Cấm dùng: nha, nè, nghen). Ngữ pháp đủ CHỦ-VỊ.
+    7. ĐỒNG NHẤT: Copy y nguyên `global_identity_en`, `outfit_en`, `setting_en` vào mọi Prompt nếu chưa đổi bối cảnh.
+    8. {narrator_instruction}
+    9. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style):
@@ -345,6 +349,7 @@ def create_scene_details(target_id, mode, style):
     
     LƯU Ý ĐẶC BIỆT:
     - ĐẾM TỪ: Cảnh 4s tuyệt đối < 20 từ. Cảnh 6s < 30 từ. Cảnh 8s < 40 từ. CẤM VIẾT DÀI HƠN.
+    - KỸ THUẬT CHỐT GIÁ LẤP LỬNG: TUYỆT ĐỐI KHÔNG đọc 1 giá chết. Dùng công thức: "Không phải [Giá A], không phải [Giá B]... hôm nay CHƯA TỚI [Giá C]".
     - CẢNH B-ROLL CẬN CHẤT LIỆU: Bắt buộc vẫn phải có bóng dáng/bàn tay/khuôn mặt lấp ló của KOC đang nói. Cấm để sản phẩm đứng một mình.
     
     TRẢ VỀ JSON:
@@ -365,7 +370,7 @@ def create_scene_details(target_id, mode, style):
                 "outfit_en": "English desc of outfit.",
                 "action_en": "Medium shot, energetic hand gestures.",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ Miền Bắc | Nhịp độ: Nhanh | Mục đích: ...", 
-                "voiceover": "Thoại tiếng Việt (Cấm nha/nè. Hãy đếm từ để khớp số giây).",
+                "voiceover": "Thoại tiếng Việt (Neo giá giảm dần, Cấm nha/nè. Hãy đếm từ để khớp số giây).",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Product: [prod_dna]. NO generated text.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [setting_en]. Character: [global_identity_en] wearing [outfit_en]. Action: [action_en]. Audio: \\"[exact vi dialogue]\\". Product: [prod_dna]. Maintain absolute scale and rigid parts. NO morphing."
             }}
@@ -393,7 +398,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
 
     🛑 LỆNH TẨY NÃO (OVERRIDE): HÃY BỎ QUA CHIẾN LƯỢC CỦA DỮ LIỆU CŨ.
     BẠN BẮT BUỘC PHẢI VIẾT 5 KỊCH BẢN MỚI THEO ĐÚNG CHIẾN LƯỢC NÀY: '{angle}'.
-    (NẾU CHIẾN LƯỢC YÊU CẦU LÀ FLASH SALE HOẶC CHỐT ĐƠN, BẮT BUỘC CÂU HOOK ĐẦU TIÊN PHẢI NÓI VỀ GIÁ SỐC, XẢ KHO, ĐỪNG KỂ LỂ LÝ DO).
+    (NẾU CHIẾN LƯỢC YÊU CẦU LÀ FLASH SALE HOẶC CHỐT ĐƠN, BẮT BUỘC CÂU HOOK ĐẦU TIÊN PHẢI ĐẬP NGAY VÀO KỸ THUẬT NEO GIÁ: KHÔNG PHẢI GIÁ A, KHÔNG PHẢI GIÁ B MÀ CHƯA TỚI GIÁ C).
 
     SỐ DIỄN VIÊN: {num_chars}.
     LUẬT: Giọng BẮC CHUẨN (Cấm nha/nè/vô). Xưng hô thông minh.
@@ -405,7 +410,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
                 "setting": "Bối cảnh thực tế",
-                "hook": "Xưng hô & Hook dẫn dắt (CÓ CHỦ VỊ, THEO ĐÚNG CHIẾN LƯỢC MỚI YÊU CẦU)",
+                "hook": "Xưng hô & Hook dẫn dắt (CÓ CHỦ VỊ, DÙNG KỸ THUẬT NEO GIÁ LẤP LỬNG NẾU LÀ FLASH SALE)",
                 "actors": {num_chars}
             }}
             // Tạo đủ 5 kịch bản
@@ -448,7 +453,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Giọng BẮC CHUẨN (Cấm nha/nè/vô). Xưng hô chuẩn.
+    LUẬT: Giọng BẮC CHUẨN (Cấm nha/nè/vô). Xưng hô chuẩn. Nếu bán hàng phải CHE GIÁ LẤP LỬNG.
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -515,7 +520,7 @@ with st.sidebar:
                 if st.form_submit_button("🚀 Đăng Ký Tài Khoản", type="secondary", use_container_width=True):
                     ph_reg = st.empty()
                     email_check, phone_check = reg_email.strip(), reg_phone.strip()
-                    if not email_check or not phone_check or not reg_pass.strip(): ph_reg.error("Điền đủ thông vị trí!")
+                    if not email_check or not phone_check or not reg_pass.strip(): ph_reg.error("Điền đủ thông tin!")
                     elif not is_valid_phone(phone_check): ph_reg.error("SĐT không hợp lệ!")
                     elif email_check in st.session_state.licensed_accounts: ph_reg.error("Email đã tồn tại!")
                     else:
@@ -682,7 +687,7 @@ st.markdown("### 🎥 Đạo Diễn, Góc Quay & Thời Lượng")
 col_opt1, col_opt2 = st.columns(2)
 
 style = col_opt1.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Hoạt Hình 2D", "Studio Tối Giản"], key=f"sty_{st.session_state.reset_key}")
-angle_options = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước (Chốt sale)"]
+angle_options = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau", "🔍 Review", "💡 Chia sẻ", "😂 Hài hước"]
 initial_angle = col_opt1.selectbox("🧭 Chiến lược:", angle_options, key=f"ang_{st.session_state.reset_key}")
 
 duration_choice = col_opt2.selectbox("⏳ Thời lượng video:", ["Tự động (AI Tối ưu ~20-30s)", "Tùy chỉnh (Nhập số giây)"], key=f"dur_{st.session_state.reset_key}")
@@ -723,7 +728,7 @@ if st.session_state.get("loading_gen_main", False):
             "outlines": [ 
                 {{
                     "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế", 
-                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (chị em/anh em/mẹ bầu/các mẹ). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. CẤM CTA MUA HÀNG. VĂN PHONG BẮC CHUẨN.",
+                    "hook": "HOOK BẮT BUỘC: Xưng hô dân dã (chị em/anh em/mẹ bầu/các mẹ). TUYỆT ĐỐI KHÔNG DÙNG 'anh chị'. CẤM CTA MUA HÀNG. VĂN PHONG BẮC CHUẨN. Nếu là Bán Hàng/Flash Sale thì phải CHE GIÁ LẤP LỬNG bằng kỹ thuật neo giá giảm dần.",
                     "actors": {num_chars}
                 }},
                 {{ "id": 2, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }},
