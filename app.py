@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V31.0 (TOÁN HỌC NHỊP THỞ DẤU PHẨY VÀ BẢNG TRA CỨU MỚI)
+# 2. HÀM AI LÕI & LUẬT THÉP V32.0 (TOÁN HỌC ĐỘNG & FULL VOICEOVER SYNC)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -293,7 +293,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp trước ống kính. Chèn lệnh `Audio:` vào `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
     
     if "TikTok Shop" in mode:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI GỐC (CẤM TỪ MIỀN NAM). Tốc độ 4.5 từ/s."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI GỐC (CẤM TỪ MIỀN NAM). Tốc độ 4.8 từ/s."
     else:
         voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI GỐC (CẤM TỪ MIỀN NAM). Tự nhiên (3.5 từ/s)."
 
@@ -301,39 +301,35 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     BẠN LÀ ĐẠO DIỄN VIRTUAL CHO VEO 3. PHONG CÁCH: {style}
     
     🛑 QUY TẮC QUAY DỰNG VÀ VIẾT THOẠI:
-    1. ƯU TIÊN PHÂN CẢNH DÀI & TOÁN HỌC NHỊP THỞ (ĐÃ TRỪ HAO DẤU PHẨY):
-       - Mỗi dấu phẩy (,) khi đọc thực tế tốn 0.5s. Để video không bị cắt cụt đuôi, số lượng từ tối đa BẮT BUỘC phải giảm xuống.
-       - Viết xong thoại, BẮT BUỘC tự ĐẾM CHÍNH XÁC TỔNG SỐ TỪ. Điền vào 'word_count'.
-       - TUYỆT ĐỐI KHÔNG DÙNG PHÉP CHIA. HÃY TRA BẢNG DƯỚI ĐÂY ĐỂ GÁN SỐ GIÂY ('dur'):
-         + Từ 1 đến 14 từ ➔ BẮT BUỘC gán "4s"
-         + Từ 15 đến 22 từ ➔ BẮT BUỘC gán "6s" 
-         + Từ 23 đến 30 từ ➔ BẮT BUỘC gán "8s"
-         + Từ 31 đến 38 từ ➔ BẮT BUỘC gán "10s"
-         + CẤM VIẾT QUÁ 38 TỪ CHO MỖI PHÂN CẢNH. (Ví dụ: 30 từ là BẮT BUỘC phải gán 8s, không được phép gán 6s).
+    1. TỐC ĐỘ ĐỒNG NHẤT & TOÁN HỌC ĐỘNG (BẢO VỆ ÂM THANH):
+       - TẤT CẢ CÁC PHÂN CẢNH TỪ ĐẦU TỚI CUỐI PHẢI CÓ CÙNG 1 TỐC ĐỘ ĐỌC (4.8 từ/s). KHÔNG ĐƯỢC CHỖ NHANH CHỖ CHẬM.
+       - CẤM GÁN VÀO CÁC MỐC CỐ ĐỊNH 4s, 6s, 8s. HÃY TỰ ĐỘNG TÍNH THỜI GIAN THEO CÔNG THỨC: 
+         `dur` = Làm tròn số của [(Số từ / 4.8) + (Số lượng dấu phẩy * 0.5s)].
+         (Ví dụ: Cảnh có 32 từ và 2 dấu phẩy -> (32/4.8) + (2*0.5) = 7.6s -> Gán `dur: "8s"`). 
+       - Xuất kết quả phép tính làm tròn vào biến 'dur' để âm thanh và video khớp nhau 100%.
 
-    2. CÂN BẰNG NHỊP THỞ (SYLLABLE BALANCING) & DẤU CÂU:
-       - ĐỂ TRÁNH GIỌNG ĐỌC BỊ DỒN CHỮ: Bắt buộc CHIA ĐỀU SỐ TỪ giữa các dấu phẩy (,). Các vế câu phải cân xứng nhịp điệu. KHÔNG lạm dụng dấu phẩy để ngắt vụn câu (Cấm: Chỉ với, chưa tới, hai triệu).
+    2. CÂN BẰNG NHỊP THỞ (SYLLABLE BALANCING):
+       - ĐỂ TRÁNH GIỌNG ĐỌC BỊ DỒN CHỮ: Bắt buộc CHIA ĐỀU SỐ TỪ giữa các dấu phẩy (,). Các vế câu phải dài cân xứng để nhịp đọc trôi chảy tự nhiên.
 
-    3. BỘ LỌC TẠP ÂM LỒNG TIẾNG (PURE DIALOGUE LOCK - CỰC KỲ QUAN TRỌNG):
-       - Trường `voiceover` TUYỆT ĐỐI CHỈ CHỨA NỘI DUNG ĐỌC. 
-       - CẤM TẤT CẢ ngoặc đơn chỉ đạo diễn xuất (VD: cấm "(cười)", "(chỉ tay)", "(giọng nam)"). Máy TTS sẽ đọc nhầm thành tiếng.
-       - TRONG `vid_p`: Nếu có lệnh Audio, CHỈ TRÍCH XUẤT 5-7 TỪ ĐẦU TIÊN CỦA LỜI THOẠI để làm mỏ neo nhép môi. Cấm chèn cả đoạn dài.
+    3. PURE VOICEOVER & TRÍCH XUẤT AUDIO (CỰC KỲ QUAN TRỌNG):
+       - Trường `voiceover` TUYỆT ĐỐI CHỈ CHỨA CHỮ. CẤM MỌI NGOẶC ĐƠN.
+       - TRONG phần `vid_p`: Nếu có lệnh Audio, BẮT BUỘC chép lại ĐẦY ĐỦ 100% câu thoại từ trường `voiceover` vào Audio: "...". TUYỆT ĐỐI KHÔNG ĐƯỢC CẮT BỚT.
 
     4. KHÓA MÀU SẮC CHI TIẾT ĐA BỘ PHẬN (MULTI-PART COLOR LOCK):
-       - Lấy màu của TỪNG BỘ PHẬN (thân, nắp, viền) từ 'product_color_lock'. Nhúng CHẾT vào 'prod_dna'.
+       - Nhúng CHẾT màu sắc từng bộ phận (từ 'product_color_lock') vào 'prod_dna'.
        - Chèn vào cuối video_prompt và img_p: "Maintain EXACT original product colors for all parts (body, lid, details)."
 
     5. BỘ LỌC CHÍNH SÁCH VÀ ĐO LƯỜNG:
        - CẤM TUYỆT ĐỐI "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "trị dứt điểm", "thuốc". Dùng "hỗ trợ", "cực kỳ".
-       - Nệm/Thảm dùng từ ước lượng (VD: "dày khoảng 20 phân"). Liệt kê đa dạng kích thước nếu có. 
+       - Nệm/Thảm dùng từ ước lượng (VD: "dày khoảng 20 phân"). Liệt kê kích thước.
 
-    6. HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU. CẤM đọc số lẻ. Bắt buộc làm tròn số lên và dùng từ "CHƯA TỚI" hoặc "CHƯA ĐẾN". CẤM dùng "cành".
+    6. HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU KÈM LOGIC NỐI. CẤM đọc số lẻ. Dùng "CHƯA TỚI". CẤM "cành".
 
-    7. ĐẠO DIỄN VẬT LÝ CƠ HỌC: Mở nắp nồi cơm/tủ BẮT BUỘC mô tả cơ học: "lid springing open upwards naturally along the hinge". Gió: "Invisible wind causing the fabric to flutter gently".
+    7. ĐẠO DIỄN VẬT LÝ CƠ HỌC: Mở nắp nồi cơm/tủ BẮT BUỘC mô tả: "lid springing open upwards naturally along the hinge". Gió: "Invisible wind causing the fabric to flutter gently".
 
     8. KHÔNG CHỮ VÀ KHÔNG UI/ICON (ANTI-UI/TEXT LOCK): 
-       - BẮT BUỘC CHÈN LỆNH NÀY vào CUỐI tất cả `img_p` và `vid_p`: "NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
-       - Khi KOC chỉ tay xuống dưới, TUYỆT ĐỐI KHÔNG nhắc đến "cart", "button", "icon" trong prompt tiếng Anh.
+       - CHÈN VÀO CUỐI `img_p` và `vid_p`: "NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
+       - Khi KOC chỉ tay xuống, TUYỆT ĐỐI KHÔNG nhắc đến "cart", "button", "icon".
     
     9. ĐỒNG NHẤT KHÔNG GIAN VÀ TRANG PHỤC: Khóa chặt `global_outfit_en` và `global_setting_en` cho mọi phân cảnh. KHÔNG nhảy bối cảnh.
     10. {narrator_instruction}
@@ -354,8 +350,8 @@ def create_scene_details(target_id, mode, style):
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
-    audio_instruction = 'TRONG TẤT CẢ vid_p BẮT BUỘC chèn lệnh: Audio: "[Chỉ copy 5-7 từ đầu tiên của voiceover]"' if is_on_camera else 'KHÔNG chèn Audio vào vid_p.'
-    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ (4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
+    audio_instruction = 'TRONG TẤT CẢ vid_p BẮT BUỘC chèn lệnh: Audio: "[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG CỦA VOICEOVER VÀO ĐÂY]"' if is_on_camera else 'KHÔNG chèn Audio vào vid_p.'
+    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tốc độ (4.8 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | PHÂN TÍCH DNA: {dna_data_ctx}
@@ -363,16 +359,12 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
-    - BẢNG TRA CỨU THỜI GIAN (ĐÃ TRỪ HAO DẤU PHẨY, CẤM DÙNG PHÉP CHIA): Viết thoại xong, đếm số từ điền vào 'word_count'. SAU ĐÓ BẮT BUỘC TRA BẢNG NÀY ĐỂ GÁN 'dur':
-      + 1 đến 14 từ -> Gán "4s"
-      + 15 đến 22 từ -> Gán "6s"
-      + 23 đến 30 từ -> Gán "8s"
-      + 31 đến 38 từ -> Gán "10s" (TUYỆT ĐỐI cấm viết quá 38 từ/cảnh).
-    - ĐẠO DIỄN NHỊP ĐỘ: Cảnh 1 dứt khoát. Cảnh 2 và 3 BẮT BUỘC PHẢI SIÊU TỐC, X2 TỐC ĐỘ, ÉP SALE LIÊN THANH bằng cách nhồi rất nhiều thông tin.
+    - TOÁN HỌC THỜI GIAN LINH HOẠT: Để video đồng nhất tốc độ 100%, đếm tổng số từ và số lượng dấu phẩy của voiceover. Tính 'dur' = Làm tròn (Số từ / 4.8 + Số dấu phẩy * 0.5s). Gán trực tiếp số giây này (VD: "5s", "9s"). CẤM ép vào mốc cứng.
+    - ĐỒNG NHẤT TỐC ĐỘ: Không được chỗ nhanh chỗ chậm. Đạo diễn nhịp độ phải đồng nhất.
     - CHIA ĐỀU VẾ CÂU (SYLLABLE BALANCING): Các vế câu ngăn cách bởi dấu phẩy phải dài ngang nhau để nhịp đọc trôi chảy. Tự nhiên. Không ngắt vụn.
-    - PURE VOICEOVER: Trường `voiceover` CHỈ CHỨA CHỮ ĐỂ ĐỌC. Cấm TUYỆT ĐỐI các ngoặc đơn chỉ đạo (VD: cấm "(mỉm cười)").
+    - PURE VOICEOVER & FULL AUDIO IN PROMPT: 'voiceover' KHÔNG chứa ngoặc đơn. Trong 'vid_p', PHẢI CHÉP LẠI TOÀN BỘ 100% lời thoại vào phần Audio, cấm cắt xén.
     - BỘ LỌC CHÍNH SÁCH: Cấm "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc". Nệm/Thảm phải dùng "dày khoảng 20 phân", liệt kê các kích thước.
-    - HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY CẢNH 1. CẤM đọc số lẻ. Làm tròn số lên và dùng "CHƯA TỚI".
+    - HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN CẢNH 1. CẤM đọc số lẻ. Làm tròn số lên và dùng "CHƯA TỚI".
     - KHÓA MÀU SẮC VÀ BỐI CẢNH: Dùng chung `global_setting_en`, `global_outfit_en`. Lấy màu chi tiết nhúng CHẾT vào 'prod_dna'.
     - ANTI-UI/TEXT LOCK: Khi KOC chỉ tay, KHÔNG nhắc đến "cart, button, icon". Chèn chuỗi cấm UI/Text vào cuối mọi ảnh/video.
     
@@ -390,14 +382,14 @@ def create_scene_details(target_id, mode, style):
             {{
                 "scene": 1, 
                 "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ.",
-                "dur": "TRA BẢNG NGHIÊM NGẶT: <=14 từ gán 4s; 15-22 từ gán 6s; 23-30 từ gán 8s; 31-38 từ gán 10s. (Ví dụ 30 từ BẮT BUỘC gán 8s)", 
+                "dur": "TÍNH TOÁN = (word_count / 4.8) + (số dấu phẩy * 0.5s). Ghi kết quả làm tròn (VD: 5s, 7s, 9s, 11s)", 
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
                 "action_en": "Miêu tả hành động. CẤM NHẮC ĐẾN NÚT/GIỎ HÀNG.",
-                "director": "Phân cảnh 1: Dứt khoát | Phân cảnh 2 & 3: SIÊU TỐC, DỒN DẬP X2 | Phân cảnh cuối: Chốt sale mạnh mẽ", 
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Nhịp độ: ĐỒNG NHẤT 100% CẢ VIDEO, Dồn dập", 
                 "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) NGẮT NGHỈ TỰ NHIÊN, CÂN XỨNG. CẤM BỎ NGOẶC ĐƠN VÀO. LÀM TRÒN GIÁ TIỀN (CHƯA TỚI). CẤM ĐỌC SỐ LẺ. LÁCH TỪ VI PHẠM.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product colors for all parts. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
-                "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[LẤY 5-7 TỪ ĐẦU CỦA VOICOVER]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
+                "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY VÀ KHÔNG ĐƯỢC CẮT XÉN]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
             }}
             // ... Tiếp tục các cảnh khác. BẮT BUỘC SỬ DỤNG LẠI [global_setting_en] và [global_outfit_en].
         ]
@@ -772,8 +764,7 @@ if num_chars > 0:
 
 btn_gen_main_ph = st.empty()
 if st.session_state.get("loading_gen_main", False):
-    btn_gen_main_ph.empty()
-    st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 14px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đạo diễn AI đang quét OCR hình ảnh và sinh kịch bản... Vui lòng đợi!</div>", unsafe_allow_html=True)
+    btn_gen_main_ph.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 14px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đạo diễn AI đang quét OCR hình ảnh và sinh kịch bản... Vui lòng đợi!</div>", unsafe_allow_html=True)
     lock_ui()
     try:
         st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
