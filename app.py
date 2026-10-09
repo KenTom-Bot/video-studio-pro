@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V44.0 (NATURAL EYE-LEVEL POSTURE & HIGH-ENERGY HOOK)
+# 2. HÀM AI LÕI & LUẬT THÉP V45.0 (UNIFORM PACING & HIGH-IMPACT CHEST VOICE)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -277,9 +277,9 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {strat_cmd}
     
     🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
-    1. TÔNG GIỌNG BÙNG NỔ NĂNG LƯỢNG, ĐANH THÉP, DỒN DẬP NHƯNG TỰ NHIÊN:
-       - Thoại BẮT BUỘC phải dứt khoát, mang nhịp độ nhanh (4.2 - 4.5 từ/giây), nhấn mạnh vào từ khóa trọng tâm.
-       - CẤM TIỆT lối nói ru ngủ, văn vở, đều đều. Phải có sự tự tin, hoạt ngôn, kích thích tò mò cao.
+    1. ĐỒNG NHẤT NHỊP ĐỘ NHANH & NỘI LỰC MẠNH MẼ TRÊN TẤT CẢ PHÂN CẢNH:
+       - Thoại phải dứt khoát, ngắt nhịp đanh thép, năng lượng cao và đồng đều từ đầu đến cuối video (4.3 - 4.5 từ/giây).
+       - TUYỆT ĐỐI CẤM văn phong đều đều, nhẹ nhàng, buồn ngủ, rề rà. Mỗi câu phải có trọng lượng, nhấn thẳng vào động từ hành động và lợi ích vượt trội.
     2. BỘ LỌC CHÍNH SÁCH VĨNH VIỄN (MỌI NGÀNH HÀNG): CẤM TUYỆT ĐỐI các từ "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "thuốc", "đặc trị", "trị dứt điểm", "trị bệnh". Phải dùng "cực kỳ", "rất", "hỗ trợ", "cải thiện". 
     3. PERSONA HÀ NỘI CHUẨN: Lời thoại mang đậm chất Bắc Bộ dứt khoát (nhé, này, thế, dùng, không). CẤM TUYỆT ĐỐI từ miền Nam: "nha", "nè", "nghen", "vô", "xài", "dzậy".
     4. CẤU TRÚC THOẠI VÀ DẤU CÂU (NHỊP THỞ TỰ NHIÊN): Sử dụng dấu phẩy (,) ngắt nghỉ cân xứng theo cụm ý. TUYỆT ĐỐI KHÔNG lạm dụng dấu phẩy làm ngắt vụn câu.
@@ -299,64 +299,60 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp trước ống kính. Chèn lệnh `Audio:` vào `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
     
     if "TikTok Shop" in mode:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Tông giọng MẠNH MẼ, ĐANH THÉP, NHẢ CHỮ NHANH VÀ DỨT KHOÁT, NĂNG LƯỢNG CAO CUỐN HÚT (Tốc độ đọc thực tế 4.2 - 4.5 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Giọng ngực (chest voice) ĐẦY NỘI LỰC, ĐANH THÉP, NHẢ CHỮ NHANH VÀ DỨT KHOÁT, ĐỒNG NHẤT NHỊP ĐỘ (4.3 - 4.5 từ/giây)."
     else:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Hào hứng, tự nhiên, nhịp độ hoạt ngôn cuốn hút (Tốc độ 3.5 - 3.8 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Hào hứng, tự nhiên, nhịp độ hoạt ngôn cuốn hút, đồng nhất tốc độ (3.5 - 3.8 từ/giây)."
 
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL ĐỈNH CAO CHO VEO 3. PHONG CÁCH: {style}
     
-    🛑 QUY TẮC KHỚP THỜI GIAN, TƯ THẾ TỰ NHIÊN VÀ CHỈ ĐẠO DIỄN XUẤT:
-    1. KHÓA TƯ THẾ ĐỨNG THẲNG TỰ NHIÊN & GÓC MÁY NGANG TẦM MẮT (UPRIGHT NATURAL STANCE - CỰC KỲ QUAN TRỌNG):
-       - TUYỆT ĐỐI CẤM NHÂN VẬT CÚI GẬP NGƯỜI, KHOM LƯNG XUỐNG BÀN (NO leaning forward, NO awkward crouching, NO hunching).
-       - BẮT BUỘC miêu tả tư thế đứng thẳng thanh lịch: "Upright relaxed standing posture, direct eye-level shot, squared shoulders, head held naturally with confident posture".
-       - Thao tác cầm sản phẩm ngang ngực: "holding and presenting the product naturally at mid-chest height toward the camera with one hand, other hand gesturing naturally".
+    🛑 QUY TẮC KHỚP SỐ TỪ - THỜI LƯỢNG CHUẨN XÁC & ĐỒNG NHẤT NỘI LỰC:
+    1. BẢNG KHỚP SỐ TỪ - THỜI GIAN ĐỒNG BỘ TUYỆT ĐỐI (4.3 - 4.5 TỪ/GIÂY, CHỐNG THỪA/THIẾU VOICE):
+       - Để thời gian video vừa khít với lời thoại, BẮT BUỘC viết đúng khung số từ sau:
+         + 4 giây ➔ BẮT BUỘC viết từ 16 đến 18 từ
+         + 6 giây ➔ BẮT BUỘC viết từ 25 đến 27 từ
+         + 8 giây ➔ BẮT BUỘC viết từ 34 đến 36 từ
+         + 10 giây ➔ BẮT BUỘC viết từ 42 đến 45 từ
+         + CÁC MỐC THỜI LƯỢNG CHỈ ĐƯỢC PHÉP LÀ "4s", "6s", "8s", "10s". TUYỆT ĐỐI KHÔNG DÙNG MỐC KHÁC.
+       - TRẦN THỜI GIAN CỨNG 10S: Mọi phân cảnh <= 10s. Nếu lượng thông tin dài quá 45 từ, BẮT BUỘC TÁCH LÀM 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans': "Nối tiếp liền mạch từ cảnh trước".
 
-    2. BIỂU CẢM KHUÔN MẶT VÀ HÌNH THỂ SỐNG ĐỘNG NHƯ NGƯỜI THẬT (VIVID NATURAL HUMAN ACTING):
-       - CẤM NHĂN MẶT, TRỢN MẮT CĂNG THẲNG HOẶC ĐỨNG ĐƠ CỨNG.
-       - Chỉ đạo biểu cảm cuốn hút: "Bright animated eyes, authentic lively expression of exciting discovery, natural micro-smile, fast and clear lip-sync articulation matching dialogue energy, gentle confident head nods".
-       - Khiến người xem cảm nhận đây là một KOC người thật xinh đẹp, duyên dáng, hoạt ngôn và tràn đầy năng lượng.
+    2. ĐỒNG NHẤT NỘI LỰC VÀ BIỂU CẢM HÌNH THỂ MẠNH MẼ:
+       - Tất cả các phân cảnh từ đầu đến cuối phải giữ vững một cường độ giọng nói: đanh thép, chắc khỏe, nhả chữ dứt điểm, không hụt hơi.
+       - Trong `action_en`, BẮT BUỘC chỉ đạo diễn xuất hình thể và cơ mặt có nội lực:
+         + Ánh mắt & cơ mặt: "intense focused eye contact, animated facial micro-expressions showing unwavering confidence and high authority, crisp energetic speech articulation".
+         + Hình thể: "upright natural posture (NO crouching, NO leaning forward, NO hunching), decisive rhythmic hand movements emphasizing key phrases, sharp assertive gestures matching speech impact".
 
-    3. BẢNG KHỚP SỐ TỪ - THỜI GIAN NHANH MẠNH (TỐC ĐỘ 4.2 - 4.5 TỪ/S):
-       - Nhịp độ đọc dứt khoát, năng lượng cao, không rề rà:
-         + Từ 1 đến 15 từ ➔ Gán "dur": "4s"
-         + Từ 16 đến 24 từ ➔ Gán "dur": "6s" (Đoạn 20-22 từ nhả chữ dứt khoát khớp 6s)
-         + Từ 25 đến 33 từ ➔ Gán "dur": "8s"
-         + Từ 34 đến 40 từ ➔ Gán "dur": "10s"
-         + TUYỆT ĐỐI CẤM VIẾT QUÁ 40 TỪ TRONG MỘT PHÂN CẢNH.
-       - TRẦN THỜI GIAN CỨNG 10S: Mọi phân cảnh <= 10s. Nếu nội dung vượt quá 40 từ, BẮT BUỘC TÁCH LÀM 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans': "Nối tiếp liền mạch từ cảnh trước".
-
-    4. KHÓA CƠ HỌC VẬT LÝ VÀ CHỐNG TỰ SINH CHI TIẾT THỪA (ZERO-MUTATION MECHANICAL LOCK):
+    3. KHÓA CƠ HỌC VẬT LÝ VÀ CHỐNG TỰ SINH CHI TIẾT THỪA (ZERO-MUTATION MECHANICAL LOCK):
        - TUYỆT ĐỐI CẤM AI TỰ BỊA CHI TIẾT THỪA: Không tự vẽ thêm quai xách cong, tay cầm thừa, hay núm nắp lạ nếu ảnh gốc không có.
        - Cơ chế nắp dựa theo 'lid_mechanism':
          + Nếu nắp bản lề: "Lid swings upward strictly along the fixed rear hinge axis from 0 to 80 degrees. The base and side casing remain 100% static and rigid without morphing."
          + Thao tác ngón tay chính xác: "Forefinger clicks the top front release latch, latch clicks open, spring-loaded lid pops upward along the rear pivot."
          + CẤM nắp tự bay lên trời hoặc người mở chạm vào hư không.
 
-    5. PURE VOICEOVER & FULL AUDIO SYNC (CỰC KỲ QUAN TRỌNG):
+    4. PURE VOICEOVER & FULL AUDIO SYNC (CỰC KỲ QUAN TRỌNG):
        - Thoại BẮT BUỘC mang năng lượng mạnh mẽ, nhả chữ đanh thép dứt khoát. CẤM thoại đều đều.
        - Trường `voiceover` TUYỆT ĐỐI CHỈ CHỨA CHỮ ĐỂ ĐỌC. CẤM mọi ngoặc đơn chỉ đạo diễn xuất.
        - TRONG `vid_p`: Chép CHÍNH XÁC VÀ ĐẦY ĐỦ 100% nội dung của trường `voiceover` vào Audio: "...". TUYỆT ĐỐI KHÔNG ĐƯỢC CẮT BỚT.
 
-    6. KHÓA MÀU SẮC ĐA BỘ PHẬN (MULTI-PART COLOR LOCK):
+    5. KHÓA MÀU SẮC ĐA BỘ PHẬN (MULTI-PART COLOR LOCK):
        - Lấy màu TỪNG BỘ PHẬN (thân, nắp, viền) từ 'product_color_lock'. Nhúng CHẾT vào 'prod_dna'.
        - Chèn vào cuối video_prompt và img_p: "Maintain EXACT original product colors for all parts (body, lid, details). Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures."
 
-    7. BỘ LỌC CHÍNH SÁCH VÀ ĐO LƯỜNG:
+    6. BỘ LỌC CHÍNH SÁCH VÀ ĐO LƯỜNG:
        - CẤM: "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "trị dứt điểm", "thuốc". Dùng "hỗ trợ".
        - Nệm/Thảm: Dùng từ ước lượng (VD: "dày khoảng 20 phân"). Liệt kê kích thước.
 
-    8. CÔNG THỨC GIÁ OMNI-CHANNEL (ĐA NỀN TẢNG): 
+    7. CÔNG THỨC GIÁ OMNI-CHANNEL (ĐA NỀN TẢNG): 
        - Neo bằng Giá Gốc làm tròn. GIẤU KÍN GIÁ SALE. Thay bằng: "...bấm ngay vào giỏ hàng để nhận giá xả kho cực sốc". 
        - Kèm câu miễn trừ: "Lưu ý ưu đãi có hạn và giá có thể thay đổi tùy thời điểm nhé".
 
-    9. KHÔNG CHỮ VÀ KHÔNG UI/ICON (ANTI-UI/TEXT LOCK): 
+    8. KHÔNG CHỮ VÀ KHÔNG UI/ICON (ANTI-UI/TEXT LOCK): 
        - BẮT BUỘC CHÈN: "NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
        - Khi KOC chỉ tay xuống, TUYỆT ĐỐI KHÔNG nhắc đến "cart", "button", "icon" trong prompt tiếng Anh.
     
-    10. ĐỒNG NHẤT KHÔNG GIAN VÀ TRANG PHỤC: Khóa chặt `global_outfit_en` và `global_setting_en` cho mọi phân cảnh.
-    11. {narrator_instruction}
-    12. {char_rules}
+    9. ĐỒNG NHẤT KHÔNG GIAN VÀ TRANG PHỤC: Khóa chặt `global_outfit_en` và `global_setting_en` cho mọi phân cảnh.
+    10. {narrator_instruction}
+    11. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style):
@@ -374,7 +370,7 @@ def create_scene_details(target_id, mode, style):
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
     audio_instruction = 'TRONG TẤT CẢ vid_p BẮT BUỘC chèn lệnh: Audio: "[CHÉP LẠI TOÀN BỘ 100% CÂU THOẠI TRONG VOICEOVER, CẤM CẮT XÉN]"' if is_on_camera else 'KHÔNG chèn Audio vào vid_p.'
-    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Tông giọng MẠNH MẼ, ĐANH THÉP, NHANH, DỒN DẬP, NHẤN MẠNH TỪ KHÓA TRỌNG TÂM (4.2 - 4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm, Tự nhiên."
+    voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Giọng ngực (chest voice) ĐẦY NỘI LỰC, ĐANH THÉP, NHẢ CHỮ NHANH VÀ DỨT KHOÁT, ĐỒNG NHẤT NHỊP ĐỘ (4.3 - 4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm, Tự nhiên."
 
     prompt = f"""
     DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | PHÂN TÍCH DNA: {dna_data_ctx}
@@ -382,18 +378,19 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
+    - BẢNG QUY ĐỔI SỐ TỪ - THỜI LƯỢNG CHUẨN XÁC (TỐC ĐỘ 4.3 - 4.5 TỪ/S, KHÔNG THỪA KHÔNG THIẾU):
+      + Phân cảnh 4s ➔ BẮT BUỘC viết từ 16 đến 18 từ
+      + Phân cảnh 6s ➔ BẮT BUỘC viết từ 25 đến 27 từ
+      + Phân cảnh 8s ➔ BẮT BUỘC viết từ 34 đến 36 từ
+      + Phân cảnh 10s ➔ BẮT BUỘC viết từ 42 đến 45 từ
+      + CHỈ ĐƯỢC CHỌN THỜI LƯỢNG LÀ 4s, 6s, 8s, HOẶC 10s.
+    - ĐỒNG NHẤT NỘI LỰC MỌI CẢNH: Cả video giữ nguyên một nhịp độ nhanh, đanh thép, giọng ngực khỏe khoắn, không tụt năng lượng ở cảnh giữa.
     - TƯ THẾ ĐỨNG THẲNG TỰ NHIÊN & GÓC NGANG TẦM MẮT (action_en): 
       + TUYỆT ĐỐI CẤM NHÂN VẬT CÚI GẬP NGƯỜI, CÚI MẶT XUỐNG BÀN (NO leaning forward, NO crouching, NO hunching).
       + Nhân vật đứng thẳng lưng thanh lịch, góc máy ngang tầm mắt (eye-level shot), hai tay cầm và giới thiệu sản phẩm tự nhiên ngang ngực (mid-chest height).
-      + Biểu cảm tươi tắn, ánh mắt sáng lôi cuốn, nụ cười nhẹ tự tin, cử chỉ tay linh hoạt tự nhiên như KOC người thật.
-    - BẢNG TRA SỐ TỪ - THỜI LƯỢNG NHANH GỌN (TỐC ĐỘ 4.2 - 4.5 TỪ/S):
-      + 1 đến 15 từ -> "4s"
-      + 16 đến 24 từ -> "6s" (Đoạn 20-22 từ nhả chữ dứt khoát khớp 6s)
-      + 25 đến 33 từ -> "8s"
-      + 34 đến 40 từ -> "10s"
-      + TUYỆT ĐỐI CẤM VIẾT QUÁ 40 TỪ TRONG MỘT CẢNH.
+      + Biểu cảm tự tin, ánh mắt sắc sảo tập trung, cử chỉ tay dứt khoát đồng bộ với lời nói.
     - TRẦN THỜI GIAN TỐI ĐA 10S: Mọi phân cảnh BẮT BUỘC có thời lượng <= 10s (chỉ chọn trong 4s, 6s, 8s, 10s).
-    - TỰ ĐỘNG TÁCH CẢNH NỐI TIẾP: Nếu nội dung dài vượt quá 40 từ, BẮT BUỘC TÁCH THÀNH 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans: "Nối tiếp liền mạch từ cảnh trước"'.
+    - TỰ ĐỘNG TÁCH CẢNH NỐI TIẾP: Nếu nội dung dài vượt quá 45 từ, BẮT BUỘC TÁCH THÀNH 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans: "Nối tiếp liền mạch từ cảnh trước"'.
     - KHÓA CƠ HỌC VÀ CHỐNG CHI TIẾT THỪA: Dựa vào 'lid_mechanism' và 'product_color_lock' để miêu tả ngón tay bấm nút nhả chốt và nắp mở dọc trục bản lề 0-80 độ. Cấm tự vẽ quai xách thừa.
     - CẤU TRÚC THOẠI HÀ NỘI: BẮT BUỘC NGẮT NGHỈ BẰNG DẤU PHẨY (,) CÂN BẰNG. Văn phong HÀ NỘI GỐC (Cấm: nha, nè, vô).
     - BỘ LỌC CHÍNH SÁCH: Cấm "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc". Nệm/Thảm phải dùng "dày khoảng 20 phân", liệt kê kích thước.
@@ -416,11 +413,11 @@ def create_scene_details(target_id, mode, style):
             {{
                 "scene": 1, 
                 "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ.",
-                "dur": "4s/6s/8s/10s (Tra bảng chuẩn: 1-15 từ -> 4s, 16-24 từ -> 6s, 25-33 từ -> 8s, 34-40 từ -> 10s)", 
+                "dur": "4s/6s/8s/10s (Bắt buộc khớp chuẩn: 16-18 từ -> 4s, 25-27 từ -> 6s, 34-36 từ -> 8s, 42-45 từ -> 10s)", 
                 "trans": "Chuyển cảnh mới hoặc Nối tiếp liền mạch từ cảnh trước", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
                 "action_en": "Direct eye-level shot. Character stands upright in a relaxed and natural posture (NO crouching, NO leaning forward, NO awkward hunching). Holds and presents the product naturally at mid-chest height toward camera. Expressive bright eyes, engaging authentic micro-smile, crisp natural mouth articulation syncing to dialogue cadence, elegant purposeful hand gestures.",
-                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Tông: Mạnh mẽ, đanh thép, nhả chữ dứt khoát, dồn dập cuốn hút, nhấn trọng âm từng cụm ý", 
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Tông: Giọng ngực đầy nội lực, đanh thép, nhả chữ dứt khoát, nhịp độ dồn dập đồng nhất (4.3 - 4.5 từ/s)", 
                 "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) NGẮT NGHỈ TỰ NHIÊN, CÂN XỨNG. TÔNG GIỌNG MẠNH MẼ KHÔNG ĐỀU ĐỀU. CẤM BỎ NGOẶC ĐƠN VÀO. CHỈ ĐỌC GIÁ GỐC ĐỂ NEO, GIẤU KÍN GIÁ SALE. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
                 "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], standing upright naturally with squared shoulders and relaxed confident posture. Action: [action_en]. Product: [prod_dna] held at mid-chest height. Maintain EXACT original product colors for all parts. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
                 "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], standing upright naturally without hunching or awkward crouching. Action: [action_en]. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY, KHÔNG CẮT BỚT]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
