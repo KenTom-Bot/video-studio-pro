@@ -197,7 +197,7 @@ for key, default_val in [
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", ""), ("last_style", ""), ("last_narrator", ""),
     ("target_duration_instruction", ""), ("character_profiles", []), 
-    ("editing_acc_email", None), ("current_project_id", None)
+    ("editing_acc_email", None), ("current_project_id", None), ("load_more", False)
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V39.0 (HARD MECHANICAL & ZERO MUTATION LOCK)
+# 2. HÀM AI LÕI & LUẬT THÉP V40.0 (KHẮC PHỤC TREO NÚT TẠO THÊM & BẢO TOÀN TẤT CẢ)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -873,15 +873,23 @@ if all_sc:
                 if st.session_state.get(ck, False):
                     btn_clone_ph.empty()
                     st.markdown("<div style='background: #fef2f2; color: #dc2626; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
-                    lock_ui(); 
-                    try: st.session_state.cloned_scripts.extend(clone_script(sc_id)); st.toast("✅ Đã clone!")
-                    except Exception as e: st.error(f"❌ Lỗi: {e}")
-                    st.session_state[ck] = False; st.rerun()
+                    lock_ui()
+                    try: 
+                        st.session_state.cloned_scripts.extend(clone_script(sc_id))
+                        st.toast("✅ Đã clone!")
+                    except Exception as e: 
+                        st.error(f"❌ Lỗi: {e}")
+                    finally:
+                        st.session_state[ck] = False
+                        st.rerun()
                 else:
                     if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True):
                         can_run, msg = check_usage_limit(st.session_state.current_email)
-                        if can_run: st.session_state[ck] = True; st.rerun()
-                        else: st.error(msg)
+                        if can_run: 
+                            st.session_state[ck] = True
+                            st.rerun()
+                        else: 
+                            st.error(msg)
 
     st.markdown("<br>### ⏳ **2. Kịch Bản Đang Chờ Dựng**", unsafe_allow_html=True)
     if not pend_sc: st.success("🎉 Đã hoàn thiện toàn bộ danh sách.")
@@ -901,18 +909,23 @@ if all_sc:
                     lock_ui()
                     try:
                         create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
-                        st.session_state.active_script_id = sc_id; st.session_state.scroll_to_detail = True; st.toast("✅ Hoàn tất dựng!")
-                        time.sleep(0.5)
-                        st.rerun()
+                        st.session_state.active_script_id = sc_id
+                        st.session_state.scroll_to_detail = True
+                        st.toast("✅ Hoàn tất dựng!")
                     except Exception as e: 
                         st.error(f"❌ Lỗi: {e}")
-                        st.session_state[ck] = False; st.rerun()
-            
+                    finally:
+                        st.session_state[ck] = False
+                        time.sleep(0.5)
+                        st.rerun()
                 else:
                     if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True):
                         can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
-                        if can_run: st.session_state[ck] = True; st.rerun()
-                        else: st.error(msg)
+                        if can_run: 
+                            st.session_state[ck] = True
+                            st.rerun()
+                        else: 
+                            st.error(msg)
 
     st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
@@ -940,13 +953,19 @@ if all_sc:
             p_chars = [{"id": c["id"], "role": c["role"]} for c in e_chars] if e_chars else st.session_state.character_profiles
             new_sc = generate_more_scripts(c_ang, c_num, e_chars, c_nar, c_dur_str, p_chars)
             st.session_state.expanded_scripts.extend(new_sc)
-            st.session_state.scroll_to_top = True; st.toast("✅ Đã sinh thêm 5 kịch bản!")
+            st.session_state.scroll_to_top = True
+            st.toast("✅ Đã sinh thêm 5 kịch bản!")
+        except Exception as e:
+            st.error(f"❌ Lỗi: {e}")
+        finally:
+            st.session_state.load_more = False
             time.sleep(0.5)
             st.rerun()
-        except Exception as e: st.error(f"❌ Lỗi: {e}")
-        st.session_state.load_more = False; st.rerun()
     else:
         if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True):
             can_run, msg = check_usage_limit(st.session_state.current_email)
-            if can_run: st.session_state.load_more = True; st.rerun()
-            else: st.error(msg)
+            if can_run:
+                st.session_state.load_more = True
+                st.rerun()
+            else:
+                st.error(msg)
