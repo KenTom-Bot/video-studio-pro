@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V38.0 (HIGH-ENERGY VOICE & VIVID EXPRESSIONS LOCK)
+# 2. HÀM AI LÕI & LUẬT THÉP V39.0 (HARD MECHANICAL & ZERO MUTATION LOCK)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -277,7 +277,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {strat_cmd}
     
     🛑 QUY TẮC CỐT LÕI (TUÂN THỦ 100%):
-    1. TÔNG GIỌNG MẠNH MẼ, KHÔNG ĐỀU ĐỀU: Thoại phải có ngữ điệu lên bổng xuống trầm, mang năng lượng cao, dứt khoát của một KOC thực chiến. Sử dụng câu hỏi tu từ, ngắt nghỉ tương phản để cuốn người xem ngay từ giây đầu tiên. CẤM lối hành văn đều đều, buồn ngủ, hành chính.
+    1. TÔNG GIỌNG MẠNH MẼ, NHẤN TRỌNG ÂM TỪNG VẾ: Thoại phải có ngữ điệu lên bổng xuống trầm, năng lượng cao, dứt khoát. CẤM lối hành văn đều đều, bình bình, ru ngủ.
     2. BỘ LỌC CHÍNH SÁCH VĨNH VIỄN (MỌI NGÀNH HÀNG): CẤM TUYỆT ĐỐI các từ "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "thuốc", "đặc trị", "trị dứt điểm", "trị bệnh". Phải dùng "cực kỳ", "rất", "hỗ trợ", "cải thiện". 
     3. PERSONA HÀ NỘI CHUẨN: Lời thoại mang đậm chất Bắc Bộ (nhé, này, thế, dùng, không). CẤM TUYỆT ĐỐI từ miền Nam: "nha", "nè", "nghen", "vô", "xài", "dzậy".
     4. CẤU TRÚC THOẠI VÀ DẤU CÂU (NHỊP THỞ TỰ NHIÊN): Thoại câu dài trôi chảy, sử dụng dấu phẩy (,) ngắt nghỉ cân xứng theo cụm ý. TUYỆT ĐỐI KHÔNG lạm dụng dấu phẩy làm ngắt vụn câu chắp vá.
@@ -304,31 +304,34 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL ĐỈNH CAO CHO VEO 3. PHONG CÁCH: {style}
     
-    🛑 QUY TẮC QUAY DỰNG VÀ CHỈ ĐẠO DIỄN XUẤT:
+    🛑 QUY TẮC QUAY DỰNG VÀ CHỈ ĐẠO DIỄN XUẤT CƠ HỌC:
     1. KỶ LUẬT TRẦN THỜI GIAN 10 GIÂY & TỰ ĐỘNG TÁCH CẢNH NỐI TIẾP:
        - MỖI PHÂN CẢNH TUYỆT ĐỐI KHÔNG ĐƯỢC VƯỢT QUÁ 10 GIÂY. Các mốc chỉ được là "4s", "6s", "8s" hoặc "10s".
-       - Nếu nội dung dài vượt quá 38 từ, BẮT BUỘC PHẢI TỰ ĐỘNG CHIA LÀM 2 PHÂN CẢNH NỐI TIẾP NHAU (ví dụ Cảnh 2 và Cảnh 3).
-       - Cảnh nối tiếp thứ hai ghi rõ ở 'trans': "Nối tiếp liền mạch từ cảnh trước", duy trì góc quay và nhân vật liền mạch.
+       - Nếu nội dung dài vượt quá 38 từ, BẮT BUỘC TÁCH LÀM 2 PHÂN CẢNH NỐI TIẾP NHAU (Ví dụ: Cảnh 2 và Cảnh 3).
+       - Cảnh thứ hai ghi 'trans': "Nối tiếp liền mạch từ cảnh trước", duy trì góc quay và nhân vật.
        - BẢNG TRA SỐ TỪ: 1-14 từ -> "4s"; 15-22 từ -> "6s"; 23-30 từ -> "8s"; 31-38 từ -> "10s". CẤM VIẾT QUÁ 38 TỪ TRONG MỘT CẢNH.
 
-    2. BIỂU CẢM CƠ MẶT VÀ HÌNH THỂ SỐNG ĐỘNG NHƯ NGƯỜI THẬT (VIVID HUMAN ACTING):
-       - CẤM NHÂN VẬT ĐỨNG YÊN ĐƠ CỨNG. Trong trường `action_en`, BẮT BUỘC chỉ đạo cơ mặt và hình thể chi tiết:
-         + Ánh mắt và chân mày: "expressive widened eyes, animated subtle eyebrow raise showing genuine surprise and delight".
-         + Khẩu hình: "sharp, clear, natural mouth articulation matching voice cadence perfectly".
-         + Ngôn ngữ hình thể: "confident forward-leaning posture, energetic and purposeful hand gestures illustrating key features, authentic welcoming head nods".
-       - Khiến người xem cảm nhận đây là một reviewer người thật 100% đang trực tiếp trải nghiệm và nói chuyện.
+    2. KHÓA CƠ HỌC VẬT LÝ VÀ CHỐNG TỰ SINH CHI TIẾT THỪA (ZERO-MUTATION MECHANICAL LOCK):
+       - TUYỆT ĐỐI CẤM AI TỰ BỊA CHI TIẾT THỪA: Không tự vẽ thêm quai xách cong, tay cầm thừa, hay núm nắp lạ nếu ảnh gốc không có.
+       - Với Nồi cơm/Thiết bị có nắp: QUY ĐỊNH RÕ CƠ CHẾ NẮP DỰA THEO 'lid_mechanism':
+         + Nếu nắp bản lề: "Lid swings upward strictly along the fixed rear hinge axis from 0 to 80 degrees. The base and side casing remain 100% static and rigid without morphing."
+         + Thao tác ngón tay chính xác: "Forefinger clicks the top front release latch, latch clicks open, spring-loaded lid pops upward along the rear pivot."
+         + CẤM nắp tự bay lên trời hoặc người mở chạm vào hư không.
 
-    3. CƠ CHẾ MỞ NẮP VẬT LÝ CHÍNH XÁC (PRECISION LATCH & HINGE MECHANICS):
-       - Dựa vào 'lid_mechanism' từ phân tích: Miêu tả rõ ngón tay thao tác đúng nút/chốt (VD: "Index finger presses the release button on top handle, latch disengages and lid springs open smoothly along rear hinge"). CẤM miêu tả nắp tự bay lên.
+    3. BIỂU CẢM CƠ MẶT VÀ HÌNH THỂ SỐNG ĐỘNG NHƯ NGƯỜI THẬT (VIVID HUMAN ACTING):
+       - Trong trường `action_en`, BẮT BUỘC chỉ đạo cơ mặt và hình thể:
+         + Ánh mắt & chân mày: "expressive widened eyes, animated subtle eyebrow raise showing genuine surprise and delight".
+         + Khẩu hình: "sharp, clear, natural mouth articulation matching voice cadence perfectly".
+         + Ngôn ngữ hình thể: "confident forward-leaning posture, energetic purposeful hand gestures, authentic welcoming head nods".
 
     4. PURE VOICEOVER & FULL AUDIO SYNC (CỰC KỲ QUAN TRỌNG):
-       - Thoại BẮT BUỘC mang năng lượng mạnh mẽ, nhấn nhá trọng âm rõ ràng. CẤM thoại bằng phẳng đều đều.
-       - Trường `voiceover` TUYỆT ĐỐI CHỈ CHỨA CHỮ ĐỂ ĐỌC. CẤM mọi ngoặc đơn chỉ đạo (VD: cấm "(cười)", "(chỉ tay)").
+       - Thoại BẮT BUỘC mang năng lượng mạnh mẽ, nhấn nhá trọng âm rõ ràng. CẤM thoại đều đều.
+       - Trường `voiceover` TUYỆT ĐỐI CHỈ CHỨA CHỮ ĐỂ ĐỌC. CẤM mọi ngoặc đơn chỉ đạo diễn xuất.
        - TRONG `vid_p`: Chép CHÍNH XÁC VÀ ĐẦY ĐỦ 100% nội dung của trường `voiceover` vào Audio: "...". TUYỆT ĐỐI KHÔNG ĐƯỢC CẮT BỚT.
 
     5. KHÓA MÀU SẮC ĐA BỘ PHẬN (MULTI-PART COLOR LOCK):
        - Lấy màu TỪNG BỘ PHẬN (thân, nắp, viền) từ 'product_color_lock'. Nhúng CHẾT vào 'prod_dna'.
-       - Chèn vào cuối video_prompt và img_p: "Maintain EXACT original product colors for all parts (body, lid, details)."
+       - Chèn vào cuối video_prompt và img_p: "Maintain EXACT original product colors for all parts (body, lid, details). Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures."
 
     6. BỘ LỌC CHÍNH SÁCH VÀ ĐO LƯỜNG:
        - CẤM: "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "trị dứt điểm", "thuốc". Dùng "hỗ trợ".
@@ -370,12 +373,14 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT:
+    - KHÓA CƠ HỌC VÀ CHỐNG CHI TIẾT THỪA (QUAN TRỌNG): 
+      + Dựa vào 'lid_mechanism' và 'product_color_lock': Miêu tả chuẩn xác cơ chế mở (nắp bản lề trục sau mở 0-80 độ, ngón tay bấm nút nhả chốt thực tế). 
+      + Tuyệt đối cấm AI tự vẽ thêm quai xách cong hoặc chi tiết thừa không có trên ảnh gốc.
     - NĂNG LƯỢNG THOẠI & BIỂU CẢM SỐNG ĐỘNG:
       + Thoại: Viết câu có nhịp dứt khoát, ngữ điệu cuốn hút, nhấn trọng âm rõ ràng vào giải pháp và lợi ích. CẤM câu văn bình bình đều đều.
       + Hình thể & Cơ mặt: Trong 'action_en', BẮT BUỘC chỉ đạo cơ mặt vi mô (ánh mắt sáng, chân mày nhướng nhẹ ngạc nhiên, nụ cười chân thực, cử chỉ tay dứt khoát, tư thế tự tin) để tạo cảm giác người thật 100%.
     - TRẦN THỜI GIAN TỐI ĐA 10S: Mọi phân cảnh BẮT BUỘC có thời lượng <= 10s (chỉ chọn trong 4s, 6s, 8s, 10s).
     - TỰ ĐỘNG TÁCH CẢNH NỐI TIẾP: Nếu nội dung dài vượt quá 38 từ, BẮT BUỘC TÁCH THÀNH 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans: "Nối tiếp liền mạch từ cảnh trước"'.
-    - THAO TÁC MỞ NẮP CHUẨN XÁC: Nếu có cảnh mở nắp nồi cơm/hộp/tủ, PHẢI DỰA VÀO 'lid_mechanism' trong DNA để miêu tả ngón tay bấm đúng nút/vị trí khóa.
     - BẢNG TRA CỨU SỐ TỪ: 1-14 từ -> "4s"; 15-22 từ -> "6s"; 23-30 từ -> "8s"; 31-38 từ -> "10s". TUYỆT ĐỐI KHÔNG VIẾT QUÁ 38 TỪ TRONG MỘT CẢNH.
     - CẤU TRÚC THOẠI HÀ NỘI: BẮT BUỘC NGẮT NGHỈ BẰNG DẤU PHẨY (,) CÂN BẰNG. Văn phong HÀ NỘI GỐC (Cấm: nha, nè, vô).
     - BỘ LỌC CHÍNH SÁCH: Cấm "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc". Nệm/Thảm phải dùng "dày khoảng 20 phân", liệt kê các kích thước.
@@ -401,11 +406,11 @@ def create_scene_details(target_id, mode, style):
                 "dur": "4s/6s/8s/10s (Tối đa 10s)", 
                 "trans": "Chuyển cảnh mới hoặc Nối tiếp liền mạch từ cảnh trước", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
-                "action_en": "Miêu tả hành động & biểu cảm sống động: expressive facial micro-expressions (widened energetic eyes, genuine smile, raised eyebrows), sharp mouth articulation, natural purposeful hand gestures, confident dynamic posture. CẤM NHẮC ĐẾN NÚT/GIỎ HÀNG KHI CHỈ TAY.",
-                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Tông: Mạnh mẽ, nhấn trọng âm từng vế câu, dồn dập, biểu cảm sống động", 
+                "action_en": "Miêu tả hành động & biểu cảm sống động (expressive facial micro-expressions, clear mouth articulation, natural purposeful gestures). Nếu mở nắp: Forefinger clicks the release latch, lid springs upward strictly along fixed rear hinge axis from 0 to 80 degrees, base remains rigid without morphing. CẤM NHẮC ĐẾN NÚT/GIỎ HÀNG KHI CHỈ TAY.",
+                "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Tông: Mạnh mẽ, nhấn trọng âm từng vế câu, dồn dập cuốn hút", 
                 "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) NGẮT NGHỈ TỰ NHIÊN, CÂN XỨNG. TÔNG GIỌNG MẠNH MẼ KHÔNG ĐỀU ĐỀU. CẤM BỎ NGOẶC ĐƠN VÀO. CHỈ ĐỌC GIÁ GỐC ĐỂ NEO, GIẤU KÍN GIÁ SALE. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
-                "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product colors for all parts. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
-                "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY, KHÔNG CẮT BỚT]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
+                "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product colors for all parts. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
+                "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY, KHÔNG CẮT BỚT]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
             }}
             // ... Tiếp tục các cảnh khác. Mỗi cảnh tối đa 10s, nếu nội dung dài tự động tách làm 2 cảnh nối tiếp.
         ]
@@ -691,17 +696,12 @@ with st.sidebar:
         limit = "Không giới hạn" if plan == "VIP" else (20 if plan == "Advanced" else (10 if plan == "Basic" else 3))
         st.info(f"**GÓI {plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Tạo chi tiết: **{used}/{limit}**\n• Hết hạn: {user_info.get('expires_at', '')}")
 
-        btn_logout_ph = st.empty()
-        if st.session_state.get("loading_logout", False):
-            btn_logout_ph.empty()
-            st.markdown("<div style='background: #eff6ff; border: 1px solid #93c5fd; padding: 8px; border-radius: 8px; color: #1e3a8a; text-align: center; font-weight: bold;'>⏳ Đang thoát...</div>", unsafe_allow_html=True)
-            lock_ui(); st.session_state.is_logged_in = False; st.session_state.loading_logout = False
-            st.toast("✅ Đăng xuất!")
-            time.sleep(0.5)
-            st.rerun()
-        else:
-            if btn_logout_ph.button("🚪 Đăng Xuất"): 
-                st.session_state.loading_logout = True; st.rerun()
+        if st.button("🚪 Đăng Xuất"): 
+            with st.spinner("⏳ Đang thoát..."):
+                st.session_state.is_logged_in = False
+                st.toast("✅ Đăng xuất!")
+                time.sleep(0.5)
+                st.rerun()
 
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
@@ -779,11 +779,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "core_value": "Giá trị cốt lõi", "pain_points": "Nỗi đau", "hook_element": "Yếu tố giữ chân",
                         "product_size_class": "Phân loại kích thước SP. Phân tích cách tương tác vật lý KHÔNG ẢO GIÁC.",
                         "product_color_lock": "QUÉT THỊ GIÁC TUYỆT ĐỐI CHÍNH XÁC: Bóc tách màu sắc chi tiết của TỪNG BỘ PHẬN sản phẩm từ ảnh tải lên (VD: Thân máy màu trắng, Nắp màu đen bóng, Viền mạ vàng...). CẤM bịa màu.",
-                        "lid_mechanism": "QUÉT CƠ CHẾ MỞ NẮP TỪ ẢNH: Phân tích xem nắp là nắp liền bản lề hay nắp rời. Vị trí nút bấm/chốt mở nằm ở đâu (trên tay cầm nắp, mặt trước thân máy, hay núm nhấc rời).",
+                        "lid_mechanism": "QUÉT CƠ CHẾ MỞ NẮP TỪ ẢNH: Phân tích xem nắp là nắp liền bản lề hay nắp rời. Vị trí nút bấm/chốt mở nằm ở đâu (trên tay cầm nắp, mặt trước thân máy, hay núm nhấc rời). Khóa cố định không vẽ thêm quai xách.",
                         "detected_prices": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Đọc kĩ ảnh tải lên để tìm Giá Gốc và Giá Sale (nếu có). Trích xuất nguyên bản text.",
                         "product_dimensions": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Quét ảnh tìm thông số kích thước thực tế. Nệm/Thảm BẮT BUỘC dùng từ 'Độ dày' kèm ước lượng (khoảng), TUYỆT ĐỐI KHÔNG dùng 'Chiều cao'. Nếu có nhiều kích thước thì liệt kê.",
                         "voice_gender": "Phân tích xem sản phẩm này hợp giọng Nam hay Nữ để đọc thoại",
-                        "prompt_dna_lock": "Khóa thị giác (Visual DNA) cho AI sinh video."
+                        "prompt_dna_lock": "Khóa thị giác (Visual DNA) cho AI sinh video. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures."
                     }},
                     "outlines": [ 
                         {{
@@ -893,17 +893,26 @@ if all_sc:
                 c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
                 c1.caption(f"⚡ *{outline.get('hook', 'Nội dung cốt lõi')}*")
                 
-                if c2.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True):
-                    can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
-                    if can_run:
-                        with st.spinner("⏳ Đang đếm từ và dựng kịch bản chi tiết..."):
-                            try:
-                                create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
-                                st.session_state.active_script_id = sc_id; st.session_state.scroll_to_detail = True; st.toast("✅ Hoàn tất dựng!")
-                                time.sleep(0.5)
-                                st.rerun()
-                            except Exception as e: st.error(f"❌ Lỗi: {e}")
-                    else: st.error(msg)
+                ck = f"load_cre_{sc_id}"
+                btn_cre_ph = c2.empty()
+                if st.session_state.get(ck, False):
+                    btn_cre_ph.empty()
+                    st.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang dựng...</div>", unsafe_allow_html=True)
+                    lock_ui()
+                    try:
+                        create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
+                        st.session_state.active_script_id = sc_id; st.session_state.scroll_to_detail = True; st.toast("✅ Hoàn tất dựng!")
+                        time.sleep(0.5)
+                        st.rerun()
+                    except Exception as e: 
+                        st.error(f"❌ Lỗi: {e}")
+                        st.session_state[ck] = False; st.rerun()
+            
+                else:
+                    if btn_cre_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True):
+                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
+                        if can_run: st.session_state[ck] = True; st.rerun()
+                        else: st.error(msg)
 
     st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
@@ -922,16 +931,22 @@ if all_sc:
             e_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"ef_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
             if e_file: e_chars.append({"id": i+1, "role": e_role or "AI tự phân", "file": e_file})
 
-    if st.columns([1, 2, 1])[1].button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True):
-        can_run, msg = check_usage_limit(st.session_state.current_email)
-        if can_run: 
-            with st.spinner("⏳ Đang sáng tạo thêm 5 kịch bản mới..."):
-                try:
-                    p_chars = [{"id": c["id"], "role": c["role"]} for c in e_chars] if e_chars else st.session_state.character_profiles
-                    new_sc = generate_more_scripts(c_ang, c_num, e_chars, c_nar, c_dur_str, p_chars)
-                    st.session_state.expanded_scripts.extend(new_sc)
-                    st.session_state.scroll_to_top = True; st.toast("✅ Đã sinh thêm 5 kịch bản!")
-                    time.sleep(0.5)
-                    st.rerun()
-                except Exception as e: st.error(f"❌ Lỗi: {e}")
-        else: st.error(msg)
+    btn_more_ph = st.columns([1, 2, 1])[1].empty()
+    if st.session_state.get("load_more", False):
+        btn_more_ph.empty()
+        st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 12px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đang sáng tạo thêm 5 kịch bản...</div>", unsafe_allow_html=True)
+        lock_ui()
+        try:
+            p_chars = [{"id": c["id"], "role": c["role"]} for c in e_chars] if e_chars else st.session_state.character_profiles
+            new_sc = generate_more_scripts(c_ang, c_num, e_chars, c_nar, c_dur_str, p_chars)
+            st.session_state.expanded_scripts.extend(new_sc)
+            st.session_state.scroll_to_top = True; st.toast("✅ Đã sinh thêm 5 kịch bản!")
+            time.sleep(0.5)
+            st.rerun()
+        except Exception as e: st.error(f"❌ Lỗi: {e}")
+        st.session_state.load_more = False; st.rerun()
+    else:
+        if btn_more_ph.button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True):
+            can_run, msg = check_usage_limit(st.session_state.current_email)
+            if can_run: st.session_state.load_more = True; st.rerun()
+            else: st.error(msg)
