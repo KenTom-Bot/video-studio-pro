@@ -231,7 +231,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V35.0 (ANTI-PASSWORD-AUTOFILL & FULL SYNC)
+# 2. HÀM AI LÕI & LUẬT THÉP V35.0 (OMNI-CHANNEL PRICE HIDING & TIME MATH FIX)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -281,7 +281,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     2. PERSONA HÀ NỘI CHUẨN: Lời thoại mang đậm chất Bắc Bộ. CẤM TUYỆT ĐỐI từ miền Nam: "nha", "nè", "nghen", "vô", "xài", "dzậy".
     3. CẤU TRÚC THOẠI VÀ DẤU CÂU (NHỊP THỞ TỰ NHIÊN): Ưu tiên thoại câu dài trôi chảy. Sử dụng dấu phẩy (,) ngắt nghỉ một cách CÂN XỨNG VÀ TỰ NHIÊN theo cụm ý. TUYỆT ĐỐI KHÔNG lạm dụng dấu phẩy làm ngắt vụn câu chắp vá.
     4. BỘ LỌC THUẬT NGỮ ĐO LƯỜNG: Nệm/Thảm/Mền BẮT BUỘC dùng từ "ĐỘ DÀY" kèm từ ước lượng (VD: "dày khoảng 20 phân"). Cấm 'Chiều cao'. Nếu có nhiều kích thước, phải liệt kê rõ.
-    5. CÔNG THỨC HOOK FLASH SALE: ĐƯA MỨC GIÁ LÊN NGAY CÂU ĐẦU TIÊN KÈM CẦU NỐI LOGIC. CẤM đọc số lẻ. CẤM dùng từ "cành". Làm tròn lên và dùng "Chưa tới".
+    5. CÔNG THỨC HOOK ĐA NỀN TẢNG (OMNI-CHANNEL PRICING): ĐƯA LÊN NGAY CÂU ĐẦU TIÊN KÈM CẦU NỐI LOGIC. BẮT BUỘC ĐỌC LÀM TRÒN GIÁ GỐC ĐỂ NEO. TUYỆT ĐỐI KHÔNG ĐƯỢC ĐỌC GIÁ SALE, thay vào đó phải giấu giá đi bằng câu kêu gọi "bấm ngay vào giỏ hàng để nhận giá xả kho cực sốc". BẮT BUỘC CHÈN câu miễn trừ: "Lưu ý ưu đãi có hạn và giá có thể thay đổi tùy thời điểm nhé".
     6. BỐI CẢNH ĐỒNG NHẤT: BẮT BUỘC TOÀN BỘ KỊCH BẢN PHẢI DIỄN RA TẠI CÙNG 1 BỐI CẢNH (KHO HÀNG/SHOWROOM nếu là Flash Sale).
     7. KHÔNG CHỮ/UI TẠO TỪ AI (ANTI-UI LOCK): CẤM TUYỆT ĐỐI sự xuất hiện của chữ, subtitles, UI elements, giỏ hàng ảo, logos, icons. Khung hình phải hoàn toàn sạch.
     8. KHÔNG TẠP ÂM (PURE DIALOGUE): Lời thoại CHỈ CHỨA CHỮ ĐỂ ĐỌC. CẤM ngoặc đơn chỉ đạo diễn xuất.
@@ -324,7 +324,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
        - CẤM TUYỆT ĐỐI "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "trị dứt điểm", "thuốc". Dùng "hỗ trợ", "cực kỳ".
        - Nệm/Thảm dùng từ ước lượng (VD: "dày khoảng 20 phân"). Liệt kê đa dạng kích thước nếu có. 
 
-    6. HOOK FLASH SALE: ĐƯA MỨC GIÁ SỐC LÊN NGAY LỜI THOẠI ĐẦU. CẤM đọc số lẻ. Bắt buộc làm tròn số lên và dùng từ "CHƯA TỚI" hoặc "CHƯA ĐẾN". CẤM dùng "cành".
+    6. CÔNG THỨC GIÁ OMNI-CHANNEL (ĐA NỀN TẢNG):
+       - ĐƯA LÊN NGAY LỜI THOẠI ĐẦU. Neo bằng Giá Gốc làm tròn. 
+       - GIẤU KÍN GIÁ SALE (Tuyệt đối không đọc giá sale thực tế hay nói "chưa tới bao nhiêu"). Thay bằng: "...nhưng hôm nay có trợ giá cực sốc, bấm xem ngay". 
+       - BẮT BUỘC chèn thêm: "Lưu ý ưu đãi có hạn và giá có thể thay đổi tùy thời điểm nhé".
 
     7. ĐẠO DIỄN VẬT LÝ CƠ HỌC: Mở nắp nồi cơm/tủ BẮT BUỘC mô tả cơ học: "lid springing open upwards naturally along the hinge". Gió: "Invisible wind causing the fabric to flutter gently".
 
@@ -361,13 +364,13 @@ def create_scene_details(target_id, mode, style):
     
     LƯU Ý ĐẶC BIỆT:
     - KHÓA BỐI CẢNH & TRANG PHỤC TOÀN CỤC: DÙNG CHUNG 'global_setting_en' và 'global_outfit_en' cho 100% các cảnh. 
-    - ĐỘNG TÍNH THỜI GIAN THEO DẤU CÂU: Viết thoại xong đếm từ và số lượng dấu phẩy điền vào 'word_count'. TÍNH 'dur' = Làm tròn((Số từ/4.8) + (Số dấu phẩy * 0.5s)). Gán kết quả thực tế (VD: 5s, 8s, 11s).
+    - ĐỘNG TÍNH THỜI GIAN THEO DẤU CÂU: Viết thoại xong đếm từ và số lượng dấu phẩy điền vào 'word_count'. TÍNH 'dur' = Làm tròn((Số từ/4.8) + (Số dấu phẩy * 0.5)). Gán kết quả thực tế (VD: 5s, 8s, 11s).
     - CẤU TRÚC THOẠI HÀ NỘI: BẮT BUỘC NGẮT NGHỈ BẰNG DẤU PHẨY (,) CÂN BẰNG. Văn phong HÀ NỘI GỐC (Cấm: nha, nè, vô).
     - BỘ LỌC CHÍNH SÁCH: Cấm "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc". Nệm/Thảm phải dùng "dày khoảng 20 phân", liệt kê các kích thước.
-    - OMNI-CHANNEL HOOK FLASH SALE: ĐƯA MỨC GIÁ LÊN NGAY CẢNH 1. Neo Giá Gốc làm tròn. GIẤU GIÁ SALE BẰNG LỜI KÊU GỌI BẤM XEM. THÊM MIỄN TRỪ TRÁCH NHIỆM (Giá có thể thay đổi...).
+    - OMNI-CHANNEL HOOK FLASH SALE: ĐƯA LÊN NGAY CẢNH 1. Neo Giá Gốc làm tròn. TUYỆT ĐỐI KHÔNG NÓI CHI TIẾT GIÁ SALE. GIẤU GIÁ SALE BẰNG LỜI KÊU GỌI BẤM XEM. THÊM MIỄN TRỪ TRÁCH NHIỆM (Giá có thể thay đổi...).
     - KHÓA MÀU SẮC ĐA CHI TIẾT (Lid, Body...): Lấy màu chi tiết nhúng CHẾT vào 'prod_dna'.
     - ANTI-UI/TEXT LOCK: Khi KOC chỉ tay, KHÔNG nhắc đến "cart, button, icon". Chèn chuỗi cấm UI/Text vào cuối mọi ảnh/video.
-    - PURE VOICEOVER & FULL AUDIO IN PROMPT: 'voiceover' KHÔNG chứa ngoặc đơn. Trong 'vid_p', PHẢI CHÉP LẠI TOÀN BỘ 100% lời thoại vào phần Audio, TUYỆT ĐỐI KHÔNG LÀM NGẮN.
+    - PURE VOICEOVER & FULL AUDIO IN PROMPT: 'voiceover' KHÔNG chứa ngoặc đơn. Trong 'vid_p', PHẢI CHÉP LẠI TOÀN BỘ 100% lời thoại vào phần Audio.
     
     TRẢ VỀ JSON CHUẨN XÁC:
     {{
@@ -383,12 +386,12 @@ def create_scene_details(target_id, mode, style):
             {{
                 "scene": 1, 
                 "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ. NÊU RÕ CÓ BAO NHIÊU DẤU PHẨY.",
-                "dur": "TÍNH TOÁN ĐỘNG: (Số từ / 4.8) + (Số dấu phẩy * 0.5s). Ghi kết quả làm tròn (VD: 5s, 7s, 9s, 11s)", 
+                "dur": "TÍNH TOÁN ĐỘNG: (Số từ / 4.8) + (Số dấu phẩy * 0.5). Ghi kết quả làm tròn (VD: 5s, 7s, 9s, 11s)", 
                 "trans": "Chuyển cảnh mới", 
                 "setting": "Mô tả bối cảnh tiếng Việt...",
                 "action_en": "Miêu tả hành động. CẤM NHẮC ĐẾN NÚT/GIỎ HÀNG.",
                 "director": "Chỉ đạo Voice: Giọng Nam/Nữ HÀ NỘI GỐC | Nhịp độ: ĐỒNG NHẤT 100% CẢ VIDEO, Dồn dập", 
-                "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) NGẮT NGHỈ TỰ NHIÊN, CÂN XỨNG. CẤM BỎ NGOẶC ĐƠN VÀO. LÀM TRÒN GIÁ TIỀN. CẤM ĐỌC SỐ LẺ. LÁCH TỪ VI PHẠM.",
+                "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) NGẮT NGHỈ TỰ NHIÊN, CÂN XỨNG. CẤM BỎ NGOẶC ĐƠN VÀO. CHỈ ĐỌC GIÁ GỐC ĐỂ NEO, GIẤU KÍN GIÁ SALE. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
                 "img_p": "Cinematic vertical 9:16 photo. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Maintain EXACT original product colors for all parts. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
                 "vid_p": "Vertical 9:16 video. Static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY, KHÔNG CẮT BỚT]\\". Product: [prod_dna]. Maintain absolute scale, rigid parts, and EXACT ORIGINAL PRODUCT COLORS FOR ALL PARTS. NO morphing. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
             }}
@@ -415,7 +418,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
     🛑 LỆNH TẨY NÃO: BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO ĐÚNG ĐỊNH HƯỚNG NÀY: '{angle}'.
-    (NẾU LÀ FLASH SALE, BẮT BUỘC ĐƯA GIÁ SỐC LÊN ĐẦU VIDEO, CÓ CÂU NỐI LOGIC, LÀM TRÒN LÊN VÀ BẢO 'CHƯA TỚI...'. CẤM ĐỌC SỐ LẺ).
+    (NẾU LÀ FLASH SALE, BẮT BUỘC DÙNG CHIẾN LƯỢC GIÁ OMNI-CHANNEL: NEO GIÁ GỐC LÊN ĐẦU KÈM LOGIC, TUYỆT ĐỐI KHÔNG ĐỌC CHI TIẾT GIÁ SALE, GIẤU GIÁ VÀ ĐƯA CÂU MIỄN TRỪ TRÁCH NHIỆM 'giá có thể thay đổi' VÀO).
 
     SỐ DIỄN VIÊN: {num_chars}.
     LUẬT: CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU (Ngắt phẩy tự nhiên). Giọng HÀ NỘI CHUẨN. CẤM DÙNG TỪ: tuyệt đối, hoàn toàn, 100%, thuốc, đặc trị. ĐỒNG NHẤT 1 BỐI CẢNH/KỊCH BẢN. Khung hình cấm UI/Icon.
@@ -427,7 +430,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
                 "setting": "Bối cảnh thực tế (Bắt buộc là Kho/Xưởng nếu là Flash Sale. Đồng nhất suốt video)",
-                "hook": "Xưng hô & Hook có cầu nối logic và giá làm tròn lấp lửng (CÓ CHỦ VỊ, CẤM SỐ LẺ, CẤM TỪ VI PHẠM, CÂN BẰNG VẾ CÂU KHÔNG NGẮT VỤN)",
+                "hook": "Xưng hô & Hook có cầu nối logic, neo giá gốc làm tròn và giấu kín giá sale, CÓ KÈM câu miễn trừ trách nhiệm (CÓ CHỦ VỊ, CẤM TỪ VI PHẠM, CÂN BẰNG VẾ CÂU KHÔNG NGẮT VỤN)",
                 "actors": {num_chars}
             }}
             // Tạo đủ 5 kịch bản
@@ -470,7 +473,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Thoại CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU. Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "chữa bệnh". Đặt BỐI CẢNH ĐỒNG NHẤT. Nếu bán hàng, dùng chiến lược OMNI-CHANNEL (Neo giá gốc, giấu giá sale, thêm miễn trừ trách nhiệm).
+    LUẬT: Thoại CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU. Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "chữa bệnh". Đặt BỐI CẢNH ĐỒNG NHẤT. Nếu bán hàng, dùng chiến lược OMNI-CHANNEL (Neo giá gốc, GIẤU KÍN GIÁ SALE tuyệt đối, thêm miễn trừ trách nhiệm).
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -765,8 +768,7 @@ if num_chars > 0:
 
 btn_gen_main_ph = st.empty()
 if st.session_state.get("loading_gen_main", False):
-    btn_gen_main_ph.empty()
-    st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 14px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đạo diễn AI đang quét OCR hình ảnh và sinh kịch bản... Vui lòng đợi!</div>", unsafe_allow_html=True)
+    btn_gen_main_ph.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 14px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đạo diễn AI đang quét OCR hình ảnh và sinh kịch bản... Vui lòng đợi!</div>", unsafe_allow_html=True)
     lock_ui()
     try:
         st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
@@ -880,8 +882,7 @@ if all_sc:
                 ck = f"load_clone_{sc_id}"
                 btn_clone_ph = c3.empty()
                 if st.session_state.get(ck, False):
-                    btn_clone_ph.empty()
-                    st.markdown("<div style='background: #fef2f2; color: #dc2626; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
+                    btn_clone_ph.markdown("<div style='background: #fef2f2; color: #dc2626; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
                     lock_ui(); 
                     try: st.session_state.cloned_scripts.extend(clone_script(sc_id)); st.toast("✅ Đã clone!")
                     except Exception as e: st.error(f"❌ Lỗi: {e}")
@@ -905,8 +906,7 @@ if all_sc:
                 ck = f"load_cre_{sc_id}"
                 btn_cre_ph = c2.empty()
                 if st.session_state.get(ck, False):
-                    btn_cre_ph.empty()
-                    st.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang dựng...</div>", unsafe_allow_html=True)
+                    btn_cre_ph.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang dựng...</div>", unsafe_allow_html=True)
                     lock_ui()
                     try:
                         create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
@@ -942,8 +942,7 @@ if all_sc:
 
     btn_more_ph = st.columns([1, 2, 1])[1].empty()
     if st.session_state.get("load_more", False):
-        btn_more_ph.empty()
-        st.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 12px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đang sáng tạo thêm 5 kịch bản...</div>", unsafe_allow_html=True)
+        btn_more_ph.markdown("<div style='background: #fff0f2; border: 1.5px solid #ffa4b4; padding: 12px; border-radius: 8px; color: #d90429; text-align: center; font-weight: bold;'>⏳ Đang sáng tạo thêm 5 kịch bản...</div>", unsafe_allow_html=True)
         lock_ui()
         try:
             p_chars = [{"id": c["id"], "role": c["role"]} for c in e_chars] if e_chars else st.session_state.character_profiles
