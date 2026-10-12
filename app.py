@@ -24,7 +24,7 @@ ga_script = """
     if (!window.parent.document.getElementById('ga-script')) {
         var script = document.createElement('script');
         script.id = 'ga-script';
-        script.src = "[https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W](https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W)";
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
         script.async = true;
         window.parent.document.head.appendChild(script);
 
@@ -245,41 +245,72 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V56.0 (SMART JSON REPAIR & TOKEN OPTIMIZED)
+# 2. HÀM AI LÕI & LUẬT THÉP (CẬP NHẬT MODEL GEMINI-3.8-FLASH & JSON REPAIR)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
     if match: 
-        cleaned = match.group(0)
+        candidate = match.group(0)
     else:
-        first_char = cleaned[0] if len(cleaned) > 0 else "{"
-        if first_char == "{":
-            cleaned = cleaned.rstrip(", \n\r\t")
-            if not cleaned.endswith("}"):
-                cleaned += "\n}\n}" if cleaned.count("{") > cleaned.count("}") else "\n}"
-        elif first_char == "[":
-            cleaned = cleaned.rstrip(", \n\r\t")
-            if not cleaned.endswith("]"):
-                cleaned += "\n]"
+        candidate = cleaned
+
+    def try_parse(s):
+        try:
+            p = json.loads(s, strict=False)
+            return p[0] if isinstance(p, list) and len(p) > 0 else p
+        except Exception:
+            return None
+
+    res = try_parse(candidate)
+    if res is not None:
+        return res
+
+    fixed = candidate.rstrip(", \n\r\t")
+    in_str = False
+    escape = False
+    stack = []
+    
+    for ch in fixed:
+        if escape:
+            escape = False
+            continue
+        if ch == '\\':
+            escape = True
+            continue
+        if ch == '"':
+            in_str = not in_str
+            continue
+        if not in_str:
+            if ch in ('{', '['):
+                stack.append('}' if ch == '{' else ']')
+            elif ch in ('}', ']'):
+                if stack and stack[-1] == ch:
+                    stack.pop()
+
+    if in_str:
+        fixed += '"'
+
+    while stack:
+        fixed += stack.pop()
+
+    res = try_parse(fixed)
+    if res is not None:
+        return res
 
     try:
-        parsed = json.loads(cleaned, strict=False)
+        py_str = candidate.replace('true', 'True').replace('false', 'False').replace('null', 'None')
+        parsed = ast.literal_eval(py_str)
         return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 else parsed
     except Exception:
-        try:
-            py_str = cleaned.replace('true', 'True').replace('false', 'False').replace('null', 'None')
-            parsed = ast.literal_eval(py_str)
-            return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 else parsed
-        except Exception:
-            raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
+        raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
-    """Sử dụng gemini-2.5-flash chuẩn ổn định, kèm max_output_tokens 4096 để không bao giờ bị đứt chuỗi."""
+    model_name = "gemini-3.8-flash"
     for attempt in range(2):
         try:
             res = client.models.generate_content(
-                model="gemini-2.5-flash", 
+                model=model_name, 
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=sys_inst, 
@@ -290,7 +321,11 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
             )
             return repair_and_parse_json(res.text)
         except Exception as e:
-            if attempt == 1: raise e
+            err_msg = str(e).lower()
+            if "not_found" in err_msg or "404" in err_msg:
+                model_name = "gemini-3.8-flash-lite"
+            if attempt == 1: 
+                raise e
             time.sleep(1)
 
 def generate_char_rules_string(profiles):
