@@ -245,15 +245,12 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP (CẬP NHẬT MODEL GEMINI-3.8-FLASH & JSON REPAIR)
+# 2. HÀM AI LÕI & LUẬT THÉP V57.0 (FORCE FULL 4-SCENE AIDA & BULLETPROOF PARSING)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
-    if match: 
-        candidate = match.group(0)
-    else:
-        candidate = cleaned
+    candidate = match.group(0) if match else cleaned
 
     def try_parse(s):
         try:
@@ -263,8 +260,7 @@ def repair_and_parse_json(text_content: str):
             return None
 
     res = try_parse(candidate)
-    if res is not None:
-        return res
+    if res is not None: return res
 
     fixed = candidate.rstrip(", \n\r\t")
     in_str = False
@@ -272,31 +268,19 @@ def repair_and_parse_json(text_content: str):
     stack = []
     
     for ch in fixed:
-        if escape:
-            escape = False
-            continue
-        if ch == '\\':
-            escape = True
-            continue
-        if ch == '"':
-            in_str = not in_str
-            continue
+        if escape: escape = False; continue
+        if ch == '\\': escape = True; continue
+        if ch == '"': in_str = not in_str; continue
         if not in_str:
-            if ch in ('{', '['):
-                stack.append('}' if ch == '{' else ']')
+            if ch in ('{', '['): stack.append('}' if ch == '{' else ']')
             elif ch in ('}', ']'):
-                if stack and stack[-1] == ch:
-                    stack.pop()
+                if stack and stack[-1] == ch: stack.pop()
 
-    if in_str:
-        fixed += '"'
-
-    while stack:
-        fixed += stack.pop()
+    if in_str: fixed += '"'
+    while stack: fixed += stack.pop()
 
     res = try_parse(fixed)
-    if res is not None:
-        return res
+    if res is not None: return res
 
     try:
         py_str = candidate.replace('true', 'True').replace('false', 'False').replace('null', 'None')
@@ -305,7 +289,7 @@ def repair_and_parse_json(text_content: str):
     except Exception:
         raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6000):
     model_name = "gemini-3.8-flash"
     for attempt in range(2):
         try:
@@ -324,8 +308,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
             err_msg = str(e).lower()
             if "not_found" in err_msg or "404" in err_msg:
                 model_name = "gemini-3.8-flash-lite"
-            if attempt == 1: 
-                raise e
+            if attempt == 1: raise e
             time.sleep(1)
 
 def generate_char_rules_string(profiles):
@@ -378,6 +361,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL ĐỈNH CAO CHO VEO 3. PHONG CÁCH: {style}
     
+    🛑 BẮT BUỘC XUẤT ĐỦ 4 PHÂN CẢNH THEO MÔ HÌNH AIDA (TUYỆT ĐỐI KHÔNG ĐƯỢC CHỈ XUẤT 1 CẢNH):
+    - Kịch bản hoàn chỉnh BẮT BUỘC gồm 4 phân cảnh trong mảng 'scenes':
+      1. Scene 1 (aida_stage: "Attention"): 4s (12-14 từ) - Hook giữ chân, đánh trúng nỗi đau, không lộ liễu.
+      2. Scene 2 (aida_stage: "Interest"): 6s (18-20 từ) - Sản phẩm xuất hiện đúng lúc, giải quyết vấn đề.
+      3. Scene 3 (aida_stage: "Desire"): 8s (26-28 từ) - Điểm độc bản (USP), cảm nhận thực tế, công năng vượt trội.
+      4. Scene 4 (aida_stage: "Action"): 6s hoặc 8s (18-20 hoặc 26-28 từ) - Kêu gọi hành động khéo léo, đòn bẩy giá tương phản.
+    
     🛑 QUY TẮC ÂM THANH MÔI TRƯỜNG THỰC TẾ (DIEGETIC SOUND) & BẢO TOÀN VẬT THỂ:
     1. TỰ ĐỘNG SINH ÂM THANH MÔI TRƯỜNG VẬT LÝ THỰC TẾ (DIEGETIC & FOLEY SOUND FX):
        - Tùy theo tình huống của cảnh, BẮT BUỘC mô tả âm thanh tự nhiên đan xen với giọng đọc trong prompt `vid_p`:
@@ -402,7 +392,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     4. LỆNH CƯỠNG CHẾ THOẠI TỨC THÌ TẠI GIÂY 0.00 (ZERO-LATENCY SPEECH TRIGGER):
        - Nhân vật mở miệng phát âm ngay frame đầu tiên: "Character begins speaking immediately at second 0.00 without any idle delay or hesitation."
     
-    5. BẢNG KHỚP SỐ TỪ - THỜI GIAN ĐÃ TRỪ HAO NGHỈ & ĐỘ TRỄ (CHỐNG THIẾU VOICE TRIỆT ĐỂ):
+    5. BẢNG KHỚP SỐ TỪ - THỜI GIAN ĐÃ TRỪ HAO NGHỈ & ĐỘ TRỄ:
        - Cảnh 4s & 6s: TỐI ĐA 1 DẤU PHẨY (,). Cảnh 8s & 10s: TỐI ĐA 2 DẤU PHẨY (,).
        - CÂN XỨNG VẾ CÂU: Số từ giữa 2 vế qua dấu phẩy phải tương đương nhau.
        - KHUNG SỐ TỪ THỰC TẾ CHUẨN XÁC:
@@ -411,7 +401,6 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
          + Phân cảnh 8s ➔ BẮT BUỘC viết từ 26 đến 28 từ (Tối đa 2 dấu phẩy)
          + Phân cảnh 10s ➔ BẮT BUỘC viết từ 34 đến 36 từ (Tối đa 2 dấu phẩy)
          + CHỈ ĐƯỢC CHỌN CÁC MỐC THỜI LƯỢNG "4s", "6s", "8s", "10s".
-       - TRẦN THỜI GIAN CỨNG 10S: Mọi phân cảnh <= 10s. Nếu vượt quá 36 từ, BẮT BUỘC TÁCH LÀM 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans': "Nối tiếp liền mạch từ cảnh trước".
 
     6. TƯ THẾ TỰ NHIÊN & GÓC MÁY NGANG TẦM MẮT:
        - TUYỆT ĐỐI CẤM NHÂN VẬT CÚI GẬP NGƯỜI, KHOM LƯNG XUỐNG BÀN (NO leaning forward, NO awkward crouching, NO hunching).
@@ -434,7 +423,7 @@ def create_scene_details(target_id, mode, style):
     narrator_mode = outline.get("narrator_mode", st.session_state.get("last_narrator", "On-camera"))
     char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
     char_rules = generate_char_rules_string(char_profiles)
-    duration_instruction = outline.get("duration_instruction", st.session_state.get("target_duration_instruction", "Tự động phân bổ 15-30 giây"))
+    duration_instruction = outline.get("duration_instruction", st.session_state.get("target_duration_instruction", "Tự động phân bổ 24-30 giây"))
     
     is_on_camera = "On-camera" in narrator_mode
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
@@ -448,67 +437,86 @@ def create_scene_details(target_id, mode, style):
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('hook', outline.get('target_hook'))}. Bối cảnh: {outline.get('setting', outline.get('setting_style'))}.
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
-    LƯU Ý ĐẶC BIỆT (ÂM THANH MÔI TRƯỜNG THỰC TẾ & BỐI CẢNH NATIVE):
-    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director'.
-    - ĐẠO DIỄN BỐI CẢNH NATIVE:
-      + Nếu là GỐI NGỦ, ĐỆM, CHĂN GA: Bối cảnh BẮT BUỘC là PHÒNG NGỦ HIỆN ĐẠI (`cozy modern bedroom`), GỐI/ĐỆM ĐẶT NGAY TRÊN GIƯỜNG NGỦ CÓ GA BỌC CHỈNH CHU. Nhân vật ngồi ở mép giường hoặc đứng cạnh giường tương tác nhẹ nhàng (ấn thử độ đàn hồi bọt nhớ của gối trên giường). TUYỆT ĐỐI CẤM đặt trên bàn làm việc/bàn cạnh giường.
-      + Nếu là KỊCH BẢN FLASH SALE / XẢ KHO: Bối cảnh BẮT BUỘC là KHO HÀNG / XƯỞNG / SHOWROOM NGẬP TRÀN KIỆN HÀNG.
-      + Nếu là ĐỒ GIA DỤNG / BẾP: Đặt trên mặt bàn bếp/đảo bếp (`kitchen counter`).
-    - NHÂN VẬT THOẠI NGAY TẠI GIÂY 0.00: Tuyệt đối không đứng im hay trễ 1s đầu cảnh.
-    - CÔNG THỨC NÓI GIÁ TƯƠNG PHẢN (KHI NÓI VỀ GIÁ): 
-      + Neo giá gốc làm tròn (gần... nghìn / tận... nghìn).
-      + Ghép từ nối tương phản và tính từ giá đáy: "Giá niêm yết gần [X] nghìn, nhưng hôm nay xả kho giảm cực sâu, bấm ngay giỏ hàng nhận deal hời, lưu ý giá có thể thay đổi tùy thời điểm nhé."
-    - BẢNG SỐ TỪ CHUẨN XÁC ĐÃ TRỪ HAO ĐỘ TRỄ:
-      + Phân cảnh 4s ➔ BẮT BUỘC viết từ 12 đến 14 từ (Tối đa 1 dấu phẩy)
-      + Phân cảnh 6s ➔ BẮT BUỘC viết từ 18 đến 20 từ (Tối đa 1 dấu phẩy)
-      + Phân cảnh 8s ➔ BẮT BUỘC viết từ 26 đến 28 từ (Tối đa 2 dấu phẩy)
-      + Phân cảnh 10s ➔ BẮT BUỘC viết từ 34 đến 36 từ (Tối đa 2 dấu phẩy)
-      + CHỈ ĐƯỢC CHỌN THỜI LƯỢNG LÀ 4s, 6s, 8s, HOẶC 10s.
-    - CÂN BẰNG VẾ CÂU: Số từ giữa 2 vế qua dấu phẩy phải tương đương nhau, ngắt nghỉ nhẹ nhàng, không viết vế sau dài hơn vế trước.
-    - BẮT BUỘC PHÂN BỔ CÁC PHÂN CẢNH THEO AIDA:
-      + Cảnh 1 (Attention): Hook 3s đầu đánh đúng nỗi đau/tò mò, KHÔNG quảng cáo thô thiển.
-      + Cảnh 2 (Interest): Đưa sản phẩm vào như giải pháp cứu cánh trong bối cảnh chuẩn.
-      + Cảnh 3 (Desire): Nêu rõ tại sao nên mua, chứng minh tính vượt trội và minh họa cách sử dụng nhanh gọn.
-      + Cảnh 4 (Action): Kêu gọi hành động tự nhiên, chốt sale bằng công thức giá tương phản Omni-channel.
-    - KHÓA KHÔNG GIAN BÀN TAY VÀ VẬT THỂ (vid_p & action_en):
-      + BẮT BUỘC chèn lệnh: "Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, resting stably in its designated environment, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding."
-    - TƯ THẾ ĐỨNG THẲNG TỰ NHIÊN & GÓC NGANG TẦM MẮT (action_en): 
-      + TUYỆT ĐỐI CẤM NHÂN VẬT CÚI GẬP NGƯỜI, CÚI MẶT XUỐNG BÀN (NO leaning forward, NO crouching, NO hunching).
-    - TRẦN THỜI GIAN TỐI ĐA 10S: Mọi phân cảnh BẮT BUỘC có thời lượng <= 10s (chỉ chọn trong 4s, 6s, 8s, 10s).
-    - TỰ ĐỘNG TÁCH CẢNH NỐI TIẾP: Nếu nội dung dài vượt quá 36 từ, BẮT BUỘC TÁCH THÀNH 2 PHÂN CẢNH NỐI TIẾP. Cảnh sau ghi 'trans': "Nối tiếp liền mạch từ cảnh trước"'.
-    - CẤU TRÚC THOẠI HÀ NỘI: BẮT BUỘC NGẮT NGHỈ BẰNG DẤU PHẨY (,) CÂN BẰNG. Văn phong HÀ NỘI GỐC (Cấm: nha, nè, vô).
-    - BỘ LỌC CHÍNH SÁCH: Cấm "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "thuốc".
-    - ANTI-UI/TEXT LOCK: Khi KOC chỉ tay, KHÔNG nhắc đến "cart, button, icon". Chèn chuỗi cấm UI/Text vào cuối mọi ảnh/video.
-    - PURE VOICEOVER & FULL AUDIO IN PROMPT: 'voiceover' KHÔNG chứa ngoặc đơn. Trong 'vid_p', PHẢI CHÉP LẠI TOÀN BỘ 100% lời thoại vào phần Audio, TUYỆT ĐỐI KHÔNG LÀM NGẮN.
+    🛑 LỆNH CƯỠNG CHẾ CỰC KỲ QUAN TRỌNG:
+    BẠN BẮT BUỘC PHẢI TẠO RA ĐẦY ĐỦ CẢ 4 PHÂN CẢNH TRONG MẢNG 'scenes' (KHÔNG ĐƯỢC CHỈ TẠO 1 CẢNH):
+    - Scene 1: Attention (4s, 12-14 từ)
+    - Scene 2: Interest (6s, 18-20 từ)
+    - Scene 3: Desire (8s, 26-28 từ)
+    - Scene 4: Action (6s hoặc 8s, 18-20 hoặc 26-28 từ)
+    
+    LƯU Ý ĐẶC BIỆT:
+    - Bối cảnh native: gối ngủ/chăn đệm đặt trên giường trong phòng ngủ ấm cúng; flash sale ở kho hàng; đồ bếp ở mặt bàn bếp.
+    - Nhân vật thoại ngay tại giây 0.00.
+    - Công thức giá tương phản Omni-channel (neo giá gốc làm tròn, khẳng định giảm sâu, giấu giá sale, miễn trừ thời gian).
+    - Khóa vật thể cứng: không dính tay, không nhân bản, không biến mất.
     
     TRẢ VỀ JSON CHUẨN XÁC:
     {{
         "title": "{outline.get('title')}",
-        "total_dur": "Tổng thời gian",
+        "total_dur": "Khoảng 24s-30s",
         "outfit_vi": "Tóm tắt trang phục và bối cảnh",
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
         "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
-        "global_setting_en": "Exact English desc of the unified native environment/setting (e.g. cozy modern bedroom with neatly made bed for pillows, or authentic warehouse/showroom for flash sale). MUST BE LOCKED.",
+        "global_setting_en": "Exact English desc of the unified native environment/setting. MUST BE LOCKED.",
         "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC. Strict numerical persistence of exactly ONE item.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
             {{
                 "scene": 1, 
-                "aida_stage": "Attention / Interest / Desire / Action",
-                "word_count": "AI điền số nguyên. ĐẾM CHÍNH XÁC TỪNG TỪ.",
-                "dur": "4s/6s/8s/10s (Bắt buộc khớp chuẩn an toàn: 12-14 từ -> 4s, 18-20 từ -> 6s, 26-28 từ -> 8s, 34-36 từ -> 10s)", 
-                "trans": "Chuyển cảnh mới hoặc Nối tiếp liền mạch từ cảnh trước", 
-                "setting": "Mô tả bối cảnh tiếng Việt chuẩn xác (Phòng ngủ đặt trên giường, hoặc Kho hàng xưởng xả kho)...",
-                "action_en": "Direct eye-level shot. Character maintains upright natural elegant posture (NO crouching, NO leaning forward, NO awkward hunching). Interacts naturally with product resting in its native location. Hands show clear anatomical separation without merging into fabric. Expressive bright eyes, engaging authentic micro-smile, crisp natural mouth articulation starting immediately at 0.00s matching dialogue cadence.",
-                "director": "Giai đoạn AIDA: Attention/Interest/Desire/Action | Bối cảnh: Native chuẩn xác | Âm thanh thực tế: [Mô tả chi tiết SFX thực tế] | Khởi động: THOẠI NGAY TẠI GIÂY 0.00 | Tông: Giọng ngực đầy nội lực (4.3 - 4.5 từ/s)", 
-                "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) CÂN BẰNG TỪ HAI VẾ, NGẮT NGHỈ RẤT NGẮN. TÔNG GIỌNG MẠNH MẼ KHÔNG ĐỀU ĐỀU. CẤM BỎ NGOẶC ĐƠN VÀO. THOẠI TỰ NHIÊN KHÔNG QUẢNG CÁO LỘ LIỄU. NẾU NÓI GIÁ PHẢI DÙNG ĐÒN BẨY TƯƠNG PHẢN. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
-                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], positioned naturally with upright posture. Action: [action_en]. Product: [prod_dna] resting stably on designated surface. Maintain EXACT original product colors for all parts. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
-                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], upright natural stance without hunching or awkward crouching. Action: [action_en]. Immediate speech start at second 0.00 without idle delay. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY, KHÔNG CẮT BỚT]\\", Layered SFX: [Mô tả âm thanh tiếng Anh thực tế: sizzling frying sound, crunchy chewing sound, whooshing wind breeze, mechanical latch click...], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO morphing, NO warping, NO melting edges. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
+                "aida_stage": "Attention",
+                "word_count": "12-14",
+                "dur": "4s", 
+                "trans": "Chuyển cảnh mới", 
+                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "action_en": "Direct eye-level shot. Character maintains upright natural elegant posture. Interacts naturally with product. Hands show clear anatomical separation without merging into fabric. Expressive bright eyes, engaging authentic micro-smile, mouth articulation starting immediately at 0.00s.",
+                "director": "Giai đoạn AIDA: Attention | Bối cảnh: Native chuẩn xác | Âm thanh thực tế: [SFX] | Khởi động: THOẠI NGAY TẠI GIÂY 0.00 | Tông: Giọng ngực đầy nội lực (4.3 - 4.5 từ/s)", 
+                "voiceover": "Thoại câu đơn/kép ngắn 12-14 từ, ngắt nghỉ rất ngắn, gây tò mò hoặc đánh đúng nỗi đau.",
+                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
+                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00 without idle delay. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 1]\\", Layered SFX: [Mô tả âm thanh tiếng Anh thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding. Strict zero-mutation geometry. NO morphing, NO warping, NO melting edges. Clean frame."
+            }},
+            {{
+                "scene": 2, 
+                "aida_stage": "Interest",
+                "word_count": "18-20",
+                "dur": "6s", 
+                "trans": "Chuyển cảnh mới", 
+                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "action_en": "Direct eye-level shot. Character presents product naturally. Hands separate from fabric. Expressive face, mouth articulates immediately at 0.00s.",
+                "director": "Giai đoạn AIDA: Interest | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Đanh thép, dứt khoát", 
+                "voiceover": "Thoại 18-20 từ nêu rõ sản phẩm là gì, dành cho ai, giải quyết vấn đề gì, tối đa 1 dấu phẩy cân bằng 2 vế.",
+                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Clean frame.", 
+                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 2]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Anatomically separate hands and fingers. Clean frame."
+            }},
+            {{
+                "scene": 3, 
+                "aida_stage": "Desire",
+                "word_count": "26-28",
+                "dur": "8s", 
+                "trans": "Chuyển cảnh mới", 
+                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "action_en": "Direct eye-level shot. Character highlights unique product features with genuine excitement. Speech articulation begins at 0.00s.",
+                "director": "Giai đoạn AIDA: Desire | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Hào hứng, nội lực", 
+                "voiceover": "Thoại 26-28 từ nêu bật điểm độc bản và lý do tại sao nên mua ngay, tối đa 2 dấu phẩy cân bằng.",
+                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Clean frame.", 
+                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 3]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Clean frame."
+            }},
+            {{
+                "scene": 4, 
+                "aida_stage": "Action",
+                "word_count": "18-20",
+                "dur": "6s", 
+                "trans": "Chuyển cảnh mới", 
+                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "action_en": "Direct eye-level shot. Character points gently downward to action trigger. Mouth articulates immediately at 0.00s.",
+                "director": "Giai đoạn AIDA: Action | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Thúc giục, mạnh mẽ", 
+                "voiceover": "Thoại 18-20 từ đòn bẩy giá tương phản: Giá niêm yết gần [X] nghìn, nhưng hôm nay xả kho giảm cực sâu, bấm ngay giỏ hàng nhận deal hời, lưu ý giá có thể thay đổi tùy thời điểm nhé.",
+                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Clean frame.", 
+                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 4]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Clean frame."
             }}
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=4096)
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=6000)
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
