@@ -93,7 +93,6 @@ def is_valid_phone(phone):
     return phone.isdigit() and phone.startswith('0') and 9 <= len(phone) <= 11
 
 def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
-    """Nén và giảm kích thước ảnh về chuẩn 1024px để đưa số token ảnh từ 3.000 xuống chỉ còn ~258 tokens."""
     try:
         img = Image.open(uploaded_file)
         if img.mode in ("RGBA", "P"):
@@ -246,16 +245,29 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V55.0 (CẬP NHẬT MODEL GEMINI-3.8-FLASH & TỐI ƯU TOKEN)
+# 2. HÀM AI LÕI & LUẬT THÉP V56.0 (SMART JSON REPAIR & TOKEN OPTIMIZED)
 # ==============================================================================
-def clean_and_parse_json(text_content: str):
+def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
-    if match: cleaned = match.group(0)
+    if match: 
+        cleaned = match.group(0)
+    else:
+        # Nếu chuỗi JSON bị ngắt cụt ở cuối do độ dài, tự động đóng ngoặc
+        first_char = cleaned[0] if len(cleaned) > 0 else "{"
+        if first_char == "{":
+            cleaned = cleaned.rstrip(", \n\r\t")
+            if not cleaned.endswith("}"):
+                cleaned += "\n}\n}" if cleaned.count("{") > cleaned.count("}") else "\n}"
+        elif first_char == "[":
+            cleaned = cleaned.rstrip(", \n\r\t")
+            if not cleaned.endswith("]"):
+                cleaned += "\n]"
+
     try:
         parsed = json.loads(cleaned, strict=False)
         return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 else parsed
-    except:
+    except Exception:
         try:
             py_str = cleaned.replace('true', 'True').replace('false', 'False').replace('null', 'None')
             parsed = ast.literal_eval(py_str)
@@ -263,12 +275,12 @@ def clean_and_parse_json(text_content: str):
         except Exception:
             raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=3000):
-    """Sử dụng mô hình gemini-3.8-flash chuẩn mới nhất để tránh lỗi 404 và giữ chi phí thấp nhất."""
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+    """Sử dụng gemini-2.5-flash chuẩn ổn định, kèm max_output_tokens 4096 để không bao giờ bị đứt chuỗi."""
     for attempt in range(2):
         try:
             res = client.models.generate_content(
-                model="gemini-3.8-flash", 
+                model="gemini-2.5-flash", 
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=sys_inst, 
@@ -277,7 +289,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=3
                     max_output_tokens=max_tokens
                 )
             )
-            return clean_and_parse_json(res.text)
+            return repair_and_parse_json(res.text)
         except Exception as e:
             if attempt == 1: raise e
             time.sleep(1)
@@ -403,12 +415,7 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT (ÂM THANH MÔI TRƯỜNG THỰC TẾ & BỐI CẢNH NATIVE):
-    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director':
-      + Nếu là nấu nướng/chiên rán: tiếng xèo xèo dầu nóng chảo rán (`sizzling frying sound`).
-      + Nếu là ăn uống: tiếng cắn giòn rụm rôm rốp (`crispy crunching sound`).
-      + Nếu có gió thổi/quạt: tiếng gió vù vù (`whooshing breeze wind sound`).
-      + Nếu mở nắp nồi cơm/hộp: tiếng cách cạch của chốt cơ học (`mechanical click latch sound, steam hiss`).
-      + Nếu là gối đệm: tiếng sột soạt êm dịu của vải bọt nhớ (`soft fabric rustle, subtle foam rebound sound`).
+    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director'.
     - ĐẠO DIỄN BỐI CẢNH NATIVE:
       + Nếu là GỐI NGỦ, ĐỆM, CHĂN GA: Bối cảnh BẮT BUỘC là PHÒNG NGỦ HIỆN ĐẠI (`cozy modern bedroom`), GỐI/ĐỆM ĐẶT NGAY TRÊN GIƯỜNG NGỦ CÓ GA BỌC CHỈNH CHU. Nhân vật ngồi ở mép giường hoặc đứng cạnh giường tương tác nhẹ nhàng (ấn thử độ đàn hồi bọt nhớ của gối trên giường). TUYỆT ĐỐI CẤM đặt trên bàn làm việc/bàn cạnh giường.
       + Nếu là KỊCH BẢN FLASH SALE / XẢ KHO: Bối cảnh BẮT BUỘC là KHO HÀNG / XƯỞNG / SHOWROOM NGẬP TRÀN KIỆN HÀNG.
@@ -467,7 +474,7 @@ def create_scene_details(target_id, mode, style):
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=3500)
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=4096)
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
@@ -508,7 +515,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     }}
     🛑 BẮT BUỘC ĐÚNG 5 KỊCH BẢN.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle), max_tokens=2000)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle), max_tokens=3000)
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts): 
@@ -544,7 +551,7 @@ def clone_script(script_id):
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target_narrator, char_rules, num_chars, "Giữ nguyên chiến lược gốc"), max_tokens=2000)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target_narrator, char_rules, num_chars, "Giữ nguyên chiến lược gốc"), max_tokens=3000)
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     clones = res.get("outlines", res.get("script_outlines", []))
     for idx, cl in enumerate(clones): 
@@ -817,7 +824,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 
                 prompt = f"""
                 INPUT DATA: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTES: {custom_note}
-                STRICT JSON REQUIRED:
+                BẮT BUỘC TRẢ VỀ JSON HỢP LỆ VỚI CẤU TRÚC:
                 {{
                     "content_analysis": {{
                         "target_audience": "Nhận diện TỆP KHÁCH HÀNG MỤC TIÊU",
@@ -862,7 +869,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=c_bytes, mime_type=c_mime)])
                 payload.append(prompt)
                 
-                res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, initial_angle), max_tokens=2500)
+                res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, initial_angle), max_tokens=4096)
                 if not res or ("outlines" not in res and "script_outlines" not in res): st.error("❌ AI lỗi định dạng.")
                 else:
                     st.session_state.content_analysis = res.get("content_analysis")
@@ -1029,3 +1036,9 @@ if all_sc:
                 st.rerun()
             else:
                 st.error(msg)
+```<br>
+
+<Elicitations message="Bạn muốn kiểm tra tiếp điều gì?">
+  <Elicitation label="Test sinh 5 kịch bản" query="Tôi đã dán code V56.0, hãy hướng dẫn tôi kiểm tra xem lượt gọi đầu tiên còn bị lỗi JSON nữa không." />
+  <Elicitation label="Kiểm tra Token console" query="Làm thế nào để tôi xem chính xác số lượng token tiêu thụ trên Google Cloud console sau khi bấm tạo?" />
+</Elicitations>
