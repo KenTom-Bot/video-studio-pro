@@ -245,7 +245,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V57.0 (FORCE FULL 4-SCENE AIDA & BULLETPROOF PARSING)
+# 2. HÀM AI LÕI & LUẬT THÉP V58.0 (HERO SKU DETECTION & SMART COLOR FALLBACK)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -327,26 +327,25 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL KÊNH TIKTOK SHOP TRIỆU VIEW. PHONG CÁCH: {style}
     {strat_cmd}
     
-    🛑 QUY TẮC BỐI CẢNH VÀ CỐT TRUYỆN CHUẨN XÁC THEO SẢN PHẨM & KỊCH BẢN:
-    1. PHÂN BIỆT BỐI CẢNH THỰC TẾ CHUẨN XÁC:
-       - NẾU LÀ KỊCH BẢN FLASH SALE / XẢ KHO / GIÁ SỐC: BẮT BUỘC toàn bộ bối cảnh phải diễn ra tại KHO HÀNG, XƯỞNG SẢN XUẤT, HOẶC SHOWROOM TỔNG NGẬP TRÀN KIỆN HÀNG.
-       - NẾU LÀ KỊCH BẢN REVIEW / ĐỜI SỐNG / NỖI ĐAU: BẮT BUỘC bối cảnh phải là KHÔNG GIAN SỬ DỤNG TỰ NHIÊN CỦA SẢN PHẨM ĐÓ. 
-         + Gối ngủ, chăn ga, đệm: BẮT BUỘC ở PHÒNG NGỦ ẤM CÚNG, ĐẶT SẢN PHẨM NGAY TRÊN GIƯỜNG NGỦ. Tuyệt đối CẤM đặt trên bàn làm việc/bàn cạnh giường.
-         + Đồ bếp, gia dụng: BẮT BUỘC ở PHÒNG BẾP / BÀN BẾP.
-         + Đồ ăn/uống: Bàn ăn gia đình hoặc khu nấu bếp.
-    2. KỊCH BẢN CHUẨN MÔ HÌNH AIDA:
-       - Attention (3s đầu): Hook giật gân, tạo tò mò hoặc xúc động đánh đúng nỗi đau/mong muốn của tệp khách. CẤM giơ sản phẩm thô thiển.
-       - Interest: Nêu rõ sản phẩm là gì, dành cho ai, giải quyết vấn đề gì trong không gian tự nhiên.
-       - Desire: Nêu bật lý do nên mua, điểm độc bản (USP) so với thị trường.
-       - Action: Kêu gọi hành động tự nhiên, chốt ưu đãi đúng lúc.
-    3. CÔNG THỨC ĐÒN BẨY GIÁ TƯƠNG PHẢN (KHI NÓI GIÁ):
+    🛑 QUY TẮC NHẬN DIỆN MÀU BÁN CHẠY (HERO SKU) & BỐI CẢNH NATIVE:
+    1. ƯU TIÊN MÃ MÀU/HỌA TIẾT BÁN CHẠY NHẤT:
+       - Quét OCR toàn bộ chữ trong ảnh: nếu thấy nhãn 'Đã bán 1K+', 'Đã bán...', 'Top bán chạy', 'Hot sale' hoặc ô màu được khoanh đỏ viền nổi bật (VD: 'thỏ hoa - Đã bán 1K+'), BẮT BUỘC chọn mã màu/họa tiết đó làm SẢN PHẨM HERO CHỦ ĐẠO cho video[cite: 7].
+       - Nếu ảnh KHÔNG CÓ nhãn bán chạy: Tự động trích xuất danh sách bảng màu 'color_palette' và chọn màu đẹp/nổi bật nhất làm màu chủ đạo, các màu khác làm combo nền.
+    2. PHÂN BIỆT BỐI CẢNH THỰC TẾ:
+       - Flash Sale/Xả kho: Bắt buộc ở Kho hàng/Xưởng ngập kiện hàng.
+       - Ga giường, gối ngủ, nệm: Bắt buộc ở Phòng ngủ hiện đại ấm cúng, sản phẩm ĐẶT NGAY TRÊN GIƯỜNG NGỦ[cite: 7]. Cấm đặt trên bàn.
+       - Đồ bếp: Đặt trên mặt bàn bếp/đảo bếp.
+    3. KỊCH BẢN CHUẨN MÔ HÌNH AIDA:
+       - Hook 3s đầu: Đánh trúng nỗi đau/tò mò/xúc động, không lộ liễu.
+       - Interest & Desire: Giới thiệu sản phẩm hero, nhắc đến bảng màu phong phú.
+       - Action: Kêu gọi hành động, dùng đòn bẩy giá tương phản.
+    4. CÔNG THỨC GIÁ TƯƠNG PHẢN (KHI NÓI GIÁ):
        - Neo giá gốc làm tròn (gần... nghìn / tận... nghìn).
-       - Dùng mẫu tương phản: "Giá niêm yết gần [X] nghìn, nhưng hôm nay xả kho giảm cực sâu, bấm ngay giỏ hàng nhận deal hời, lưu ý giá có thể thay đổi tùy thời điểm nhé."
-       - CẤM đọc số lẻ lê thê. CẤM đọc giá sale thực tế để dùng được đa kênh.
-    4. BỘ LỌC CHÍNH SÁCH VĨNH VIỄN: CẤM "tuyệt đối", "hoàn toàn", "100%", "chắc chắn", "cam kết", "thuốc", "đặc trị", "trị dứt điểm".
-    5. PERSONA HÀ NỘI CHUẨN: Dứt khoát (nhé, này, thế, dùng, không). CẤM từ miền Nam: "nha", "nè", "nghen", "vô", "xài".
-    6. KHÔNG CHỮ/UI TẠO TỪ AI: CẤM chữ, subtitles, UI elements, icons. Khung hình sạch 100%.
-    7. {char_rules}
+       - Khẳng định: 'Giá niêm yết gần [X] nghìn, nhưng hôm nay xả kho giảm cực sâu, bấm ngay giỏ hàng nhận deal hời, lưu ý giá có thể thay đổi tùy thời điểm nhé.'
+    5. BỘ LỌC CHÍNH SÁCH VĨNH VIỄN: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'chắc chắn', 'thuốc', 'đặc trị'.
+    6. PERSONA HÀ NỘI CHUẨN: Dứt khoát (nhé, này, thế, dùng, không). CẤM từ miền Nam.
+    7. KHÔNG CHỮ/UI TẠO TỪ AI: Khung hình sạch 100%.
+    8. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
@@ -354,65 +353,40 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     narrator_instruction = f"Nhân vật xuất hiện trực tiếp trước ống kính. Chèn lệnh `Audio:` vào `video_prompt`." if is_on_camera else "Lồng tiếng ngoài. KHÔNG chèn Audio vào `video_prompt`."
     
     if "TikTok Shop" in mode:
-        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Giọng ngực (chest voice) ĐẦY NỘI LỰC, ĐANH THÉP, BẮT ĐẦU NÓI NGAY TẠI GIÂY 0.00, TỐC ĐỘ ĐỀU METRONOME KHÔNG DỒN ĐUÔI CÂU (4.3 - 4.5 từ/s)."
+        voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Giọng ngực ĐẦY NỘI LỰC, ĐANH THÉP, BẮT ĐẦU NÓI NGAY TẠI GIÂY 0.00, TỐC ĐỘ ĐỀU METRONOME KHÔNG DỒN ĐUÔI CÂU (4.3 - 4.5 từ/s)."
     else:
         voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN. Hào hứng, tự nhiên, nhịp độ hoạt ngôn cuốn hút, nói ngay đầu cảnh."
 
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL ĐỈNH CAO CHO VEO 3. PHONG CÁCH: {style}
     
-    🛑 BẮT BUỘC XUẤT ĐỦ 4 PHÂN CẢNH THEO MÔ HÌNH AIDA (TUYỆT ĐỐI KHÔNG ĐƯỢC CHỈ XUẤT 1 CẢNH):
-    - Kịch bản hoàn chỉnh BẮT BUỘC gồm 4 phân cảnh trong mảng 'scenes':
-      1. Scene 1 (aida_stage: "Attention"): 4s (12-14 từ) - Hook giữ chân, đánh trúng nỗi đau, không lộ liễu.
-      2. Scene 2 (aida_stage: "Interest"): 6s (18-20 từ) - Sản phẩm xuất hiện đúng lúc, giải quyết vấn đề.
-      3. Scene 3 (aida_stage: "Desire"): 8s (26-28 từ) - Điểm độc bản (USP), cảm nhận thực tế, công năng vượt trội.
-      4. Scene 4 (aida_stage: "Action"): 6s hoặc 8s (18-20 hoặc 26-28 từ) - Kêu gọi hành động khéo léo, đòn bẩy giá tương phản.
+    🛑 BẮT BUỘC XUẤT ĐỦ 4 PHÂN CẢNH THEO MÔ HÌNH AIDA:
+    1. Scene 1 (aida_stage: "Attention"): 4s (12-14 từ) - Hook giữ chân, đánh trúng nỗi đau, không lộ liễu.
+    2. Scene 2 (aida_stage: "Interest"): 6s (18-20 từ) - Sản phẩm hero xuất hiện đúng lúc, giới thiệu tính năng giải pháp.
+    3. Scene 3 (aida_stage: "Desire"): 8s (26-28 từ) - Nhấn mạnh điểm độc bản (USP), nhắc đến sự phong phú của bảng màu/combo, trải nghiệm thực tế.
+    4. Scene 4 (aida_stage: "Action"): 6s hoặc 8s (18-20 hoặc 26-28 từ) - Chốt hạ bằng đòn bẩy giá tương phản Omni-channel.
     
-    🛑 QUY TẮC ÂM THANH MÔI TRƯỜNG THỰC TẾ (DIEGETIC SOUND) & BẢO TOÀN VẬT THỂ:
-    1. TỰ ĐỘNG SINH ÂM THANH MÔI TRƯỜNG VẬT LÝ THỰC TẾ (DIEGETIC & FOLEY SOUND FX):
-       - Tùy theo tình huống của cảnh, BẮT BUỘC mô tả âm thanh tự nhiên đan xen với giọng đọc trong prompt `vid_p`:
-         + Chiên xào / Nấu nướng: Chèn tiếng xèo xèo của dầu nóng, tiếng lách tách đáy chảo (`sizzling frying sound, gentle oil crackle in pan`).
-         + Ăn uống: Tiếng cắn giòn rụm, nhai giòn tan (`crisp crunching bite sound, satisfying crunchy chewing sound`).
-         + Gió thổi / Ngoài trời / Quạt: Tiếng gió thổi vi vu vù vù (`audible whooshing wind breeze sound, fluttering ambient air`).
-         + Nồi cơm / Đồ điện tử: Tiếng chốt nắp bật cách cạch, tiếng hơi nước phì nhẹ (`mechanical latch click sound, steam hiss`).
-         + Chăn ga / Gối nệm: Tiếng sột soạt êm ái của sợi vải và tiếng bọt nhớ đàn hồi (`soft fabric rustling, subtle foam compression sound`).
-       - Trong lệnh âm thanh của `vid_p`, cấu trúc chuẩn:
-         Audio: "[Lời thoại]", Layered SFX: [Âm thanh vật lý thực tế tương ứng], Ambient environment background sound.
-
-    2. ĐẠO DIỄN BỐI CẢNH NATIVE CHUẨN XÁC 100%:
-       - Với sản phẩm GỐI NGỦ / NỆM / CHĂN GA: Bối cảnh BẮT BUỘC là PHÒNG NGỦ HIỆN ĐẠI ẤM CÚNG (`cozy modern bedroom`). Gối BẮT BUỘC ĐẶT TRÊN GIƯỜNG NGỦ CÓ GA BỌC CHỈNH CHU (`resting on a neatly made bed`). Nhân vật ngồi mép giường hoặc đứng cạnh giường tương tác nhẹ nhàng (dùng lòng bàn tay ấn thử độ đàn hồi bọt nhớ của gối trên giường). TUYỆT ĐỐI CẤM đặt gối lên bàn!
-       - Với kịch bản FLASH SALE / XẢ KHO: Bối cảnh BẮT BUỘC là KHO HÀNG / XƯỞNG SẢN XUẤT / SHOWROOM TỔNG ngập tràn kiện hàng và kệ pallet.
-       - Với ĐỒ BẾP / GIA DỤNG: Đặt trên mặt bàn bếp/đảo bếp (`kitchen counter / island`).
-    
-    3. KHÓA BẢO TOÀN VẬT THỂ & CHỐNG DÍNH TAY, CHỐNG BIẾN MẤT (RIGID PERSISTENCE LOCK):
-       - TUYỆT ĐỐI CẤM sản phẩm bị dính da tay, tự biến mất hoặc tự nhân bản thêm cái thứ hai.
-       - Trong `vid_p`, BẮT BUỘC chèn lệnh:
-         "Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, resting stably in its designated environment, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding."
-    
-    4. LỆNH CƯỠNG CHẾ THOẠI TỨC THÌ TẠI GIÂY 0.00 (ZERO-LATENCY SPEECH TRIGGER):
-       - Nhân vật mở miệng phát âm ngay frame đầu tiên: "Character begins speaking immediately at second 0.00 without any idle delay or hesitation."
-    
-    5. BẢNG KHỚP SỐ TỪ - THỜI GIAN ĐÃ TRỪ HAO NGHỈ & ĐỘ TRỄ:
-       - Cảnh 4s & 6s: TỐI ĐA 1 DẤU PHẨY (,). Cảnh 8s & 10s: TỐI ĐA 2 DẤU PHẨY (,).
-       - CÂN XỨNG VẾ CÂU: Số từ giữa 2 vế qua dấu phẩy phải tương đương nhau.
-       - KHUNG SỐ TỪ THỰC TẾ CHUẨN XÁC:
-         + Phân cảnh 4s ➔ BẮT BUỘC viết từ 12 đến 14 từ (Tối đa 1 dấu phẩy)
-         + Phân cảnh 6s ➔ BẮT BUỘC viết từ 18 đến 20 từ (Tối đa 1 dấu phẩy)
-         + Phân cảnh 8s ➔ BẮT BUỘC viết từ 26 đến 28 từ (Tối đa 2 dấu phẩy)
-         + Phân cảnh 10s ➔ BẮT BUỘC viết từ 34 đến 36 từ (Tối đa 2 dấu phẩy)
-         + CHỈ ĐƯỢC CHỌN CÁC MỐC THỜI LƯỢNG "4s", "6s", "8s", "10s".
-
-    6. TƯ THẾ TỰ NHIÊN & GÓC MÁY NGANG TẦM MẮT:
-       - TUYỆT ĐỐI CẤM NHÂN VẬT CÚI GẬP NGƯỜI, KHOM LƯNG XUỐNG BÀN (NO leaning forward, NO awkward crouching, NO hunching).
-       - BẮT BUỘC tư thế thanh lịch, thẳng lưng, góc máy ngang tầm mắt.
-    
-    7. CÔNG THỨC THOẠI GIÁ TƯƠNG PHẢN (KHI NÓI GIÁ):
-       - Neo giá gốc làm tròn. BẮT BUỘC dùng mẫu tương phản: "Giá niêm yết gần [X] nghìn, nhưng hôm nay xả kho giảm cực sâu, bấm ngay giỏ hàng nhận deal hời, lưu ý giá có thể thay đổi tùy thời điểm nhé."
-
-    8. KHÓA MÀU SẮC ĐA BỘ PHẬN: Nhúng chết màu sắc, vân vải, hoa văn từ `product_color_lock` vào `prod_dna`.
-    9. KHÔNG CHỮ VÀ KHÔNG UI/ICON (ANTI-UI/TEXT LOCK): Khung hình sạch 100%.
-    10. {narrator_instruction}
-    11. {char_rules}
+    🛑 QUY TẮC MÃ MÀU HERO SKU & DIEGETIC SOUND:
+    1. KHÓA MÀU HERO SKU ĐÃ QUÉT ĐƯỢC:
+       - Nếu phát hiện màu bán chạy (nhãn 'Đã bán 1K+', viền đỏ): Khóa 100% màu/họa tiết đó (VD: ga giường thỏ hoa) làm sản phẩm trên giường/tay nhân vật[cite: 7].
+       - Các màu khác trong bảng màu được mô tả xếp ngay ngắn ở góc giường/trên kệ để minh họa sự đa dạng.
+    2. TỰ ĐỘNG SINH ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX):
+       - Chiên xào: sizzling frying sound.
+       - Ăn uống: crunchy chewing sound.
+       - Ga gối đệm: soft fabric rustle, subtle foam compression sound.
+       - Gió thổi: whooshing wind breeze sound.
+       - Nồi cơm/thiết bị: mechanical latch click sound.
+    3. ĐẠO DIỄN BỐI CẢNH NATIVE:
+       - Ga gối đệm: PHÒNG NGỦ HIỆN ĐẠI, ĐẶT SẢN PHẨM TRÊN GIƯỜNG NGỦ[cite: 7].
+       - Flash sale: KHO HÀNG / XƯỞNG NGẬP KIỆN HÀNG.
+    4. KHÓA BẢO TOÀN VẬT THỂ:
+       - "Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, resting stably in its designated environment, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding."
+    5. THOẠI TỨC THÌ 0.00S: Nhân vật mở miệng nói ngay từ frame đầu tiên.
+    6. BẢNG TỪ CHUẨN XÁC: 4s (12-14 từ), 6s (18-20 từ), 8s (26-28 từ), 10s (34-36 từ).
+    7. CÔNG THỨC GIÁ TƯƠNG PHẢN: Neo giá gốc làm tròn, khẳng định giảm sâu, giấu giá sale, miễn trừ thời gian.
+    8. KHÔNG CHỮ/UI TẠO TỪ AI: Khung hình sạch 100%.
+    9. {narrator_instruction}
+    10. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style):
@@ -429,7 +403,7 @@ def create_scene_details(target_id, mode, style):
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
-    audio_instruction = 'TRONG TẤT CẢ vid_p BẮT BUỘC chèn lệnh: Audio: "[CHÉP LẠI TOÀN BỘ 100% CÂU THOẠI TRONG VOICEOVER, CẤM CẮT XÉN]", Layered SFX: [MÔ TẢ TIẾNG ĐỘNG THỰC TẾ CỦA TÌNH HUỐNG (VD tiếng xèo xèo rán đồ, vù vù gió thổi, rôm rốp khi ăn, cách cạch mở nắp...)]' if is_on_camera else 'KHÔNG chèn Audio thoại vào vid_p, chỉ chèn Layered SFX thực tế.'
+    audio_instruction = 'TRONG TẤT CẢ vid_p BẮT BUỘC chèn lệnh: Audio: "[CHÉP LẠI TOÀN BỘ 100% CÂU THOẠI TRONG VOICEOVER, CẤM CẮT XÉN]", Layered SFX: [MÔ TẢ TIẾNG ĐỘNG THỰC TẾ CỦA TÌNH HUỐNG (VD tiếng sột soạt vải, xèo xèo rán đồ, vù vù gió thổi, rôm rốp khi ăn...)]' if is_on_camera else 'KHÔNG chèn Audio thoại vào vid_p, chỉ chèn Layered SFX thực tế.'
     voice_hint = "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Giọng ngực ĐẦY NỘI LỰC, ĐANH THÉP, BẮT ĐẦU NÓI NGAY TẠI GIÂY 0.00, TỐC ĐỘ ĐỀU ĐẶN METRONOME KHÔNG DỒN ĐUÔI (4.3 - 4.5 từ/s)." if "TikTok Shop" in mode else "Giọng [Nam/Nữ tự phân tích] HÀ NỘI CHUẨN 100% (CẤM TỪ MIỀN NAM). Nhanh, Truyền cảm, Tự nhiên."
 
     prompt = f"""
@@ -437,18 +411,18 @@ def create_scene_details(target_id, mode, style):
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('hook', outline.get('target_hook'))}. Bối cảnh: {outline.get('setting', outline.get('setting_style'))}.
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
-    🛑 LỆNH CƯỠNG CHẾ CỰC KỲ QUAN TRỌNG:
-    BẠN BẮT BUỘC PHẢI TẠO RA ĐẦY ĐỦ CẢ 4 PHÂN CẢNH TRONG MẢNG 'scenes' (KHÔNG ĐƯỢC CHỈ TẠO 1 CẢNH):
+    🛑 LỆNH CƯỠNG CHẾ: BẮT BUỘC TẠO ĐỦ 4 PHÂN CẢNH TRONG MẢNG 'scenes':
     - Scene 1: Attention (4s, 12-14 từ)
     - Scene 2: Interest (6s, 18-20 từ)
     - Scene 3: Desire (8s, 26-28 từ)
     - Scene 4: Action (6s hoặc 8s, 18-20 hoặc 26-28 từ)
     
     LƯU Ý ĐẶC BIỆT:
-    - Bối cảnh native: gối ngủ/chăn đệm đặt trên giường trong phòng ngủ ấm cúng; flash sale ở kho hàng; đồ bếp ở mặt bàn bếp.
-    - Nhân vật thoại ngay tại giây 0.00.
-    - Công thức giá tương phản Omni-channel (neo giá gốc làm tròn, khẳng định giảm sâu, giấu giá sale, miễn trừ thời gian).
-    - Khóa vật thể cứng: không dính tay, không nhân bản, không biến mất.
+    - Bối cảnh native: ga gối đệm đặt trên giường trong phòng ngủ ấm cúng[cite: 7]; flash sale ở kho hàng.
+    - Màu sắc: Khóa đúng màu/họa tiết Hero SKU bán chạy nhất đã quét từ DNA (VD: thỏ hoa)[cite: 7].
+    - Thoại ngay tại 0.00s.
+    - Công thức giá tương phản Omni-channel.
+    - Khóa không gian tay và vật thể: cấm dính da tay, cấm biến mất.
     
     TRẢ VỀ JSON CHUẨN XÁC:
     {{
@@ -458,7 +432,7 @@ def create_scene_details(target_id, mode, style):
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
         "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
         "global_setting_en": "Exact English desc of the unified native environment/setting. MUST BE LOCKED.",
-        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC. Strict numerical persistence of exactly ONE item.",
+        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC HERO SKU CHÍNH XÁC. Strict numerical persistence of exactly ONE item.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
             {{
@@ -496,7 +470,7 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh tiếng Việt...",
                 "action_en": "Direct eye-level shot. Character highlights unique product features with genuine excitement. Speech articulation begins at 0.00s.",
                 "director": "Giai đoạn AIDA: Desire | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Hào hứng, nội lực", 
-                "voiceover": "Thoại 26-28 từ nêu bật điểm độc bản và lý do tại sao nên mua ngay, tối đa 2 dấu phẩy cân bằng.",
+                "voiceover": "Thoại 26-28 từ nêu bật điểm độc bản và lý do tại sao nên mua ngay (nhắc đến bảng màu đa dạng), tối đa 2 dấu phẩy cân bằng.",
                 "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Clean frame.", 
                 "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 3]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Clean frame."
             }},
@@ -535,7 +509,8 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
     🛑 LỆNH TẨY NÃO: BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO MÔ HÌNH AIDA VÀ CHIẾN LƯỢC: '{angle}'.
-    - Phân biệt bối cảnh: Nếu Flash Sale thì là Kho hàng/Xưởng ngập kiện hàng; nếu Review sản phẩm phòng ngủ/gối/đệm thì BẮT BUỘC là Phòng ngủ đặt gối trên giường ngủ.
+    - Phân biệt bối cảnh: Nếu Flash Sale thì là Kho hàng/Xưởng ngập kiện hàng; nếu Review sản phẩm phòng ngủ/gối/đệm thì BẮT BUỘC là Phòng ngủ đặt gối trên giường ngủ[cite: 7].
+    - Khóa đúng Hero SKU bán chạy nhất từ DNA (VD: thỏ hoa)[cite: 7].
     - Hook 3 giây đầu đánh trúng nỗi đau/tò mò/xúc động, không quảng cáo lộ liễu.
     - Làm rõ: Sản phẩm là gì/có gì đặc biệt, Dành cho ai, Tại sao nên mua, Dùng ở đâu tiện ích ra sao, Cách dùng thực tế.
     - Áp dụng công thức giá tương phản Omni-channel (neo giá gốc làm tròn, khẳng định giảm cực sâu/chạm đáy, kêu gọi bấm xem deal hời, miễn trừ trách nhiệm thời gian).
@@ -549,7 +524,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
             {{
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
-                "setting": "Bối cảnh thực tế chuẩn xác (Phòng ngủ đặt trên giường ngủ nếu là gối đệm; Kho hàng xưởng nếu là Flash Sale)",
+                "setting": "Bối cảnh thực tế chuẩn xác (Phòng ngủ đặt trên giường ngủ nếu là gối đệm[cite: 7]; Kho hàng xưởng nếu là Flash Sale)",
                 "hook": "Hook 3 giây đầu AIDA: Xưng hô tự nhiên, đánh trúng nỗi đau hoặc gây tò mò cực độ, KHÔNG quảng cáo lộ liễu (CÓ CHỦ VỊ, CẤM TỪ VI PHẠM, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP)",
                 "actors": {num_chars}
             }}
@@ -585,7 +560,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc theo mô hình AIDA: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Thoại CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP. Hook không lộ liễu. Bối cảnh chuẩn native (phòng ngủ trên giường nếu là gối nệm; kho hàng nếu là flash sale). Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "chữa bệnh". Đặt BỐI CẢNH ĐỒNG NHẤT. Nếu bán hàng, dùng công thức giá tương phản Omni-channel.
+    LUẬT: Thoại CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP. Hook không lộ liễu. Bối cảnh chuẩn native (phòng ngủ trên giường nếu là gối nệm[cite: 7]; kho hàng nếu là flash sale). Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "chữa bệnh". Đặt BỐI CẢNH ĐỒNG NHẤT. Nếu bán hàng, dùng công thức giá tương phản Omni-channel.
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -827,7 +802,7 @@ else:
             col_a, col_b = st.columns(2)
             col_a.markdown(f"**💰 Hoa hồng:** <span style='color:#15803d; font-weight:900;'>{prod.get('commission_percent', 0)}%</span><br>**🎯 Tệp:** {prod.get('target_audience', '')}", unsafe_allow_html=True)
             col_b.markdown(f"**🧠 Insight:** {prod.get('product_insight', '')}<br>**💔 Nỗi đau:** {prod.get('pain_points', '')}", unsafe_allow_html=True)
-    up_files = st.file_uploader("📦 Upload Ảnh SP (Tự động nén tối ưu Token - Đọc Giá & Cơ chế mở nắp):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Mã bán chạy & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
     custom_note = st.text_area("✍ Ghi chú AI:", key=f"ns_{st.session_state.reset_key}")
 
 st.markdown("---")
@@ -838,9 +813,9 @@ style = col_opt1.selectbox("🎨 Phong cách hình ảnh:", ["Điện Ảnh Châ
 angle_options = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước (Chốt sale)"]
 initial_angle = col_opt1.selectbox("🧭 Chiến lược:", angle_options, key=f"ang_{st.session_state.reset_key}")
 
-duration_choice = col_opt2.selectbox("⏳ Thời lượng video:", ["Tự động (AI Tối ưu ~20-30s)", "Tùy chỉnh (Nhập số giây)"], key=f"dur_{st.session_state.reset_key}")
+duration_choice = col_opt2.selectbox("⏳ Thời lượng video:", ["Tự động (AI Tối ưu ~24-30s)", "Tùy chỉnh (Nhập số giây)"], key=f"dur_{st.session_state.reset_key}")
 if duration_choice.startswith("Tùy"): st.session_state.target_duration_instruction = f"Chính xác {col_opt2.number_input('Số giây:', min_value=10, max_value=300, value=60)} giây."
-else: st.session_state.target_duration_instruction = "Khoảng 15-30 giây."
+else: st.session_state.target_duration_instruction = "Khoảng 24-30 giây."
 
 narrator_mode = col_opt2.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)", "🎙 Lồng tiếng ngoài (Off-screen)"], key=f"nar_{st.session_state.reset_key}")
 num_chars = st.number_input("👤 Số lượng Diễn viên:", min_value=1, max_value=8, value=1, key=f"num_{st.session_state.reset_key}")
@@ -857,7 +832,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
     can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
     if not can_run: st.error(f"❌ {msg}")
     else:
-        with st.spinner("⏳ Đạo diễn AI đang nén ảnh tối ưu token và phân tích DNA sản phẩm... Vui lòng đợi!"):
+        with st.spinner("⏳ Đạo diễn AI đang quét OCR bảng màu, nhận diện mã bán chạy và phân tích DNA... Vui lòng đợi!"):
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -873,22 +848,24 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "core_value": "Giá trị cốt lõi giải quyết vấn đề gì", 
                         "pain_points": "Nỗi đau / Rào cản lớn nhất của khách hàng", 
                         "hook_element": "Yếu tố giật gân, tạo tò mò hoặc xúc động đánh đúng tâm lý trong 3 giây đầu",
+                        "hero_sku_color": "QUÉT OCR ƯU TIÊN MÃ MÀU BÁN CHẠY: Nhận diện xem mã màu/họa tiết nào có nhãn 'Đã bán 1K+', 'Đã bán...', 'Top bán chạy' hoặc ô khoanh viền đỏ (VD: 'thỏ hoa'). Nếu không có thì chọn màu đẹp nhất.",
+                        "color_palette": "BẢNG MÃ MÀU TOÀN BỘ: Liệt kê danh sách tất cả các màu sắc/họa tiết có trong ảnh (VD: chấm bi đỏ, cherry nâu, da báo, thỏ hoa, kẻ nơ...).",
                         "what_and_unique": "SẢN PHẨM LÀ GÌ & CÓ GÌ ĐẶC BIỆT: Định danh sản phẩm và điểm độc bản (USP) vượt trội",
                         "target_user": "SẢN PHẨM DÀNH CHO AI: Đối tượng cụ thể phù hợp nhất",
                         "why_buy": "TẠI SAO NÊN MUA: Lý do thuyết phục không thể chối từ",
                         "where_and_convenience": "DÙNG Ở ĐÂU & TIỆN LỢI LÀ GÌ: Hoàn cảnh ứng dụng thực tế và tính linh hoạt",
                         "how_to_use": "CÁCH SỬ DỤNG: Thao tác thực tế 1-2 bước trực quan, dễ dàng",
                         "product_size_class": "Phân loại kích thước SP. Tương tác vật lý không ảo giác.",
-                        "product_color_lock": "QUÉT THỊ GIÁC TUYỆT ĐỐI CHÍNH XÁC: Bóc tách màu sắc chi tiết của TỪNG BỘ PHẬN sản phẩm từ ảnh tải lên. CẤM bịa màu.",
-                        "lid_mechanism": "QUÉT CƠ CHẾ MỞ NẮP TỪ ẢNH: Phân tích xem nắp là nắp liền bản lề hay nắp rời. Vị trí nút bấm/chốt mở nằm ở đâu. Khóa cố định không vẽ thêm quai xách.",
-                        "detected_prices": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Đọc kĩ ảnh tải lên để tìm Giá Gốc và Giá Sale (nếu có). Trích xuất nguyên bản text.",
-                        "product_dimensions": "QUÉT OCR TUYỆT ĐỐI CHÍNH XÁC: Quét ảnh tìm thông số kích thước thực tế. Nệm/Thảm BẮT BUỘC dùng từ 'Độ dày' kèm ước lượng (khoảng).",
-                        "voice_gender": "Phân tích xem sản phẩm này hợp giọng Nam hay Nữ để đọc thoại",
+                        "product_color_lock": "KHÓA MÀU SẮC HERO SKU: Bóc tách chi tiết màu sắc, họa tiết in của mã bán chạy nhất để nhúng cứng vào prompt.",
+                        "lid_mechanism": "QUÉT CƠ CHẾ MỞ NẮP TỪ ẢNH (nếu có thiết bị): Bản lề hay nắp rời.",
+                        "detected_prices": "QUÉT OCR GIÁ TIỀN: Đọc kĩ ảnh tìm Giá Gốc và Giá Sale (nếu có).",
+                        "product_dimensions": "QUÉT THÔNG SỐ: Kích thước, độ dày đệm/ga giường.",
+                        "voice_gender": "Giọng Nam hay Nữ phù hợp nhất",
                         "prompt_dna_lock": "Khóa thị giác (Visual DNA) cho AI sinh video. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures."
                     }},
                     "outlines": [ 
                         {{
-                            "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế chuẩn xác (Phòng ngủ đặt trên giường ngủ nếu là gối đệm; Kho hàng xưởng nếu là Flash Sale)", 
+                            "id": 1, "title": "Tên", "setting": "Bối cảnh thực tế chuẩn xác (Phòng ngủ đặt trên giường ngủ nếu là gối/ga đệm; Kho hàng xưởng nếu là Flash Sale)", 
                             "hook": "HOOK 3 GIÂY ĐẦU AIDA: Xưng hô dân dã, đánh trúng nỗi đau hoặc tò mò xúc động, KHÔNG quảng cáo lộ liễu. TÔNG GIỌNG MẠNH MẼ, ĐANH THÉP, DỒN DẬP.",
                             "actors": {num_chars}
                         }},
@@ -918,18 +895,20 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     outlines = res.get("outlines", res.get("script_outlines", []))
                     for o in outlines: o.update({"duration_instruction": st.session_state.target_duration_instruction, "narrator_mode": narrator_mode, "character_profiles": st.session_state.character_profiles})
                     st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None, "scroll_to_top": True})
-                    st.toast("✅ Đã phân tích xong (Đã tối ưu token ảnh)!")
+                    st.toast("✅ Đã phân tích xong (Đã nhận diện Hero SKU & Tối ưu token ảnh)!")
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # Hiển thị DNA
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
     st.divider()
-    st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Theo Mô Hình AIDA**")
+    st.markdown(f"### 🔍 **Phân Tích DNA Chi Tiết Theo Mô Hình AIDA & Hero SKU**")
     with st.container(border=True):
-        st.markdown(f"##### 🎯 **1. Chân dung Khách hàng & Hook 3s (Attention):**<br><div style='line-height: 1.8;'>{format_analysis_field(ca.get('target_audience', ''))}<br>{format_analysis_field(ca.get('pain_points', ''))}<br><b>⚡ Yếu tố Hook 3s đầu:</b> <span style='color:#d90429; font-weight:bold;'>{ca.get('hook_element', '')}</span></div>", unsafe_allow_html=True)
-        st.markdown(f"--- \n##### 💎 **2. Giải phẫu Sản phẩm Không Lộ Liễu (Interest & Desire):**<br><div style='line-height: 1.8;'><b>📦 Sản phẩm là gì & Điểm đặc biệt:</b> {ca.get('what_and_unique', '')}<br><b>👥 Sản phẩm dành cho ai:</b> {ca.get('target_user', '')}<br><b>🔥 Tại sao nên mua:</b> {ca.get('why_buy', '')}<br><b>📍 Dùng ở đâu & Tiện lợi:</b> {ca.get('where_and_convenience', '')}<br><b>🛠 Cách sử dụng:</b> {ca.get('how_to_use', '')}</div>", unsafe_allow_html=True)
-        st.markdown(f"--- \n##### 🏭 **3. Vật lý, Cơ chế & Màu sắc Đa Chi Tiết:**<br><div style='line-height: 1.8;'><b>📐 Thông số (Đã lọc vi phạm):</b> <span style='color:#059669; font-weight:bold;'>{ca.get('product_dimensions', 'Chưa lấy được kích thước')}</span><br><b>🎨 Màu chi tiết (Đã khóa):</b> <span style='color:#0284c7; font-weight:bold;'>{ca.get('product_color_lock', 'Không xác định')}</span><br><b>⚙ Cơ chế mở nắp thực tế:</b> <span style='color:#8b5cf6; font-weight:bold;'>{ca.get('lid_mechanism', 'Bản lề thông thường')}</span><br><b>💰 Mức giá (OCR):</b> <span style='color:#d90429; font-weight:bold;'>{ca.get('detected_prices', 'Không tìm thấy')}</span></div>", unsafe_allow_html=True)
+        col_dna1, col_dna2 = st.columns(2)
+        col_dna1.markdown(f"##### 🎯 **1. Chân dung Khách hàng & Hook 3s (Attention):**<br><div style='line-height: 1.8;'>{format_analysis_field(ca.get('target_audience', ''))}<br>{format_analysis_field(ca.get('pain_points', ''))}<br><b>⚡ Yếu tố Hook 3s đầu:</b> <span style='color:#d90429; font-weight:bold;'>{ca.get('hook_element', '')}</span></div>", unsafe_allow_html=True)
+        col_dna2.markdown(f"##### 🔥 **2. Mã Màu Bán Chạy Nhất (Hero SKU):**<br><div style='line-height: 1.8;'><b>⭐ Màu ưu tiên làm video:</b> <span style='color:#d90429; font-size:16px; font-weight:bold;'>{ca.get('hero_sku_color', 'Tự động chọn màu đẹp nhất')}</span><br><b>🎨 Toàn bộ bảng màu phát hiện:</b> <span style='color:#0284c7;'>{format_analysis_field(ca.get('color_palette', 'Đang cập nhật'))}</span></div>", unsafe_allow_html=True)
+        st.markdown(f"--- \n##### 💎 **3. Giải phẫu Sản phẩm Không Lộ Liễu (Interest & Desire):**<br><div style='line-height: 1.8;'><b>📦 Sản phẩm là gì & Điểm đặc biệt:</b> {ca.get('what_and_unique', '')}<br><b>👥 Sản phẩm dành cho ai:</b> {ca.get('target_user', '')}<br><b>🔥 Tại sao nên mua:</b> {ca.get('why_buy', '')}<br><b>📍 Dùng ở đâu & Tiện lợi:</b> {ca.get('where_and_convenience', '')}<br><b>🛠 Cách sử dụng:</b> {ca.get('how_to_use', '')}</div>", unsafe_allow_html=True)
+        st.markdown(f"--- \n##### 🏭 **4. Vật lý, Cơ chế & Giá tiền OCR:**<br><div style='line-height: 1.8;'><b>📐 Thông số (Đã lọc vi phạm):</b> <span style='color:#059669; font-weight:bold;'>{ca.get('product_dimensions', 'Chưa lấy được kích thước')}</span><br><b>🎨 Khóa màu chi tiết:</b> <span style='color:#0284c7; font-weight:bold;'>{ca.get('product_color_lock', 'Không xác định')}</span><br><b>💰 Mức giá (OCR):</b> <span style='color:#d90429; font-weight:bold;'>{ca.get('detected_prices', 'Không tìm thấy')}</span></div>", unsafe_allow_html=True)
     if ca.get('prompt_dna_lock'): st.markdown("##### 📌 **Visual DNA Lock:**"); st.code(ca.get('prompt_dna_lock'), language="text")
 
 # DANH SÁCH KỊCH BẢN
@@ -947,14 +926,14 @@ if all_sc:
         if isinstance(vp, str): vp = {"gender": "Nữ", "tone": vp}
         
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
-        st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT (CHUẨN AIDA & DIEGETIC AUDIO): {str(asc.get('title')).upper()}**")
+        st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT (CHUẨN 4 PHÂN CẢNH AIDA & DIEGETIC AUDIO): {str(asc.get('title')).upper()}**")
         st.markdown(f"<div class='detail-header-box'>⏱ Thời lượng: <b>{asc.get('total_dur')}</b> | 🎙 Giọng: <b>{vp.get('gender', 'Nữ')} ({vp.get('tone', '')})</b> | 👔 Bối cảnh chung: <b>{asc.get('outfit_vi')}</b></div>", unsafe_allow_html=True)
         
         scenes = asc.get("scenes", [])
         if isinstance(scenes, dict): scenes = [scenes]
         for idx, scn in enumerate(scenes, 1):
-            aida_badge = f"<span style='background:#dbeafe; color:#1e40af; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:12px; margin-left:8px;'>{scn.get('aida_stage', 'AIDA')}</span>"
-            st.markdown(f"#### 📍 Phân cảnh {idx} ({scn.get('dur', '8s')}) {aida_badge} — [ {scn.get('trans', 'Chuyển cảnh')} ]", unsafe_allow_html=True)
+            aida_badge = f"<span style='background:#dbeafe; color:#1e40af; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:12px; margin-left:8px;'>Giai đoạn {scn.get('aida_stage', 'AIDA')}</span>"
+            st.markdown(f"#### 📍 Phân cảnh {idx} ({scn.get('dur', '6s')}) {aida_badge} — [ {scn.get('trans', 'Chuyển cảnh')} ]", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh & Miêu tả:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & SFX Thực Tế:** *{scn.get('director')}*\n\n**💬 Thoại (Số từ thực tế: {scn.get('word_count', 'Không đếm')}):** <span class='voiceover-text'>{scn.get('voiceover')}</span>", unsafe_allow_html=True)
             
             img_p, vid_p = scn.get('img_p', ''), scn.get('vid_p', '')
@@ -1014,13 +993,13 @@ if all_sc:
                 btn_cre_ph = c2.empty()
                 if st.session_state.get(ck, False):
                     btn_cre_ph.empty()
-                    st.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang dựng...</div>", unsafe_allow_html=True)
+                    st.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 6px; padding: 6px; text-align: center; font-size: 13px; font-weight: bold;'>⏳ Đang dựng đủ 4 cảnh AIDA...</div>", unsafe_allow_html=True)
                     lock_ui()
                     try:
                         create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
                         st.session_state.active_script_id = sc_id
                         st.session_state.scroll_to_detail = True
-                        st.toast("✅ Hoàn tất dựng!")
+                        st.toast("✅ Hoàn tất dựng kịch bản 4 phân cảnh!")
                     except Exception as e: 
                         st.error(f"❌ Lỗi: {e}")
                     finally:
@@ -1041,8 +1020,8 @@ if all_sc:
     a_opts = ["🌟 Tự động mix", "🧠 Chuyên gia", "💡 Mẹo hay", "🎭 Drama", "📖 Storytelling", "😂 Hài hước"] if is_viral_mode else ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước (Chốt sale)"]
     c_ang = cg1.selectbox("🧭 Chiến lược:", a_opts, key=f"ea_{st.session_state.reset_key}")
     c_num = cg2.number_input("Số diễn viên:", 1, 8, 1, key=f"en_{st.session_state.reset_key}")
-    c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Tự động (~20-30s)", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
-    c_dur_str = f"Chính xác {cg3.number_input('Số giây:', 10, 300, 60, key=f'eds_{st.session_state.reset_key}')} giây." if "Tùy" in c_dur_choice else "Khoảng 15-30 giây."
+    c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Tự động (~24-30s)", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
+    c_dur_str = f"Chính xác {cg3.number_input('Số giây:', 10, 300, 60, key=f'eds_{st.session_state.reset_key}')} giây." if "Tùy" in c_dur_choice else "Khoảng 24-30 giây."
     c_nar = cg4.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)", "🎙 Lồng tiếng ngoài (Off-screen)"], key=f"ena_{st.session_state.reset_key}")
 
     e_chars = []
