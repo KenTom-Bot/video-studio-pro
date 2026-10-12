@@ -95,8 +95,7 @@ def is_valid_phone(phone):
 def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
     try:
         img = Image.open(uploaded_file)
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
+        if img.mode in ("RGBA", "P"): img = img.convert("RGB")
         img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
         out_buffer = io.BytesIO()
         img.save(out_buffer, format="JPEG", quality=quality, optimize=True)
@@ -245,7 +244,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V58.0 (HERO SKU DETECTION & SMART COLOR FALLBACK)
+# 2. HÀM AI LÕI & LUẬT THÉP V59.0 (CƯỠNG CHẾ ĐỦ 4 CẢNH AIDA & CHỐNG THIẾU CẢNH)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -289,7 +288,7 @@ def repair_and_parse_json(text_content: str):
     except Exception:
         raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6000):
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=7000):
     model_name = "gemini-3.8-flash"
     for attempt in range(2):
         try:
@@ -327,13 +326,13 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL KÊNH TIKTOK SHOP TRIỆU VIEW. PHONG CÁCH: {style}
     {strat_cmd}
     
-    🛑 QUY TẮC NHẬN DIỆN MÀU BÁN CHẠY (HERO SKU) & BỐI CẢNH NATIVE:
+    🛑 QUY TẮC BỐI CẢNH VÀ CỐT TRUYỆN CHUẨN XÁC THEO SẢN PHẨM & KỊCH BẢN:
     1. ƯU TIÊN MÃ MÀU/HỌA TIẾT BÁN CHẠY NHẤT:
-       - Quét OCR toàn bộ chữ trong ảnh: nếu thấy nhãn 'Đã bán 1K+', 'Đã bán...', 'Top bán chạy', 'Hot sale' hoặc ô màu được khoanh đỏ viền nổi bật (VD: 'thỏ hoa - Đã bán 1K+'), BẮT BUỘC chọn mã màu/họa tiết đó làm SẢN PHẨM HERO CHỦ ĐẠO cho video[cite: 7].
+       - Quét OCR toàn bộ chữ trong ảnh: nếu thấy nhãn 'Đã bán 1K+', 'Đã bán...', 'Top bán chạy', 'Hot sale' hoặc ô màu được khoanh đỏ viền nổi bật (VD: 'thỏ hoa - Đã bán 1K+'), BẮT BUỘC chọn mã màu/họa tiết đó làm SẢN PHẨM HERO CHỦ ĐẠO cho video.
        - Nếu ảnh KHÔNG CÓ nhãn bán chạy: Tự động trích xuất danh sách bảng màu 'color_palette' và chọn màu đẹp/nổi bật nhất làm màu chủ đạo, các màu khác làm combo nền.
     2. PHÂN BIỆT BỐI CẢNH THỰC TẾ:
        - Flash Sale/Xả kho: Bắt buộc ở Kho hàng/Xưởng ngập kiện hàng.
-       - Ga giường, gối ngủ, nệm: Bắt buộc ở Phòng ngủ hiện đại ấm cúng, sản phẩm ĐẶT NGAY TRÊN GIƯỜNG NGỦ[cite: 7]. Cấm đặt trên bàn.
+       - Ga giường, gối ngủ, nệm: Bắt buộc ở Phòng ngủ hiện đại ấm cúng, sản phẩm ĐẶT NGAY TRÊN GIƯỜNG NGỦ. Cấm đặt trên bàn.
        - Đồ bếp: Đặt trên mặt bàn bếp/đảo bếp.
     3. KỊCH BẢN CHUẨN MÔ HÌNH AIDA:
        - Hook 3s đầu: Đánh trúng nỗi đau/tò mò/xúc động, không lộ liễu.
@@ -360,15 +359,17 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     return f"""
     BẠN LÀ ĐẠO DIỄN VIRTUAL ĐỈNH CAO CHO VEO 3. PHONG CÁCH: {style}
     
-    🛑 BẮT BUỘC XUẤT ĐỦ 4 PHÂN CẢNH THEO MÔ HÌNH AIDA:
-    1. Scene 1 (aida_stage: "Attention"): 4s (12-14 từ) - Hook giữ chân, đánh trúng nỗi đau, không lộ liễu.
-    2. Scene 2 (aida_stage: "Interest"): 6s (18-20 từ) - Sản phẩm hero xuất hiện đúng lúc, giới thiệu tính năng giải pháp.
-    3. Scene 3 (aida_stage: "Desire"): 8s (26-28 từ) - Nhấn mạnh điểm độc bản (USP), nhắc đến sự phong phú của bảng màu/combo, trải nghiệm thực tế.
-    4. Scene 4 (aida_stage: "Action"): 6s hoặc 8s (18-20 hoặc 26-28 từ) - Chốt hạ bằng đòn bẩy giá tương phản Omni-channel.
+    🛑 QUY TẮC CƯỠNG CHẾ TUYỆT ĐỐI VỀ SỐ LƯỢNG PHÂN CẢNH:
+    - MẢNG 'scenes' BẮT BUỘC PHẢI CHỨA ĐỦ CHÍNH XÁC 4 PHÂN CẢNH (SCENE 1, SCENE 2, SCENE 3, SCENE 4) TƯƠNG ỨNG VỚI 4 GIAI ĐOẠN AIDA:
+      1. Scene 1 (aida_stage: "Attention"): 4s (12-14 từ)
+      2. Scene 2 (aida_stage: "Interest"): 6s (18-20 từ)
+      3. Scene 3 (aida_stage: "Desire"): 8s (26-28 từ)
+      4. Scene 4 (aida_stage: "Action"): 6s hoặc 8s (18-20 hoặc 26-28 từ)
+    - TUYỆT ĐỐI CẤM NGỪNG LẠI SAU CẢNH 1 HOẶC CẢNH 2. NẾU THIẾU BẤT KỲ CẢNH NÀO TRONG 4 CẢNH SẼ BỊ COI LÀ LỖI HỆ THỐNG NGHIÊM TRỌNG.
     
     🛑 QUY TẮC MÃ MÀU HERO SKU & DIEGETIC SOUND:
     1. KHÓA MÀU HERO SKU ĐÃ QUÉT ĐƯỢC:
-       - Nếu phát hiện màu bán chạy (nhãn 'Đã bán 1K+', viền đỏ): Khóa 100% màu/họa tiết đó (VD: ga giường thỏ hoa) làm sản phẩm trên giường/tay nhân vật[cite: 7].
+       - Nếu phát hiện màu bán chạy (nhãn 'Đã bán 1K+', viền đỏ): Khóa 100% màu/họa tiết đó (VD: ga giường thỏ hoa) làm sản phẩm trên giường/tay nhân vật.
        - Các màu khác trong bảng màu được mô tả xếp ngay ngắn ở góc giường/trên kệ để minh họa sự đa dạng.
     2. TỰ ĐỘNG SINH ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX):
        - Chiên xào: sizzling frying sound.
@@ -377,7 +378,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
        - Gió thổi: whooshing wind breeze sound.
        - Nồi cơm/thiết bị: mechanical latch click sound.
     3. ĐẠO DIỄN BỐI CẢNH NATIVE:
-       - Ga gối đệm: PHÒNG NGỦ HIỆN ĐẠI, ĐẶT SẢN PHẨM TRÊN GIƯỜNG NGỦ[cite: 7].
+       - Ga gối đệm: PHÒNG NGỦ HIỆN ĐẠI, ĐẶT SẢN PHẨM TRÊN GIƯỜNG NGỦ.
        - Flash sale: KHO HÀNG / XƯỞNG NGẬP KIỆN HÀNG.
     4. KHÓA BẢO TOÀN VẬT THỂ:
        - "Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, resting stably in its designated environment, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding."
@@ -411,15 +412,16 @@ def create_scene_details(target_id, mode, style):
     Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('hook', outline.get('target_hook'))}. Bối cảnh: {outline.get('setting', outline.get('setting_style'))}.
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
-    🛑 LỆNH CƯỠNG CHẾ: BẮT BUỘC TẠO ĐỦ 4 PHÂN CẢNH TRONG MẢNG 'scenes':
+    🛑 LỆNH CƯỠNG CHẾ TỐI HẬU:
+    BẠN BẮT BUỘC PHẢI SINH ĐỦ CẢ 4 PHÂN CẢNH SAU ĐÂY TRONG MẢNG 'scenes' (CẤM TUYỆT ĐỐI CHỈ SINH 1 HOẶC 2 CẢNH):
     - Scene 1: Attention (4s, 12-14 từ)
     - Scene 2: Interest (6s, 18-20 từ)
     - Scene 3: Desire (8s, 26-28 từ)
     - Scene 4: Action (6s hoặc 8s, 18-20 hoặc 26-28 từ)
-    
+
     LƯU Ý ĐẶC BIỆT:
-    - Bối cảnh native: ga gối đệm đặt trên giường trong phòng ngủ ấm cúng[cite: 7]; flash sale ở kho hàng.
-    - Màu sắc: Khóa đúng màu/họa tiết Hero SKU bán chạy nhất đã quét từ DNA (VD: thỏ hoa)[cite: 7].
+    - Bối cảnh native: ga gối đệm đặt trên giường trong phòng ngủ ấm cúng; flash sale ở kho hàng.
+    - Màu sắc: Khóa đúng màu/họa tiết Hero SKU bán chạy nhất đã quét từ DNA (VD: thỏ hoa).
     - Thoại ngay tại 0.00s.
     - Công thức giá tương phản Omni-channel.
     - Khóa không gian tay và vật thể: cấm dính da tay, cấm biến mất.
@@ -441,12 +443,12 @@ def create_scene_details(target_id, mode, style):
                 "word_count": "12-14",
                 "dur": "4s", 
                 "trans": "Chuyển cảnh mới", 
-                "setting": "Mô tả bối cảnh tiếng Việt...",
-                "action_en": "Direct eye-level shot. Character maintains upright natural elegant posture. Interacts naturally with product. Hands show clear anatomical separation without merging into fabric. Expressive bright eyes, engaging authentic micro-smile, mouth articulation starting immediately at 0.00s.",
-                "director": "Giai đoạn AIDA: Attention | Bối cảnh: Native chuẩn xác | Âm thanh thực tế: [SFX] | Khởi động: THOẠI NGAY TẠI GIÂY 0.00 | Tông: Giọng ngực đầy nội lực (4.3 - 4.5 từ/s)", 
-                "voiceover": "Thoại câu đơn/kép ngắn 12-14 từ, ngắt nghỉ rất ngắn, gây tò mò hoặc đánh đúng nỗi đau.",
-                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
-                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00 without idle delay. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 1]\\", Layered SFX: [Mô tả âm thanh tiếng Anh thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding. Strict zero-mutation geometry. NO morphing, NO warping, NO melting edges. Clean frame."
+                "setting": "Mô tả bối cảnh cảnh 1...",
+                "action_en": "Direct eye-level shot. Character maintains upright posture. Interacts naturally with product. Hands separate from fabric. Expressive face, mouth articulates immediately at 0.00s.",
+                "director": "Giai đoạn AIDA: Attention | Bối cảnh: Native chuẩn xác | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Nội lực dứt khoát", 
+                "voiceover": "Thoại câu ngắn 12-14 từ đánh trúng nỗi đau hoặc tò mò.",
+                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Strict zero-mutation geometry. Clean frame.", 
+                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 1]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Clean frame."
             }},
             {{
                 "scene": 2, 
@@ -454,12 +456,12 @@ def create_scene_details(target_id, mode, style):
                 "word_count": "18-20",
                 "dur": "6s", 
                 "trans": "Chuyển cảnh mới", 
-                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "setting": "Mô tả bối cảnh cảnh 2...",
                 "action_en": "Direct eye-level shot. Character presents product naturally. Hands separate from fabric. Expressive face, mouth articulates immediately at 0.00s.",
-                "director": "Giai đoạn AIDA: Interest | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Đanh thép, dứt khoát", 
-                "voiceover": "Thoại 18-20 từ nêu rõ sản phẩm là gì, dành cho ai, giải quyết vấn đề gì, tối đa 1 dấu phẩy cân bằng 2 vế.",
+                "director": "Giai đoạn AIDA: Interest | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Đanh thép", 
+                "voiceover": "Thoại 18-20 từ nêu rõ sản phẩm là gì, dành cho ai, giải quyết vấn đề gì.",
                 "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Clean frame.", 
-                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 2]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Anatomically separate hands and fingers. Clean frame."
+                "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 2]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Clean frame."
             }},
             {{
                 "scene": 3, 
@@ -467,10 +469,10 @@ def create_scene_details(target_id, mode, style):
                 "word_count": "26-28",
                 "dur": "8s", 
                 "trans": "Chuyển cảnh mới", 
-                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "setting": "Mô tả bối cảnh cảnh 3...",
                 "action_en": "Direct eye-level shot. Character highlights unique product features with genuine excitement. Speech articulation begins at 0.00s.",
                 "director": "Giai đoạn AIDA: Desire | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Hào hứng, nội lực", 
-                "voiceover": "Thoại 26-28 từ nêu bật điểm độc bản và lý do tại sao nên mua ngay (nhắc đến bảng màu đa dạng), tối đa 2 dấu phẩy cân bằng.",
+                "voiceover": "Thoại 26-28 từ nêu bật điểm độc bản và lý do tại sao nên mua ngay (nhắc đến bảng màu đa dạng).",
                 "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Clean frame.", 
                 "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech start at second 0.00. Audio: \\"[ĐIỀN ĐẦY ĐỦ VOICEOVER CẢNH 3]\\", Layered SFX: [Mô tả SFX thực tế], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item. Clean frame."
             }},
@@ -480,7 +482,7 @@ def create_scene_details(target_id, mode, style):
                 "word_count": "18-20",
                 "dur": "6s", 
                 "trans": "Chuyển cảnh mới", 
-                "setting": "Mô tả bối cảnh tiếng Việt...",
+                "setting": "Mô tả bối cảnh cảnh 4...",
                 "action_en": "Direct eye-level shot. Character points gently downward to action trigger. Mouth articulates immediately at 0.00s.",
                 "director": "Giai đoạn AIDA: Action | Bối cảnh: Native | Âm thanh thực tế: [SFX] | Khởi động: THOẠI TẠI 0.00s | Tông: Thúc giục, mạnh mẽ", 
                 "voiceover": "Thoại 18-20 từ đòn bẩy giá tương phản: Giá niêm yết gần [X] nghìn, nhưng hôm nay xả kho giảm cực sâu, bấm ngay giỏ hàng nhận deal hời, lưu ý giá có thể thay đổi tùy thời điểm nhé.",
@@ -490,8 +492,15 @@ def create_scene_details(target_id, mode, style):
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=6000)
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=7000)
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
+    
+    # Cơ chế kiểm tra an toàn: Nếu AI vẫn thiếu cảnh, tái thử thách một lần nữa
+    if len(res.get("scenes", [])) < 3:
+        st.warning("⚠️ Đang tự động bổ sung đủ 4 phân cảnh AIDA...")
+        fix_prompt = f"{prompt}\n\n🛑 LƯU Ý: LẦN TRƯỚC BẠN CHỈ SINH {len(res.get('scenes', []))} CẢNH. LẦN NÀY BẮT BUỘC PHẢI SINH ĐỦ CẢ 4 CẢNH TỪ SCENE 1 ĐẾN SCENE 4!"
+        res = call_gemini([fix_prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=7000)
+        
     st.session_state.generated_details[target_id] = res
 
 def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more, duration_inst, char_profiles):
@@ -509,8 +518,8 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     {prod_ctx} | {db_ctx} | {dna_ctx}
 
     🛑 LỆNH TẨY NÃO: BẠN BẮT BUỘC PHẢI VIẾT CẢ 5 KỊCH BẢN MỚI THEO MÔ HÌNH AIDA VÀ CHIẾN LƯỢC: '{angle}'.
-    - Phân biệt bối cảnh: Nếu Flash Sale thì là Kho hàng/Xưởng ngập kiện hàng; nếu Review sản phẩm phòng ngủ/gối/đệm thì BẮT BUỘC là Phòng ngủ đặt gối trên giường ngủ[cite: 7].
-    - Khóa đúng Hero SKU bán chạy nhất từ DNA (VD: thỏ hoa)[cite: 7].
+    - Phân biệt bối cảnh: Nếu Flash Sale thì là Kho hàng/Xưởng ngập kiện hàng; nếu Review sản phẩm phòng ngủ/gối/đệm thì BẮT BUỘC là Phòng ngủ đặt gối trên giường ngủ.
+    - Khóa đúng Hero SKU bán chạy nhất từ DNA (VD: thỏ hoa).
     - Hook 3 giây đầu đánh trúng nỗi đau/tò mò/xúc động, không quảng cáo lộ liễu.
     - Làm rõ: Sản phẩm là gì/có gì đặc biệt, Dành cho ai, Tại sao nên mua, Dùng ở đâu tiện ích ra sao, Cách dùng thực tế.
     - Áp dụng công thức giá tương phản Omni-channel (neo giá gốc làm tròn, khẳng định giảm cực sâu/chạm đáy, kêu gọi bấm xem deal hời, miễn trừ trách nhiệm thời gian).
@@ -524,7 +533,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
             {{
                 "id": {cur_len+1},
                 "title": "Tên kịch bản 1",
-                "setting": "Bối cảnh thực tế chuẩn xác (Phòng ngủ đặt trên giường ngủ nếu là gối đệm[cite: 7]; Kho hàng xưởng nếu là Flash Sale)",
+                "setting": "Bối cảnh thực tế chuẩn xác (Phòng ngủ đặt trên giường ngủ nếu là gối đệm; Kho hàng xưởng nếu là Flash Sale)",
                 "hook": "Hook 3 giây đầu AIDA: Xưng hô tự nhiên, đánh trúng nỗi đau hoặc gây tò mò cực độ, KHÔNG quảng cáo lộ liễu (CÓ CHỦ VỊ, CẤM TỪ VI PHẠM, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP)",
                 "actors": {num_chars}
             }}
@@ -560,7 +569,7 @@ def clone_script(script_id):
     prompt = f"""
     DỮ LIỆU GỐC: {dna_str}
     Nhân bản kịch bản gốc theo mô hình AIDA: {json.dumps(target, ensure_ascii=False)}. Tạo 5 biến thể mới.
-    LUẬT: Thoại CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP. Hook không lộ liễu. Bối cảnh chuẩn native (phòng ngủ trên giường nếu là gối nệm[cite: 7]; kho hàng nếu là flash sale). Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "chữa bệnh". Đặt BỐI CẢNH ĐỒNG NHẤT. Nếu bán hàng, dùng công thức giá tương phản Omni-channel.
+    LUẬT: Thoại CÂU GHÉP DÀI CÂN BẰNG VẾ CÂU, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP. Hook không lộ liễu. Bối cảnh chuẩn native (phòng ngủ trên giường nếu là gối nệm; kho hàng nếu là flash sale). Giọng HÀ NỘI GỐC. Cấm "tuyệt đối", "chữa bệnh". Đặt BỐI CẢNH ĐỒNG NHẤT. Nếu bán hàng, dùng công thức giá tương phản Omni-channel.
     TRẢ VỀ JSON:
     {{
         "outlines": [
