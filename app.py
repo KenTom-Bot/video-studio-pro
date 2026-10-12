@@ -10,6 +10,8 @@ import re
 import time
 import ast
 import uuid
+import io
+from PIL import Image
 from datetime import datetime, timedelta
 
 # ==============================================================================
@@ -89,6 +91,19 @@ client = genai.Client(api_key=api_key) if api_key else None
 def is_valid_phone(phone):
     phone = phone.strip()
     return phone.isdigit() and phone.startswith('0') and 9 <= len(phone) <= 11
+
+def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
+    """Nén và giảm kích thước ảnh về chuẩn 1024px để đưa số token ảnh từ 3.000 xuống chỉ còn ~258 tokens."""
+    try:
+        img = Image.open(uploaded_file)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+        out_buffer = io.BytesIO()
+        img.save(out_buffer, format="JPEG", quality=quality, optimize=True)
+        return out_buffer.getvalue(), "image/jpeg"
+    except Exception:
+        return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
@@ -231,7 +246,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V53.0 (DIEGETIC SOUND & DYNAMIC ENVIRONMENT SYNC)
+# 2. HÀM AI LÕI & LUẬT THÉP V54.0 (TỐI ƯU CHI PHÍ TOKEN & TOÀN BỘ LOGIC CỐT LÕI)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -248,17 +263,24 @@ def clean_and_parse_json(text_content: str):
         except Exception:
             raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON."):
-    for attempt in range(3):
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=3000):
+    """Giới hạn max_output_tokens và kiểm soát retry nhằm tối ưu hóa chi phí API tuyệt đối."""
+    for attempt in range(2):
         try:
             res = client.models.generate_content(
-                model="gemini-3.6-flash", contents=contents,
-                config=types.GenerateContentConfig(system_instruction=sys_inst, response_mime_type="application/json", temperature=0.7)
+                model="gemini-2.5-flash", 
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=sys_inst, 
+                    response_mime_type="application/json", 
+                    temperature=0.7,
+                    max_output_tokens=max_tokens
+                )
             )
             return clean_and_parse_json(res.text)
         except Exception as e:
-            if attempt == 2: raise e
-            time.sleep(2)
+            if attempt == 1: raise e
+            time.sleep(1)
 
 def generate_char_rules_string(profiles):
     if not profiles: return "CHAR_LOCK: AI tự tạo diện mạo KOC người Việt Nam chân thực, thần thái tự tin, ánh mắt sáng, nụ cười cuốn hút, khóa cố định Khuôn mặt, Kiểu tóc, Vóc dáng."
@@ -316,7 +338,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
          + Chiên xào / Nấu nướng: Chèn tiếng xèo xèo của dầu nóng, tiếng lách tách đáy chảo (`sizzling frying sound, gentle oil crackle in pan`).
          + Ăn uống: Tiếng cắn giòn rụm, nhai giòn tan (`crisp crunching bite sound, satisfying crunchy chewing sound`).
          + Gió thổi / Ngoài trời / Quạt: Tiếng gió thổi vi vu vù vù (`audible whooshing wind breeze sound, fluttering ambient air`).
-         + Nồi cơm / Đồ điện tử: Tiếng chốt nắp bật cách cạch, tiếng hơi nước phì nhẹ (`mechanical latch click sound, gentle steam release hiss`).
+         + Nồi cơm / Đồ điện tử: Tiếng chốt nắp bật cách cạch, tiếng hơi nước phì nhẹ (`mechanical latch click sound, steam hiss`).
          + Chăn ga / Gối nệm: Tiếng sột soạt êm ái của sợi vải và tiếng bọt nhớ đàn hồi (`soft fabric rustling, subtle foam compression sound`).
        - Trong lệnh âm thanh của `vid_p`, cấu trúc chuẩn:
          Audio: "[Lời thoại]", Layered SFX: [Âm thanh vật lý thực tế tương ứng], Ambient environment background sound.
@@ -381,12 +403,7 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT (ÂM THANH MÔI TRƯỜNG THỰC TẾ & BỐI CẢNH NATIVE):
-    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director':
-      + Nếu là nấu nướng/chiên rán: tiếng xèo xèo dầu nóng chảo rán (`sizzling frying sound`).
-      + Nếu là ăn uống: tiếng cắn giòn rụm rôm rốp (`crispy crunching sound`).
-      + Nếu có gió thổi/quạt: tiếng gió vù vù (`whooshing breeze wind sound`).
-      + Nếu mở nắp nồi cơm/hộp: tiếng cách cạch của chốt cơ học (`mechanical click latch sound, steam hiss`).
-      + Nếu là gối đệm: tiếng sột soạt êm dịu của vải bọt nhớ (`soft fabric rustle, subtle foam rebound sound`).
+    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director'.
     - ĐẠO DIỄN BỐI CẢNH NATIVE:
       + Nếu là GỐI NGỦ, ĐỆM, CHĂN GA: Bối cảnh BẮT BUỘC là PHÒNG NGỦ HIỆN ĐẠI (`cozy modern bedroom`), GỐI/ĐỆM ĐẶT NGAY TRÊN GIƯỜNG NGỦ CÓ GA BỌC CHỈNH CHU. Nhân vật ngồi ở mép giường hoặc đứng cạnh giường tương tác nhẹ nhàng (ấn thử độ đàn hồi bọt nhớ của gối trên giường). TUYỆT ĐỐI CẤM đặt trên bàn làm việc/bàn cạnh giường.
       + Nếu là KỊCH BẢN FLASH SALE / XẢ KHO: Bối cảnh BẮT BUỘC là KHO HÀNG / XƯỞNG / SHOWROOM NGẬP TRÀN KIỆN HÀNG.
@@ -425,8 +442,8 @@ def create_scene_details(target_id, mode, style):
         "outfit_vi": "Tóm tắt trang phục và bối cảnh",
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
         "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
-        "global_setting_en": "Exact English desc of the unified native environment/setting (e.g. cozy modern bedroom with neatly made bed for pillows, or authentic warehouse/showroom for flash sale). MUST BE LOCKED.",
-        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC (EXACT COLOR, FABRIC WEAVE, PATTERNS...). Strict numerical persistence of exactly ONE item.",
+        "global_setting_en": "Exact English desc of the unified native environment/setting. MUST BE LOCKED.",
+        "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC. Strict numerical persistence of exactly ONE item.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
             {{
@@ -437,16 +454,15 @@ def create_scene_details(target_id, mode, style):
                 "trans": "Chuyển cảnh mới hoặc Nối tiếp liền mạch từ cảnh trước", 
                 "setting": "Mô tả bối cảnh tiếng Việt chuẩn xác (Phòng ngủ đặt trên giường, hoặc Kho hàng xưởng xả kho)...",
                 "action_en": "Direct eye-level shot. Character maintains upright natural elegant posture (NO crouching, NO leaning forward, NO awkward hunching). Interacts naturally with product resting in its native location. Hands show clear anatomical separation without merging into fabric. Expressive bright eyes, engaging authentic micro-smile, crisp natural mouth articulation starting immediately at 0.00s matching dialogue cadence.",
-                "director": "Giai đoạn AIDA: Attention/Interest/Desire/Action | Bối cảnh: Native chuẩn xác | Âm thanh thực tế: [Mô tả chi tiết SFX thực tế như tiếng xèo xèo rán đồ, vù vù gió thổi, rôm rốp khi cắn ăn, cách cạch mở nắp...] | Khởi động: THOẠI NGAY TẠI GIÂY 0.00 | Tông: Giọng ngực đầy nội lực (4.3 - 4.5 từ/s)", 
+                "director": "Giai đoạn AIDA: Attention/Interest/Desire/Action | Bối cảnh: Native chuẩn xác | Âm thanh thực tế: [Mô tả chi tiết SFX thực tế] | Khởi động: THOẠI NGAY TẠI GIÂY 0.00 | Tông: Giọng ngực đầy nội lực (4.3 - 4.5 từ/s)", 
                 "voiceover": "Thoại CÂU GHÉP CÓ DẤU PHẨY (,) CÂN BẰNG TỪ HAI VẾ, NGẮT NGHỈ RẤT NGẮN. TÔNG GIỌNG MẠNH MẼ KHÔNG ĐỀU ĐỀU. CẤM BỎ NGOẶC ĐƠN VÀO. THOẠI TỰ NHIÊN KHÔNG QUẢNG CÁO LỘ LIỄU. NẾU NÓI GIÁ PHẢI DÙNG ĐÒN BẨY TƯƠNG PHẢN. CẤM TỪ MIỀN NAM. LÁCH TỪ VI PHẠM.",
-                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], positioned naturally with upright posture. Action: [action_en]. Product: [prod_dna] resting stably on designated surface (e.g. on the bed). Maintain EXACT original product colors for all parts. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
+                "img_p": "Cinematic vertical 9:16 photo. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], positioned naturally with upright posture. Action: [action_en]. Product: [prod_dna] resting stably on designated surface. Maintain EXACT original product colors for all parts. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame.", 
                 "vid_p": "Vertical 9:16 video. Direct eye-level static shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en], upright natural stance without hunching or awkward crouching. Action: [action_en]. Immediate speech start at second 0.00 without idle delay. Audio: \\"[ĐIỀN ĐẦY ĐỦ 100% NỘI DUNG VOICEOVER VÀO ĐÂY, KHÔNG CẮT BỚT]\\", Layered SFX: [Mô tả âm thanh tiếng Anh thực tế: sizzling frying sound, crunchy chewing sound, whooshing wind breeze, mechanical latch click...], ambient room tone. Product: [prod_dna]. Strict numerical object persistence: Exactly ONE single product item visible throughout the shot, strictly NO extra duplicates, NO disappearing artifacts. Anatomically separate hands and fingers with crisp spatial boundary; skin never merges with fabric or casing. Product maintains 100% frozen geometry, identical fabric weave, fixed print patterns, and invariant colors without warping, fading, or pixel bleeding. Strict zero-mutation geometry. NO added handles, NO extra lifting loops, NO phantom fixtures. NO morphing, NO warping, NO melting edges. NO generated text, NO subtitles, NO typography, NO watermarks, NO UI elements, NO icons, NO logos, NO buttons, NO floating graphics. Clean frame."
             }}
-            // ... Tiếp tục các cảnh khác theo tuần tự AIDA. Mỗi cảnh tối đa 10s, nếu nội dung dài tự động tách làm 2 cảnh nối tiếp.
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"))
+    res = call_gemini([prompt], get_sys_inst_details(mode, style, narrator_mode, char_rules, f"TỔNG THỜI GIAN: {duration_instruction}"), max_tokens=3500)
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     st.session_state.generated_details[target_id] = res
 
@@ -483,19 +499,11 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
                 "hook": "Hook 3 giây đầu AIDA: Xưng hô tự nhiên, đánh trúng nỗi đau hoặc gây tò mò cực độ, KHÔNG quảng cáo lộ liễu (CÓ CHỦ VỊ, CẤM TỪ VI PHẠM, TÔNG GIỌNG MẠNH MẼ ĐANH THÉP)",
                 "actors": {num_chars}
             }}
-            // Tạo đủ 5 kịch bản
         ]
     }}
     🛑 BẮT BUỘC ĐÚNG 5 KỊCH BẢN.
     """
-    payload = []
-    if extra_char_inputs:
-        for c in extra_char_inputs:
-            payload.append(f"ACTOR {c['id']} ({c['role']}):")
-            payload.append(types.Part.from_bytes(data=c["bytes"], mime_type=c["mime_type"]))
-    payload.append(prompt)
-    
-    res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle))
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle), max_tokens=2000)
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts): 
@@ -507,7 +515,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
 
 def clone_script(script_id):
     mode = st.session_state.get("last_mode", "Bán Hàng")
-    style = st.session_style = "Điện ảnh"
+    style = st.session_state.get("last_style", "Điện ảnh")
     
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if sc["id"] == script_id), None)
@@ -528,11 +536,10 @@ def clone_script(script_id):
     {{
         "outlines": [
             {{ "id": {cur_len+1}, "title": "...", "setting": "...", "hook": "...", "actors": {num_chars} }}
-            // Tạo đủ 5 kịch bản
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target_narrator, char_rules, num_chars, "Giữ nguyên chiến lược gốc"))
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target_narrator, char_rules, num_chars, "Giữ nguyên chiến lược gốc"), max_tokens=2000)
     if not res or ("outlines" not in res and "script_outlines" not in res): raise Exception("AI JSON Error.")
     clones = res.get("outlines", res.get("script_outlines", []))
     for idx, cl in enumerate(clones): 
@@ -766,7 +773,7 @@ else:
             col_a, col_b = st.columns(2)
             col_a.markdown(f"**💰 Hoa hồng:** <span style='color:#15803d; font-weight:900;'>{prod.get('commission_percent', 0)}%</span><br>**🎯 Tệp:** {prod.get('target_audience', '')}", unsafe_allow_html=True)
             col_b.markdown(f"**🧠 Insight:** {prod.get('product_insight', '')}<br>**💔 Nỗi đau:** {prod.get('pain_points', '')}", unsafe_allow_html=True)
-    up_files = st.file_uploader("📦 Upload Ảnh SP (Quét OCR Tuyệt đối - Đọc Giá, Cơ chế mở nắp & Kích thước):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh SP (Tự động nén tối ưu Token - Đọc Giá & Cơ chế mở nắp):", type=["jpg", "png"], accept_multiple_files=True, key=f"us_{st.session_state.reset_key}")
     custom_note = st.text_area("✍ Ghi chú AI:", key=f"ns_{st.session_state.reset_key}")
 
 st.markdown("---")
@@ -796,7 +803,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
     can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=False)
     if not can_run: st.error(f"❌ {msg}")
     else:
-        with st.spinner("⏳ Đạo diễn AI đang phân tích sâu DNA sản phẩm theo mô hình AIDA... Vui lòng đợi!"):
+        with st.spinner("⏳ Đạo diễn AI đang nén ảnh tối ưu token và phân tích DNA sản phẩm... Vui lòng đợi!"):
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -839,18 +846,25 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 }}
                 🛑 NẾU CHIẾN LƯỢC LÀ TỰ ĐỘNG MIX THÌ BẠN HÃY MIX. CÒN NẾU CHIẾN LƯỢC LÀ '{initial_angle}', BẠN BẮT BUỘC PHẢI TRẢ VỀ CẢ 5 KỊCH BẢN THEO ĐÚNG CHIẾN LƯỢC NÀY. KHÔNG ĐƯỢC MIX! CẤM XUẤT HIỆN CHỮ/SUBTITLES Ở HÌNH VÀ VIDEO. BẮT BUỘC TUÂN THỦ CHÍNH SÁCH MỌI NỀN TẢNG (Cấm "tuyệt đối", cấm "chữa bệnh").
                 """
-                payload = ["REFERENCE IMAGES:"] + [types.Part.from_bytes(data=f.getvalue(), mime_type=f.type or "image/jpeg") for f in up_files] if up_files else []
-                for c in char_inputs: payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=c['file'].getvalue(), mime_type=c['file'].type or "image/jpeg")])
+                payload = ["REFERENCE IMAGES:"]
+                if up_files:
+                    for f in up_files:
+                        c_bytes, c_mime = compress_image_bytes(f, max_dimension=1024, quality=80)
+                        payload.append(types.Part.from_bytes(data=c_bytes, mime_type=c_mime))
+                        
+                for c in char_inputs:
+                    c_bytes, c_mime = compress_image_bytes(c['file'], max_dimension=768, quality=80)
+                    payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=c_bytes, mime_type=c_mime)])
                 payload.append(prompt)
                 
-                res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, initial_angle))
+                res = call_gemini(payload, get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, initial_angle), max_tokens=2500)
                 if not res or ("outlines" not in res and "script_outlines" not in res): st.error("❌ AI lỗi định dạng.")
                 else:
                     st.session_state.content_analysis = res.get("content_analysis")
                     outlines = res.get("outlines", res.get("script_outlines", []))
                     for o in outlines: o.update({"duration_instruction": st.session_state.target_duration_instruction, "narrator_mode": narrator_mode, "character_profiles": st.session_state.character_profiles})
                     st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None, "scroll_to_top": True})
-                    st.toast("✅ Đã phân tích xong!")
+                    st.toast("✅ Đã phân tích xong (Đã tối ưu token ảnh)!")
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # Hiển thị DNA
