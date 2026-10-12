@@ -246,7 +246,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V54.0 (TỐI ƯU CHI PHÍ TOKEN & TOÀN BỘ LOGIC CỐT LÕI)
+# 2. HÀM AI LÕI & LUẬT THÉP V55.0 (CẬP NHẬT MODEL GEMINI-3.8-FLASH & TỐI ƯU TOKEN)
 # ==============================================================================
 def clean_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -264,11 +264,11 @@ def clean_and_parse_json(text_content: str):
             raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=3000):
-    """Giới hạn max_output_tokens và kiểm soát retry nhằm tối ưu hóa chi phí API tuyệt đối."""
+    """Sử dụng mô hình gemini-3.8-flash chuẩn mới nhất để tránh lỗi 404 và giữ chi phí thấp nhất."""
     for attempt in range(2):
         try:
             res = client.models.generate_content(
-                model="gemini-2.5-flash", 
+                model="gemini-3.8-flash", 
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=sys_inst, 
@@ -403,7 +403,12 @@ def create_scene_details(target_id, mode, style):
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
     LƯU Ý ĐẶC BIỆT (ÂM THANH MÔI TRƯỜNG THỰC TẾ & BỐI CẢNH NATIVE):
-    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director'.
+    - TỰ ĐỘNG CHÈN ÂM THANH MÔI TRƯỜNG THỰC TẾ (Layered SFX) trong 'vid_p' và 'director':
+      + Nếu là nấu nướng/chiên rán: tiếng xèo xèo dầu nóng chảo rán (`sizzling frying sound`).
+      + Nếu là ăn uống: tiếng cắn giòn rụm rôm rốp (`crispy crunching sound`).
+      + Nếu có gió thổi/quạt: tiếng gió vù vù (`whooshing breeze wind sound`).
+      + Nếu mở nắp nồi cơm/hộp: tiếng cách cạch của chốt cơ học (`mechanical click latch sound, steam hiss`).
+      + Nếu là gối đệm: tiếng sột soạt êm dịu của vải bọt nhớ (`soft fabric rustle, subtle foam rebound sound`).
     - ĐẠO DIỄN BỐI CẢNH NATIVE:
       + Nếu là GỐI NGỦ, ĐỆM, CHĂN GA: Bối cảnh BẮT BUỘC là PHÒNG NGỦ HIỆN ĐẠI (`cozy modern bedroom`), GỐI/ĐỆM ĐẶT NGAY TRÊN GIƯỜNG NGỦ CÓ GA BỌC CHỈNH CHU. Nhân vật ngồi ở mép giường hoặc đứng cạnh giường tương tác nhẹ nhàng (ấn thử độ đàn hồi bọt nhớ của gối trên giường). TUYỆT ĐỐI CẤM đặt trên bàn làm việc/bàn cạnh giường.
       + Nếu là KỊCH BẢN FLASH SALE / XẢ KHO: Bối cảnh BẮT BUỘC là KHO HÀNG / XƯỞNG / SHOWROOM NGẬP TRÀN KIỆN HÀNG.
@@ -442,7 +447,7 @@ def create_scene_details(target_id, mode, style):
         "outfit_vi": "Tóm tắt trang phục và bối cảnh",
         "global_identity_en": "Exact English desc of Face, Hair, Body.",
         "global_outfit_en": "Exact English desc of the FULL multi-layered outfit. MUST BE LOCKED.",
-        "global_setting_en": "Exact English desc of the unified native environment/setting. MUST BE LOCKED.",
+        "global_setting_en": "Exact English desc of the unified native environment/setting (e.g. cozy modern bedroom with neatly made bed for pillows, or authentic warehouse/showroom for flash sale). MUST BE LOCKED.",
         "prod_dna": "Mô tả SP bằng Tiếng Anh. BẮT BUỘC CHỨA MÀU SẮC CHÍNH XÁC. Strict numerical persistence of exactly ONE item.",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "scenes": [
