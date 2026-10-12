@@ -24,7 +24,7 @@ ga_script = """
     if (!window.parent.document.getElementById('ga-script')) {
         var script = document.createElement('script');
         script.id = 'ga-script';
-        script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
+        script.src = "[https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W](https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W)";
         script.async = true;
         window.parent.document.head.appendChild(script);
 
@@ -253,7 +253,6 @@ def repair_and_parse_json(text_content: str):
     if match: 
         cleaned = match.group(0)
     else:
-        # Nếu chuỗi JSON bị ngắt cụt ở cuối do độ dài, tự động đóng ngoặc
         first_char = cleaned[0] if len(cleaned) > 0 else "{"
         if first_char == "{":
             cleaned = cleaned.rstrip(", \n\r\t")
@@ -1036,9 +1035,3 @@ if all_sc:
                 st.rerun()
             else:
                 st.error(msg)
-```<br>
-
-<Elicitations message="Bạn muốn kiểm tra tiếp điều gì?">
-  <Elicitation label="Test sinh 5 kịch bản" query="Tôi đã dán code V56.0, hãy hướng dẫn tôi kiểm tra xem lượt gọi đầu tiên còn bị lỗi JSON nữa không." />
-  <Elicitation label="Kiểm tra Token console" query="Làm thế nào để tôi xem chính xác số lượng token tiêu thụ trên Google Cloud console sau khi bấm tạo?" />
-</Elicitations>
