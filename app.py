@@ -225,7 +225,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V78.0 (KHÓA CHẶT HOOK GỐC & FULL HEADER BOX)
+# 2. HÀM AI LÕI & LUẬT THÉP V79.0 (STRICT HOOK & NATIVE COMPLIANCE)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -474,11 +474,11 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (CÓ CHỈNH SỬA & GIA HẠN TÀI KHOẢN)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (CÓ PHÂN HỆ, GIA HẠN & GHI CHÚ)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
-        tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký"])
+        tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký Dùng Thử"])
         with tabs[0]:
             with st.form("login_form", border=False):
                 email_input = st.text_input("Email:", key="f_login_email", autocomplete="new-password")
@@ -509,7 +509,18 @@ with st.sidebar:
                 r_email = st.text_input("Email đăng ký:", key="f_reg_email", autocomplete="new-password")
                 r_phone = st.text_input("Số điện thoại:", key="f_reg_phone", autocomplete="new-password")
                 r_pass = st.text_input("Mật khẩu mới:", type="password", key="f_reg_pass", autocomplete="new-password")
-                submit_reg = st.form_submit_button("🚀 Đăng Ký", type="secondary", use_container_width=True)
+                
+                # KHẢO SÁT MỤC ĐÍCH SỬ DỤNG
+                r_purpose = st.selectbox(
+                    "🎯 Mục đích chính bạn dùng app:",
+                    [
+                        "🛒 Tiếp thị liên kết / Bán hàng TikTok Shop",
+                        "🌟 Xây kênh thương hiệu / Video Viral",
+                        "⚡ Cả hai thể loại (Đầy đủ tính năng)"
+                    ],
+                    key="f_reg_purpose"
+                )
+                submit_reg = st.form_submit_button("🚀 Đăng Ký Nhận 3 Lượt/Ngày", type="secondary", use_container_width=True)
                 
                 if submit_reg:
                     email_r, phone_r, pass_r = r_email.strip(), r_phone.strip(), r_pass.strip()
@@ -521,8 +532,17 @@ with st.sidebar:
                         st.error("⚠️ Email này đã tồn tại trên hệ thống!")
                     else:
                         exp = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
+                        
+                        # Gán quyền theo mục đích đã chọn
+                        if "Tiếp thị liên kết" in r_purpose:
+                            assigned_roles = ["🛒 TikTok Shop & Bán Hàng"]
+                        elif "Xây kênh" in r_purpose:
+                            assigned_roles = ["🌟 Viral & Xây Kênh"]
+                        else:
+                            assigned_roles = ALL_MODULES
+                            
                         st.session_state.licensed_accounts[email_r] = {
-                            "roles": ALL_MODULES, "phone": phone_r, "password": pass_r,
+                            "roles": assigned_roles, "phone": phone_r, "password": pass_r,
                             "expires_at": exp, "plan_type": "Trial", "daily_usage_count": 0,
                             "last_generation_date": "", "active_session_id": st.session_state.session_id
                         }
@@ -593,7 +613,7 @@ with st.sidebar:
                             st.session_state.show_all_projects = True
                             st.rerun()
 
-        # KHỐI 3: QUẢN TRỊ ADMIN (CÓ CHỨC NĂNG SỬA HẠN & GIA HẠN TÀI KHOẢN)
+        # KHỐI 3: QUẢN TRỊ ADMIN (PHÂN QUYỀN THỂ LOẠI & GIA HẠN CHI TIẾT)
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
@@ -602,7 +622,16 @@ with st.sidebar:
                 adm_acc = st.text_input("Email:", autocomplete="new-password", key="adm_in_acc")
                 adm_phone = st.text_input("SĐT:", autocomplete="new-password", key="adm_in_phone")
                 adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password", key="adm_in_pass")
-                adm_plan = st.radio("Gói cước:", ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (không giới hạn)"], horizontal=True, key="adm_in_plan")
+                
+                # CHỌN THỂ LOẠI ĐƯỢC PHÉP SỬ DỤNG
+                adm_roles_choice = st.multiselect(
+                    "🎯 Thể loại được cấp quyền:",
+                    ALL_MODULES,
+                    default=ALL_MODULES,
+                    key="adm_in_roles"
+                )
+                
+                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_in_plan")
                 
                 dur_options = [
                     "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", 
@@ -633,15 +662,18 @@ with st.sidebar:
 
                 if st.button("💾 Cấp Quyền Tài Khoản", type="primary", use_container_width=True, key="btn_submit_grant_admin"):
                     if adm_acc.strip() and adm_phone.strip() and adm_pass.strip():
-                        st.session_state.licensed_accounts[adm_acc.strip()] = {
-                            "roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(),
-                            "expires_at": calculated_exp_str, "plan_type": adm_plan, "daily_usage_count": 0,
-                            "last_generation_date": "", "active_session_id": ""
-                        }
-                        save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
-                        st.toast(f"✅ Đã cấp quyền thành công đến {calculated_exp_str}!")
-                        time.sleep(0.4)
-                        st.rerun()
+                        if not adm_roles_choice:
+                            st.error("⚠️ Vui lòng chọn ít nhất 1 thể loại được cấp quyền!")
+                        else:
+                            st.session_state.licensed_accounts[adm_acc.strip()] = {
+                                "roles": adm_roles_choice, "phone": adm_phone.strip(), "password": adm_pass.strip(),
+                                "expires_at": calculated_exp_str, "plan_type": adm_plan, "daily_usage_count": 0,
+                                "last_generation_date": "", "active_session_id": ""
+                            }
+                            save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
+                            st.toast(f"✅ Đã cấp quyền thành công đến {calculated_exp_str}!")
+                            time.sleep(0.4)
+                            st.rerun()
                     else:
                         st.error("⚠️ Vui lòng nhập đầy đủ Email, SĐT và Mật khẩu!")
 
@@ -658,16 +690,21 @@ with st.sidebar:
                 with st.expander(f"👤 {acc_mail} ({info.get('plan_type')})"):
                     st.write(f"📞 **SĐT:** `{info.get('phone', 'N/A')}`")
                     st.write(f"⏳ **Hạn hiện tại:** `{info.get('expires_at')}`")
+                    st.write(f"🎯 **Thể loại:** `{', '.join(info.get('roles', ALL_MODULES))}`")
                     
                     st.markdown("---")
                     st.markdown("**⚙ Chỉnh sửa / Gia hạn:**")
                     
-                    # 1. Chọn đổi gói cước
+                    # 1. Đổi thể loại
+                    cur_roles = info.get("roles", ALL_MODULES)
+                    new_roles = st.multiselect("Đổi thể loại cấp phép:", ALL_MODULES, default=cur_roles, key=f"roles_sel_{acc_mail}")
+                    
+                    # 2. Đổi gói cước
                     cur_plan = info.get("plan_type", "Trial")
                     plan_idx = ["Trial", "Basic", "Advanced", "VIP"].index(cur_plan) if cur_plan in ["Trial", "Basic", "Advanced", "VIP"] else 0
-                    new_plan = st.selectbox("Đổi gói cước:", ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (Không giới hạn)"], index=plan_idx, key=f"plan_sel_{acc_mail}")
+                    new_plan = st.selectbox("Đổi gói cước:", ["Trial", "Basic", "Advanced", "VIP"], index=plan_idx, key=f"plan_sel_{acc_mail}")
                     
-                    # 2. Chọn mốc thời hạn gia hạn
+                    # 3. Chọn mốc thời hạn gia hạn
                     renew_opts = [
                         "Giữ nguyên hạn hiện tại", "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", 
                         "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", 
@@ -693,11 +730,12 @@ with st.sidebar:
                         st.caption("📅 Hạn mới: **Vĩnh viễn (2099-12-31)**")
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
                         st.caption(f"📅 Hạn mới: **{target_exp_str}**")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật & Gia Hạn", key=f"save_renew_{acc_mail}", use_container_width=True):
+                        st.session_state.licensed_accounts[acc_mail]["roles"] = new_roles
                         st.session_state.licensed_accounts[acc_mail]["plan_type"] = new_plan
                         st.session_state.licensed_accounts[acc_mail]["expires_at"] = target_exp_str
                         save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
@@ -736,12 +774,21 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # KHỐI 5: THÔNG TIN TÀI KHOẢN & ĐĂNG XUẤT (NẰM DƯỚI CÙNG BẢO ĐẢM THỨ TỰ)
+        # KHỐI 5: THÔNG TIN TÀI KHOẢN & GHI CHÚ QUYỀN LỢI CỤ THỂ (DƯỚI CÙNG)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
         u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
         u_lim = "Không giới hạn" if u_plan == "VIP" else (20 if u_plan == "Advanced" else (10 if u_plan == "Basic" else 3))
-        st.info(f"**GÓI {u_plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Tạo chi tiết: **{u_used}/{u_lim}**\n• Hạn dùng: {u_info.get('expires_at')}")
+        
+        plan_desc_map = {
+            "Trial": "3 lượt chi tiết/ngày (Dùng thử)",
+            "Basic": "10 lượt chi tiết/ngày (Bán lẻ / Cá nhân)",
+            "Advanced": "20 lượt chi tiết/ngày (Shop lớn / KOC chạy Ads)",
+            "VIP": "Không giới hạn lượt tạo (Agency / Studio)"
+        }
+        u_desc = plan_desc_map.get(u_plan, "")
+        
+        st.info(f"**GÓI {u_plan.upper()}**\n\n• **Quyền lợi:** {u_desc}\n• **Email:** {st.session_state.current_email}\n• **Đã tạo hôm nay:** **{u_used}/{u_lim}**\n• **Hạn dùng:** {u_info.get('expires_at')}")
 
         if st.button("🚪 Đăng Xuất"): 
             st.session_state.is_logged_in = False
@@ -750,10 +797,15 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (TỰ ĐỘNG LỌC THEO PHÂN HỆ ĐƯỢC CẤP)
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
-mode = st.selectbox("🎯 Thể loại:", ALL_MODULES, key=f"mode_sel_{st.session_state.reset_key}")
+
+# Lọc thể loại theo quyền của tài khoản đang đăng nhập
+user_allowed_modules = st.session_state.licensed_accounts.get(st.session_state.current_email, {}).get("roles", ALL_MODULES)
+if not user_allowed_modules: user_allowed_modules = ALL_MODULES
+
+mode = st.selectbox("🎯 Thể loại:", user_allowed_modules, key=f"mode_sel_{st.session_state.reset_key}")
 is_viral_mode = "Viral" in mode
 
 up_files, custom_note = [], ""
@@ -873,7 +925,7 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if sc["id"] in st.session_state.generated_details]
     pend_sc = [sc for sc in all_sc if sc["id"] not in st.session_state.generated_details]
 
-    # KHUNG HIỂN THỊ CHI TIẾT (ĐƯỢC GẮN THẺ NEO ĐỂ TỰ ĐỘNG CUỘN ĐẾN ĐÂY)
+    # KHUNG HIỂN THỊ CHI TIẾT
     if st.session_state.active_script_id is not None:
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         if st.button("⬅ Thu gọn danh sách kịch bản"):
@@ -886,7 +938,6 @@ if all_sc:
         
         st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title')).upper()}**")
         
-        # HIỂN THỊ KHUNG HEADER ĐẦY ĐỦ VÀ SÂU SẮC NHƯ CÁC BẢN GỐC
         director_summary_html = asc.get('director_summary', '')
         if not director_summary_html:
             gender_txt = vp.get('gender', 'Nữ')
