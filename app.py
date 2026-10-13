@@ -602,7 +602,7 @@ with st.sidebar:
                 adm_acc = st.text_input("Email:", autocomplete="new-password", key="adm_in_acc")
                 adm_phone = st.text_input("SĐT:", autocomplete="new-password", key="adm_in_phone")
                 adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password", key="adm_in_pass")
-                adm_plan = st.radio("Gói cước:", ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (không giới hạn)"], horizontal=True, key="adm_in_plan")
+                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_in_plan")
                 
                 dur_options = [
                     "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", 
@@ -664,7 +664,7 @@ with st.sidebar:
                     
                     # 1. Chọn đổi gói cước
                     cur_plan = info.get("plan_type", "Trial")
-                    plan_idx = ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (không giới hạn)"].index(cur_plan) if cur_plan in ["Trial", "Basic", "Advanced", "VIP"] else 0
+                    plan_idx = ["Trial", "Basic", "Advanced", "VIP"].index(cur_plan) if cur_plan in ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (không giới hạn)"] else 0
                     new_plan = st.selectbox("Đổi gói cước:", ["Trial", "Basic", "Advanced", "VIP"], index=plan_idx, key=f"plan_sel_{acc_mail}")
                     
                     # 2. Chọn mốc thời hạn gia hạn
