@@ -59,18 +59,6 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
 
-    /* GHI ĐÈ TRIỆT ĐỂ MÀU CHỮ NÚT BẤM HỖ TRỢ */
-    [data-testid="stSidebar"] .support-box a,
-    [data-testid="stSidebar"] .support-box a:link,
-    [data-testid="stSidebar"] .support-box a:visited,
-    [data-testid="stSidebar"] .support-box a:hover,
-    [data-testid="stSidebar"] .support-box a:active,
-    [data-testid="stSidebar"] .support-box a span {
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-        text-decoration: none !important;
-    }
-
     /* DETAIL HEADER BOX CHUYÊN NGHIỆP */
     .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; color: #1e3a8a; line-height: 1.8; box-shadow: 0 3px 10px rgba(0,0,0,0.03); }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 10px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: inline-block; width: 100%; margin-top: 4px; line-height: 1.7; }
@@ -488,7 +476,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (KHỐI HỖ TRỢ TRỰC TIẾP, CHỐNG ROUTE ẢO)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (KHỐI HỖ TRỢ TINH GỌN, NỔI BẬT)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -768,47 +756,23 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ (100% CHỮ TRẮNG, CHỐNG ROUTE ẢO BẰNG STOP PROPAGATION)
-        support_pure_html = (
-            '<div class="support-box" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); '
-            'border: 1.5px solid #86efac; border-radius: 14px; padding: 14px 10px; '
+        # KHỐI 4: HỖ TRỢ TRỰC TIẾP (THẺ TĨNH HIỂN THỊ NỔI BẬT, CHỮ TRẮNG, KHÔNG PHẢI NÚT CALL)
+        support_box_html = (
+            '<div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); '
+            'border: 1.5px solid #86efac; border-radius: 14px; padding: 14px 12px; '
             'text-align: center; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">'
-            '<div style="font-weight: 900; font-size: 16px; color: #15803d; margin-bottom: 8px;">🎧 HỖ TRỢ TRỰC TIẾP</div>'
-            '<div style="margin-bottom: 8px;">'
-            '<a href="tel:0869628316" target="_blank" rel="noopener noreferrer" '
-            'onclick="event.stopPropagation(); window.location.href=\'tel:0869628316\'; return false;" '
-            'style="display: block; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); '
-            'text-decoration: none !important; padding: 10px 0; border-radius: 8px; '
-            'box-shadow: 0 2px 6px rgba(220,38,38,0.3); text-align: center; cursor: pointer;">'
-            '<span style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; font-weight: 900; font-size: 15px; text-decoration: none !important;">'
-            '📞 Hotline: 0869 628 316</span></a>'
+            '<div style="font-weight: 900; font-size: 15px; color: #15803d; margin-bottom: 8px;">'
+            '🎧 HỖ TRỢ TRỰC TIẾP'
             '</div>'
-            '<div style="display: flex; gap: 6px; justify-content: center; width: 100%;">'
-            '<a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" rel="noopener noreferrer" '
-            'onclick="event.stopPropagation(); window.open(\'[https://zalo.me/0869628316](https://zalo.me/0869628316)\', \'_blank\'); return false;" '
-            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #0068ff 0%, #004ecc 100%); '
-            'text-decoration: none !important; padding: 8px 0; border-radius: 8px; text-align: center; '
-            'box-shadow: 0 2px 5px rgba(0,104,255,0.3); display: block; cursor: pointer;">'
-            '<span style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; font-weight: 800; font-size: 13.5px; text-decoration: none !important;">'
-            '💬 Zalo</span></a>'
-            '<a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" rel="noopener noreferrer" '
-            'onclick="event.stopPropagation(); window.open(\'[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)\', \'_blank\'); return false;" '
-            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #1877f2 0%, #0d65d9 100%); '
-            'text-decoration: none !important; padding: 8px 0; border-radius: 8px; text-align: center; '
-            'box-shadow: 0 2px 5px rgba(24,119,242,0.3); display: block; cursor: pointer;">'
-            '<span style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; font-weight: 800; font-size: 13.5px; text-decoration: none !important;">'
-            'Facebook</span></a>'
-            '<a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" rel="noopener noreferrer" '
-            'onclick="event.stopPropagation(); window.open(\'[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)\', \'_blank\'); return false;" '
-            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #18181b 0%, #09090b 100%); '
-            'text-decoration: none !important; padding: 8px 0; border-radius: 8px; text-align: center; border: 1px solid #333; '
-            'box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: block; cursor: pointer;">'
-            '<span style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; font-weight: 800; font-size: 13.5px; text-decoration: none !important;">'
-            'TikTok</span></a>'
+            '<div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); '
+            'color: #ffffff !important; padding: 10px 8px; border-radius: 8px; '
+            'font-weight: 900; font-size: 14.5px; letter-spacing: 0.3px; '
+            'box-shadow: 0 3px 8px rgba(220,38,38,0.28); user-select: text;">'
+            '📞 Hotline/Zalo: 0869 628 316'
             '</div>'
             '</div>'
         )
-        st.markdown(support_pure_html, unsafe_allow_html=True)
+        st.markdown(support_box_html, unsafe_allow_html=True)
 
         # KHỐI 5: THÔNG TIN TÀI KHOẢN & GHI CHÚ QUYỀN LỢI CỤ THỂ (DƯỚI CÙNG)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
