@@ -17,7 +17,7 @@ from datetime import datetime, timedelta, date
 # ==============================================================================
 # 1. CẤU HÌNH GIAO DIỆN & TÍCH HỢP GOOGLE ANALYTICS 4
 # ==============================================================================
-st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
+st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
 ga_script = """
 <script>
@@ -59,15 +59,6 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     
-    /* KHỐI HỖ TRỢ HIỆN ĐẠI & NÚT BẤM */
-    .support-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 14px; padding: 14px 12px; text-align: center; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .hotline-tag { font-size: 14.5px; font-weight: 800; color: #166534; margin-bottom: 10px; }
-    .hotline-tag a { color: #dc2626 !important; text-decoration: none; font-size: 17px; font-weight: 900; border-bottom: 1.5px dashed #dc2626; padding-bottom: 1px; }
-    .btn-zalo { background: linear-gradient(135deg, #0068FF 0%, #004ecc 100%); color: #ffffff !important; font-weight: 800; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; box-shadow: 0 2px 6px rgba(0,104,255,0.3); display: inline-flex; align-items: center; justify-content: center; min-width: 65px; border: none; }
-    .btn-fb { background: linear-gradient(135deg, #1877F2 0%, #0d65d9 100%); color: #ffffff !important; font-weight: 800; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; box-shadow: 0 2px 6px rgba(24,119,242,0.3); display: inline-flex; align-items: center; justify-content: center; min-width: 65px; border: none; }
-    .btn-tt { background: linear-gradient(135deg, #111111 0%, #000000 100%); color: #ffffff !important; font-weight: 800; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 1px solid #333; display: inline-flex; align-items: center; justify-content: center; min-width: 65px; }
-    .social-icons-container { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
-
     /* DETAIL HEADER BOX CHUYÊN NGHIỆP */
     .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; color: #1e3a8a; line-height: 1.8; box-shadow: 0 3px 10px rgba(0,0,0,0.03); }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 10px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: inline-block; width: 100%; margin-top: 4px; line-height: 1.7; }
@@ -225,7 +216,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V82.0 (HIGH-RETENTION SENSORY STORYTELLING)
+# 2. HÀM AI LÕI & LUẬT THÉP V83.0 (HIGH-RETENTION SENSORY STORYTELLING)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -485,7 +476,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (PHÂN QUYỀN, GIA HẠN & HOTLINE CHUẨN)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (FIXED INDEPENDENT HTML IFRAME LINKS)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -765,19 +756,89 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ (CHUẨN 100% HTML - CLICK MỞ TAB MỚI & GỌI ĐIỆN THOẠI TRỰC TIẾP)
-        support_html = """
-        <div class="support-box">
-            <div style="font-weight:900; font-size:16px; color:#15803d; margin-bottom:4px;">🎧 HỖ TRỢ</div>
-            <div class="hotline-tag">Hotline: <a href="tel:0869628316">0869 628 316</a></div>
-            <div class="social-icons-container">
-                <a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" rel="noopener noreferrer" class="btn-zalo">Zalo</a>
-                <a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" rel="noopener noreferrer" class="btn-fb">Facebook</a>
-                <a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" rel="noopener noreferrer" class="btn-tt">TikTok</a>
+        # KHỐI 4: HỖ TRỢ - SỬ DỤNG IFRAME ĐỘC LẬP (TRIỆT TIÊU LỖI DÍNH PREFIX VÀ MỞ LINK/GỌI ĐIỆN 100%)
+        support_iframe_code = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                }
+                .box {
+                    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                    border: 1.5px solid #86efac;
+                    border-radius: 14px;
+                    padding: 12px 10px;
+                    text-align: center;
+                    box-sizing: border-box;
+                }
+                .title {
+                    font-weight: 900;
+                    font-size: 15px;
+                    color: #15803d;
+                    margin-bottom: 4px;
+                }
+                .hotline {
+                    font-size: 13.5px;
+                    font-weight: 800;
+                    color: #166534;
+                    margin-bottom: 10px;
+                }
+                .hotline a {
+                    color: #dc2626;
+                    text-decoration: none;
+                    font-size: 16px;
+                    font-weight: 900;
+                    border-bottom: 1.5px dashed #dc2626;
+                    cursor: pointer;
+                }
+                .btn-group {
+                    display: flex;
+                    gap: 6px;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .btn {
+                    color: #ffffff !important;
+                    font-weight: 800;
+                    padding: 7px 12px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    font-size: 13px;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 60px;
+                    border: none;
+                    transition: transform 0.1s ease;
+                }
+                .btn:active {
+                    transform: scale(0.96);
+                }
+                .zalo { background: linear-gradient(135deg, #0068FF 0%, #004ecc 100%); box-shadow: 0 2px 6px rgba(0,104,255,0.3); }
+                .fb { background: linear-gradient(135deg, #1877F2 0%, #0d65d9 100%); box-shadow: 0 2px 6px rgba(24,119,242,0.3); }
+                .tt { background: linear-gradient(135deg, #111111 0%, #000000 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 1px solid #333; }
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <div class="title">🎧 HỖ TRỢ</div>
+                <div class="hotline">Hotline: <a href="tel:0869628316" target="_top">0869 628 316</a></div>
+                <div class="btn-group">
+                    <a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" rel="noopener noreferrer" class="btn zalo">Zalo</a>
+                    <a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" rel="noopener noreferrer" class="btn fb">Facebook</a>
+                    <a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" rel="noopener noreferrer" class="btn tt">TikTok</a>
+                </div>
             </div>
-        </div>
+        </body>
+        </html>
         """
-        st.markdown(support_html, unsafe_allow_html=True)
+        components.html(support_iframe_code, height=128)
 
         # KHỐI 5: THÔNG TIN TÀI KHOẢN & GHI CHÚ QUYỀN LỢI CỤ THỂ (DƯỚI CÙNG)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
@@ -802,9 +863,9 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (TỰ ĐỘNG LỌC THEO PHÂN HỆ ĐƯỢC CẤP)
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (ĐẠO DIỄN AI - HỆ THỐNG KỊCH BẢN PRO)
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Hệ Thống Kịch Bản Đa Vũ Trụ Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
 user_allowed_modules = st.session_state.licensed_accounts.get(st.session_state.current_email, {}).get("roles", ALL_MODULES)
 if not user_allowed_modules: user_allowed_modules = ALL_MODULES
