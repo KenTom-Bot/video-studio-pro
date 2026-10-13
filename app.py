@@ -216,7 +216,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V85.0 (HIGH-RETENTION SENSORY STORYTELLING)
+# 2. HÀM AI LÕI & LUẬT THÉP V86.0 (HIGH-RETENTION SENSORY STORYTELLING)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -476,7 +476,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (KHỐI HỖ TRỢ HOÀN TOÀN MỚI 100% HOẠT ĐỘNG)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (100% BULLETPROOF IFRAME SUPPORT BOX)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -756,38 +756,115 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ (THIẾT KẾ FLEXBOX CHUẨN - KHÔNG BAO GIỜ BỊ DÍNH DẤU ... VÀ GỌI ĐIỆN / MỞ LINK TRỰC TIẾP)
-        support_pure_html = (
-            '<div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); '
-            'border: 1.5px solid #86efac; border-radius: 14px; padding: 14px 10px; '
-            'text-align: center; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">'
-            '<div style="font-weight: 900; font-size: 16px; color: #15803d; margin-bottom: 8px;">🎧 HỖ TRỢ</div>'
-            '<div style="margin-bottom: 10px;">'
-            '<a href="tel:0869628316" style="display: block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); '
-            'color: #ffffff !important; text-decoration: none; padding: 9px 8px; border-radius: 8px; '
-            'font-weight: 800; font-size: 14px; box-shadow: 0 2px 6px rgba(220,38,38,0.25); text-align: center;">'
-            '📞 Hotline: 0869 628 316</a>'
-            '</div>'
-            '<div style="display: flex; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box;">'
-            '<a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" rel="noopener noreferrer" '
-            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #0068FF 0%, #004ecc 100%); '
-            'color: #ffffff !important; text-decoration: none; padding: 8px 2px; border-radius: 8px; '
-            'font-weight: 800; font-size: 13px; text-align: center; box-shadow: 0 2px 5px rgba(0,104,255,0.25); '
-            'white-space: nowrap; overflow: hidden; text-overflow: clip; display: block;">💬 Zalo</a>'
-            '<a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" rel="noopener noreferrer" '
-            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #1877F2 0%, #0d65d9 100%); '
-            'color: #ffffff !important; text-decoration: none; padding: 8px 2px; border-radius: 8px; '
-            'font-weight: 800; font-size: 13px; text-align: center; box-shadow: 0 2px 5px rgba(24,119,242,0.25); '
-            'white-space: nowrap; overflow: hidden; text-overflow: clip; display: block;">Facebook</a>'
-            '<a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" rel="noopener noreferrer" '
-            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #111111 0%, #000000 100%); '
-            'color: #ffffff !important; text-decoration: none; padding: 8px 2px; border-radius: 8px; '
-            'font-weight: 800; font-size: 13px; text-align: center; border: 1px solid #333; '
-            'box-shadow: 0 2px 5px rgba(0,0,0,0.25); white-space: nowrap; overflow: hidden; text-overflow: clip; display: block;">TikTok</a>'
-            '</div>'
-            '</div>'
-        )
-        st.markdown(support_pure_html, unsafe_allow_html=True)
+        # KHỐI 4: HỖ TRỢ - IFRAME CHUẨN HTML CÁCH LY 100% (CHỮ TRẮNG NỔI BẬT, MỞ TAB MỚI & GỌI ĐIỆN THOẠI)
+        support_box_code = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                }
+                body {
+                    background: transparent;
+                    padding: 2px;
+                }
+                .card {
+                    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                    border: 1.5px solid #86efac;
+                    border-radius: 12px;
+                    padding: 12px 10px;
+                    text-align: center;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                }
+                .header-title {
+                    font-size: 15px;
+                    font-weight: 900;
+                    color: #15803d;
+                    margin-bottom: 8px;
+                    letter-spacing: 0.3px;
+                }
+                .hotline-btn {
+                    display: block;
+                    width: 100%;
+                    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+                    color: #ffffff !important;
+                    font-size: 14.5px;
+                    font-weight: 800;
+                    text-decoration: none;
+                    padding: 9px 0;
+                    border-radius: 8px;
+                    margin-bottom: 8px;
+                    box-shadow: 0 2px 6px rgba(220,38,38,0.25);
+                    cursor: pointer;
+                    text-align: center;
+                }
+                .hotline-btn:active {
+                    transform: scale(0.98);
+                }
+                .social-row {
+                    display: flex;
+                    gap: 6px;
+                    width: 100%;
+                }
+                .social-btn {
+                    flex: 1;
+                    display: block;
+                    color: #ffffff !important;
+                    font-size: 13px;
+                    font-weight: 800;
+                    text-decoration: none;
+                    text-align: center;
+                    padding: 8px 0;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+                    white-space: nowrap;
+                }
+                .social-btn:active {
+                    transform: scale(0.97);
+                }
+                .zalo-bg { background: linear-gradient(135deg, #0068ff 0%, #0052cc 100%); }
+                .fb-bg { background: linear-gradient(135deg, #1877f2 0%, #0d65d9 100%); }
+                .tt-bg { background: linear-gradient(135deg, #1e1e1e 0%, #0a0a0a 100%); border: 1px solid #333; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="header-title">🎧 HỖ TRỢ TRỰC TIẾP</div>
+                <a href="tel:0869628316" target="_top" onclick="triggerCall(); return false;" class="hotline-btn">
+                    📞 Hotline: 0869 628 316
+                </a>
+                <div class="social-row">
+                    <a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" rel="noopener noreferrer" onclick="openSocial('[https://zalo.me/0869628316](https://zalo.me/0869628316)'); return false;" class="social-btn zalo-bg">💬 Zalo</a>
+                    <a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" rel="noopener noreferrer" onclick="openSocial('[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)'); return false;" class="social-btn fb-bg">Facebook</a>
+                    <a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" rel="noopener noreferrer" onclick="openSocial('[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)'); return false;" class="social-btn tt-bg">TikTok</a>
+                </div>
+            </div>
+            <script>
+                function triggerCall() {
+                    try {
+                        window.top.location.href = 'tel:0869628316';
+                    } catch(e) {
+                        window.location.href = 'tel:0869628316';
+                    }
+                }
+                function openSocial(link) {
+                    try {
+                        window.open(link, '_blank', 'noopener,noreferrer');
+                    } catch(e) {
+                        window.top.open(link, '_blank');
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        """
+        components.html(support_box_code, height=140)
 
         # KHỐI 5: THÔNG TIN TÀI KHOẢN & GHI CHÚ QUYỀN LỢI CỤ THỂ (DƯỚI CÙNG)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
