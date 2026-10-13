@@ -122,6 +122,11 @@ def save_single_account(email, acc_data):
     try: supabase.table("licensed_accounts").upsert({"email": email, **acc_data}).execute()
     except: pass
 
+def delete_single_account(email):
+    if not supabase or email == ADMIN_EMAIL: return
+    try: supabase.table("licensed_accounts").delete().eq("email", email).execute()
+    except: pass
+
 def check_usage_limit(email, is_detailing=False):
     if email == ADMIN_EMAIL: return True, ""
     acc = st.session_state.licensed_accounts.get(email)
@@ -169,6 +174,7 @@ def format_analysis_field(field_val) -> str:
     text = str(field_val).strip()
     return "".join([f"<div style='margin-left: 10px; margin-top: 3px;'>• {line.strip()}</div>" for line in text.split('<br>') if line.strip()])
 
+# Khởi tạo state
 if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
@@ -194,8 +200,25 @@ if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMA
             st.rerun()
         st.stop()
 
+# Xử lý cuộn trang mượt mà
+if st.session_state.scroll_to_top:
+    components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0)
+    st.session_state.scroll_to_top = False
+
+if st.session_state.scroll_to_detail:
+    components.html("""
+    <script>
+        setTimeout(function() {
+            var el = window.parent.document.getElementById('detailed-view-anchor');
+            if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+            else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); }
+        }, 300);
+    </script>
+    """, height=0)
+    st.session_state.scroll_to_detail = False
+
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V70.0 (SEAMLESS STORYTELLING & NATURAL LONG VOICEOVER)
+# 2. HÀM AI LÕI & LUẬT THÉP V71.0 (SEAMLESS STORYTELLING & AUTO-SCROLL UI)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -527,7 +550,8 @@ with st.sidebar:
                             "content_analysis": sd.get("content_analysis"), "all_scripts": sd.get("all_scripts", []),
                             "cloned_scripts": sd.get("cloned_scripts", []), "expanded_scripts": sd.get("expanded_scripts", []),
                             "generated_details": {int(k): v for k, v in sd.get("generated_details", {}).items()},
-                            "character_profiles": sd.get("character_profiles", []), "current_project_id": p['id'], "active_project_title": p['project_title']
+                            "character_profiles": sd.get("character_profiles", []), "current_project_id": p['id'], "active_project_title": p['project_title'],
+                            "scroll_to_detail": True
                         })
                         st.rerun()
                     if st.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True):
@@ -700,8 +724,14 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if sc["id"] in st.session_state.generated_details]
     pend_sc = [sc for sc in all_sc if sc["id"] not in st.session_state.generated_details]
 
+    # KHUNG HIỂN THỊ CHI TIẾT (ĐƯỢC GẮN THẺ NEO ĐỂ TỰ ĐỘNG CUỘN ĐẾN ĐÂY)
     if st.session_state.active_script_id is not None:
-        if st.button("⬅ Thu gọn danh sách"): st.session_state.active_script_id = None; st.rerun()
+        st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
+        if st.button("⬅ Thu gọn danh sách kịch bản"):
+            st.session_state.active_script_id = None
+            st.session_state.scroll_to_top = True
+            st.rerun()
+            
         asc = st.session_state.generated_details.get(st.session_state.active_script_id, {})
         vp = asc.get("voice", {})
         
@@ -727,7 +757,10 @@ if all_sc:
             c1.markdown(f"**#{sc_id}. {outline.get('title')}**")
             c1.caption(f"⚡ *{outline.get('hook')}*")
             if sc_id != st.session_state.active_script_id:
-                if c2.button("👁 Xem", key=f"r_{sc_id}", use_container_width=True): st.session_state.active_script_id = sc_id; st.rerun()
+                if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True):
+                    st.session_state.active_script_id = sc_id
+                    st.session_state.scroll_to_detail = True
+                    st.rerun()
             
             btn_clone_ph = c3.empty()
             if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True):
@@ -755,6 +788,7 @@ if all_sc:
                     with st.spinner("⏳ Đang đối chiếu ảnh tham chiếu và dựng 4 cảnh AIDA..."):
                         create_scene_details(sc_id, st.session_state.last_mode, st.session_state.last_style)
                         st.session_state.active_script_id = sc_id
+                        st.session_state.scroll_to_detail = True
                         st.toast("✅ Đã hoàn tất dựng 4 phân cảnh chuẩn xác!")
                         time.sleep(0.4)
                         st.rerun()
@@ -771,16 +805,17 @@ if all_sc:
     c_nar = cg4.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)", "🎙 Lồng tiếng ngoài (Off-screen)"], key=f"ena_{st.session_state.reset_key}")
 
     e_chars = []
-    for i in range(c_num):
-        c_r, c_i = st.columns([2, 1])
-        e_role = c_r.text_input(f"Vai trò NV {i+1} mới:", key=f"er_{i}_{st.session_state.reset_key}")
-        e_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"ef_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
-        if e_file: e_chars.append({"id": i+1, "role": e_role or "AI phân tích", "file": e_file})
+    if c_num > 0:
+        for i in range(c_num):
+            c_r, c_i = st.columns([2, 1])
+            e_role = c_r.text_input(f"Vai trò NV {i+1} mới:", key=f"er_{i}_{st.session_state.reset_key}")
+            e_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"ef_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
+            if e_file: e_chars.append({"id": i+1, "role": e_role or "AI phân tích", "file": e_file})
 
     if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True):
         can_run, msg = check_usage_limit(st.session_state.current_email)
         if can_run:
-            with st.spinner("⏳ Đang sáng tạo thêm 5 kịch bản..."):
+            with st.spinner("⏳ Đang sáng tạo thêm 5 kịch bản theo mô hình AIDA..."):
                 p_chars = [{"id": c["id"], "role": c["role"]} for c in e_chars] if e_chars else st.session_state.character_profiles
                 new_sc = generate_more_scripts(c_ang, c_num, e_chars, c_nar, c_dur_str, p_chars)
                 st.session_state.expanded_scripts.extend(new_sc)
