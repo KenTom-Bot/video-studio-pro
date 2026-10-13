@@ -225,7 +225,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V77.0 (STRICT HOOK PRESERVATION & FULL HEADER DETAILS)
+# 2. HÀM AI LÕI & LUẬT THÉP V78.0 (KHÓA CHẶT HOOK GỐC & FULL HEADER BOX)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -365,7 +365,7 @@ def create_scene_details(target_id, mode, style):
         "total_dur": "Khoảng 30 giây",
         "voice": {{"gender": "Nam/Nữ", "tone": "{voice_hint}"}},
         "outfit_vi": "Trang phục cụ thể và kiểu tóc duy nhất được khóa cố định suốt 4 cảnh",
-        "director_summary": "Tóm tắt đạo diễn đầy đủ: ⏱ Thời lượng: Khoảng 30 giây (4 phân cảnh AIDA) | 🎙 Giọng: [Nam/Nữ] HÀ NỘI GỐC ĐẦY NỘI LỰC, ĐANH THÉP (4.3-4.5 từ/s) | 👔 Trang phục & Kiểu tóc: [Mô tả chi tiết trang phục và kiểu tóc duy nhất] | 🎯 Sản phẩm Hero SKU: [Mô tả chuẩn mẫu mã từ ảnh tham chiếu]",
+        "director_summary": "⏱ <b>Thời lượng:</b> Khoảng 30 giây (Chuẩn 4 phân cảnh AIDA) | 🎙 <b>Giọng đọc:</b> [Nam/Nữ] HÀ NỘI GỐC ĐẦY NỘI LỰC, ĐANH THÉP, TRUYỀN CẢM (4.3-4.5 từ/s)<br>👔 <b>Đồng nhất nhân vật & kiểu tóc:</b> [Mô tả trang phục và 1 kiểu tóc duy nhất]<br>🎯 <b>Sản phẩm Hero SKU:</b> [Mô tả mẫu mã chuẩn từ ảnh tham chiếu]",
         "global_identity_en": "Vietnamese KOC, pleasant natural face, EXACT LOCKED HAIRSTYLE (choose strictly ONE: neatly tied high bun OR straight loose hair), Body.",
         "global_outfit_en": "Exact locked outfit description, invariant across all scenes.",
         "global_setting_en": "Exact native room setting, invariant across all scenes.",
@@ -436,7 +436,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     TRẢ VỀ JSON:
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên 1", "setting": "Bối cảnh...", "hook": "Hook 3s...", "actors": {num_chars} }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản mới", "setting": "Bối cảnh...", "hook": "Câu hook 3s đầu ngắn gọn ấn tượng...", "actors": {num_chars} }}
         ]
     }}
     BẮT BUỘC ĐỦ 5 KỊCH BẢN.
@@ -474,7 +474,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & TỐI ƯU GIAO DIỆN KHO DỰ ÁN + ADMIN
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (CÓ CHỈNH SỬA & GIA HẠN TÀI KHOẢN)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -593,7 +593,7 @@ with st.sidebar:
                             st.session_state.show_all_projects = True
                             st.rerun()
 
-        # KHỐI 3: QUẢN TRỊ ADMIN (NẾU LÀ ADMIN EMAIL) - TÁCH KHỎI FORM ĐỂ HIỆN Ô TÙY CHỈNH NGAY LẬP TỨC
+        # KHỐI 3: QUẢN TRỊ ADMIN (CÓ CHỨC NĂNG SỬA HẠN & GIA HẠN TÀI KHOẢN)
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
@@ -645,7 +645,7 @@ with st.sidebar:
                     else:
                         st.error("⚠️ Vui lòng nhập đầy đủ Email, SĐT và Mật khẩu!")
 
-            st.markdown("##### 👥 Danh Sách Tài Khoản")
+            st.markdown("##### 👥 Danh Sách Tài Khoản & Gia Hạn")
             search_acc = st.text_input("🔍 Tìm tài khoản (Email/SĐT):", placeholder="Nhập email hoặc SĐT...", key="search_acc_input")
             other_accs = [item for item in st.session_state.licensed_accounts.items() if item[0] != ADMIN_EMAIL]
             
@@ -656,8 +656,55 @@ with st.sidebar:
 
             for acc_mail, info in filt_accs:
                 with st.expander(f"👤 {acc_mail} ({info.get('plan_type')})"):
-                    st.caption(f"SĐT: {info.get('phone', 'N/A')} | Hạn: {info.get('expires_at')}")
-                    if st.button("🗑 Xóa tài khoản", key=f"del_acc_{acc_mail}", use_container_width=True):
+                    st.write(f"📞 **SĐT:** `{info.get('phone', 'N/A')}`")
+                    st.write(f"⏳ **Hạn hiện tại:** `{info.get('expires_at')}`")
+                    
+                    st.markdown("---")
+                    st.markdown("**⚙ Chỉnh sửa / Gia hạn:**")
+                    
+                    # 1. Chọn đổi gói cước
+                    cur_plan = info.get("plan_type", "Trial")
+                    plan_idx = ["Trial", "Basic", "Advanced", "VIP"].index(cur_plan) if cur_plan in ["Trial", "Basic", "Advanced", "VIP"] else 0
+                    new_plan = st.selectbox("Đổi gói cước:", ["Trial", "Basic", "Advanced", "VIP"], index=plan_idx, key=f"plan_sel_{acc_mail}")
+                    
+                    # 2. Chọn mốc thời hạn gia hạn
+                    renew_opts = [
+                        "Giữ nguyên hạn hiện tại", "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", 
+                        "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", 
+                        "Tùy chỉnh (Số ngày)", "Tùy chỉnh (Chọn ngày)"
+                    ]
+                    renew_choice = st.selectbox("Gia hạn / Đổi thời hạn:", renew_opts, key=f"renew_opt_{acc_mail}")
+                    
+                    target_exp_str = info.get("expires_at", "2099-12-31")
+                    if renew_choice == "Tùy chỉnh (Số ngày)":
+                        r_days = st.number_input("Số ngày gia hạn thêm:", min_value=1, max_value=3650, value=30, key=f"rdays_{acc_mail}")
+                        target_exp_str = (datetime.now() + timedelta(days=int(r_days))).strftime("%Y-%m-%d")
+                        st.caption(f"📅 Hạn mới: **{target_exp_str}**")
+                    elif renew_choice == "Tùy chỉnh (Chọn ngày)":
+                        try:
+                            cur_d = datetime.strptime(info.get("expires_at", ""), "%Y-%m-%d").date()
+                        except:
+                            cur_d = date.today() + timedelta(days=30)
+                        r_date = st.date_input("Chọn ngày hết hạn mới:", value=cur_d, key=f"rdate_{acc_mail}")
+                        target_exp_str = r_date.strftime("%Y-%m-%d")
+                        st.caption(f"📅 Hạn mới: **{target_exp_str}**")
+                    elif renew_choice == "Vĩnh viễn":
+                        target_exp_str = "2099-12-31"
+                        st.caption("📅 Hạn mới: **Vĩnh viễn (2099-12-31)**")
+                    elif renew_choice != "Giữ nguyên hạn hiện tại":
+                        dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
+                        target_exp_str = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        st.caption(f"📅 Hạn mới: **{target_exp_str}**")
+
+                    c_act1, c_act2 = st.columns(2)
+                    if c_act1.button("🔄 Cập Nhật & Gia Hạn", key=f"save_renew_{acc_mail}", use_container_width=True):
+                        st.session_state.licensed_accounts[acc_mail]["plan_type"] = new_plan
+                        st.session_state.licensed_accounts[acc_mail]["expires_at"] = target_exp_str
+                        save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
+                        st.toast(f"✅ Đã cập nhật {acc_mail} thành công!")
+                        time.sleep(0.4); st.rerun()
+
+                    if c_act2.button("🗑 Xóa tài khoản", key=f"del_acc_{acc_mail}", type="secondary", use_container_width=True):
                         delete_single_account(acc_mail)
                         if acc_mail in st.session_state.licensed_accounts:
                             del st.session_state.licensed_accounts[acc_mail]
