@@ -664,7 +664,7 @@ with st.sidebar:
                     
                     # 1. Chọn đổi gói cước
                     cur_plan = info.get("plan_type", "Trial")
-                    plan_idx = ["Trial", "Basic", "Advanced", "VIP"].index(cur_plan) if cur_plan in ["Trial", "Basic", "Advanced", "VIP"] else 0
+                    plan_idx = ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (không giới hạn)"].index(cur_plan) if cur_plan in ["Trial", "Basic", "Advanced", "VIP"] else 0
                     new_plan = st.selectbox("Đổi gói cước:", ["Trial", "Basic", "Advanced", "VIP"], index=plan_idx, key=f"plan_sel_{acc_mail}")
                     
                     # 2. Chọn mốc thời hạn gia hạn
