@@ -216,7 +216,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V86.0 (HIGH-RETENTION SENSORY STORYTELLING)
+# 2. HÀM AI LÕI & LUẬT THÉP (HIGH-RETENTION SENSORY STORYTELLING)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -476,7 +476,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (100% BULLETPROOF IFRAME SUPPORT BANNER)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (KHỐI HỖ TRỢ TINH GỌN, SỐ TO NỔI BẬT)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -756,7 +756,7 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ TRỰC TIẾP (100% CÁCH LY QUA IFRAME - CHỮ TRẮNG TINH & SVG SẮC NÉT)
+        # KHỐI 4: HỖ TRỢ TRỰC TIẾP (BỐ CỤC 2 DÒNG: SỐ TO RÕ RÀNG, NỀN ĐỎ TRẦM DỊU MẮT)
         support_iframe_code = """
         <!DOCTYPE html>
         <html>
@@ -779,58 +779,70 @@ with st.sidebar:
                     border-radius: 14px;
                     padding: 12px 10px;
                     text-align: center;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
                 }
                 .support-title {
-                    font-size: 14.5px;
-                    font-weight: 900;
+                    font-size: 14px;
+                    font-weight: 800;
                     color: #15803d;
-                    margin-bottom: 8px;
+                    margin-bottom: 7px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
-                }
-                .hotline-banner {
-                    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-                    color: #ffffff !important;
-                    border-radius: 8px;
-                    padding: 10px 8px;
-                    font-size: 15px;
-                    font-weight: 900;
                     letter-spacing: 0.3px;
+                }
+                .hotline-card {
+                    background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+                    border-radius: 10px;
+                    padding: 8px 6px;
+                    box-shadow: 0 3px 8px rgba(153, 27, 27, 0.25);
+                    user-select: all;
+                    text-align: center;
+                }
+                .hotline-label {
+                    color: #fecdd3 !important;
+                    font-size: 12.5px;
+                    font-weight: 700;
+                    margin-bottom: 3px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 8px;
-                    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.35);
-                    user-select: all;
+                    gap: 5px;
+                    letter-spacing: 0.2px;
                 }
-                .hotline-banner span {
+                .hotline-number {
                     color: #ffffff !important;
-                    -webkit-text-fill-color: #ffffff !important;
+                    font-size: 20px;
+                    font-weight: 900;
+                    letter-spacing: 1.2px;
+                    line-height: 1.2;
+                    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
                 }
             </style>
         </head>
         <body>
             <div class="support-container">
                 <div class="support-title">
-                    <svg style="width: 18px; height: 18px; fill: #15803d; flex-shrink: 0;" viewBox="0 0 24 24">
+                    <svg style="width: 17px; height: 17px; fill: #15803d; flex-shrink: 0;" viewBox="0 0 24 24">
                         <path d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3c.55 0 1-.45 1-1v-4.18A3 3 0 0 0 21 14V10a9 9 0 0 0-9-9z"/>
                     </svg>
                     <span>HỖ TRỢ TRỰC TIẾP</span>
                 </div>
-                <div class="hotline-banner">
-                    <svg style="width: 18px; height: 18px; fill: #ffffff; flex-shrink: 0;" viewBox="0 0 24 24">
-                        <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                    </svg>
-                    <span>Hotline/Zalo: 0869 628 316</span>
+                <div class="hotline-card">
+                    <div class="hotline-label">
+                        <svg style="width: 13px; height: 13px; fill: #fecdd3; flex-shrink: 0;" viewBox="0 0 24 24">
+                            <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                        <span>Hotline / Zalo:</span>
+                    </div>
+                    <div class="hotline-number">0869 628 316</div>
                 </div>
             </div>
         </body>
         </html>
         """
-        components.html(support_iframe_code, height=105)
+        components.html(support_iframe_code, height=115)
 
         # KHỐI 5: THÔNG TIN TÀI KHOẢN & GHI CHÚ QUYỀN LỢI CỤ THỂ (DƯỚI CÙNG)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
