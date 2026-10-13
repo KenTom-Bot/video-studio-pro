@@ -223,7 +223,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V74.0
+# 2. HÀM AI LÕI & LUẬT THÉP V75.0
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -274,40 +274,52 @@ def generate_char_rules_string(profiles):
     return rules
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
-    strat = "MIX ĐA DẠNG 5 GÓC ĐỘ" if "Tự động mix" in angle else f"VIẾT CẢ 5 KỊCH BẢN THEO: '{angle}'"
+    strat_cmd = "BẠN PHẢI MIX ĐA DẠNG 5 GÓC ĐỘ NỘI DUNG." if "Tự động mix" in angle else f"VIẾT CẢ 5 KỊCH BẢN THEO: '{angle}'"
     return f"""
-    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP. {strat}. PHONG CÁCH: {style}
-    🛑 BỘ LỌC CHÍNH SÁCH:
-    1. CẤM TỪ CAM KẾT: 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'chuẩn đét', 'giảm cân giữ dáng'.
-    2. AN TOÀN TRẺ EM: Sản phẩm Mẹ & Bé luôn có mẹ bế/chăm sóc, TUYỆT ĐỐI CẤM để bé một mình.
-    3. HERO SKU: Nhận diện mẫu mã/họa tiết bán chạy từ ảnh tham chiếu (da báo, thỏ hoa).
+    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP VIỆT NAM. PHONG CÁCH: {style}
+    {strat_cmd}
+    
+    🛑 BỘ LỌC CHÍNH SÁCH BÁN HÀNG VIỆT NAM (TUÂN THỦ 100%):
+    1. CẤM TỪ CAM KẾT VÀ TỪ CẤM: 'tuyệt đối', 'hoàn toàn', '100%', 'chắc chắn', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'chuẩn đét', 'giảm cân giữ dáng'.
+       - Dùng từ ngữ tự nhiên, đời thường: 'hỗ trợ', 'cải thiện', 'nhẹ bụng hơn', 'tiện ích', 'đáng thử', 'ưng ý'.
+    2. AN TOÀN TRẺ EM: Nếu là sản phẩm Mẹ & Bé, luôn có mẹ bế hoặc kề bên chăm sóc, TUYỆT ĐỐI CẤM để bé một mình trong phòng/trên giường.
+    3. ƯU TIÊN MÃ BÁN CHẠY (HERO SKU): Soi kỹ ảnh tham chiếu (ví dụ họa tiết da báo hoặc thỏ hoa có nhãn Đã bán 1K+) để làm sản phẩm chủ đạo.
     4. BỐI CẢNH NATIVE: Ga gối đệm trên giường phòng ngủ; đồ bếp ở bàn bếp; xả kho ở kho hàng.
-    5. ĐÒN BẨY GIÁ: Neo giá gốc làm tròn (gần... nghìn), khẳng định giảm sâu, giấu giá sale, miễn trừ thời gian.
-    6. PERSONA HÀ NỘI CHUẨN: Dứt khoát (nhé, này, thế, dùng). Cấm: nha, nè, vô, xài.
+    5. ĐÒN BẨY GIÁ TƯƠNG PHẢN: Neo giá gốc làm tròn (gần... nghìn), khẳng định giảm sâu, giấu giá sale, miễn trừ thời gian.
+    6. PERSONA HÀ NỘI CHUẨN: Dứt khoát (nhé, này, thế, dùng, không). CẤM từ miền Nam: nha, nè, vô, xài.
     7. {char_rules}
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction):
     is_on_camera = "On-camera" in narrator_mode
     audio_cmd = "Chèn `Audio:` vào `vid_p`." if is_on_camera else "Không chèn thoại vào `vid_p`."
-    voice_hint = "Giọng [Nam/Nữ] HÀ NỘI GỐC ĐẦY NỘI LỰC, ĐANH THÉP, TRUYỀN CẢM, THOẠI NGAY 0.00S, NHỊP ĐỘ ĐỀU METRONOME (4.3 - 4.5 từ/s)."
+    voice_hint = "Giọng [Nam/Nữ] HÀ NỘI GỐC ĐẦY NỘI LỰC, ĐANH THÉP, TRUYỀN CẢM, BẮT ĐẦU THOẠI NGAY TẠI 0.00S, NHỊP ĐỘ ĐỀU METRONOME (4.3 - 4.5 từ/s)."
 
     return f"""
-    BẠN LÀ BẬC THẦY KỊCH BẢN VIRTUAL TIKTOK SHOP. PHONG CÁCH: {style}
-    🛑 QUY TẮC CỐT LÕI (TRIỆT TIÊU ICON GIỎ HÀNG & CLEAN FRAME):
-    1. CẤM MỌI ICON GIỎ HÀNG, NÚT BẤM & SUB NỔI:
-       - Scene 4 cử chỉ tự nhiên: "Character gestures warmly downward with an open hand". CẤM ghi "basket trigger", "cart button".
-       - Cuối mọi img_p & vid_p: "Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO simulated UI, NO overlays, NO text, NO subtitles. Clean frame."
-    2. THOẠI DÀI LIỀN MẠCH, TỰ NHIÊN, LOGIC (4 cảnh là 1 bài nói hoàn chỉnh):
-       - Scene 1 (Attention - 6s): 22–25 từ. Hook nỗi đau thực tế, thoại ngay 0.00s.
-       - Scene 2 (Interest - 8s): 30–34 từ. Dẫn dắt giải pháp chân thật.
-       - Scene 3 (Desire - 10s): 38–42 từ. Trực quan hóa giá trị, cảm nhận sướng, nhắc bảng màu.
-       - Scene 4 (Action - 6s/8s): 24–28 từ. Chốt deal đòn bẩy giá tương phản.
-    3. KHÓA 100% ẢNH THAM CHIẾU & 1 KIỂU TÓC DUY NHẤT:
-       - `prod_dna` mô tả chính xác mẫu mã ảnh tham chiếu (VD: da báo nâu đen chuẩn ảnh). Cấm đổi mẫu giữa các cảnh.
-       - Khóa 1 kiểu tóc duy nhất trong `global_identity_en` và 1 bộ đồ `global_outfit_en`.
-       - Cảnh 1 trực quan hóa nỗi đau thực tế khớp lời thoại.
-    4. SFX THỰC TẾ: Dầu sôi xèo xèo, phun sương xì xì, cắn giòn rụm, sột soạt vải.
+    BẠN LÀ BẬC THẦY KỊCH BẢN VIRTUAL VIDEO TIKTOK SHOP TẠI VIỆT NAM. PHONG CÁCH: {style}
+    
+    🛑 QUY TẮC CỐT LÕI: TRIỆT TIÊU TOÀN BỘ ICON GIỎ HÀNG, NÚT BẤM & SUB NỔI (100% CLEAN CINEMATIC FRAME):
+    1. TUYỆT ĐỐI CẤM MỌI ICON GIỎ HÀNG, ICON NÚT BẤM, SHOPPING UI HOẶC CHỮ NỔI:
+       - Trong `action_en` Cảnh 4: TUYỆT ĐỐI KHÔNG dùng các từ nhạy cảm như "basket trigger", "cart icon", "buy button", "click button".
+       - Thay vào đó, mô tả cử chỉ tự nhiên của người thật: "Character gestures warmly and naturally downward with an open hand, maintaining friendly eye contact and welcoming posture".
+       - Trong mọi `img_p` và `vid_p`, BẮT BUỘC chèn lệnh cấm sắt:
+         "Strictly pure live-action camera footage without any on-screen graphics: NO yellow shopping cart icons, NO floating animated buttons, NO simulated TikTok shop UI, NO overlays, NO text, NO subtitles, NO badges, NO typography, NO watermarks. 100% clean pristine cinematic frame."
+
+    2. CẢ 4 PHÂN CẢNH GHÉP LẠI PHẢI THÀNH 1 ĐOẠN VĂN KỂ CHUYỆN CÓ HỒN, LOGIC CHẶT CHẼ:
+       - CẤM VIẾT CÂU THOẠI CỘT LỐC, RỜI RẠC TỪNG CẢNH.
+       - Thoại phải có từ nối dẫn dắt tự nhiên giữa các cảnh.
+       - Khung số từ chuẩn mực:
+         + Scene 1 (Attention - 6s): 22 – 25 từ. Hook đánh trúng nỗi đau, nói ngay 0.00s.
+         + Scene 2 (Interest - 8s): 30 – 34 từ. Đưa sản phẩm vào giải quyết vấn đề chân thật.
+         + Scene 3 (Desire - 10s): 38 – 42 từ. Trực quan hóa giá trị, cảm nhận sướng, nhắc đến bảng màu đa dạng.
+         + Scene 4 (Action - 6s/8s): 24 – 28 từ. Chốt deal đòn bẩy giá tương phản mượt mà.
+
+    3. KHÓA 100% MẪU MÃ TỪ ẢNH GỐC & KHÓA 1 KIỂU TÓC DUY NHẤT:
+       - Soi trực tiếp ảnh sản phẩm gửi kèm để mô tả `prod_dna` chuẩn xác (VD: ga giường da báo chuẩn màu nâu-đen; chai xịt dầu thủy tinh).
+       - Khóa DUY NHẤT một kiểu tóc trong `global_identity_en` (VD: búi cao hoặc xõa dài) và 1 bộ trang phục `global_outfit_en` cho cả 4 cảnh.
+       - Cảnh 1 quay cận cảnh THỰC TRẠNG NỖI ĐAU khớp với lời thoại. Cảnh 2 & 3 hành động thực tế sinh động.
+    
+    4. ÂM THANH THỰC TẾ (Layered SFX): Tiếng dầu sôi xèo xèo, phun sương xì xì, cắn giòn rụm, sột soạt vải mềm.
     5. {audio_cmd}
     6. {char_rules}
     """
@@ -325,26 +337,37 @@ def create_scene_details(target_id, mode, style):
     prod_data_ctx = json.dumps(st.session_state.get('current_product_data_saved'), ensure_ascii=False)
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
     
-    audio_instruction = 'Chèn: Audio: "[CHÉP ĐỦ 100% VOICEOVER]", Layered SFX: [MÔ TẢ SFX THỰC TẾ]' if is_on_camera else 'Chỉ chèn Layered SFX thực tế.'
-    voice_hint = "Giọng [Nam/Nữ] HÀ NỘI CHUẨN 100%, ĐẦY NỘI LỰC, ĐANH THÉP, TRUYỀN CẢM, THOẠI NGAY 0.00S (4.3 - 4.5 từ/s)."
+    audio_instruction = 'Chèn: Audio: "[CHÉP ĐỦ 100% VOICEOVER]", Layered SFX: [MÔ TẢ SFX THỰC TẾ]' if is_on_camera else 'Chỉ chèn Layered SFX thực tế, không chèn thoại.'
+    voice_hint = "Giọng [Nam/Nữ] HÀ NỘI CHUẨN 100%, ĐẦY NỘI LỰC, ĐANH THÉP, TRUYỀN CẢM, THOẠI NGAY 0.00S, NHỊP ĐỘ ĐỀU METRONOME (4.3 - 4.5 từ/s)."
 
     prompt_text = f"""
-    DỮ LIỆU: {prod_data_ctx} | DNA: {dna_data_ctx}
-    Viết chi tiết ID {target_id}: '{outline.get('title')}'. Hook: {outline.get('hook')}. Bối cảnh: {outline.get('setting')}.
+    DỮ LIỆU ĐẦU VÀO: {prod_data_ctx} | DNA: {dna_data_ctx}
+    Viết chi tiết kịch bản ID {target_id}: '{outline.get('title')}'. Hook gốc: {outline.get('hook')}. Bối cảnh: {outline.get('setting')}.
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode}
     
-    🛑 YÊU CẦU:
-    1. CẤM ICON GIỎ HÀNG/UI SHOPPING: Scene 4 chỉ mở lòng bàn tay hướng nhẹ xuống. Cuối img_p & vid_p cấm icons, text, subs.
-    2. THOẠI DÀI TỰ NHIÊN, LIỀN MẠCH 4 CẢNH: Scene 1 (22-25 từ); Scene 2 (30-34 từ); Scene 3 (38-42 từ); Scene 4 (24-28 từ).
-    3. ĐỐI CHIẾU ẢNH: prod_dna khớp 100% mẫu mã/họa tiết ảnh tham chiếu (da báo/thỏ hoa). Khóa 1 kiểu tóc duy nhất trong global_identity_en.
-    4. Cảnh 1 quay cận cảnh thực trạng nỗi đau. Cảnh 4 chốt giá tương phản.
+    🛑 LỆNH CƯỠNG CHẾ KHÓA THỊ GIÁC & TRIỆT TIÊU ICON GIỎ HÀNG / SUB NỔI:
+    1. TUYỆT ĐỐI CẤM TẠO ICON GIỎ HÀNG, ICON NÚT BẤM, UI SHOPPING TRÊN VIDEO:
+       - Trong Scene 4: Nhân vật chỉ mở lòng bàn tay hướng nhẹ xuống dưới một cách tự nhiên ("Character gestures warmly downward with an open hand"). CẤM ghi "basket trigger" hay "cart button".
+       - Cuối mọi img_p và vid_p, BẮT BUỘC chèn lệnh:
+         "Strictly pure live-action camera footage without any on-screen graphics: NO yellow shopping cart icons, NO floating animated buttons, NO simulated TikTok shop UI, NO overlays, NO text, NO subtitles, NO badges, NO typography. 100% clean pristine cinematic frame."
+    
+    2. VIẾT THOẠI DÀI, HAY, TỰ NHIÊN, LIỀN MẠCH 4 PHÂN CẢNH THÀNH 1 ĐOẠN HOÀN CHỈNH:
+       + Scene 1 (Attention - 6s): Viết đủ 22 đến 25 từ. Hook đánh trúng nỗi đau thực tế, thoại ngay 0.00s.
+       + Scene 2 (Interest - 8s): Viết đủ 30 đến 34 từ. Dùng từ nối liền mạch, chia sẻ giải pháp chân thật.
+       + Scene 3 (Desire - 10s): Viết đủ 38 đến 42 từ. Trực quan hóa giá trị, cảm nhận sướng, nhắc bảng màu đa dạng.
+       + Scene 4 (Action - 6s/8s): Viết đủ 24 đến 28 từ. Chốt deal đòn bẩy giá tương phản mượt mà.
+    
+    3. ĐỐI CHIẾU ẢNH THAM CHIẾU GỐC & KHÓA 1 KIỂU TÓC DUY NHẤT:
+       + Soi trực tiếp ảnh gửi kèm để mô tả `prod_dna` chuẩn xác 100% mẫu mã, họa tiết (VD: ga da báo chuẩn như ảnh). CẤM đổi mẫu giữa các cảnh.
+       + Khóa DUY NHẤT một kiểu tóc trong `global_identity_en` và 1 bộ trang phục `global_outfit_en` cho cả 4 cảnh.
+       + Cảnh 1: Hình ảnh trực quan hóa nỗi đau thực tế khớp với lời thoại.
     
     TRẢ VỀ JSON:
     {{
         "title": "{outline.get('title')}",
         "total_dur": "Khoảng 30 giây",
         "outfit_vi": "Trang phục và kiểu tóc khóa cố định duy nhất cho cả 4 cảnh",
-        "global_identity_en": "Vietnamese KOC, pleasant natural face, EXACT LOCKED HAIRSTYLE (choose strictly ONE: neatly tied high bun OR straight loose hair), invariant across all scenes.",
+        "global_identity_en": "Vietnamese KOC, pleasant natural face, EXACT LOCKED HAIRSTYLE (choose strictly ONE invariant style across all scenes: neatly tied high bun OR straight loose hair), Body.",
         "global_outfit_en": "Exact locked outfit description, invariant across all scenes.",
         "global_setting_en": "Exact native room setting, invariant across all scenes.",
         "prod_dna": "Photorealistic description matching the exact reference image product, including exact pattern and colors, locked across all scenes.",
@@ -353,38 +376,38 @@ def create_scene_details(target_id, mode, style):
             {{
                 "scene": 1, "aida_stage": "Attention", "dur": "6s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 1 trực quan hóa nỗi đau...",
-                "action_en": "Realistic shot demonstrating direct pain point. Character with locked hairstyle and outfit. Speaking at 0.00s.",
+                "action_en": "Realistic shot demonstrating the exact pain point mentioned. Character with locked hairstyle and outfit. Speaking naturally starting immediately at 0.00s.",
                 "director": "Attention | Trực quan hóa nỗi đau | SFX thực tế | Khởi động: 0.00s | Tông đanh thép",
-                "voiceover": "Thoại đầy đủ 22-25 từ đánh trúng nỗi đau...",
-                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO text, NO subtitles, NO UI. Clean frame.",
-                "vid_p": "Vertical 9:16 video. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. Clean frame."
+                "voiceover": "Thoại đầy đủ dài từ 22 đến 25 từ, tự nhiên, gần gũi, đánh trúng nỗi đau thực tế...",
+                "img_p": "Vertical 9:16 photo. Cinematic eye-level shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO text, NO subtitles, NO UI overlays. Clean pristine frame.",
+                "vid_p": "Vertical 9:16 video. Eye-level shot. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Stable geometry, persistent pattern. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. 100% clean pristine cinematic frame."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest", "dur": "8s", "trans": "Chuyển cảnh mới",
-                "setting": "Mô tả bối cảnh giải pháp...",
-                "action_en": "Practical demonstration action smoothly transitioning from scene 1. Same locked hairstyle and outfit.",
+                "setting": "Mô tả bối cảnh giải pháp xuất hiện...",
+                "action_en": "Practical demonstration action smoothly transitioning from scene 1. Same locked hairstyle and outfit. Interacting naturally with product.",
                 "director": "Interest | Thao tác thực tế | SFX | Khởi động: 0.00s | Tông tự nhiên",
-                "voiceover": "Thoại nối tiếp 30-34 từ giải thích giải pháp...",
-                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO icons, NO text, NO subtitles, NO UI. Clean frame.",
-                "vid_p": "Vertical 9:16 video. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 2]\\", Layered SFX: [tiếng phun sương/thao tác]. Product: [prod_dna]. Clean frame."
+                "voiceover": "Thoại nối tiếp liền mạch dài từ 30 đến 34 từ, giải thích giải pháp chân thật...",
+                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO text, NO subtitles, NO UI overlays. Clean pristine frame.",
+                "vid_p": "Vertical 9:16 video. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 2]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. 100% clean pristine cinematic frame."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire", "dur": "10s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh trải nghiệm vượt trội...",
-                "action_en": "Sensory experience action showing practical benefits and multiple varieties. Same locked hairstyle.",
+                "action_en": "Sensory experience action showing practical benefits and multiple color varieties neatly arranged. Same locked hairstyle.",
                 "director": "Desire | Trải nghiệm & Bảng màu | SFX | Khởi động: 0.00s | Tông nội lực",
-                "voiceover": "Thoại sâu sắc 38-42 từ nêu bật điểm độc bản và bảng màu combo...",
-                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Clean frame.",
-                "vid_p": "Vertical 9:16 video. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Clean frame."
+                "voiceover": "Thoại sâu sắc dài từ 38 đến 42 từ, nêu bật điểm độc bản và nhắc đến bảng màu combo...",
+                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO text, NO subtitles, NO UI overlays. Clean pristine frame.",
+                "vid_p": "Vertical 9:16 video. Rich real-life sensory experience. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. 100% clean pristine cinematic frame."
             }},
             {{
                 "scene": 4, "aida_stage": "Action", "dur": "6s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh chốt deal...",
-                "action_en": "Character gestures warmly and naturally downward with an open hand, maintaining friendly eye contact. Same locked hairstyle and outfit.",
-                "director": "Action | Đòn bẩy giá | SFX | Khởi động: 0.00s | Tông chốt deal",
-                "voiceover": "Thoại chốt deal 24-28 từ theo đòn bẩy giá tương phản...",
-                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Clean frame.",
-                "vid_p": "Vertical 9:16 video. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 4]\\", Layered SFX: [tiếng động nhẹ]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text, NO subtitles. Clean frame."
+                "action_en": "Warm confident closing gesture: Character gestures warmly and naturally downward with an open hand, maintaining friendly eye contact and welcoming posture. Same locked hairstyle and outfit.",
+                "director": "Action | Đòn bẩy giá tương phản | SFX | Khởi động: 0.00s | Tông chốt deal",
+                "voiceover": "Thoại chốt deal tự nhiên dài từ 24 đến 28 từ theo đòn bẩy giá tương phản...",
+                "img_p": "Vertical 9:16 photo. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO text, NO subtitles, NO UI overlays. Clean pristine frame.",
+                "vid_p": "Vertical 9:16 video. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Action: [action_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% VOICEOVER CẢNH 4]\\", Layered SFX: [tiếng động nhẹ nhàng]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. 100% clean pristine cinematic frame."
             }}
         ]
     }}
@@ -527,7 +550,7 @@ with st.sidebar:
         
         st.markdown("---")
         
-        # KHỐI 2: KHO DỰ ÁN (TỐI ƯU HIỂN THỊ 3 DỰ ÁN + TÌM KIẾM)
+        # KHỐI 2: KHO DỰ ÁN (HIỂN THỊ 3 DỰ ÁN + TÌM KIẾM)
         st.markdown("### 📂 KHO DỰ ÁN")
         if supabase:
             try:
@@ -572,51 +595,58 @@ with st.sidebar:
                             st.session_state.show_all_projects = True
                             st.rerun()
 
-        # KHỐI 3: QUẢN TRỊ ADMIN (NẾU LÀ ADMIN EMAIL) - ĐẦY ĐỦ CÁC GÓI THỜI HẠN & TÙY CHỈNH
+        # KHỐI 3: QUẢN TRỊ ADMIN (NẾU LÀ ADMIN EMAIL) - TÁCH KHỎI FORM ĐỂ HIỆN Ô TÙY CHỈNH NGAY LẬP TỨC
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             
             with st.expander("➕ Cấp Quyền Tài Khoản Mới", expanded=False):
-                with st.form("admin_grant"):
-                    adm_acc = st.text_input("Email:", autocomplete="new-password")
-                    adm_phone = st.text_input("SĐT:", autocomplete="new-password")
-                    adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password")
-                    adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"])
-                    
-                    dur_options = ["3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Số ngày)", "Tùy chỉnh (Chọn ngày)"]
-                    adm_dur = st.selectbox("Thời hạn:", dur_options)
-                    
-                    custom_days = 30
-                    custom_target_date = date.today() + timedelta(days=30)
-                    if adm_dur == "Tùy chỉnh (Số ngày)":
-                        custom_days = st.number_input("Nhập số ngày sử dụng:", min_value=1, max_value=3650, value=30)
-                    elif adm_dur == "Tùy chỉnh (Chọn ngày)":
-                        custom_target_date = st.date_input("Chọn ngày hết hạn cụ thể:", value=date.today() + timedelta(days=30))
-                        
-                    if st.form_submit_button("💾 Cấp Quyền"):
-                        if adm_acc and adm_phone and adm_pass:
-                            if adm_dur == "Vĩnh viễn":
-                                exp_str = "2099-12-31"
-                            elif adm_dur == "Tùy chỉnh (Số ngày)":
-                                exp_str = (datetime.now() + timedelta(days=int(custom_days))).strftime("%Y-%m-%d")
-                            elif adm_dur == "Tùy chỉnh (Chọn ngày)":
-                                exp_str = custom_target_date.strftime("%Y-%m-%d")
-                            else:
-                                dur_days_map = {
-                                    "3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, 
-                                    "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730
-                                }
-                                exp_str = (datetime.now() + timedelta(days=dur_days_map.get(adm_dur, 30))).strftime("%Y-%m-%d")
+                adm_acc = st.text_input("Email:", autocomplete="new-password", key="adm_in_acc")
+                adm_phone = st.text_input("SĐT:", autocomplete="new-password", key="adm_in_phone")
+                adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password", key="adm_in_pass")
+                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_in_plan")
+                
+                dur_options = [
+                    "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", 
+                    "1 Năm", "2 Năm", "Vĩnh viễn", 
+                    "Tùy chỉnh (Số ngày)", "Tùy chỉnh (Chọn ngày)"
+                ]
+                adm_dur = st.selectbox("Thời hạn:", dur_options, key="adm_in_dur")
+                
+                # CÁC Ô NHẬP TÙY CHỈNH XUẤT HIỆN TỨC THÌ
+                calculated_exp_str = "2099-12-31"
+                if adm_dur == "Tùy chỉnh (Số ngày)":
+                    custom_num_days = st.number_input("👉 Nhập số ngày sử dụng:", min_value=1, max_value=3650, value=30, step=1, key="custom_num_days_input")
+                    calculated_exp_str = (datetime.now() + timedelta(days=int(custom_num_days))).strftime("%Y-%m-%d")
+                    st.caption(f"📅 Dự tính hết hạn ngày: **{calculated_exp_str}**")
+                elif adm_dur == "Tùy chỉnh (Chọn ngày)":
+                    custom_chosen_date = st.date_input("👉 Chọn ngày hết hạn cụ thể trên lịch:", value=date.today() + timedelta(days=30), min_value=date.today(), key="custom_date_input")
+                    calculated_exp_str = custom_chosen_date.strftime("%Y-%m-%d")
+                    st.caption(f"📅 Hết hạn vào ngày: **{calculated_exp_str}**")
+                elif adm_dur == "Vĩnh viễn":
+                    calculated_exp_str = "2099-12-31"
+                    st.caption("📅 Thời hạn vĩnh viễn (2099-12-31)")
+                else:
+                    dur_days_map = {
+                        "3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, 
+                        "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730
+                    }
+                    calculated_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(adm_dur, 30))).strftime("%Y-%m-%d")
+                    st.caption(f"📅 Hết hạn vào ngày: **{calculated_exp_str}**")
 
-                            st.session_state.licensed_accounts[adm_acc.strip()] = {
-                                "roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(),
-                                "expires_at": exp_str, "plan_type": adm_plan, "daily_usage_count": 0,
-                                "last_generation_date": "", "active_session_id": ""
-                            }
-                            save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
-                            st.toast("✅ Đã cấp quyền thành công!")
-                            time.sleep(0.4); st.rerun()
+                if st.button("💾 Cấp Quyền Tài Khoản", type="primary", use_container_width=True, key="btn_submit_grant_admin"):
+                    if adm_acc.strip() and adm_phone.strip() and adm_pass.strip():
+                        st.session_state.licensed_accounts[adm_acc.strip()] = {
+                            "roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(),
+                            "expires_at": calculated_exp_str, "plan_type": adm_plan, "daily_usage_count": 0,
+                            "last_generation_date": "", "active_session_id": ""
+                        }
+                        save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
+                        st.toast(f"✅ Đã cấp quyền thành công đến {calculated_exp_str}!")
+                        time.sleep(0.4)
+                        st.rerun()
+                    else:
+                        st.error("⚠️ Vui lòng nhập đầy đủ Email, SĐT và Mật khẩu!")
 
             st.markdown("##### 👥 Danh Sách Tài Khoản")
             search_acc = st.text_input("🔍 Tìm tài khoản (Email/SĐT):", placeholder="Nhập email hoặc SĐT...", key="search_acc_input")
@@ -649,7 +679,7 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ (ĐƯỢC ĐẨY LÊN TRÊN THÔNG TIN TÀI KHOẢN, CÓ HOTLINE & ICON ĐẸP)
+        # KHỐI 4: HỖ TRỢ (NẰM TRÊN THÔNG TIN TÀI KHOẢN, CÓ HOTLINE BẤM GỌI & ICON MỚI)
         st.markdown("""
         <div class="support-box">
             <div style="font-weight:900; font-size:16px; color:#15803d; margin-bottom:4px;">🎧 HỖ TRỢ</div>
