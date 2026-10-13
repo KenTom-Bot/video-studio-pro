@@ -772,8 +772,8 @@ with st.sidebar:
             <div class="hotline-tag">Hotline: <a href="tel:0869628316">0869 628 316</a></div>
             <div class="social-icons-container">
                 <a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" class="btn-zalo">Zalo</a>
-                <a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" class="btn-fb">Facebook</a>
-                <a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" class="btn-tt">TikTok</a>
+                <a href="[https://www.facebook.com/profile.php?id=61594877491617]" target="_blank" class="btn-fb">Facebook</a>
+                <a href="[https://www.tiktok.com/@binhnguyenai.studio]" target="_blank" class="btn-tt">TikTok</a>
             </div>
         </div>
         """, unsafe_allow_html=True)
