@@ -59,21 +59,6 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
 
-    /* CSS ĐỊNH DẠNG NÚT BẤM LIÊN HỆ CHUẨN NỀN TẢNG */
-    div[data-testid="stSidebar"] a[data-testid="stLinkButton"] {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-weight: 800 !important;
-        border-radius: 8px !important;
-        text-decoration: none !important;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.12) !important;
-        transition: transform 0.1s ease !important;
-    }
-    div[data-testid="stSidebar"] a[data-testid="stLinkButton"]:active {
-        transform: scale(0.97) !important;
-    }
-    
     /* DETAIL HEADER BOX CHUYÊN NGHIỆP */
     .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; color: #1e3a8a; line-height: 1.8; box-shadow: 0 3px 10px rgba(0,0,0,0.03); }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 10px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: inline-block; width: 100%; margin-top: 4px; line-height: 1.7; }
@@ -231,7 +216,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V84.0 (HIGH-RETENTION SENSORY STORYTELLING)
+# 2. HÀM AI LÕI & LUẬT THÉP V85.0 (HIGH-RETENTION SENSORY STORYTELLING)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -491,7 +476,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
     except Exception as e: return str(e)
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (100% NATIVE STREAMLIT LINK BUTTONS)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (KHỐI HỖ TRỢ HOÀN TOÀN MỚI 100% HOẠT ĐỘNG)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -740,7 +725,7 @@ with st.sidebar:
                         st.caption("📅 Hạn mới: **Vĩnh viễn (2099-12-31)**")
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
                         st.caption(f"📅 Hạn mới: **{target_exp_str}**")
 
                     c_act1, c_act2 = st.columns(2)
@@ -771,18 +756,38 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ - SỬ DỤNG STREAMLIT LINK BUTTON CHÍNH CHỦ (100% HOẠT ĐỘNG, KHÔNG DÍNH PREFIX)
-        with st.container(border=True):
-            st.markdown("<div style='text-align:center; font-weight:900; font-size:16px; color:#15803d; margin-bottom:4px;'>🎧 HỖ TRỢ</div>", unsafe_allow_html=True)
-            
-            # Hotline bấm gọi trực tiếp trên điện thoại
-            st.link_button("📞 Hotline: 0869 628 316", "tel:0869628316", use_container_width=True)
-            
-            # 3 Nút bấm Zalo, Facebook, TikTok
-            c_soc1, c_soc2, c_soc3 = st.columns(3)
-            c_soc1.link_button("💬 Zalo", "[https://zalo.me/0869628316](https://zalo.me/0869628316)", use_container_width=True)
-            c_soc2.link_button("🌐 Facebook", "[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)", use_container_width=True)
-            c_soc3.link_button("🎵 TikTok", "[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)", use_container_width=True)
+        # KHỐI 4: HỖ TRỢ (THIẾT KẾ FLEXBOX CHUẨN - KHÔNG BAO GIỜ BỊ DÍNH DẤU ... VÀ GỌI ĐIỆN / MỞ LINK TRỰC TIẾP)
+        support_pure_html = (
+            '<div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); '
+            'border: 1.5px solid #86efac; border-radius: 14px; padding: 14px 10px; '
+            'text-align: center; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">'
+            '<div style="font-weight: 900; font-size: 16px; color: #15803d; margin-bottom: 8px;">🎧 HỖ TRỢ</div>'
+            '<div style="margin-bottom: 10px;">'
+            '<a href="tel:0869628316" style="display: block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); '
+            'color: #ffffff !important; text-decoration: none; padding: 9px 8px; border-radius: 8px; '
+            'font-weight: 800; font-size: 14px; box-shadow: 0 2px 6px rgba(220,38,38,0.25); text-align: center;">'
+            '📞 Hotline: 0869 628 316</a>'
+            '</div>'
+            '<div style="display: flex; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box;">'
+            '<a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" rel="noopener noreferrer" '
+            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #0068FF 0%, #004ecc 100%); '
+            'color: #ffffff !important; text-decoration: none; padding: 8px 2px; border-radius: 8px; '
+            'font-weight: 800; font-size: 13px; text-align: center; box-shadow: 0 2px 5px rgba(0,104,255,0.25); '
+            'white-space: nowrap; overflow: hidden; text-overflow: clip; display: block;">💬 Zalo</a>'
+            '<a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" rel="noopener noreferrer" '
+            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #1877F2 0%, #0d65d9 100%); '
+            'color: #ffffff !important; text-decoration: none; padding: 8px 2px; border-radius: 8px; '
+            'font-weight: 800; font-size: 13px; text-align: center; box-shadow: 0 2px 5px rgba(24,119,242,0.25); '
+            'white-space: nowrap; overflow: hidden; text-overflow: clip; display: block;">Facebook</a>'
+            '<a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" rel="noopener noreferrer" '
+            'style="flex: 1; min-width: 0; background: linear-gradient(135deg, #111111 0%, #000000 100%); '
+            'color: #ffffff !important; text-decoration: none; padding: 8px 2px; border-radius: 8px; '
+            'font-weight: 800; font-size: 13px; text-align: center; border: 1px solid #333; '
+            'box-shadow: 0 2px 5px rgba(0,0,0,0.25); white-space: nowrap; overflow: hidden; text-overflow: clip; display: block;">TikTok</a>'
+            '</div>'
+            '</div>'
+        )
+        st.markdown(support_pure_html, unsafe_allow_html=True)
 
         # KHỐI 5: THÔNG TIN TÀI KHOẢN & GHI CHÚ QUYỀN LỢI CỤ THỂ (DƯỚI CÙNG)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
