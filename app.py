@@ -602,7 +602,7 @@ with st.sidebar:
                 adm_acc = st.text_input("Email:", autocomplete="new-password", key="adm_in_acc")
                 adm_phone = st.text_input("SĐT:", autocomplete="new-password", key="adm_in_phone")
                 adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password", key="adm_in_pass")
-                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_in_plan")
+                adm_plan = st.radio("Gói cước:", ["Trial (3 kịch bản)", "Basic (10 kịch bản)", "Advanced (20 kịch bản)", "VIP (không giới hạn)"], horizontal=True, key="adm_in_plan")
                 
                 dur_options = [
                     "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", 
