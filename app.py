@@ -12,10 +12,10 @@ import ast
 import uuid
 import io
 from PIL import Image
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & GA4
+# 1. CẤU HÌNH GIAO DIỆN & TÍCH HỢP GOOGLE ANALYTICS 4
 # ==============================================================================
 st.set_page_config(page_title="Universal AI Video Studio Pro", page_icon="🎬", layout="wide")
 
@@ -42,7 +42,11 @@ ga_script = """
 components.html(ga_script, width=0, height=0)
 
 def lock_ui():
-    st.markdown("<style>div[data-testid='stAppViewContainer'] { pointer-events: none; opacity: 0.65; }</style>", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+        div[data-testid="stAppViewContainer"] { pointer-events: none; opacity: 0.65; transition: opacity 0.3s ease; }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.markdown("""
 <style>
@@ -50,16 +54,23 @@ st.markdown("""
     .main-title { font-size: 2.2rem !important; font-weight: 900 !important; background: linear-gradient(90deg, #ff0050 0%, #ff5252 50%, #ff7300 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     div[data-testid="stButton"] > button[kind="primary"], div[data-testid="stFormSubmitButton"] > button[kind="primary"] { background: linear-gradient(135deg, #e63946 0%, #d90429 100%) !important; color: white !important; border-radius: 8px !important; font-weight: bold; width: 100%; }
     div[data-testid="stButton"] > button[kind="secondary"], div[data-testid="stFormSubmitButton"] > button[kind="secondary"] { background: linear-gradient(135deg, #ff4b4b 0%, #ff7300 100%) !important; color: #ffffff !important; box-shadow: 0 3px 8px rgba(255, 75, 75, 0.35) !important; padding: 0.55rem 1rem !important; font-weight: bold !important; border: none !important; width: 100%; }
+    div[data-testid="stButton"] > button[kind="secondary"]:hover, div[data-testid="stFormSubmitButton"] > button[kind="secondary"]:hover { transform: translateY(-1px) !important; box-shadow: 0 5px 14px rgba(255, 75, 75, 0.5) !important; }
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #bbf7d0; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .custom-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-    .support-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 12px; padding: 12px; text-align: center; margin-top: 15px; margin-bottom: 15px; }
-    .btn-zalo { background: #0068FF; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; }
-    .btn-fb { background: #1877F2; color: white !important; font-weight: 900; padding: 8px 24px; border-radius: 8px; text-decoration: none; font-size: 16px; font-family: serif; }
-    .btn-tt { background: #000000; color: white !important; font-weight: 900; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; }
-    .social-icons-container { display: flex; gap: 12px; justify-content: center; margin-top: 8px; }
+    
+    /* KHỐI HỖ TRỢ HIỆN ĐẠI */
+    .support-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 14px; padding: 14px 12px; text-align: center; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .hotline-tag { font-size: 14.5px; font-weight: 800; color: #166534; margin-bottom: 8px; }
+    .hotline-tag a { color: #dc2626 !important; text-decoration: none; font-size: 16px; font-weight: 900; }
+    .btn-zalo { background: linear-gradient(135deg, #0068FF 0%, #004ecc 100%); color: white !important; font-weight: 800; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; box-shadow: 0 2px 6px rgba(0,104,255,0.3); display: inline-flex; align-items: center; justify-content: center; min-width: 65px; }
+    .btn-fb { background: linear-gradient(135deg, #1877F2 0%, #0d65d9 100%); color: white !important; font-weight: 800; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; box-shadow: 0 2px 6px rgba(24,119,242,0.3); display: inline-flex; align-items: center; justify-content: center; min-width: 65px; }
+    .btn-tt { background: linear-gradient(135deg, #111111 0%, #000000 100%); color: white !important; font-weight: 800; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 1px solid #333; display: inline-flex; align-items: center; justify-content: center; min-width: 65px; }
+    .social-icons-container { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+
     .detail-header-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #1e3a8a; }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 10px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: inline-block; width: 100%; margin-top: 4px; line-height: 1.7; }
+    .scrollable-sidebar-container { max-height: 380px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
     div[data-testid="stFileUploader"] section { padding: 4px; min-height: 2rem; border: 1.5px dashed #cbd5e1 !important; background-color: #f8fafc !important; }
     div[data-baseweb="input"] > div, div[data-baseweb="textarea"] > div { background-color: #f8fafc !important; border: 1.5px solid #cbd5e1 !important; border-radius: 8px !important; }
 </style>
@@ -78,7 +89,8 @@ api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
 client = genai.Client(api_key=api_key) if api_key else None
 
 def count_words(text: str) -> int:
-    return len(re.findall(r'\b\w+\b', text)) if text else 0
+    if not text: return 0
+    return len(re.findall(r'\b\w+\b', text))
 
 def is_valid_phone(phone):
     phone = phone.strip()
@@ -96,7 +108,7 @@ def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 def load_licensed_accounts():
-    accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0968484369", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
+    accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0869628316", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
     if not supabase: return accs
     try:
         res = supabase.table("licensed_accounts").select("*").execute()
@@ -123,9 +135,9 @@ def delete_single_account(email):
 def check_usage_limit(email, is_detailing=False):
     if email == ADMIN_EMAIL: return True, ""
     acc = st.session_state.licensed_accounts.get(email)
-    if not acc: return False, "Lỗi xác thực."
+    if not acc: return False, "Lỗi xác thực tài khoản."
     if datetime.now() > datetime.strptime(acc.get("expires_at", "2099-12-31"), "%Y-%m-%d"):
-        return False, "Tài khoản đã hết hạn."
+        return False, "Tài khoản của bạn đã hết hạn. Vui lòng liên hệ Hotline/Zalo 0869 628 316 để gia hạn!"
     plan = acc.get("plan_type", "Trial")
     if plan == "VIP": return True, ""
     limit = {"Advanced": 20, "Basic": 10, "Trial": 3}.get(plan, 3)
@@ -134,7 +146,7 @@ def check_usage_limit(email, is_detailing=False):
         acc["daily_usage_count"] = 0
         acc["last_generation_date"] = today
     if is_detailing:
-        if acc.get("daily_usage_count", 0) >= limit: return False, f"Hết lượt tạo chi tiết ({limit}/{limit}) hôm nay!"
+        if acc.get("daily_usage_count", 0) >= limit: return False, f"Hết lượt tạo chi tiết kịch bản ({limit}/{limit}) hôm nay! Vui lòng nâng cấp gói."
         acc["daily_usage_count"] += 1
         save_single_account(email, acc)
     return True, ""
@@ -142,18 +154,24 @@ def check_usage_limit(email, is_detailing=False):
 def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt"):
     b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
     html_id = f"btn_{int(time.time()*10000)}_{len(text_to_copy)}"
-    components.html(f"""
-    <button id="{html_id}" style="background:#16a34a; color:white; border:none; padding:8px 16px; font-size:13px; font-weight:700; border-radius:6px; cursor:pointer; width:100%;">{button_label}</button>
+    html_code = f"""
+    <button id="{html_id}" style="background:#16a34a; color:white; border:none; padding:8px 16px; font-size:13px; font-weight:700; border-radius:6px; cursor:pointer; width:100%; transition: 0.2s;">{button_label}</button>
     <script>
     document.getElementById("{html_id}").addEventListener("click", function() {{
         const text = decodeURIComponent(escape(atob("{b64}")));
         navigator.clipboard.writeText(text).then(function() {{
             document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
             setTimeout(() => {{ document.getElementById("{html_id}").innerText = "{button_label}"; }}, 2000);
+        }}).catch(function(err) {{
+            const textArea = document.createElement("textarea");
+            textArea.value = text; document.body.appendChild(textArea); textArea.select();
+            try {{ document.execCommand('copy'); document.getElementById("{html_id}").innerText = "✅ Đã sao chép!"; }} catch (e) {{}}
+            document.body.removeChild(textArea);
         }});
     }});
     </script>
-    """, height=45)
+    """
+    components.html(html_code, height=45)
 
 def format_analysis_field(field_val) -> str:
     if isinstance(field_val, dict): return "<br>".join([f"• <b>{str(k).replace('_', ' ').title()}:</b> {str(v)}" for k, v in field_val.items()])
@@ -161,6 +179,7 @@ def format_analysis_field(field_val) -> str:
     text = str(field_val).strip()
     return "".join([f"<div style='margin-left: 10px; margin-top: 3px;'>• {line.strip()}</div>" for line in text.split('<br>') if line.strip()])
 
+# Khởi tạo state
 if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
@@ -175,17 +194,18 @@ for key, default_val in [
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
-# Khóa 1 thiết bị
+# Khóa thiết bị đồng thời
 if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMAIL:
     current_acc_lock = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
     if current_acc_lock.get("active_session_id") != st.session_state.session_id:
-        st.error("🚨 TÀI KHOẢN ĐANG ĐĂNG NHẬP Ở NƠI KHÁC.")
+        st.error("🚨 TÀI KHOẢN ĐANG ĐĂNG NHẬP Ở THIẾT BỊ KHÁC. Mỗi tài khoản chỉ dùng trên 1 thiết bị duy nhất.")
         if st.button("🔌 Sử dụng trên thiết bị này (Đăng xuất thiết bị kia)", type="primary"):
             st.session_state.licensed_accounts[st.session_state.current_email]["active_session_id"] = st.session_state.session_id
             save_single_account(st.session_state.current_email, st.session_state.licensed_accounts[st.session_state.current_email])
             st.rerun()
         st.stop()
 
+# Xử lý cuộn trang mượt mà
 if st.session_state.scroll_to_top:
     components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0)
     st.session_state.scroll_to_top = False
@@ -203,7 +223,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 2. HÀM AI LÕI & LUẬT THÉP V73.0
+# 2. HÀM AI LÕI & LUẬT THÉP V74.0
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
@@ -552,24 +572,51 @@ with st.sidebar:
                             st.session_state.show_all_projects = True
                             st.rerun()
 
-        # KHỐI 3: QUẢN TRỊ ADMIN (NẾU LÀ ADMIN EMAIL) - TỐI ƯU TÌM KIẾM & ẨN BỚT TÀI KHOẢN
+        # KHỐI 3: QUẢN TRỊ ADMIN (NẾU LÀ ADMIN EMAIL) - ĐẦY ĐỦ CÁC GÓI THỜI HẠN & TÙY CHỈNH
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
-            with st.form("admin_grant"):
-                st.markdown("##### ➕ Cấp Quyền Tài Khoản")
-                adm_acc = st.text_input("Email:", autocomplete="new-password")
-                adm_phone = st.text_input("SĐT:", autocomplete="new-password")
-                adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password")
-                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"])
-                adm_dur = st.selectbox("Thời hạn:", ["3 Ngày", "7 Ngày", "1 Tháng", "Vĩnh viễn"])
-                if st.form_submit_button("💾 Cấp Quyền"):
-                    if adm_acc and adm_phone and adm_pass:
-                        exp_str = "2099-12-31" if "Vĩnh" in adm_dur else (datetime.now() + timedelta(days={"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30}[adm_dur])).strftime("%Y-%m-%d")
-                        st.session_state.licensed_accounts[adm_acc.strip()] = {"roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(), "expires_at": exp_str, "plan_type": adm_plan, "daily_usage_count": 0, "last_generation_date": "", "active_session_id": ""}
-                        save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
-                        st.toast("✅ Đã cấp quyền thành công!")
-                        time.sleep(0.4); st.rerun()
+            
+            with st.expander("➕ Cấp Quyền Tài Khoản Mới", expanded=False):
+                with st.form("admin_grant"):
+                    adm_acc = st.text_input("Email:", autocomplete="new-password")
+                    adm_phone = st.text_input("SĐT:", autocomplete="new-password")
+                    adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password")
+                    adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"])
+                    
+                    dur_options = ["3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Số ngày)", "Tùy chỉnh (Chọn ngày)"]
+                    adm_dur = st.selectbox("Thời hạn:", dur_options)
+                    
+                    custom_days = 30
+                    custom_target_date = date.today() + timedelta(days=30)
+                    if adm_dur == "Tùy chỉnh (Số ngày)":
+                        custom_days = st.number_input("Nhập số ngày sử dụng:", min_value=1, max_value=3650, value=30)
+                    elif adm_dur == "Tùy chỉnh (Chọn ngày)":
+                        custom_target_date = st.date_input("Chọn ngày hết hạn cụ thể:", value=date.today() + timedelta(days=30))
+                        
+                    if st.form_submit_button("💾 Cấp Quyền"):
+                        if adm_acc and adm_phone and adm_pass:
+                            if adm_dur == "Vĩnh viễn":
+                                exp_str = "2099-12-31"
+                            elif adm_dur == "Tùy chỉnh (Số ngày)":
+                                exp_str = (datetime.now() + timedelta(days=int(custom_days))).strftime("%Y-%m-%d")
+                            elif adm_dur == "Tùy chỉnh (Chọn ngày)":
+                                exp_str = custom_target_date.strftime("%Y-%m-%d")
+                            else:
+                                dur_days_map = {
+                                    "3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, 
+                                    "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730
+                                }
+                                exp_str = (datetime.now() + timedelta(days=dur_days_map.get(adm_dur, 30))).strftime("%Y-%m-%d")
+
+                            st.session_state.licensed_accounts[adm_acc.strip()] = {
+                                "roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(),
+                                "expires_at": exp_str, "plan_type": adm_plan, "daily_usage_count": 0,
+                                "last_generation_date": "", "active_session_id": ""
+                            }
+                            save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
+                            st.toast("✅ Đã cấp quyền thành công!")
+                            time.sleep(0.4); st.rerun()
 
             st.markdown("##### 👥 Danh Sách Tài Khoản")
             search_acc = st.text_input("🔍 Tìm tài khoản (Email/SĐT):", placeholder="Nhập email hoặc SĐT...", key="search_acc_input")
@@ -602,19 +649,20 @@ with st.sidebar:
 
         st.markdown("---")
         
-        # KHỐI 4: HỖ TRỢ & BẢO HÀNH (ĐƯỢC ĐẨY LÊN TRÊN THÔNG TIN TÀI KHOẢN)
+        # KHỐI 4: HỖ TRỢ (ĐƯỢC ĐẨY LÊN TRÊN THÔNG TIN TÀI KHOẢN, CÓ HOTLINE & ICON ĐẸP)
         st.markdown("""
         <div class="support-box">
-            <b>HỖ TRỢ & BẢO HÀNH</b>
+            <div style="font-weight:900; font-size:16px; color:#15803d; margin-bottom:4px;">🎧 HỖ TRỢ</div>
+            <div class="hotline-tag">Hotline: <a href="tel:0869628316">0869 628 316</a></div>
             <div class="social-icons-container">
-                <a href="[https://zalo.me/0968484369](https://zalo.me/0968484369)" target="_blank" class="btn-zalo">Zalo</a>
-                <a href="[https://facebook.com](https://facebook.com)" target="_blank" class="btn-fb">f</a>
-                <a href="[https://tiktok.com](https://tiktok.com)" target="_blank" class="btn-tt">TikTok</a>
+                <a href="[https://zalo.me/0869628316](https://zalo.me/0869628316)" target="_blank" class="btn-zalo">Zalo</a>
+                <a href="[https://www.facebook.com/profile.php?id=61594877491617](https://www.facebook.com/profile.php?id=61594877491617)" target="_blank" class="btn-fb">Facebook</a>
+                <a href="[https://www.tiktok.com/@binhnguyenai.studio](https://www.tiktok.com/@binhnguyenai.studio)" target="_blank" class="btn-tt">TikTok</a>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        # KHỐI 5: THÔNG TIN TÀI KHOẢN & ĐĂNG XUẤT (NẰM DƯỚI CÙNG)
+        # KHỐI 5: THÔNG TIN TÀI KHOẢN & ĐĂNG XUẤT (NẰM DƯỚI CÙNG BẢO ĐẢM THỨ TỰ)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
         u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
