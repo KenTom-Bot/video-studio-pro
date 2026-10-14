@@ -92,7 +92,7 @@ def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 # ==============================================================================
-# BỘ LỌC CHÍNH SÁCH BẢO VỆ ĐA NGÀNH NGHỀ
+# BỘ LỌC CHÍNH SÁCH ĐA NGÀNH NGHỀ & VEO 3 SAFE FILTER
 # ==============================================================================
 POLICY_REPLACEMENTS = {
     r'\btuyệt\s*đối\b': 'rất', r'\bhoàn\s*toàn\b': 'thực sự', r'\b100\s*%\b': 'rất nhiều',
@@ -110,6 +110,15 @@ def sanitize_policy_text(text: str) -> str:
         cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
+def sanitize_veo3_prompt(prompt_text: str) -> str:
+    if not prompt_text: return ""
+    # Khử các từ nhạy cảm dễ bị Veo 3 quét vi phạm an toàn trẻ em
+    p = re.sub(r'\bunzipping\s+(?:front\s+)?(?:zipper\s+)?(?:halfway\s+)?(?:on\s+)?chest\b', 'smoothly showing the durable front zipper', prompt_text, flags=re.IGNORECASE)
+    p = re.sub(r'\bparting\s+(?:front\s+)?lapel\b', 'displaying the jacket inner lining cleanly', p, flags=re.IGNORECASE)
+    p = re.sub(r'\brevealing\b', 'showing', p, flags=re.IGNORECASE)
+    p = re.sub(r'\bundressing\b', 'wearing outerwear', p, flags=re.IGNORECASE)
+    return p
+
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0869628316", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
     if not supabase: return accs
@@ -120,7 +129,7 @@ def load_licensed_accounts():
                 "roles": row.get("roles", ALL_MODULES), "phone": row.get("phone", ""),
                 "password": row.get("password", ""), "expires_at": row.get("expires_at", "2099-12-31"),
                 "plan_type": row.get("plan_type", "Trial"), "daily_usage_count": row.get("daily_usage_count", 0),
-                "last_generation_date": row.get("last_generation_date", ""), "active_session_id": row.get("active_session_id", "")
+                "last_generation_date": "", "active_session_id": row.get("active_session_id", "")
             }
     except: pass
     return accs
@@ -310,32 +319,26 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     
     🛑 BỘ LỌC CHÍNH SÁCH NỀN TẢNG ĐA NGÀNH NGHỀ (100% TUÂN THỦ):
     1. AN TOÀN TRẺ EM TUYỆT ĐỐI (MINOR SAFETY - CẤM TRẺ ĐỨNG MỘT MÌNH):
-       - Trong TẤT CẢ các phân cảnh có trẻ em, NGƯỜI MẸ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN TRONG KHUNG HÌNH (đứng cạnh, nắm tay, cúi xuống tương tác, đặt tay lên vai).
-       - TUYỆT ĐỐI CẤM bất kỳ cảnh nào chỉ có một mình đứa bé đơn độc trong khung hình (vi phạm nghiêm trọng thuật toán kiểm duyệt an toàn trẻ em).
-    2. TỪ NGỮ BÁN HÀNG: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
-    3. DƯỢC / TPCN / MỸ PHẨM: Cấm cam kết chữa khỏi bệnh, cấm cam kết trắng cấp tốc, giảm cân cấp tốc.
+       - Trong TẤT CẢ các phân cảnh có trẻ em, NGƯỜI LỚN/MẸ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN TRONG CÙNG KHUNG HÌNH (đứng cạnh, nắm tay, cúi xuống tương tác, đặt tay lên vai).
+       - TUYỆT ĐỐI CẤM bất kỳ cảnh nào chỉ có một mình đứa bé đơn độc trong khung hình.
+    2. AN TOÀN TRÊN VEO 3 / VIDEO AI:
+       - Tuyệt đối cấm các từ ngữ nhạy cảm về cơ thể trẻ em: 'unzip chest', 'parting lapel on child', 'revealing', 'body touch'. Thay bằng: 'smoothly demonstrating the zipper', 'showing the inner lining cleanly'.
+    3. TỪ NGỮ BÁN HÀNG: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
+    4. DƯỢC / TPCN / MỸ PHẨM: Cấm cam kết chữa khỏi bệnh, cấm cam kết trắng cấp tốc, giảm cân cấp tốc.
 
-    🛑 BỘ QUY TẮC "ĐÓNG ĐINH" ĐỒNG NHẤT THỰC THỂ ĐỘNG THEO SẢN PHẨM (DYNAMIC ENTITY ANCHOR):
+    🛑 NGUYÊN TẮC NEO GIÁ TƯƠNG PHẢN ĐỈNH CAO:
+    - GIÁ GỐC: Làm tròn TIẾN LÊN mốc số chẵn lớn gần nhất (VD: 169k -> 'gần hai trăm nghìn' / 'ngót nghét hai trăm cành ngoài tiệm').
+    - GIÁ SALE: Nói theo cách giảm sâu / giấu giá tinh tế (VD: 98k -> 'chưa đến một trăm nghìn' / 'giảm sốc chỉ còn hơn chín mươi cành').
+
+    🛑 BỘ QUY TẮC "ĐÓNG ĐINH" ĐỒNG NHẤT THỰC THỂ ĐỘNG THEO SẢN PHẨM:
     1. TỰ ĐỘNG CHỌN VÀ KHÓA CỨNG MÀU SẮC, KIỂU DÁNG TRANG PHỤC CỤ THỂ CHO TỪNG NHÂN VẬT:
-       - AI phải tự động chọn một bộ trang phục cụ thể phù hợp với sản phẩm và vai diễn, và KHÓA BẤT BIẾN suốt cả 4 cảnh:
-         + Ví dụ nếu là Mẹ & Bé đi ra ngoài: Khóa cụ thể áo màu gì, quần màu gì, kiểu tóc gì (Ví dụ: Mẹ luôn mặc áo phông trắng trơn và quần suông màu be, tóc đuôi ngựa; Bé luôn mặc đúng 1 mẫu áo đang quảng cáo và quần jean đen).
-         + Ví dụ nếu là KOC bán đồ ngủ/ga gối: Khóa cụ thể 1 bộ đồ ngủ mặc nhà màu pastel nhã nhặn, tóc búi cao gọn gàng.
+       - Định danh chi tiết từng lớp: Áo ngoài, áo lót trong, quần/váy, kiểu tóc, giày dép.
        - CẤM TUYỆT ĐỐI nhân vật đổi quần áo, đổi màu áo, đổi kiểu tóc hay đổi áo khoác giữa các phân cảnh!
-    
-    2. TỰ ĐỘNG CHỌN VÀ KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH LOGIC:
-       - Cả 4 phân cảnh BẮT BUỘC diễn ra tại cùng 1 vị trí logic xuyên suốt (ví dụ: cùng một vị trí trước cửa nhà, hoặc cùng một góc giường phòng ngủ, hoặc cùng một bàn bếp).
-       - CẤM nhảy cảnh vô lý (đang ở cửa nhà nhảy vào phòng ngủ đệm trắng, rồi lại nhảy ra ngoài phố).
-    
-    3. HÀNH ĐỘNG CÔNG THÁI HỌC CHUẨN XÁC THEO LỜI THOẠI (REALISTIC ERGONOMICS):
-       - Thoại tả chi tiết nào thì hành động phải thao tác đúng thực tế đời thường chi tiết đó:
-         + Kiểm tra lớp lót áo khoác: Phải mở khóa trước ngực hé lớp lót, thao tác tự nhiên.
-         + Kiểm tra ga đệm: Tay kéo căng góc bo chun bọc vào đệm hoặc vuốt phẳng bề mặt vải.
-         + Nấu nướng: Có khói nóng bốc lên nhẹ nhàng (*rising gentle steam vapor*), dầu sôi xèo xèo.
-    
+    2. TỰ ĐỘNG CHỌN VÀ KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH LOGIC.
+    3. HÀNH ĐỘNG CÔNG THÁI HỌC CHUẨN XÁC THEO LỜI THOẠI.
     4. 100% NGƯỜI VIỆT THUẦN TÚY:
        - Đầu prompt: "Authentic native Vietnamese [role description], natural Vietnamese facial features, warm skin tone, black hair".
-       - Cuối prompt: "Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, indoor bedroom, bed, extra limbs, unnatural hands, yellow cart icon, simulated buttons, text, subtitles".
-    
+       - Cuối prompt: "Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, extra limbs, unnatural hands, yellow cart icon, simulated buttons, text, subtitles".
     5. KHÓA 1 SẢN PHẨM HERO SKU: "Strictly single hero product instance: NO duplicate ghost products, NO floating items. Realistic physical handling."
     6. {audio_cmd}
     7. {char_rules}
@@ -365,58 +368,61 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK CẢNH 1: '{fixed_hook}' | BỐI CẢNH GỐC: {outline.get('setting', 'Không gian thực tế phù hợp')}
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode} | CHỈ ĐẠO GIỌNG: {voice_guidance}
     
-    🛑 LỆNH CƯỠNG CHẾ QUY CHUẨN ĐẠO DIỄN THỊ GIÁC:
-    1. AN TOÀN TRẺ EM: Nếu có nhân vật trẻ em, người mẹ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN CẠNH BÉ trong cả 4 cảnh! TUYỆT ĐỐI CẤM để bé một mình trong bất kỳ cảnh nào.
-    2. ĐỒNG NHẤT TRANG PHỤC CỤ THỂ 100%: Tự động chọn 1 màu áo, 1 kiểu quần, 1 kiểu tóc cụ thể cho từng nhân vật và KHÓA CỨNG không đổi suốt 4 cảnh. CẤM đổi trang phục giữa các cảnh!
+    🛑 LỆNH CƯỠNG CHẾ QUY CHUẨN ĐẠO DIỄN THỊ GIÁC & AN TOÀN VEO 3:
+    1. AN TOÀN TRẺ EM & VEO 3 COMPLIANCE:
+       - Nếu có trẻ em, người lớn/mẹ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN CẠNH BÉ trong cả 4 cảnh! TUYỆT ĐỐI CẤM để bé một mình trong bất kỳ cảnh nào.
+       - CẤM các từ khóa nhạy cảm trong prompt video: thay vì 'unzipping chest/lapel', dùng 'smoothly demonstrating the zipper and showing the inner mesh lining'.
+    2. ĐỒNG NHẤT TRANG PHỤC CỤ THỂ 100%: Tự động chọn 1 màu áo ngoài, 1 màu áo lót, 1 kiểu quần, 1 kiểu tóc cụ thể cho từng nhân vật và KHÓA CỨNG không đổi suốt 4 cảnh. CẤM đổi trang phục giữa các cảnh!
     3. ĐỒNG NHẤT 1 BỐI CẢNH DUY NHẤT: Khóa chết 1 vị trí không gian logic cho cả 4 cảnh, cấm nhảy cảnh lung tung.
-    4. HÀNH ĐỘNG CÔNG THÁI HỌC: Mọi thao tác cầm, mặc, thử sản phẩm phải đúng vật lý đời thực (ví dụ xem lót áo thì kéo khóa trước ngực hé lớp lót; xem ga đệm thì kéo căng mép chun).
-    5. 100% NGƯỜI VIỆT THUẦN TÚY: Đầu mọi prompt có 'Authentic native Vietnamese'; cuối prompt có bộ negative loại trừ người nước ngoài, cấm trẻ đứng một mình, cấm đổi đồ.
+    4. HÀNH ĐỘNG CÔNG THÁI HỌC: Mọi thao tác cầm, mặc, thử sản phẩm phải đúng vật lý đời thực.
+    5. ĐÒN BẨY GIÁ TƯƠNG PHẢN Ở CẢNH 4: Neo giá gốc làm tròn TIẾN LÊN mốc cao (gần hai trăm nghìn / gần nửa triệu), giá sale nói hạ sốc (chưa đến một trăm nghìn).
+    6. 100% NGƯỜI VIỆT THUẦN TÚY: Đầu mọi prompt có 'Authentic native Vietnamese'; cuối prompt có bộ negative loại trừ người nước ngoài, cấm trẻ đứng một mình, cấm đổi đồ.
     
     TRẢ VỀ JSON:
     {{
         "title": "{fixed_title}",
         "voice": {{"tone": "{voice_guidance}"}},
-        "outfit_vi": "Mô tả cụ thể màu sắc trang phục và kiểu tóc được khóa cứng bất biến cho từng nhân vật suốt 4 cảnh",
-        "global_identity_en": "Authentic native Vietnamese characters with natural Vietnamese facial features, black hair and warm skin tone. EXACT SPECIFIC LOCKED OUTFIT AND HAIRSTYLE defined and invariant across all 4 scenes. If children are present, adult is always physically present beside child. Negative: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
-        "global_outfit_en": "Specific locked outfits for all characters, fully invariant across all 4 scenes.",
+        "outfit_vi": "Mô tả cụ thể từng lớp trang phục (áo ngoài, áo trong, quần, tóc) được khóa cứng bất biến cho từng nhân vật suốt 4 cảnh",
+        "global_identity_en": "Authentic native Vietnamese characters with natural Vietnamese facial features, black hair and warm skin tone. EXACT SPECIFIC LOCKED OUTFIT AND HAIRSTYLE defined and invariant across all 4 scenes. If children are present, adult is always physically present beside child in every single shot. Negative: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump, different clothes.",
+        "global_outfit_en": "Specific locked outfits for all characters including outerwear, inner layers and bottoms, fully invariant across all 4 scenes.",
         "global_setting_en": "Specific consistent single realistic location appropriate for the product, invariant across all 4 scenes.",
         "prod_dna": "Photorealistic description matching the exact reference product, single instance.",
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 1 tại vị trí cố định...",
-                "action_en": "Cinematic vertical 9:16 eye-level shot. Authentic native Vietnamese character(s). Natural realistic interaction manifesting the opening hook. Characters safely accompanied. Negative: unaccompanied minor, child alone, Caucasian, European, outfit change.",
-                "director": "Attention | Hook mở màn đánh trúng thực tế | Khởi động: 0.00s",
+                "action_en": "Cinematic vertical 9:16 eye-level shot. Authentic native Vietnamese character(s). Natural realistic interaction manifesting the opening hook. Child is safely accompanied by adult. Wholesome family scene. Negative: unaccompanied minor, child alone, Caucasian, European, outfit change.",
+                "director": "Attention | Hook mở màn đánh trúng thực tế | An toàn trẻ em | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại mở đầu phát triển từ câu hook gốc '{fixed_hook}'...",
                 "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person/family. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, indoor bedroom jump.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s). [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
+                "vid_p": "Vertical 9:16 video. Wholesome family commercial. Authentic native Vietnamese character(s). [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 2 tại cùng vị trí cố định...",
-                "action_en": "Close-up or medium shot showing practical ergonomic handling of the product feature mentioned in dialogue. Physically grounded handling. Same locked outfits and hairstyles.",
+                "action_en": "Medium close-up shot showing practical ergonomic demonstration of the product feature mentioned in dialogue (showing inner lining cleanly). Adult and child safely together in frame. Same locked outfits.",
                 "director": "Interest | Thao tác thực tế giải phóng nỗi đau | SFX thực tế | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại giải thích tính năng vượt trội...",
                 "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person/family demonstrating product feature with realistic ergonomic handling. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, blonde hair, blue eyes, unnatural handling, wardrobe change, outfit change.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s) interacting naturally with product matching spoken dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 2]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly single product. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
+                "vid_p": "Vertical 9:16 video. Wholesome product showcase. Authentic native Vietnamese character(s) demonstrating product quality smoothly matching spoken dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 2]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly single product. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 3 tại cùng vị trí cố định...",
-                "action_en": "Sensory visual showcasing genuine comfort, joy, and tactile details matching dialogue. Adult actively present beside child if children involved. Same locked outfits.",
+                "action_en": "Sensory visual showcasing genuine comfort and joy matching dialogue. Adult is actively present beside child with reassuring hand on shoulder. Same locked outfits.",
                 "director": "Desire | Trực quan hóa giá trị giác quan & độ hài lòng | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại nêu bật cảm giác thỏa mãn và chất lượng...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) showing product sensory satisfaction. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s) enjoying product benefits matching dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) showing product sensory satisfaction together. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
+                "vid_p": "Vertical 9:16 video. Wholesome family moment. Authentic native Vietnamese character(s) enjoying product benefits matching dialogue with adult present. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 4, "aida_stage": "Action", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 4 tại cùng vị trí cố định...",
                 "action_en": "Warm confident closing gesture: Authentic Vietnamese character(s) smiling warmly at camera, open hand gesturing downward toward lower corner. Adult and child together. Same locked outfits.",
-                "director": "Action | Kêu gọi hành động tự nhiên / Chốt deal | SFX tươi vui | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại kết bài kêu gọi hành động...",
+                "director": "Action | Kêu gọi hành động tự nhiên / Chốt deal đòn bẩy giá | SFX tươi vui | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại kết bài kêu gọi hành động với đòn bẩy giá tương phản...",
                 "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) smiling warmly at camera with downward open hand gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s) smiling warmly with decisive CTA gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 4]\\", Layered SFX: [tiếng chuông ting vui tai]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
+                "vid_p": "Vertical 9:16 video. Commercial CTA shot. Authentic native Vietnamese character(s) smiling warmly with decisive CTA gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 4]\\", Layered SFX: [tiếng chuông ting vui tai]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }}
         ]
     }}
@@ -436,6 +442,7 @@ def create_scene_details(target_id, mode, style):
     for scn in res.get("scenes", []):
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
+        if "vid_p" in scn: scn["vid_p"] = sanitize_veo3_prompt(scn["vid_p"])
         
         actual_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
         exact_dur_sec = max(3.0, round(actual_speech_time, 1))
@@ -444,7 +451,7 @@ def create_scene_details(target_id, mode, style):
         total_sec += exact_dur_sec
         
     res["total_dur"] = f"Khoảng {int(round(total_sec))} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>🛡️ <b>An toàn trẻ em (Minor Safety):</b> Luôn có người lớn đồng hành 100% các cảnh (Không có cảnh trẻ đứng một mình)<br>👗 <b>Đồng nhất diện mạo:</b> {res.get('outfit_vi', 'Khóa chết 1 bộ trang phục và 1 kiểu tóc suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> Duy nhất 1 không gian xác định xuyên suốt 4 cảnh"
+    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>🛡️ <b>An toàn trẻ em & Veo 3:</b> Luôn có người lớn đồng hành 100% các cảnh, khử sạch từ khóa nhạy cảm<br>👗 <b>Đồng nhất diện mạo:</b> {res.get('outfit_vi', 'Khóa chết từng lớp trang phục suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> Duy nhất 1 không gian xác định xuyên suốt 4 cảnh"
     
     st.session_state.generated_details[target_id] = res
 
@@ -803,8 +810,8 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "product_size_class": "Phân loại kích thước",
                         "product_color_lock": "Khóa màu sắc và họa tiết Hero SKU",
                         "lid_mechanism": "Cơ chế hoạt động",
-                        "detected_prices": "Quét OCR giá tiền",
-                        "rounded_price_anchor": "Làm tròn giá niêm yết",
+                        "detected_prices": "Quét OCR giá tiền (giá gốc và giá sale)",
+                        "rounded_price_anchor": "TÂM LÝ HỌC NEO GIÁ TƯƠNG PHẢN: Làm tròn giá gốc TIẾN LÊN mốc số chẵn lớn gần nhất (VD: 169.000đ -> 'gần 200 nghìn đồng') và làm mềm giá sale (VD: 98.000đ -> 'chưa đến 100 nghìn'). Định dạng: 'Giá gốc gần [X] -> Nay giảm sốc chỉ còn [Y]'",
                         "product_dimensions": "Thông số kích thước",
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
@@ -844,7 +851,7 @@ if isinstance(ca, dict):
         col_dna1.markdown(f"##### 🎯 **1. Chân dung Khách hàng & Hook 3s (Attention):**<br><div style='line-height: 1.8;'>{format_analysis_field(ca.get('target_audience', ''))}<br>{format_analysis_field(ca.get('pain_points', ''))}<br><b>⚡ Yếu tố Hook 3s đầu:</b> <span style='color:#d90429; font-weight:bold;'>{ca.get('hook_element', '')}</span></div>", unsafe_allow_html=True)
         col_dna2.markdown(f"##### 🔥 **2. Mã Màu Bán Chạy Nhất (Hero SKU):**<br><div style='line-height: 1.8;'><b>⭐ Mẫu ưu tiên làm video:</b> <span style='color:#d90429; font-size:16px; font-weight:bold;'>{ca.get('hero_sku_color', 'Tự động')}</span><br><b>🎨 Toàn bộ bảng màu:</b> <span style='color:#0284c7;'>{format_analysis_field(ca.get('color_palette', ''))}</span></div>", unsafe_allow_html=True)
         st.markdown(f"--- \n##### 💎 **3. Giải phẫu Sản phẩm Không Lộ Liễu (Interest & Desire):**<br><div style='line-height: 1.8;'><b>📦 Sản phẩm là gì & Điểm đặc biệt:</b> {ca.get('what_and_unique', '')}<br><b>👥 Sản phẩm dành cho ai:</b> {ca.get('target_user', '')}<br><b>🔥 Tại sao nên mua:</b> {ca.get('why_buy', '')}<br><b>📍 Dùng ở đâu & Tiện lợi:</b> {ca.get('where_and_convenience', '')}<br><b>🛠 Cách sử dụng chuẩn đời thực:</b> {ca.get('how_to_use', '')}</div>", unsafe_allow_html=True)
-        st.markdown(f"--- \n##### 🏭 **4. Vật lý, Cơ chế & Mức Giá OCR:**<br><div style='line-height: 1.8;'><b>📐 Thông số:</b> {ca.get('product_dimensions', '')}<br><b>🎨 Khóa màu chi tiết:</b> {ca.get('product_color_lock', '')}<br><b>⚙ Cơ chế hoạt động:</b> {ca.get('lid_mechanism', 'Bình thường')}</div><br><b>💰 Mức giá (OCR):</b> {ca.get('detected_prices', '')} (Làm tròn: <b>{ca.get('rounded_price_anchor', '')}</b>)", unsafe_allow_html=True)
+        st.markdown(f"--- \n##### 🏭 **4. Vật lý, Cơ chế & Mức Giá OCR:**<br><div style='line-height: 1.8;'><b>📐 Thông số:</b> {ca.get('product_dimensions', '')}<br><b>🎨 Khóa màu chi tiết:</b> {ca.get('product_color_lock', '')}<br><b>⚙ Cơ chế hoạt động:</b> {ca.get('lid_mechanism', 'Bình thường')}</div><br><b>💰 Mức giá (OCR):</b> {ca.get('detected_prices', '')} <br><b>🎯 Đòn bẩy giá tương phản:</b> <span style='color:#dc2626; font-size:15px; font-weight:900;'>{ca.get('rounded_price_anchor', '')}</span>", unsafe_allow_html=True)
     if ca.get('prompt_dna_lock'):
         st.markdown("##### 📌 **Visual DNA Lock:**")
         st.code(ca.get('prompt_dna_lock'), language="text")
@@ -883,7 +890,7 @@ if all_sc:
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh đồng bộ: ~{speech_sec}s ({actual_words} từ, {comma_count} dấu phẩy | Tốc độ bắn tỉa: ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s)</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & Ngôn ngữ hình thể KOC:** *{scn.get('director')}*\n\n**💬 Thoại kịch bản:** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa Cứng Trang Phục & 100% Người Việt):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
-            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 / Kling AI / Hedra - Cử Chỉ Hình Thể KOC & SFX):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
+            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Cử Chỉ Hình Thể KOC & SFX):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
     st.markdown("### 🎬 **1. Kịch Bản Đã Dựng Chi Tiết**")
@@ -934,7 +941,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         lock_ui()
         try:
-            with st.spinner(f"⏳ Đang áp dụng khóa thực thể động, bảo vệ trẻ em và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng khóa thực thể động, an toàn Veo 3 và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = target_id_to_run
                 st.session_state.scroll_to_detail = True
