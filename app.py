@@ -91,11 +91,16 @@ def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
     except Exception:
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
+# ==============================================================================
+# BỘ LỌC CHÍNH SÁCH BẢO VỆ ĐA NGÀNH NGHỀ
+# ==============================================================================
 POLICY_REPLACEMENTS = {
     r'\btuyệt\s*đối\b': 'rất', r'\bhoàn\s*toàn\b': 'thực sự', r'\b100\s*%\b': 'rất nhiều',
     r'\bchắc\s*chắn\b': 'rất có thể', r'\bcam\s*kết\b': 'an tâm', r'\bdứt\s*điểm\b': 'cải thiện',
     r'\bđặc\s*trị\b': 'hỗ trợ', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn', r'\bvĩnh\s*viễn\b': 'lâu dài',
-    r'\bchuẩn\s*đét\b': 'vừa vặn', r'\bchữa\s*khỏi\b': 'hỗ trợ'
+    r'\bchuẩn\s*đét\b': 'vừa vặn', r'\bchữa\s*khỏi\b': 'hỗ trợ', r'\bthần\s*dược\b': 'bí quyết',
+    r'\btốt\s*nhất\b': 'rất tốt', r'\bsố\s*1\b': 'hàng đầu', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên',
+    r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'vóc dáng thon gọn', r'\bxóa\s*sạch\s*nám\b': 'mờ thâm sạm'
 }
 
 def sanitize_policy_text(text: str) -> str:
@@ -280,7 +285,10 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP & VIRAL TRIỆU VIEW. PHONG CÁCH: {style}
     {strat_cmd} | {format_direction}
-    🛑 BỘ LỌC CHÍNH SÁCH BÁN HÀNG: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'. DÙNG: 'hỗ trợ', 'cải thiện', 'tiện ích', 'đáng thử'.
+    🛑 BỘ LỌC CHÍNH SÁCH BÁN HÀNG ĐA NGÀNH NGHỀ:
+    - CẤM: 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
+    - AN TOÀN TRẺ EM (MINOR SAFETY): Trẻ em LUÔN CÓ NGƯỜI LỚN KỀ BÊN trong mọi cảnh, TUYỆT ĐỐI CẤM để bé một mình trong khung hình.
+    - DƯỢC / TPCN: Không nhận là thuốc điều trị, chỉ dùng từ 'hỗ trợ', 'bổ sung'.
     🛑 100% NGƯỜI VIỆT THUẦN TÚY: Tuyệt đối cấm mặt ngoại quốc.
     🛑 {char_rules}
     """
@@ -300,33 +308,37 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 BỘ LỌC CHÍNH SÁCH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
+    🛑 BỘ LỌC CHÍNH SÁCH NỀN TẢNG ĐA NGÀNH NGHỀ (100% TUÂN THỦ):
+    1. AN TOÀN TRẺ EM TUYỆT ĐỐI (MINOR SAFETY - CẤM TRẺ ĐỨNG MỘT MÌNH):
+       - Trong TẤT CẢ các phân cảnh có trẻ em, NGƯỜI MẸ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN TRONG KHUNG HÌNH (đứng cạnh, nắm tay, cúi xuống tương tác, đặt tay lên vai).
+       - TUYỆT ĐỐI CẤM bất kỳ cảnh nào chỉ có một mình đứa bé đơn độc trong khung hình (vi phạm nghiêm trọng thuật toán kiểm duyệt an toàn trẻ em).
+    2. TỪ NGỮ BÁN HÀNG: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
+    3. DƯỢC / TPCN / MỸ PHẨM: Cấm cam kết chữa khỏi bệnh, cấm cam kết trắng cấp tốc, giảm cân cấp tốc.
 
-    🛑 BỘ QUY TẮC "ĐÓNG ĐINH" ĐỒNG NHẤT NHÂN VẬT, TRANG PHỤC & BỐI CẢNH (HARDCODED ANCHOR):
-    1. KHÓA CỨNG MÀU SẮC & CHẤT LIỆU TRANG PHỤC TỪNG NHÂN VẬT (Invariant Across All 4 Scenes):
-       - Không dùng từ trừu tượng. Phải chỉ định rõ màu sắc cụ thể:
-         + Người mẹ (Character 1): Luôn mặc áo phông cổ tròn màu trắng trơn (plain white t-shirt) và quần suông dài màu be sáng (light beige trousers), tóc đen buộc đuôi ngựa thấp (low ponytail).
-         + Bé (Character 2): Luôn mặc áo khoác gió Người Nhện màu đỏ có mũ trùm (red Spider-Man graphic windbreaker), quần jean đen và giày sneaker trắng.
-       - CẤM TUYỆT ĐỐI đổi sang áo hoa, áo ngủ, cardigan hay đổi kiểu tóc giữa các phân cảnh!
+    🛑 BỘ QUY TẮC "ĐÓNG ĐINH" ĐỒNG NHẤT THỰC THỂ ĐỘNG THEO SẢN PHẨM (DYNAMIC ENTITY ANCHOR):
+    1. TỰ ĐỘNG CHỌN VÀ KHÓA CỨNG MÀU SẮC, KIỂU DÁNG TRANG PHỤC CỤ THỂ CHO TỪNG NHÂN VẬT:
+       - AI phải tự động chọn một bộ trang phục cụ thể phù hợp với sản phẩm và vai diễn, và KHÓA BẤT BIẾN suốt cả 4 cảnh:
+         + Ví dụ nếu là Mẹ & Bé đi ra ngoài: Khóa cụ thể áo màu gì, quần màu gì, kiểu tóc gì (Ví dụ: Mẹ luôn mặc áo phông trắng trơn và quần suông màu be, tóc đuôi ngựa; Bé luôn mặc đúng 1 mẫu áo đang quảng cáo và quần jean đen).
+         + Ví dụ nếu là KOC bán đồ ngủ/ga gối: Khóa cụ thể 1 bộ đồ ngủ mặc nhà màu pastel nhã nhặn, tóc búi cao gọn gàng.
+       - CẤM TUYỆT ĐỐI nhân vật đổi quần áo, đổi màu áo, đổi kiểu tóc hay đổi áo khoác giữa các phân cảnh!
     
-    2. KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH ĐỒNG BỘ:
-       - Cả 4 phân cảnh BẮT BUỘC diễn ra tại cùng 1 vị trí cố định: Khuôn viên trước cửa nhà ngõ phố Hà Nội, ngay cạnh chiếc xe máy tay ga màu đen đang đỗ.
-       - CẤM nhảy vào phòng khách, CẤM nhảy vào phòng ngủ lát gạch men.
+    2. TỰ ĐỘNG CHỌN VÀ KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH LOGIC:
+       - Cả 4 phân cảnh BẮT BUỘC diễn ra tại cùng 1 vị trí logic xuyên suốt (ví dụ: cùng một vị trí trước cửa nhà, hoặc cùng một góc giường phòng ngủ, hoặc cùng một bàn bếp).
+       - CẤM nhảy cảnh vô lý (đang ở cửa nhà nhảy vào phòng ngủ đệm trắng, rồi lại nhảy ra ngoài phố).
     
-    3. HÀNH ĐỘNG CÔNG THÁI HỌC CHUẨN XÁC THEO LỜI THOẠI:
-       - Cảnh 1 (Se lạnh, đi xe máy): Mẹ đứng cạnh xe máy cài khóa áo ấm cho bé hoặc đội mũ bảo hiểm.
-       - Cảnh 2 (Lót lưới đen thoáng khí): Cận cảnh tay mẹ kéo khóa trước ngực xuống một nửa, mở nhẹ vạt áo trước để lộ rõ lớp lưới tổ ong màu đen. Thao tác tự nhiên, hợp lý.
-       - Cảnh 3 (Người Nhện, bo tay): Cận cảnh bo chun tay áo ôm cổ tay, bé xoay lưng khoe họa tiết Người Nhện sau lưng.
-       - Cảnh 4 (Chốt đơn): Cả mẹ và bé đứng cạnh xe máy nhìn camera cười tươi, mẹ mở tay hướng xuống góc trái.
+    3. HÀNH ĐỘNG CÔNG THÁI HỌC CHUẨN XÁC THEO LỜI THOẠI (REALISTIC ERGONOMICS):
+       - Thoại tả chi tiết nào thì hành động phải thao tác đúng thực tế đời thường chi tiết đó:
+         + Kiểm tra lớp lót áo khoác: Phải mở khóa trước ngực hé lớp lót, thao tác tự nhiên.
+         + Kiểm tra ga đệm: Tay kéo căng góc bo chun bọc vào đệm hoặc vuốt phẳng bề mặt vải.
+         + Nấu nướng: Có khói nóng bốc lên nhẹ nhàng (*rising gentle steam vapor*), dầu sôi xèo xèo.
     
-    4. 100% NGƯỜI VIỆT BẢN ĐỊA:
-       - Đầu prompt: "Authentic native Vietnamese mother and son, natural Vietnamese facial features, warm skin tone, black hair".
-       - Cuối prompt: "Negative prompt: Caucasian, white, European, blonde hair, blue eyes, foreign face, floral pattern shirt, outfit change, wardrobe jump, indoor living room jump".
+    4. 100% NGƯỜI VIỆT THUẦN TÚY:
+       - Đầu prompt: "Authentic native Vietnamese [role description], natural Vietnamese facial features, warm skin tone, black hair".
+       - Cuối prompt: "Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, indoor bedroom, bed, extra limbs, unnatural hands, yellow cart icon, simulated buttons, text, subtitles".
     
     5. KHÓA 1 SẢN PHẨM HERO SKU: "Strictly single hero product instance: NO duplicate ghost products, NO floating items. Realistic physical handling."
-    6. TRIỆT TIÊU ICON GIỎ HÀNG, NÚT BẤM: "NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text. Clean frame."
-    7. {audio_cmd}
-    8. {char_rules}
+    6. {audio_cmd}
+    7. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style):
@@ -348,67 +360,63 @@ def create_scene_details(target_id, mode, style):
     dna_data_ctx = json.dumps(st.session_state.get('content_analysis'), ensure_ascii=False)
 
     prompt_text = f"""
-    DỮ LIỆU: {prod_data_ctx} | DNA: {dna_data_ctx}
-    KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK CẢNH 1: '{fixed_hook}' | BỐI CẢNH CỐ ĐỊNH: Trước cửa nhà ngõ phố Hà Nội cạnh xe máy đen đỗ sát cửa
+    DỮ LIỆU SẢN PHẨM: {prod_data_ctx}
+    DNA SẢN PHẨM: {dna_data_ctx}
+    KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK CẢNH 1: '{fixed_hook}' | BỐI CẢNH GỐC: {outline.get('setting', 'Không gian thực tế phù hợp')}
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode} | CHỈ ĐẠO GIỌNG: {voice_guidance}
     
-    🛑 LỆNH CƯỠNG CHẾ KHÓA CỨNG TRANG PHỤC, ĐỒNG NHẤT BỐI CẢNH VÀ HÀNH ĐỘNG CÔNG THÁI HỌC:
-    1. ĐỒNG NHẤT 100% VỀ TRANG PHỤC CỤ THỂ:
-       - Mẹ (Character 1): Luôn mặc áo phông cổ tròn màu trắng trơn (plain white t-shirt) và quần suông màu be sáng (light beige trousers), tóc buộc đuôi ngựa thấp. CẤM áo hoa!
-       - Bé (Character 2): Luôn mặc áo khoác gió Người Nhện màu đỏ có mũ trùm, quần jean đen, giày sneaker trắng.
-    2. BỐI CẢNH CỐ ĐỊNH DUY NHẤT: Trước cửa nhà ngõ phố Hà Nội, cạnh chiếc xe máy màu đen đang đỗ. Cả 4 cảnh đều diễn ra tại vị trí này. CẤM nhảy vào phòng khách hay góc khác!
-    3. HÀNH ĐỘNG CÔNG THÁI HỌC KHỚP THOẠI:
-       - Cảnh 1: Mẹ đứng cạnh xe máy kéo khóa áo ấm cho bé trước khi đi học.
-       - Cảnh 2: Cận cảnh tay mẹ kéo khóa trước ngực xuống một nửa, mở nhẹ vạt áo trước để lộ lớp lưới tổ ong màu đen bên trong.
-       - Cảnh 3: Cận cảnh bo chun tay ôm khít + bé xoay người tạo dáng khoe họa tiết Người Nhện sau lưng áo.
-       - Cảnh 4: Mẹ và bé đứng cạnh xe máy cười tươi nhìn camera, mẹ mở nhẹ tay hướng xuống góc trái.
-    4. 100% NGƯỜI VIỆT THUẦN TÚY: 'Authentic native Vietnamese' ở đầu prompt; 'Negative prompt: Caucasian, white, European, blonde hair, blue eyes, floral pattern shirt, outfit change, indoor living room jump' ở cuối prompt.
+    🛑 LỆNH CƯỠNG CHẾ QUY CHUẨN ĐẠO DIỄN THỊ GIÁC:
+    1. AN TOÀN TRẺ EM: Nếu có nhân vật trẻ em, người mẹ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN CẠNH BÉ trong cả 4 cảnh! TUYỆT ĐỐI CẤM để bé một mình trong bất kỳ cảnh nào.
+    2. ĐỒNG NHẤT TRANG PHỤC CỤ THỂ 100%: Tự động chọn 1 màu áo, 1 kiểu quần, 1 kiểu tóc cụ thể cho từng nhân vật và KHÓA CỨNG không đổi suốt 4 cảnh. CẤM đổi trang phục giữa các cảnh!
+    3. ĐỒNG NHẤT 1 BỐI CẢNH DUY NHẤT: Khóa chết 1 vị trí không gian logic cho cả 4 cảnh, cấm nhảy cảnh lung tung.
+    4. HÀNH ĐỘNG CÔNG THÁI HỌC: Mọi thao tác cầm, mặc, thử sản phẩm phải đúng vật lý đời thực (ví dụ xem lót áo thì kéo khóa trước ngực hé lớp lót; xem ga đệm thì kéo căng mép chun).
+    5. 100% NGƯỜI VIỆT THUẦN TÚY: Đầu mọi prompt có 'Authentic native Vietnamese'; cuối prompt có bộ negative loại trừ người nước ngoài, cấm trẻ đứng một mình, cấm đổi đồ.
     
     TRẢ VỀ JSON:
     {{
         "title": "{fixed_title}",
         "voice": {{"tone": "{voice_guidance}"}},
-        "outfit_vi": "Mẹ mặc áo phông trắng trơn + quần suông màu be (tóc đuôi ngựa thấp); Bé mặc áo khoác gió Người Nhện đỏ + quần jean đen (khóa cố định 100% suốt 4 cảnh)",
-        "global_identity_en": "Authentic native Vietnamese mother (plain white t-shirt, light beige trousers, low ponytail) and young son (red Spider-Man graphic windbreaker, black jeans, white sneakers). Natural Vietnamese facial features, warm skin tone, black hair. EXACT LOCKED OUTFIT AND HAIRSTYLE invariant across all 4 scenes. Negative: Caucasian, white, European, blonde hair, blue eyes, floral shirt, wardrobe change.",
-        "global_outfit_en": "Locked identical outfits for both characters across all 4 scenes: Mother in plain white t-shirt and light beige trousers; Son in red Spider-Man windbreaker jacket and black jeans.",
-        "global_setting_en": "Consistent authentic Hanoi neighborhood doorway with a black scooter parked outside.",
-        "prod_dna": "Photorealistic red windbreaker jacket with black breathable mesh inner lining and Spider-Man pattern, single instance.",
+        "outfit_vi": "Mô tả cụ thể màu sắc trang phục và kiểu tóc được khóa cứng bất biến cho từng nhân vật suốt 4 cảnh",
+        "global_identity_en": "Authentic native Vietnamese characters with natural Vietnamese facial features, black hair and warm skin tone. EXACT SPECIFIC LOCKED OUTFIT AND HAIRSTYLE defined and invariant across all 4 scenes. If children are present, adult is always physically present beside child. Negative: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
+        "global_outfit_en": "Specific locked outfits for all characters, fully invariant across all 4 scenes.",
+        "global_setting_en": "Specific consistent single realistic location appropriate for the product, invariant across all 4 scenes.",
+        "prod_dna": "Photorealistic description matching the exact reference product, single instance.",
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention", "trans": "Chuyển cảnh mới",
-                "setting": "Trước cửa nhà ngõ phố Hà Nội buổi sáng se lạnh cạnh xe máy đen đỗ ngoài cửa...",
-                "action_en": "Cinematic vertical 9:16 eye-level shot. Authentic native Vietnamese mother in plain white t-shirt and light beige trousers, standing beside a black scooter with her son, adjusting his red Spider-Man windbreaker zip for a cold morning ride. Realistic physical interaction.",
-                "director": "Attention | Hook mở màn (xe máy & trời se lạnh) | Khởi động: 0.00s",
+                "setting": "Mô tả bối cảnh cảnh 1 tại vị trí cố định...",
+                "action_en": "Cinematic vertical 9:16 eye-level shot. Authentic native Vietnamese character(s). Natural realistic interaction manifesting the opening hook. Characters safely accompanied. Negative: unaccompanied minor, child alone, Caucasian, European, outfit change.",
+                "director": "Attention | Hook mở màn đánh trúng thực tế | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại mở đầu phát triển từ câu hook gốc '{fixed_hook}'...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese mother and son beside a parked black scooter in a Hanoi alleyway doorway. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, floral pattern shirt, wardrobe change, indoor room.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese mother and son beside a black scooter outside doorway. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 1]\\", Layered SFX: [tiếng xe máy và gió se lạnh]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: Caucasian, white, European, floral shirt, outfit change."
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person/family. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, indoor bedroom jump.",
+                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s). [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest", "trans": "Chuyển cảnh mới",
-                "setting": "Cận cảnh trước ngực áo khoác gió tại vị trí cửa nhà...",
-                "action_en": "Macro close-up shot. Mother's hands naturally pulling down front zipper halfway, gently parting front chest lapel to reveal breathable black honeycomb mesh lining inside. Same plain white t-shirt on mother. Physically grounded ergonomic handling.",
-                "director": "Interest | Cận cảnh mở vạt áo trước khoe lớp lưới tổ ong | SFX kéo khóa | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại giải thích lớp lót lưới thoáng khí...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese mother's hands unzipping front zipper halfway to show inner black honeycomb mesh lining clearly. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, unnatural handling, floral shirt, wardrobe change.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese mother naturally opening front jacket lapel to display breathable black mesh lining matching spoken dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 2]\\", Layered SFX: [tiếng kéo khóa êm ái]. Product: [prod_dna]. Strictly single product. Negative prompt: Caucasian, white, European, floral shirt, outfit change."
+                "setting": "Mô tả bối cảnh cảnh 2 tại cùng vị trí cố định...",
+                "action_en": "Close-up or medium shot showing practical ergonomic handling of the product feature mentioned in dialogue. Physically grounded handling. Same locked outfits and hairstyles.",
+                "director": "Interest | Thao tác thực tế giải phóng nỗi đau | SFX thực tế | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại giải thích tính năng vượt trội...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person/family demonstrating product feature with realistic ergonomic handling. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, blonde hair, blue eyes, unnatural handling, wardrobe change, outfit change.",
+                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s) interacting naturally with product matching spoken dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 2]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly single product. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire", "trans": "Chuyển cảnh mới",
-                "setting": "Cửa nhà ngõ phố, bé khoe áo...",
-                "action_en": "Close-up of snug elastic wrist cuffs, followed by boy turning happily outside doorway to proudly showcase vibrant red Spider-Man graphic on jacket back. Same locked outfits: mother in white t-shirt, son in red jacket and black jeans.",
-                "director": "Desire | Khoe họa tiết Người Nhện sau lưng & bo chun | SFX tiếng cười trẻ thơ | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại nêu bật họa tiết Người Nhện và độ co giãn bo tay...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese boy happily turning outside doorway to showcase red Spider-Man graphic on jacket back. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, floral shirt, indoor room, wardrobe change.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese boy smiling and posing proudly showing back graphic jacket details matching dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 3]\\", Layered SFX: [tiếng cười khúc khích trẻ thơ]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, floral shirt, outfit change."
+                "setting": "Mô tả bối cảnh cảnh 3 tại cùng vị trí cố định...",
+                "action_en": "Sensory visual showcasing genuine comfort, joy, and tactile details matching dialogue. Adult actively present beside child if children involved. Same locked outfits.",
+                "director": "Desire | Trực quan hóa giá trị giác quan & độ hài lòng | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại nêu bật cảm giác thỏa mãn và chất lượng...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) showing product sensory satisfaction. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
+                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s) enjoying product benefits matching dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 4, "aida_stage": "Action", "trans": "Chuyển cảnh mới",
-                "setting": "Trước cửa nhà cạnh xe máy, cả hai mẹ con nhìn vào camera chốt deal...",
-                "action_en": "Medium shot. Authentic native Vietnamese mother in plain white t-shirt and beige trousers with arm gently around smiling son in red jacket, standing by black scooter, gesturing warmly downward with open hand toward lower corner.",
-                "director": "Action | Chốt đơn kêu gọi mua hàng tự nhiên | SFX chuông vui tai | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại kết bài chốt deal đòn bẩy giá...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese mother and son smiling warmly at camera beside parked black scooter, open hand gesture downward. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, floral shirt, indoor room, wardrobe change.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese mother and son smiling warmly by motorbike with decisive CTA gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 4]\\", Layered SFX: [tiếng chuông ting vui tai]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, floral shirt, outfit change."
+                "setting": "Mô tả bối cảnh cảnh 4 tại cùng vị trí cố định...",
+                "action_en": "Warm confident closing gesture: Authentic Vietnamese character(s) smiling warmly at camera, open hand gesturing downward toward lower corner. Adult and child together. Same locked outfits.",
+                "director": "Action | Kêu gọi hành động tự nhiên / Chốt deal | SFX tươi vui | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại kết bài kêu gọi hành động...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) smiling warmly at camera with downward open hand gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
+                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese character(s) smiling warmly with decisive CTA gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 4]\\", Layered SFX: [tiếng chuông ting vui tai]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }}
         ]
     }}
@@ -436,7 +444,7 @@ def create_scene_details(target_id, mode, style):
         total_sec += exact_dur_sec
         
     res["total_dur"] = f"Khoảng {int(round(total_sec))} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Đồng nhất diện mạo 100%:</b> Mẹ (Áo phông trắng trơn, quần suông be, tóc đuôi ngựa thấp); Bé (Áo khoác Người Nhện đỏ, quần jean đen) - Khóa cố định suốt 4 cảnh<br>📍 <b>Bối cảnh logic duy nhất:</b> Trước cửa nhà ngõ phố Hà Nội cạnh xe máy đen đỗ cửa"
+    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>🛡️ <b>An toàn trẻ em (Minor Safety):</b> Luôn có người lớn đồng hành 100% các cảnh (Không có cảnh trẻ đứng một mình)<br>👗 <b>Đồng nhất diện mạo:</b> {res.get('outfit_vi', 'Khóa chết 1 bộ trang phục và 1 kiểu tóc suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> Duy nhất 1 không gian xác định xuyên suốt 4 cảnh"
     
     st.session_state.generated_details[target_id] = res
 
@@ -451,11 +459,11 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     prompt = f"""
     {prod_ctx} | {dna_ctx}
     Sinh 5 kịch bản mới chuẩn AIDA: '{angle}'. Diễn viên: {num_chars} người Việt.
-    TUÂN THỦ CHÍNH SÁCH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn'.
+    TUÂN THỦ CHÍNH SÁCH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn'. Trẻ em luôn có người lớn bên cạnh.
     TRẢ VỀ JSON:
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên kịch bản mới", "setting": "Trước cửa nhà cạnh xe máy...", "hook": "Câu hook 3s đầu ngắn gọn...", "actors": {num_chars} }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản mới", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook 3s đầu ngắn gọn...", "actors": {num_chars} }}
         ]
     }}
     BẮT BUỘC ĐỦ 5 KỊCH BẢN.
@@ -475,7 +483,7 @@ def clone_script(script_id):
     cur_len = len(all_combined)
     num_chars = target.get("actors", target.get("actor_count", 1))
     
-    prompt = f"Nhân bản kịch bản #{script_id}: {json.dumps(target, ensure_ascii=False)} thành 5 biến thể AIDA mới tuân thủ chính sách, CẤM từ cam kết."
+    prompt = f"Nhân bản kịch bản #{script_id}: {json.dumps(target, ensure_ascii=False)} thành 5 biến thể AIDA mới tuân thủ chính sách, CẤM từ cam kết, trẻ em luôn có người lớn bên cạnh."
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target.get("narrator_mode", ""), "", num_chars, "Gốc"), max_tokens=3000)
     clones = res.get("outlines", res.get("script_outlines", []))
     for idx, cl in enumerate(clones):
@@ -647,6 +655,7 @@ with st.sidebar:
                         st.caption(f"📅 Hạn mới: **{target_exp_str}**")
                     elif renew_choice == "Vĩnh viễn":
                         target_exp_str = "2099-12-31"
+                        st.caption("📅 Hạn mới: **Vĩnh viễn (2099-12-31)**")
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
                         target_exp_str = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
@@ -800,7 +809,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
                     "outlines": [
-                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Trước cửa nhà cạnh xe máy...", "hook": "Câu hook 3s đầu...", "actors": {num_chars} }},
+                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook 3s đầu...", "actors": {num_chars} }},
                         {{ "id": 2, "title": "Tên kịch bản 2", "setting": "...", "hook": "...", "actors": {num_chars} }},
                         {{ "id": 3, "title": "Tên kịch bản 3", "setting": "...", "hook": "...", "actors": {num_chars} }},
                         {{ "id": 4, "title": "Tên kịch bản 4", "setting": "...", "hook": "...", "actors": {num_chars} }},
@@ -925,7 +934,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         lock_ui()
         try:
-            with st.spinner(f"⏳ Đang áp dụng khóa cứng trang phục, đồng nhất bối cảnh và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng khóa thực thể động, bảo vệ trẻ em và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = target_id_to_run
                 st.session_state.scroll_to_detail = True
