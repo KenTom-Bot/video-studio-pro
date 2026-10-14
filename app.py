@@ -364,20 +364,21 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 LUẬT KHỐNG CHẾ SỐ TỪ ĐỂ THỜI GIAN ĐỌC KHÔNG VƯỢT QUÁ KHUNG PHÂN CẢNH:
+    🛑 LUẬT KHỐNG CHẾ SỐ TỪ ĐỂ THỜI GIAN ĐỌC KHÔNG VƯỢT QUÁ KHUNG PHÂN CẢNH (RHYTHMIC TIME-CAP):
     - Tốc độ đọc KOC TikTok Shop: 4.8 - 5.2 từ/giây.
-    - CẢNH 4 GIÂY: TỐI ĐA 14 - 16 TỪ (tối đa 1 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 16 từ!
-    - CẢNH 6 GIÂY: TỐI ĐA 22 - 25 TỪ (tối đa 1-2 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 25 từ!
-    - CẢNH 8 GIÂY: TỐI ĐA 30 - 34 TỪ (tối đa 2 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 34 từ!
-    - CẢNH 10 GIÂY: TỐI ĐA 38 - 42 TỪ (tối đa 2-3 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 42 từ!
+    - CẢNH 1 (ATTENTION - HOOK 6s): TỐI ĐA 22 - 25 TỪ (tối đa 1-2 dấu phẩy). TUYỆT ĐỐI CẤM viết dài hơn 25 từ!
+    - CẢNH 2 (INTEREST 8s): TỐI ĐA 30 - 34 TỪ (tối đa 2 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 34 từ!
+    - CẢNH 3 (DESIRE 10s): TỐI ĐA 38 - 42 TỪ (tối đa 2-3 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 42 từ!
+    - CẢNH 4 (ACTION 6s): TỐI ĐA 22 - 25 TỪ (tối đa 1-2 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 25 từ!
 
-    🛑 MA TRẬN KHÓA CỨNG 5 LỚP THỰC THỂ (STRICT 5-LAYER IDENTITY LOCK) - CHỐNG ĐỔI ĐỒ VÀ ĐỔI TÓC 100%:
-    1. LỚP 1 (FACE): Khuôn mặt người Việt tự nhiên, độ tuổi cụ thể, lớp trang điểm nhẹ nhàng không đổi.
-    2. LỚP 2 (HAIR): KHÓA DUY NHẤT 1 KIỂU TÓC BẤT BIẾN (Ví dụ: Tóc xõa dài uốn nhẹ tự nhiên. TUYỆT ĐỐI CẤM cảnh sau búi tóc, buộc tóc hay cắt ngắn).
-    3. LỚP 3 (TOP / OUTERWEAR): KHÓA CỤ THỂ 1 LOẠI ÁO (Ví dụ: Áo len dệt kim màu be kem cổ tròn dài tay. TUYỆT ĐỐI CẤM cảnh sau đổi sang áo phông cộc tay, áo hoa hay cardigan).
-    4. LỚP 4 (BOTTOM): KHÓA CỤ THỂ 1 LOẠI QUẦN/VÁY (Ví dụ: Chân váy midi xếp ly màu nâu cà phê. TUYỆT ĐỐI CẤM cảnh sau đổi sang quần jean hay váy khác).
-    5. LỚP 5 (SETTING): KHÓA CỤ THỂ 1 BỐI CẢNH DUY NHẤT (Ví dụ: Góc phòng khách Japandi ấm áp bên sofa vải be và bàn trà gỗ. CẤM đổi sang phòng khác).
-    -> TẤT CẢ các cảnh phải mang đúng bộ quần áo, kiểu tóc và bối cảnh này!
+    🛑 MA TRẬN KHÓA CỨNG 5 LỚP THỰC THỂ (STRICT 5-LAYER IDENTITY MATRIX LOCK) - CHỐNG ĐỔI ĐỒ VÀ ĐỔI TÓC 100%:
+    BẮT BUỘC định nghĩa rõ ràng cấu trúc 'character_matrix':
+    1. LỚP 1 (FACE): Khuôn mặt người Việt tự nhiên, độ tuổi cụ thể, dáng người.
+    2. LỚP 2 (HAIR): KHÓA DUY NHẤT 1 KIỂU TÓC CỐ ĐỊNH (Ví dụ: Tóc xõa dài uốn nhẹ tự nhiên. CẤM cảnh sau búi tóc, buộc tóc hay cắt ngắn).
+    3. LỚP 3 (OUTER / TOP): KHÓA CỤ THỂ 1 LOẠI ÁO TRÊN (Ví dụ: Áo len dệt kim dày màu be kem cổ tròn dài tay. CẤM cảnh sau đổi sang áo phông cộc tay, áo hoa hay cardigan).
+    4. LỚP 4 (BOTTOM): KHÓA CỤ THỂ 1 LOẠI QUẦN/VÁY (Ví dụ: Chân váy midi xếp ly màu nâu cà phê. CẤM đổi sang quần jean hay váy khác).
+    5. LỚP 5 (SETTING): KHÓA CỤ THỂ 1 GÓC QUAY DUY NHẤT (Ví dụ: Góc phòng khách Japandi ấm áp bên sofa vải be và bàn trà gỗ. CẤM đổi sang góc khác).
+    -> Hệ thống sẽ dùng mã nguồn để ép buộc toàn bộ 4 cảnh mang CHÍNH XÁC trang phục và bối cảnh này!
 
     🛑 BỘ LỌC CHÍNH SÁCH VÀ AN TOÀN TRẺ EM / VEO 3:
     - Nếu có trẻ em: Người lớn BẮT BUỘC luôn có mặt bên cạnh trong 100% các cảnh. CẤM trẻ đứng một mình!
@@ -431,46 +432,43 @@ def create_scene_details(target_id, mode, style):
         "title": "{fixed_title}",
         "voice": {{"tone": "{voice_guidance}"}},
         "outfit_vi": "Mô tả chi tiết: Áo trên cụ thể + Quần/Váy cụ thể + Kiểu tóc cụ thể được khóa chết 100% suốt 4 cảnh",
-        "global_identity_en": "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone. EXACT LOCKED HAIRSTYLE AND DETAILS invariant across all 4 scenes.",
-        "global_outfit_en": "STRICTLY LOCKED SINGLE OUTFIT: [Mô tả chi tiết áo trên, màu sắc, kiểu dáng, chất liệu] paired with [mô tả chi tiết quần/váy, màu sắc]. 100% invariant across all 4 scenes.",
-        "global_setting_en": "Consistent single realistic room/space corner, invariant across all 4 scenes.",
+        "character_matrix": {{
+            "full_characters_appearance": "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone",
+            "locked_hairstyles": "Mô tả duy nhất 1 kiểu tóc cố định không đổi bằng tiếng Anh (ví dụ: long flowing soft wavy dark brown hair worn loose over shoulders)",
+            "locked_tops": "Mô tả chi tiết 1 mẫu áo trên cụ thể bằng tiếng Anh (ví dụ: thick ribbed cream-beige oversized crewneck knit sweater with long sleeves)",
+            "locked_bottoms": "Mô tả chi tiết 1 mẫu quần hoặc váy bằng tiếng Anh (ví dụ: coffee brown pleated A-line midi skirt reaching mid-calf)",
+            "locked_setting": "Mô tả duy nhất 1 góc bối cảnh cố định bằng tiếng Anh (ví dụ: warm cozy Japandi living room corner with beige fabric sofa and light wooden table)",
+            "locked_negative": "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed"
+        }},
         "prod_dna": "Photorealistic description matching the exact reference product, single instance.",
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention", "dur": "6s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 1 tại vị trí cố định...",
-                "action_en": "Vertical 9:16 eye-level shot. Authentic native Vietnamese character. Wearing [global_outfit_en], with [locked hairstyle]. Natural engaging action manifesting the hook.",
+                "action_en": "Natural engaging realistic human action manifesting the opening hook. Characters accompanied safely.",
                 "director": "Attention | Hook ngắn gọn dồn dập (tối đa 25 từ) | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại mở đầu phát triển từ câu hook gốc '{fixed_hook}' TUÂN THỦ TỐI ĐA 22-25 từ...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, outfit change, wardrobe jump, clothes change, extra limbs.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese person. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: Caucasian, white, European, t-shirt, short sleeves, hair bun, ponytail, outfit change, clothes change."
+                "voiceover": "Đoạn thoại mở đầu phát triển từ câu hook gốc '{fixed_hook}' TUÂN THỦ TỐI ĐA 22-25 từ..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest", "dur": "8s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 2 tại cùng vị trí cố định...",
-                "action_en": "Medium close-up shot showing practical ergonomic demonstration of product. Same [global_outfit_en], same locked hairstyle. Physically grounded handling.",
+                "action_en": "Medium close-up shot showing practical ergonomic demonstration of product with confident hand handling.",
                 "director": "Interest | Thao tác giải phóng nỗi đau (tối đa 34 từ) | SFX thực tế | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại giải thích tính năng vượt trội TUÂN THỦ TỐI ĐA 30-34 từ...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person. Demonstrating product with realistic handling. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, outfit change, clothes change.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese person smoothly interacting with product. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 2]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, t-shirt, short sleeves, hair bun, ponytail, outfit change."
+                "voiceover": "Đoạn thoại giải thích tính năng vượt trội TUÂN THỦ TỐI ĐA 30-34 từ..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire", "dur": "10s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 3 tại cùng vị trí cố định...",
-                "action_en": "Sensory visual showcasing genuine comfort and tactile delight. Same [global_outfit_en], same locked hairstyle. Product presented attractively.",
+                "action_en": "Sensory visual showcasing genuine comfort and tactile delight. Product presented attractively.",
                 "director": "Desire | Trực quan hóa giá trị giác quan (tối đa 42 từ) | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại nêu bật cảm giác thỏa mãn và chất lượng TUÂN THỦ TỐI ĐA 38-42 từ...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person enjoying product tactile benefits. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, outfit change, clothes change.",
-                "vid_p": "Vertical 9:16 video. Authentic native Vietnamese person showcasing sensory satisfaction. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, t-shirt, short sleeves, hair bun, ponytail, outfit change."
+                "voiceover": "Đoạn thoại nêu bật cảm giác thỏa mãn và chất lượng TUÂN THỦ TỐI ĐA 38-42 từ..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action", "dur": "6s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 4 tại cùng vị trí cố định...",
-                "action_en": "Warm confident closing gesture: Smiling warmly at camera, open hand gesturing downward toward lower corner. Same [global_outfit_en], same locked hairstyle.",
+                "action_en": "Warm confident closing gesture: Smiling warmly at camera, open hand gesturing downward toward lower corner.",
                 "director": "Action | Chốt deal đòn bẩy giá tương phản (tối đa 25 từ) | SFX chuông vui tai | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại kết bài chốt deal đòn bẩy giá TUÂN THỦ TỐI ĐA 22-25 từ...",
-                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person smiling warmly at camera with downward open hand gesture. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, outfit change, clothes change.",
-                "vid_p": "Vertical 9:16 video. Commercial CTA shot. Authentic native Vietnamese person smiling warmly with decisive CTA gesture. [global_setting_en]. Character: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 4]\\", Layered SFX: [tiếng chuông ting vui tai]. Product: [prod_dna]. Negative prompt: Caucasian, white, European, t-shirt, short sleeves, hair bun, ponytail, outfit change."
+                "voiceover": "Đoạn thoại kết bài chốt deal đòn bẩy giá TUÂN THỦ TỐI ĐA 22-25 từ..."
             }}
         ]
     }}
@@ -486,38 +484,23 @@ def create_scene_details(target_id, mode, style):
     res = call_gemini(payload, get_sys_inst_details(mode, style, narrator_mode, char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=7000)
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     
-    # TỰ ĐỘNG THAY THẾ BIẾN THÀNH MÔ TẢ MA TRẬN 5 LỚP
-    g_id = res.get("global_identity_en", "Authentic native Vietnamese person")
-    g_outfit = res.get("global_outfit_en", "Specific locked outfit")
-    g_setting = res.get("global_setting_en", "Consistent single realistic room corner")
-    g_prod = res.get("prod_dna", "Realistic product matching reference")
+    # TRÍCH XUẤT MA TRẬN 5 LỚP & ÉP BUỘC ĐỒNG NHẤT BẰNG PYTHON CODE
+    c_mat = res.get("character_matrix", {})
+    full_char = c_mat.get("full_characters_appearance", "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone")
+    locked_hair = c_mat.get("locked_hairstyles", "locked natural hair worn loose over shoulders")
+    locked_tops = c_mat.get("locked_tops", "locked specific long-sleeve knit sweater")
+    locked_bottoms = c_mat.get("locked_bottoms", "locked specific midi skirt")
+    locked_setting = c_mat.get("locked_setting", "Consistent single realistic room corner")
+    locked_negative = c_mat.get("locked_negative", "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed")
+    g_prod = res.get("prod_dna", "Photorealistic product matching reference image")
+    
+    # TỔNG HỢP CHỦ THỂ ĐỒNG NHẤT TUYỆT ĐỐI
+    unified_subject_description = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: wearing {locked_tops} and {locked_bottoms}"
     
     total_sec = 0.0
     for scn in res.get("scenes", []):
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
-        
-        # Xử lý img_p
-        if "img_p" in scn and scn["img_p"]:
-            ip = scn["img_p"]
-            ip = ip.replace("[global_setting_en]", g_setting)
-            ip = ip.replace("[global_identity_en]", g_id)
-            ip = ip.replace("[global_outfit_en]", g_outfit)
-            ip = ip.replace("[prod_dna]", g_prod)
-            ip = re.sub(r'\[.*?\]', '', ip).strip()
-            scn["img_p"] = ip
-            
-        # Xử lý vid_p
-        if "vid_p" in scn and scn["vid_p"]:
-            vp = scn["vid_p"]
-            vp = vp.replace("[global_setting_en]", g_setting)
-            vp = vp.replace("[global_identity_en]", g_id)
-            vp = vp.replace("[global_outfit_en]", g_outfit)
-            vp = vp.replace("[prod_dna]", g_prod)
-            vp = vp.replace(f"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH {scn.get('scene', '')}]", scn.get('voiceover', ''))
-            vp = vp.replace("[ĐIỀN ĐỦ 100% LỜI THOẠI]", scn.get('voiceover', ''))
-            vp = re.sub(r'\[.*?\]', '', vp).strip()
-            scn["vid_p"] = sanitize_veo3_prompt(vp)
         
         # TÍNH TOÁN THỜI LƯỢNG THỰC TẾ & KHÓA BẢO ĐẢM: KHUNG PHÂN CẢNH LUÔN >= THỜI GIAN ĐỌC
         actual_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
@@ -526,8 +509,34 @@ def create_scene_details(target_id, mode, style):
         scn["actual_speech_sec"] = actual_speech_time
         total_sec += float(standard_dur.replace("s", ""))
         
+        # DỌN DẸP HÀNH ĐỘNG CẢNH
+        clean_action = scn.get("action_en", "")
+        clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
+        
+        # TỰ ĐỘNG SINH IMG_P VỚI MA TRẬN KHÓA 5 LỚP BẤT BIẾN
+        scn["img_p"] = (
+            f"Vertical 9:16 cinematic photo. {unified_subject_description}. "
+            f"Setting: {locked_setting}. "
+            f"Action: {clean_action}. "
+            f"Product: {g_prod}. "
+            f"Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text, NO subtitles. "
+            f"Negative prompt: {locked_negative}."
+        )
+        
+        # TỰ ĐỘNG SINH VID_P VỚI MA TRẬN KHÓA 5 LỚP & KHỬ TỪ NHẠY CẢM VEO 3
+        audio_part = f' Audio: "{scn.get("voiceover", "")}", Layered SFX: [realistic ambient sounds].' if is_on_camera else ' Layered SFX: [realistic ambient sounds].'
+        raw_vid = (
+            f"Vertical 9:16 cinematic video. Wholesome commercial footage. {unified_subject_description}. "
+            f"Setting: {locked_setting}. "
+            f"Action: {clean_action}. Immediate speech at 0.00s.{audio_part} "
+            f"Product: {g_prod}. "
+            f"Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. "
+            f"Negative prompt: {locked_negative}."
+        )
+        scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
+        
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Tốc độ bắn tỉa 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {res.get('global_setting_en', 'Duy nhất 1 không gian xác định xuyên suốt 4 cảnh')}"
+    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Tốc độ bắn tỉa 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
     
     st.session_state.generated_details[target_id] = res
 
@@ -871,7 +880,7 @@ with st.sidebar:
                         st.session_state.show_all_admin_accounts = True; st.rerun()
 
         st.markdown("---")
-        # WIDGET HỖ TRỢ TRỰC TIẾP: NỀN ĐỎ RUBY TRẦM, CHỮ HOTLINE/ZALO HỒNG NHẠT, SỐ ĐIỆN THOẠI TRẮNG TINH 20PX
+        # WIDGET HỖ TRỢ TRỰC TIẾP
         support_iframe_code = """
         <!DOCTYPE html>
         <html>
@@ -919,7 +928,7 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (ĐÍNH KÈM KEY ĐỘNG RESET TRIỆT ĐỂ)
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (KEY ĐỘNG RESET TRIỆT ĐỂ 100%)
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
