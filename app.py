@@ -11,7 +11,6 @@ import time
 import ast
 import uuid
 import io
-import math
 from PIL import Image
 from datetime import datetime, timedelta, date
 
@@ -84,24 +83,12 @@ client = genai.Client(api_key=api_key) if api_key else None
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text)) if text else 0
 
-# TÍNH TOÁN THỜI LƯỢNG THOẠI CHUẨN XÁC: TỐC ĐỘ BẮN TỈA 4.8 - 5.2 TỪ/S
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas = text.count(',') + text.count(';')
-    periods = text.count('.') + text.count('!') + text.count('?')
-    rate = 5.0 if is_tiktok_shop else 3.8
-    comma_pause = 0.12 if is_tiktok_shop else 0.20
-    period_pause = 0.20 if is_tiktok_shop else 0.35
-    duration = (words / rate) + (commas * comma_pause) + (periods * period_pause)
-    return round(duration, 1)
-
-# KHÓA TRẦN THỜI LƯỢNG: ĐẢM BẢO KHUNG PHÂN CẢNH LUÔN >= THỜI GIAN ĐỌC THỰC TẾ
-def snap_scene_bucket(stage: str, dur_sec: float) -> str:
-    milestones = [4, 6, 8, 10, 12, 14, 16]
-    for m in milestones:
-        if dur_sec <= m:
-            return f"{m}s"
-    return f"{int(math.ceil(dur_sec))}s"
+    rate = 4.8 if is_tiktok_shop else 3.8
+    pause = 0.15 if is_tiktok_shop else 0.25
+    return round((words / rate) + (commas * pause), 1)
 
 def is_valid_phone(phone):
     phone = phone.strip()
@@ -354,42 +341,37 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 QUY TẮC BIÊN SOẠN THOẠI DÀI DẶN, GIÀU GIÁC QUAN & LIỀN MẠCH (NARRATIVE STORYTELLING):
-    1. LỜI THOẠI PHẢI ĐẦY ĐỦ, CÓ Ý NGHĨA SÂU SẮC, KHÔNG ĐƯỢC CỤT LỦN:
-       - 4 phân cảnh AIDA phải kết nối logic thành MỘT CÂU CHUYỆN HOÀN CHỈNH, sử dụng liên từ chuyển cảnh tự nhiên.
-       - Tốc độ đọc: 4.8 - 5.2 từ/giây.
-       - KHUNG SỐ TỪ CHUẨN XÁC:
-         + CẢNH 1 (ATTENTION - HOOK ~6s): Đạt độ dài từ 26 ĐẾN 32 TỪ. Đánh trúng nỗi đau thực tế đời thường, gợi cảm giác khó chịu chân thực.
-         + CẢNH 2 (INTEREST ~8s): Đạt độ dài từ 36 ĐẾN 45 TỪ. Chuyển sang giải pháp mượt mà, thao tác thực tế và giải phóng nỗi đau.
-         + CẢNH 3 (DESIRE ~10s): Đạt độ dài từ 44 ĐẾN 55 TỪ. Mô tả chi tiết trải nghiệm độ "sướng", cảm giác giác quan thèm muốn và bảng màu/combo.
-         + CẢNH 4 (ACTION ~6s): Đạt độ dài từ 26 ĐẾN 34 TỪ. Dồn toàn bộ đòn bẩy neo giá tương phản và kêu gọi chốt đơn dứt khoát.
+    🛑 BỘ LỌC CHÍNH SÁCH NỀN TẢNG ĐA NGÀNH NGHỀ (100% TUÂN THỦ):
+    1. AN TOÀN TRẺ EM TUYỆT ĐỐI (MINOR SAFETY - CẤM TRẺ ĐỨNG MỘT MÌNH):
+       - Trong TẤT CẢ các phân cảnh có trẻ em, NGƯỜI LỚN/MẸ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN TRONG CÙNG KHUNG HÌNH (đứng cạnh, nắm tay, cúi xuống tương tác, đặt tay lên vai).
+       - TUYỆT ĐỐI CẤM bất kỳ cảnh nào chỉ có một mình đứa bé đơn độc trong khung hình.
+    2. AN TOÀN TRÊN VEO 3 / VIDEO AI:
+       - Tuyệt đối cấm các từ ngữ nhạy cảm về cơ thể trẻ em: 'unzip chest', 'parting lapel on child', 'revealing', 'body touch'. Thay bằng: 'smoothly demonstrating the zipper', 'showing the inner lining cleanly'.
+    3. TỪ NGỮ BÁN HÀNG: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
+    4. DƯỢC / TPCN / MỸ PHẨM: Cấm cam kết chữa khỏi bệnh, cấm cam kết trắng cấp tốc, giảm cân cấp tốc.
 
-    2. TÍCH HỢP HIỆU ỨNG GIÁC QUAN THỰC TẾ (SENSORY ASMR & TACTILE TRIGGERS):
-       - Lời thoại và hành động phải gắn với kích thích giác quan: hơi khói bốc nghi ngút (*rising steam*), tiếng xèo xèo sôi sục (*sizzling*), độ nẩy êm ái đàn hồi (*springy softness*), vải nỉ mướt mịn sột soạt (*cozy tactile rustle*), âm thanh giòn rụm (*crisp crunch*).
+    🛑 NGUYÊN TẮC NEO GIÁ TƯƠNG PHẢN ĐỈNH CAO:
+    - GIÁ GỐC: Làm tròn TIẾN LÊN mốc số chẵn lớn gần nhất (VD: 169k -> 'gần hai trăm nghìn' / 'ngót nghét hai trăm cành ngoài tiệm').
+    - GIÁ SALE: Nói theo cách giảm sâu / giấu giá tinh tế (VD: 98k -> 'chưa đến một trăm nghìn' / 'giảm sốc chỉ còn hơn chín mươi cành').
 
-    🛑 MA TRẬN KHÓA CỨNG 5 LỚP THỰC THỂ (STRICT 5-LAYER IDENTITY MATRIX LOCK) - CHỐNG ĐỔI ĐỒ VÀ ĐỔI TÓC 100%:
-    BẮT BUỘC định nghĩa rõ ràng cấu trúc 'character_matrix':
-    1. LỚP 1 (FACE): Khuôn mặt người Việt tự nhiên, độ tuổi cụ thể, dáng người.
-    2. LỚP 2 (HAIR): KHÓA DUY NHẤT 1 KIỂU TÓC CỐ ĐỊNH (Ví dụ: Tóc xõa dài uốn nhẹ tự nhiên. CẤM cảnh sau búi tóc, buộc tóc hay cắt ngắn).
-    3. LỚP 3 (OUTER / TOP): KHÓA CỤ THỂ 1 LOẠI ÁO TRÊN (Ví dụ: Áo len dệt kim dày màu be kem cổ tròn dài tay. CẤM cảnh sau đổi sang áo phông cộc tay, áo hoa hay cardigan).
-    4. LỚP 4 (BOTTOM): KHÓA CỤ THỂ 1 LOẠI QUẦN/VÁY (Ví dụ: Chân váy midi xếp ly màu nâu cà phê. CẤM đổi sang quần jean hay váy khác).
-    5. LỚP 5 (SETTING): KHÓA CỤ THỂ 1 GÓC QUAY DUY NHẤT (Ví dụ: Góc phòng khách Japandi ấm áp bên sofa vải be và bàn trà gỗ. CẤM đổi sang góc khác).
-    -> Hệ thống sẽ dùng mã nguồn để ép buộc toàn bộ 4 cảnh mang CHÍNH XÁC trang phục và bối cảnh này!
-
-    🛑 BỘ LỌC CHÍNH SÁCH VÀ AN TOÀN TRẺ EM / VEO 3:
-    - Nếu có trẻ em: Người lớn BẮT BUỘC luôn có mặt bên cạnh trong 100% các cảnh. CẤM trẻ đứng một mình!
-    - Veo 3: Cấm các từ nhạy cảm về động chạm cơ thể trẻ em (thay 'unzip chest' bằng 'smoothly showing zipper').
-    - Bán hàng: Cấm từ cam kết tuyệt đối ('tuyệt đối', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn').
-    - Neo giá tương phản ở Cảnh 4: Giá gốc làm tròn tiến lên mốc cao, giá sale hạ sốc.
-    - {audio_cmd}
-    - {char_rules}
+    🛑 BỘ QUY TẮC "ĐÓNG ĐINH" ĐỒNG NHẤT THỰC THỂ ĐỘNG THEO SẢN PHẨM:
+    1. TỰ ĐỘNG CHỌN VÀ KHÓA CỨNG MÀU SẮC, KIỂU DÁNG TRANG PHỤC CỤ THỂ CHO TỪNG NHÂN VẬT:
+       - Định danh chi tiết từng lớp: Áo ngoài, áo lót trong, quần/váy, kiểu tóc, giày dép.
+       - CẤM TUYỆT ĐỐI nhân vật đổi quần áo, đổi màu áo, đổi kiểu tóc hay đổi áo khoác giữa các phân cảnh!
+    2. TỰ ĐỘNG CHỌN VÀ KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH LOGIC XUYÊN SUỐT 4 CẢNH.
+    3. HÀNH ĐỘNG CÔNG THÁI HỌC CHUẨN XÁC THEO LỜI THOẠI.
+    4. 100% NGƯỜI VIỆT THUẦN TÚY:
+       - Đầu prompt: "Authentic native Vietnamese [role description], natural Vietnamese facial features, warm skin tone, black hair".
+       - Cuối prompt: "Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, extra limbs, unnatural hands, yellow cart icon, simulated buttons, text, subtitles".
+    5. KHÓA 1 SẢN PHẨM HERO SKU: "Strictly single hero product instance: NO duplicate ghost products, NO floating items. Realistic physical handling."
+    6. {audio_cmd}
+    7. {char_rules}
     """
 
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
-    outline = next((sc for sc in all_combined if str(sc.get("id")) == str(target_id)), None)
-    if not outline:
-        raise Exception(f"Không tìm thấy kịch bản #{target_id} trong danh sách dự án.")
+    outline = next((sc for sc in all_combined if sc["id"] == target_id), None)
+    if not outline: return
     
     narrator_mode = outline.get("narrator_mode", st.session_state.get("last_narrator", "On-camera"))
     char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
@@ -410,62 +392,61 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK CẢNH 1: '{fixed_hook}' | BỐI CẢNH GỐC: {outline.get('setting', 'Không gian thực tế phù hợp')}
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode} | CHỈ ĐẠO GIỌNG: {voice_guidance}
     
-    🛑 LỆNH CƯỠNG CHẾ BIÊN TẬP THOẠI DÀI DẶN, CÂU CHUYỆN LIỀN MẠCH & MA TRẬN 5 LỚP:
-    1. ĐỘ DÀI VĂN BẢN VỪA VẶN, HAY VÀ CÓ NGHĨA (KHÔNG VIẾT NGẮN CỤT):
-       - Cảnh 1 (Attention): 26 ĐẾN 32 TỪ. Phát triển từ câu hook gốc '{fixed_hook}' thật tự nhiên, chạm cảm xúc.
-       - Cảnh 2 (Interest): 36 ĐẾN 45 TỪ. Nối tiếp giải pháp, thao tác thực tế công năng.
-       - Cảnh 3 (Desire): 44 ĐẾN 55 TỪ. Miêu tả độ sướng giác quan và lợi ích độc bản.
-       - Cảnh 4 (Action): 26 ĐẾN 34 TỪ. Đòn bẩy giá tương phản (neo giá gốc cao, giá sale sốc) và kêu gọi hành động.
-    2. HIỆU ỨNG GIÁC QUAN: Lồng ghép âm thanh thực tế ASMR, khói nóng, độ êm ái, búng tay nẩy tưng tưng...
-    3. MA TRẬN KHÓA 5 LỚP (BẮT BUỘC ĐỊNH DANH CỤ THỂ):
-       - Áo trên: Định danh cụ thể 1 mẫu áo (chất vải, màu sắc, kiểu cổ, kiểu tay). CẤM ĐỔI ÁO!
-       - Quần/Váy: Định danh cụ thể 1 mẫu quần/váy. CẤM ĐỔI!
-       - Kiểu tóc: Định danh duy nhất 1 kiểu (ví dụ tóc xõa tự nhiên). CẤM đổi sang búi tóc hay buộc tóc!
-       - Bối cảnh: Duy nhất 1 góc quay cố định xuyên suốt 4 cảnh.
-    4. AN TOÀN TRẺ EM: Nếu có trẻ em, người lớn luôn ở cạnh trong 100% các cảnh.
+    🛑 LỆNH CƯỠNG CHẾ QUY CHUẨN ĐẠO DIỄN THỊ GIÁC & AN TOÀN VEO 3:
+    1. AN TOÀN TRẺ EM & VEO 3 COMPLIANCE:
+       - Nếu có trẻ em, người lớn/mẹ BẮT BUỘC PHẢI LUÔN XUẤT HIỆN CẠNH BÉ trong cả 4 cảnh! TUYỆT ĐỐI CẤM để bé một mình trong bất kỳ cảnh nào.
+       - CẤM các từ khóa nhạy cảm trong prompt video: thay vì 'unzipping chest/lapel', dùng 'smoothly demonstrating the zipper and showing the inner mesh lining'.
+    2. ĐỒNG NHẤT TRANG PHỤC CỤ THỂ 100%: Tự động chọn 1 màu áo ngoài, 1 màu áo lót, 1 kiểu quần, 1 kiểu tóc cụ thể cho từng nhân vật và KHÓA CỨNG không đổi suốt 4 cảnh. CẤM đổi trang phục giữa các cảnh!
+    3. ĐỒNG NHẤT 1 BỐI CẢNH DUY NHẤT: Khóa chết 1 vị trí không gian logic cho cả 4 cảnh, cấm nhảy cảnh lung tung.
+    4. HÀNH ĐỘNG CÔNG THÁI HỌC: Mọi thao tác cầm, mặc, thử sản phẩm phải đúng vật lý đời thực.
+    5. ĐÒN BẨY GIÁ TƯƠNG PHẢN Ở CẢNH 4: Neo giá gốc làm tròn TIẾN LÊN mốc cao (gần hai trăm nghìn / gần nửa triệu), giá sale nói hạ sốc (chưa đến một trăm nghìn).
+    6. 100% NGƯỜI VIỆT THUẦN TÚY: Đầu mọi prompt có 'Authentic native Vietnamese'; cuối prompt có bộ negative loại trừ người nước ngoài, cấm trẻ đứng một mình, cấm đổi đồ.
     
     TRẢ VỀ JSON:
     {{
         "title": "{fixed_title}",
         "voice": {{"tone": "{voice_guidance}"}},
-        "outfit_vi": "Mô tả chi tiết: Áo trên cụ thể + Quần/Váy cụ thể + Kiểu tóc cụ thể được khóa chết 100% suốt 4 cảnh",
-        "character_matrix": {{
-            "full_characters_appearance": "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone",
-            "locked_hairstyles": "Mô tả duy nhất 1 kiểu tóc cố định không đổi bằng tiếng Anh (ví dụ: long flowing soft wavy dark brown hair worn loose over shoulders)",
-            "locked_tops": "Mô tả chi tiết 1 mẫu áo trên cụ thể bằng tiếng Anh (ví dụ: thick ribbed cream-beige oversized crewneck knit sweater with long sleeves)",
-            "locked_bottoms": "Mô tả chi tiết 1 mẫu quần hoặc váy bằng tiếng Anh (ví dụ: coffee brown pleated A-line midi skirt reaching mid-calf)",
-            "locked_setting": "Mô tả duy nhất 1 góc bối cảnh cố định bằng tiếng Anh (ví dụ: warm cozy Japandi living room corner with beige fabric sofa and light wooden table)",
-            "locked_negative": "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed"
-        }},
-        "prod_dna": "Photorealistic description matching the exact reference product, single instance with rich tactile sensory details.",
+        "outfit_vi": "Mô tả cụ thể từng lớp trang phục (áo ngoài, áo trong, quần, tóc) được khóa cứng bất biến cho từng nhân vật suốt 4 cảnh",
+        "global_identity_en": "Authentic native Vietnamese characters with natural Vietnamese facial features, black hair and warm skin tone. EXACT SPECIFIC LOCKED OUTFIT AND HAIRSTYLE defined and invariant across all 4 scenes. If children are present, adult is always physically present beside child in every single shot. Negative: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump, different clothes.",
+        "global_outfit_en": "Specific locked outfits for all characters including outerwear, inner layers and bottoms, fully invariant across all 4 scenes.",
+        "global_setting_en": "Specific consistent single realistic location appropriate for the product, invariant across all 4 scenes.",
+        "prod_dna": "Photorealistic description matching the exact reference product, single instance.",
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 1 tại vị trí cố định...",
-                "action_en": "Natural engaging realistic human action manifesting the opening hook with vivid sensory detail. Characters accompanied safely.",
-                "director": "Attention | Hook dẫn dắt câu chuyện cảm xúc đời thực | SFX giác quan mở màn | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại mở đầu dài từ 26 đến 32 từ, chạm trúng nỗi đau thực tế..."
+                "action_en": "Cinematic vertical 9:16 eye-level shot. Authentic native Vietnamese character(s). Natural realistic interaction manifesting the opening hook. Child is safely accompanied by adult. Wholesome family scene. Negative: unaccompanied minor, child alone, Caucasian, European, outfit change.",
+                "director": "Attention | Hook mở màn đánh trúng thực tế | An toàn trẻ em | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại mở đầu phát triển từ câu hook gốc '{fixed_hook}'...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person/family. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, foreign face, outfit change, wardrobe jump, different clothes, indoor bedroom jump.",
+                "vid_p": "Vertical 9:16 video. Wholesome family commercial. Authentic native Vietnamese character(s). [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 1]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly pure live-action footage: NO yellow shopping cart icons, NO floating buttons, NO text. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 2 tại cùng vị trí cố định...",
-                "action_en": "Medium close-up shot showing practical ergonomic demonstration of product with satisfying tactile handling.",
-                "director": "Interest | Thao tác giải phóng nỗi đau | SFX thực tế ASMR | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại dài từ 36 đến 45 từ, giải thích giải pháp mượt mà, công năng vượt trội..."
+                "action_en": "Medium close-up shot showing practical ergonomic demonstration of the product feature mentioned in dialogue (showing inner lining cleanly). Adult and child safely together in frame. Same locked outfits.",
+                "director": "Interest | Thao tác thực tế giải phóng nỗi đau | SFX thực tế | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại giải thích tính năng vượt trội...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese person/family demonstrating product feature with realistic ergonomic handling. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, blonde hair, blue eyes, unnatural handling, wardrobe change, outfit change.",
+                "vid_p": "Vertical 9:16 video. Wholesome product showcase. Authentic native Vietnamese character(s) demonstrating product quality smoothly matching spoken dialogue. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 2]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Strictly single product. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 3 tại cùng vị trí cố định...",
-                "action_en": "Sensory visual showcasing genuine comfort and tactile delight. Product presented with premium texture appeal.",
-                "director": "Desire | Trực quan hóa giá trị giác quan & độ hài lòng | SFX sống động | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại dài từ 44 đến 55 từ, nêu bật cảm giác thỏa mãn giác quan và bảng màu/combo..."
+                "action_en": "Sensory visual showcasing genuine comfort and joy matching dialogue. Adult is actively present beside child with reassuring hand on shoulder. Same locked outfits.",
+                "director": "Desire | Trực quan hóa giá trị giác quan & độ hài lòng | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại nêu bật cảm giác thỏa mãn và chất lượng...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) showing product sensory satisfaction together. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
+                "vid_p": "Vertical 9:16 video. Wholesome family moment. Authentic native Vietnamese character(s) enjoying product benefits matching dialogue with adult present. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 3]\\", Layered SFX: [tiếng động thực tế]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }},
             {{
                 "scene": 4, "aida_stage": "Action", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 4 tại cùng vị trí cố định...",
-                "action_en": "Warm confident closing gesture: Smiling warmly at camera, energetic downward open palm gesture.",
-                "director": "Action | Chốt deal đòn bẩy giá tương phản dồn dập | SFX chuông ting vui tai | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại dài từ 26 đến 34 từ chốt deal đòn bẩy giá (giá gốc cao, giá sale sốc) và kêu gọi hành động..."
+                "action_en": "Warm confident closing gesture: Authentic Vietnamese character(s) smiling warmly at camera, open hand gesturing downward toward lower corner. Adult and child together. Same locked outfits.",
+                "director": "Action | Kêu gọi hành động tự nhiên / Chốt deal đòn bẩy giá | SFX tươi vui | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại kết bài kêu gọi hành động với đòn bẩy giá tương phản...",
+                "img_p": "Vertical 9:16 photo. Authentic native Vietnamese character(s) smiling warmly at camera with downward open hand gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone without adult, Caucasian, white, European, blonde hair, blue eyes, outfit change, wardrobe jump.",
+                "vid_p": "Vertical 9:16 video. Commercial CTA shot. Authentic native Vietnamese character(s) smiling warmly with decisive CTA gesture. [global_setting_en]. Characters: [global_identity_en] wearing [global_outfit_en]. Immediate speech at 0.00s. Audio: \\"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH 4]\\", Layered SFX: [tiếng chuông ting vui tai]. Product: [prod_dna]. Negative prompt: unaccompanied minor, child alone, Caucasian, white, European, outfit change."
             }}
         ]
     }}
@@ -479,72 +460,51 @@ def create_scene_details(target_id, mode, style):
     payload.append(prompt_text)
 
     res = call_gemini(payload, get_sys_inst_details(mode, style, narrator_mode, char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=7000)
-    if not res:
-        raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng thử lại.")
+    if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     
-    scenes = res.get("scenes") or res.get("script") or []
-    if not scenes:
-        raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng thử lại.")
-    
-    # TRÍCH XUẤT MA TRẬN 5 LỚP & ÉP BUỘC ĐỒNG NHẤT BẰNG PYTHON CODE
-    c_mat = res.get("character_matrix")
-    if not isinstance(c_mat, dict):
-        c_mat = {}
-        
-    full_char = c_mat.get("full_characters_appearance") or "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone"
-    locked_hair = c_mat.get("locked_hairstyles") or "natural dark hair worn loose over shoulders"
-    locked_tops = c_mat.get("locked_tops") or "cozy long-sleeve knit sweater"
-    locked_bottoms = c_mat.get("locked_bottoms") or "matching pleated midi skirt"
-    locked_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm cozy Japandi living room corner")
-    locked_negative = c_mat.get("locked_negative") or "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed"
-    g_prod = res.get("prod_dna") or "Photorealistic product matching reference image"
-    
-    unified_subject_description = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: wearing {locked_tops} and {locked_bottoms}"
+    # KHẮC PHỤC LỖI LỌT NGOẶC VUÔNG: TỰ ĐỘNG THAY THẾ BIẾN THÀNH MÔ TẢ THỰC TẾ
+    g_id = res.get("global_identity_en", "Authentic native Vietnamese person")
+    g_outfit = res.get("global_outfit_en", "Specific locked outfit")
+    g_setting = res.get("global_setting_en", "Consistent single realistic room")
+    g_prod = res.get("prod_dna", "Realistic product matching reference")
     
     total_sec = 0.0
-    for scn in scenes:
+    for scn in res.get("scenes", []):
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
         
-        # TÍNH TOÁN THỜI LƯỢNG THỰC TẾ & KHÓA BẢO ĐẢM: KHUNG PHÂN CẢNH LUÔN >= THỜI GIAN ĐỌC
+        # Xử lý img_p: Triệt tiêu biến ngoặc vuông
+        if "img_p" in scn and scn["img_p"]:
+            ip = scn["img_p"]
+            ip = ip.replace("[global_setting_en]", g_setting)
+            ip = ip.replace("[global_identity_en]", g_id)
+            ip = ip.replace("[global_outfit_en]", g_outfit)
+            ip = ip.replace("[prod_dna]", g_prod)
+            ip = re.sub(r'\[.*?\]', '', ip).strip()
+            scn["img_p"] = ip
+            
+        # Xử lý vid_p: Triệt tiêu biến ngoặc vuông & Khử từ nhạy cảm Veo 3
+        if "vid_p" in scn and scn["vid_p"]:
+            vp = scn["vid_p"]
+            vp = vp.replace("[global_setting_en]", g_setting)
+            vp = vp.replace("[global_identity_en]", g_id)
+            vp = vp.replace("[global_outfit_en]", g_outfit)
+            vp = vp.replace("[prod_dna]", g_prod)
+            vp = vp.replace(f"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH {scn.get('scene', '')}]", scn.get('voiceover', ''))
+            vp = vp.replace("[ĐIỀN ĐỦ 100% LỜI THOẠI]", scn.get('voiceover', ''))
+            vp = re.sub(r'\[.*?\]', '', vp).strip()
+            scn["vid_p"] = sanitize_veo3_prompt(vp)
+        
         actual_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
-        standard_dur = snap_scene_bucket(scn.get("aida_stage", ""), actual_speech_time)
-        scn["dur"] = standard_dur
-        scn["actual_speech_sec"] = actual_speech_time
-        total_sec += float(standard_dur.replace("s", ""))
+        exact_dur_sec = max(3.0, round(actual_speech_time, 1))
+        scn["dur"] = f"{int(round(exact_dur_sec))}s"
+        scn["actual_speech_sec"] = exact_dur_sec
+        total_sec += exact_dur_sec
         
-        clean_action = scn.get("action_en", "")
-        clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
-        
-        # TỰ ĐỘNG SINH IMG_P VỚI MA TRẬN KHÓA 5 LỚP BẤT BIẾN
-        scn["img_p"] = (
-            f"Vertical 9:16 cinematic photo. {unified_subject_description}. "
-            f"Setting: {locked_setting}. "
-            f"Action: {clean_action}. "
-            f"Product: {g_prod}. "
-            f"Strictly pure camera footage: NO yellow shopping cart icons, NO floating buttons, NO UI overlays, NO text, NO subtitles. "
-            f"Negative prompt: {locked_negative}."
-        )
-        
-        # TỰ ĐỘNG SINH VID_P VỚI MA TRẬN KHÓA 5 LỚP & KHỬ TỪ NHẠY CẢM VEO 3
-        audio_part = f' Audio: "{scn.get("voiceover", "")}", Layered SFX: [realistic ambient sensory sounds].' if is_on_camera else ' Layered SFX: [realistic ambient sensory sounds].'
-        raw_vid = (
-            f"Vertical 9:16 cinematic video. Wholesome commercial footage. {unified_subject_description}. "
-            f"Setting: {locked_setting}. "
-            f"Action: {clean_action}. Immediate speech at 0.00s.{audio_part} "
-            f"Product: {g_prod}. "
-            f"Strictly pure live-action footage: NO yellow shopping cart icons, NO floating animated buttons, NO simulated UI, NO overlays, NO text, NO subtitles. "
-            f"Negative prompt: {locked_negative}."
-        )
-        scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
-        
-    res["scenes"] = scenes
-    res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Tốc độ bắn tỉa 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
+    res["total_dur"] = f"Khoảng {int(round(total_sec))} giây"
+    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>🛡️ <b>An toàn trẻ em & Veo 3:</b> Luôn có người lớn đồng hành 100% các cảnh, khử sạch từ khóa nhạy cảm<br>👗 <b>Đồng nhất diện mạo:</b> {res.get('outfit_vi', 'Khóa chết từng lớp trang phục suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {res.get('global_setting_en', 'Duy nhất 1 không gian xác định xuyên suốt 4 cảnh')}"
     
-    # LƯU KẾT QUẢ ĐỒNG THỜI DƯỚI CẢ INT VÀ STR ĐỂ CHỐNG LỆCH TYPE
-    st.session_state.generated_details[int(target_id)] = res
-    st.session_state.generated_details[str(target_id)] = res
+    st.session_state.generated_details[target_id] = res
 
 # ==============================================================================
 # HÀM NHÂN BẢN KỊCH BẢN (BIẾN ĐỔI VOICE, GIỮ SẢN PHẨM, LINH HOẠT DIỄN VIÊN/BỐI CẢNH)
@@ -553,11 +513,11 @@ def clone_script(script_id):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
-    target = next((sc for sc in all_combined if str(sc.get("id")) == str(script_id)), None)
+    target = next((sc for sc in all_combined if sc["id"] == script_id), None)
     if not target: return []
     
     cur_len = len(all_combined)
-    target_detail = st.session_state.generated_details.get(int(script_id), st.session_state.generated_details.get(str(script_id), {}))
+    target_detail = st.session_state.generated_details.get(script_id, {})
     
     original_voices = []
     if target_detail and "scenes" in target_detail:
@@ -582,13 +542,13 @@ def clone_script(script_id):
     
     🛑 NHIỆM VỤ NHÂN BẢN NỘI DUNG VOICE & LINH HOẠT DIỄN VIÊN / BỐI CẢNH:
     1. BẢO TỒN 100% THÔNG SỐ SẢN PHẨM: USP, công năng, cơ chế, Hero SKU và đòn bẩy neo giá tương phản (giá gốc làm tròn cao, giá sale sốc).
-    2. BIẾN HÓA LỜI THOẠI (VOICE VARIATION): Viết 5 biến thể kịch bản thoại mới truyền tải cùng thông điệp giá trị nhưng bằng 5 phong cách kể chuyện khác nhau, giàu cảm xúc và dài dặn:
+    2. BIẾN HÓA LỜI THOẠI (VOICE VARIATION): Viết 5 biến thể kịch bản thoại mới truyền tải cùng thông điệp giá trị nhưng bằng 5 phong cách kể chuyện (storytelling) khác nhau:
        - Biến thể 1: Góc tình huống đời thường dở khóc dở cười.
        - Biến thể 2: Góc chia sẻ chân thành, giải quyết nỗi đau thầm kín.
        - Biến thể 3: Góc so sánh tương phản trước và sau khi dùng.
        - Biến thể 4: Góc trải nghiệm cảm giác giác quan cực đã.
        - Biến thể 5: Góc deal hời / xả kho chốt đơn khẩn cấp.
-    3. LINH HOẠT DIỄN VIÊN & BỐI CẢNH: Tự do sáng tạo nhân vật và bối cảnh ăn khớp nhất với câu chuyện thoại mới!
+    3. LINH HOẠT DIỄN VIÊN & BỐI CẢNH: Không bị bó buộc vào dàn diễn viên cũ. Tự do sáng tạo nhân vật (ví dụ: Bố và con trai, Mẹ và bé gái, hoặc KOC một mình) và bối cảnh (phòng khách, hiên nhà, cổng trường, bàn bếp...) sao cho ăn khớp và sinh động nhất với câu chuyện thoại mới!
     4. TUÂN THỦ CHÍNH SÁCH BÁN HÀNG ĐA NGÀNH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'. Nếu có trẻ em luôn có người lớn đồng hành.
     
     TRẢ VỀ JSON:
@@ -598,17 +558,17 @@ def clone_script(script_id):
                 "id": {cur_len+1},
                 "title": "Tên biến thể kịch bản thoại mới 1",
                 "setting": "Bối cảnh mới phù hợp với câu chuyện...",
-                "hook": "Câu hook ngắn gọn cuốn hút...",
-                "actors": 1,
-                "character_roles": ["Nữ KOC Hà Nội"]
+                "hook": "Câu hook 3s đầu mới mẻ cuốn hút...",
+                "actors": 2,
+                "character_roles": ["Mẹ trẻ", "Bé gái"]
             }},
             {{
                 "id": {cur_len+2},
                 "title": "Tên biến thể kịch bản thoại mới 2",
                 "setting": "Bối cảnh mới...",
-                "hook": "...",
+                "hook": "Câu hook 3s đầu mới...",
                 "actors": 1,
-                "character_roles": ["Cô nàng công sở"]
+                "character_roles": ["Nữ KOC Hà Nội"]
             }},
             {{
                 "id": {cur_len+3},
@@ -616,7 +576,7 @@ def clone_script(script_id):
                 "setting": "...",
                 "hook": "...",
                 "actors": 2,
-                "character_roles": ["Mẹ trẻ", "Bé gái"]
+                "character_roles": ["Bố trẻ", "Bé trai"]
             }},
             {{
                 "id": {cur_len+4},
@@ -624,7 +584,7 @@ def clone_script(script_id):
                 "setting": "...",
                 "hook": "...",
                 "actors": 1,
-                "character_roles": ["KOC trẻ trung"]
+                "character_roles": ["Mẹ bỉm sữa KOC"]
             }},
             {{
                 "id": {cur_len+5},
@@ -632,7 +592,7 @@ def clone_script(script_id):
                 "setting": "...",
                 "hook": "...",
                 "actors": 2,
-                "character_roles": ["Đôi bạn thân"]
+                "character_roles": ["Mẹ", "Bé trai"]
             }}
         ]
     }}
@@ -676,7 +636,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     TRẢ VỀ JSON:
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên kịch bản mới", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook ngắn gọn...", "actors": {num_chars} }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản mới", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook 3s đầu ngắn gọn...", "actors": {num_chars} }}
         ]
     }}
     BẮT BUỘC ĐỦ 5 KỊCH BẢN.
@@ -734,7 +694,7 @@ with st.sidebar:
                         st.session_state.licensed_accounts[email_r] = {
                             "roles": ALL_MODULES, "phone": phone_r, "password": pass_r,
                             "expires_at": exp, "plan_type": "Trial", "daily_usage_count": 0,
-                            "last_generation_date": "", "active_session_id": ""
+                            "last_generation_date": "", "active_session_id": st.session_state.session_id
                         }
                         save_single_account(email_r, st.session_state.licensed_accounts[email_r])
                         st.session_state.is_logged_in = True
@@ -743,17 +703,8 @@ with st.sidebar:
                     else: st.error("⚠️ Thông tin không hợp lệ hoặc tài khoản đã tồn tại!")
     else:
         st.markdown("### 🗂 DỰ ÁN")
-        # NÚT TẠO DỰ ÁN MỚI: TĂNG RESET_KEY ĐỂ XÓA SẠCH HOÀN TOÀN TẤT CẢ FILE UPLOAD VÀ INPUT
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True, disabled=is_system_busy):
-            st.session_state.reset_key += 1
-            st.session_state.update({
-                "all_scripts": [], "cloned_scripts": [], "expanded_scripts": [],
-                "generated_details": {}, "content_analysis": None, "active_script_id": None,
-                "current_input_context": "", "current_product_data_saved": None, "current_product_data": None,
-                "current_project_id": None, "saved_reference_images": [],
-                "character_profiles": [],
-                "current_processing_id": None, "current_cloning_id": None
-            })
+            st.session_state.update({k: v for k, v in [("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []), ("generated_details", {}), ("content_analysis", None), ("active_script_id", None), ("current_input_context", ""), ("current_project_id", None), ("saved_reference_images", []), ("current_processing_id", None), ("current_cloning_id", None)]})
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.rerun()
             
@@ -886,7 +837,6 @@ with st.sidebar:
                         st.session_state.show_all_admin_accounts = True; st.rerun()
 
         st.markdown("---")
-        # WIDGET HỖ TRỢ TRỰC TIẾP: NỀN ĐỎ RUBY TRẦM, HOTLINE/ZALO HỒNG NHẠT, SỐ ĐIỆN THOẠI TRẮNG TINH 20PX
         support_iframe_code = """
         <!DOCTYPE html>
         <html>
@@ -934,7 +884,7 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (KEY ĐỘNG RESET TRIỆT ĐỂ 100%)
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
@@ -945,31 +895,31 @@ is_viral_mode = "Viral" in mode
 up_files, custom_note = [], ""
 if is_viral_mode:
     col_v1, col_v2 = st.columns(2)
-    viral_persona = col_v1.text_input("👤 Định vị Kênh:", key=f"viral_persona_{st.session_state.reset_key}")
-    viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, key=f"viral_topic_{st.session_state.reset_key}")
-    up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
-    custom_note = st.text_area("✍ Ghi chú AI:", key=f"custom_note_viral_{st.session_state.reset_key}")
+    viral_persona = col_v1.text_input("👤 Định vị Kênh:")
+    viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68)
+    up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True)
+    custom_note = st.text_area("✍ Ghi chú AI:")
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
     if products_data:
-        selected_name = st.selectbox("📌 Chọn sản phẩm:", [p["product_name"] for p in products_data], key=f"prod_select_{st.session_state.reset_key}")
+        selected_name = st.selectbox("📌 Chọn sản phẩm:", [p["product_name"] for p in products_data])
         st.session_state.current_product_data = next(p for p in products_data if p["product_name"] == selected_name)
-    up_files = st.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
-    custom_note = st.text_area("✍ Ghi chú AI:", key=f"custom_note_prod_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True)
+    custom_note = st.text_area("✍ Ghi chú AI:")
 
 col_opt1, col_opt2 = st.columns(2)
-style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
+style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"])
 angle_options = ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước"]
-initial_angle = col_opt1.selectbox("🧭 Chiến lược:", angle_options, key=f"angle_sel_{st.session_state.reset_key}")
-narrator_mode = col_opt2.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)", "🎙 Lồng tiếng ngoài (Off-screen)"], key=f"narrator_sel_{st.session_state.reset_key}")
-num_chars = col_opt2.number_input("👤 Số Diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", 1, 8, 1, key=f"num_chars_{st.session_state.reset_key}")
+initial_angle = col_opt1.selectbox("🧭 Chiến lược:", angle_options)
+narrator_mode = col_opt2.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)", "🎙 Lồng tiếng ngoài (Off-screen)"])
+num_chars = col_opt2.number_input("👤 Số Diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", 1, 8, 1)
 
 char_inputs = []
 for i in range(num_chars):
     c_r, c_i = st.columns([2, 1])
     role_default = "Mẹ trẻ 26 tuổi người Việt" if (num_chars >= 2 and i == 0) else ("Bé trai 4 tuổi người Việt" if (num_chars >= 2 and i == 1) else ("Bé gái 1 tuổi người Việt" if (num_chars >= 2 and i == 2) else ""))
-    role = c_r.text_input(f"Vai trò NV {i+1}:", value=role_default, key=f"r_{i}_{st.session_state.reset_key}")
-    c_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"f_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
+    role = c_r.text_input(f"Vai trò NV {i+1}:", value=role_default, key=f"r_{i}")
+    c_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"f_{i}", label_visibility="collapsed")
     if c_file: char_inputs.append({"id": i+1, "role": role or f"Diễn viên {i+1}", "file": c_file})
 
 if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True, disabled=is_system_busy):
@@ -1001,11 +951,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "hook_element": "Yếu tố giật gân 3 giây đầu",
                         "hero_sku_color": "Mã màu bán chạy nhất (Hero SKU)",
                         "color_palette": "Bảng màu toàn bộ",
-                        "what_and_unique": "SẢN PHẨM LÀ GÌ & CÓ GÌ ĐẶC BIỆT: Định danh sản phẩm và điểm độc bản (USP) vượt trội",
-                        "target_user": "SẢN PHẨM DÀNH CHO AI: Đối tượng cụ thể phù hợp nhất",
-                        "why_buy": "TẠI SAO NÊN MUA: Lý do thuyết phục không thể chối từ",
-                        "where_and_convenience": "DÙNG Ở ĐÂU & TIỆN LỢI LÀ GÌ: Hoàn cảnh ứng dụng thực tế",
-                        "how_to_use": "CÁCH SỬ DỤNG: Thao tác thực tế 1-2 bước trực quan chuẩn đời thực",
+                        "what_and_unique": "Sản phẩm là gì & điểm độc bản",
+                        "target_user": "Sản phẩm dành cho ai",
+                        "why_buy": "Tại sao nên mua",
+                        "where_and_convenience": "Dùng ở đâu & tiện lợi",
+                        "how_to_use": "Cách sử dụng thực tế chuẩn công thái học",
                         "product_size_class": "Phân loại kích thước",
                         "product_color_lock": "Khóa màu sắc và họa tiết Hero SKU",
                         "lid_mechanism": "Cơ chế hoạt động",
@@ -1015,7 +965,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
                     "outlines": [
-                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook ngắn gọn...", "actors": {num_chars} }},
+                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook 3s đầu...", "actors": {num_chars} }},
                         {{ "id": 2, "title": "Tên kịch bản 2", "setting": "...", "hook": "...", "actors": {num_chars} }},
                         {{ "id": 3, "title": "Tên kịch bản 3", "setting": "...", "hook": "...", "actors": {num_chars} }},
                         {{ "id": 4, "title": "Tên kịch bản 4", "setting": "...", "hook": "...", "actors": {num_chars} }},
@@ -1055,32 +1005,22 @@ if isinstance(ca, dict):
         st.markdown("##### 📌 **Visual DNA Lock:**")
         st.code(ca.get('prompt_dna_lock'), language="text")
 
-# QUẢN LÝ HIỂN THỊ DANH SÁCH KỊCH BẢN
 all_sc = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 if all_sc:
     st.divider()
-    
-    # HÀM KIỂM TRA ĐỒNG NHẤT KHÓA ID (CHỐNG LỆCH INT VS STR)
-    def is_generated(sc_id):
-        return (sc_id in st.session_state.generated_details or 
-                str(sc_id) in st.session_state.generated_details or 
-                int(sc_id) in st.session_state.generated_details)
+    comp_sc = [sc for sc in all_sc if sc["id"] in st.session_state.generated_details]
+    pend_sc = [sc for sc in all_sc if sc["id"] not in st.session_state.generated_details]
 
-    comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
-    pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
-
-    # KHUNG HIỂN THỊ CHI TIẾT KỊCH BẢN ĐƯỢC CHỌN
     if st.session_state.active_script_id is not None:
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
-        if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
+        if st.button("⬅ Thu gọn danh sách kịch bản", disabled=is_system_busy):
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
             
-        active_id = st.session_state.active_script_id
-        asc = st.session_state.generated_details.get(int(active_id), st.session_state.generated_details.get(str(active_id), {}))
+        asc = st.session_state.generated_details.get(st.session_state.active_script_id, {})
         vp = asc.get("voice", {})
-        st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title', '')).upper()}**")
+        st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title')).upper()}**")
         
         director_summary_html = asc.get('director_summary', '')
         if not director_summary_html:
@@ -1092,18 +1032,16 @@ if all_sc:
         for idx, scn in enumerate(asc.get("scenes", []), 1):
             vo_text = scn.get('voiceover', '')
             actual_words = count_words(vo_text)
-            comma_count = vo_text.count(',') + vo_text.count(';')
-            period_count = vo_text.count('.') + vo_text.count('!') + vo_text.count('?')
+            comma_count = vo_text.count(',')
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, "TikTok Shop" in st.session_state.get("last_mode", "")))
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
-            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} dấu phẩy, {period_count} dấu ngắt câu | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s)</span>", unsafe_allow_html=True)
+            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh đồng bộ: ~{speech_sec}s ({actual_words} từ, {comma_count} dấu phẩy | Tốc độ bắn tỉa: ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s)</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & Ngôn ngữ hình thể KOC:** *{scn.get('director')}*\n\n**💬 Thoại kịch bản:** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
-            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa Ma Trận 5 Lớp & 100% Người Việt):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
+            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa Cứng Trang Phục & 100% Người Việt):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
             if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Cử Chỉ Hình Thể KOC & SFX):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
-    # MỤC 1: KỊCH BẢN ĐÃ DỰNG CHI TIẾT
     st.markdown("### 🎬 **1. Kịch Bản Đã Dựng Chi Tiết**")
     for outline in comp_sc:
         sc_id = outline["id"]
@@ -1112,14 +1050,14 @@ if all_sc:
             c1.markdown(f"**#{sc_id}. {outline.get('title')}**")
             c1.caption(f"⚡ *{outline.get('hook')}*")
             
-            if str(sc_id) != str(st.session_state.active_script_id):
+            if sc_id != st.session_state.active_script_id:
                 if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
-                    st.session_state.active_script_id = int(sc_id)
+                    st.session_state.active_script_id = sc_id
                     st.session_state.scroll_to_detail = True
                     st.rerun()
             
             btn_clone_ph = c3.empty()
-            if str(st.session_state.current_cloning_id) == str(sc_id):
+            if st.session_state.current_cloning_id == sc_id:
                 btn_clone_ph.markdown("<div style='background: #fffbeb; color: #dc2626; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fca5a5;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
             else:
                 if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
@@ -1129,7 +1067,6 @@ if all_sc:
                         st.rerun()
                     else: st.error(msg)
 
-    # MỤC 2: KỊCH BẢN CHỜ DỰNG
     st.markdown("<br>### ⏳ **2. Kịch Bản Chờ Dựng**", unsafe_allow_html=True)
     for outline in pend_sc:
         sc_id = outline["id"]
@@ -1139,7 +1076,7 @@ if all_sc:
             c1.caption(f"⚡ *{outline.get('hook')}*")
             
             btn_detail_ph = c2.empty()
-            if str(st.session_state.current_processing_id) == str(sc_id):
+            if st.session_state.current_processing_id == sc_id:
                 btn_detail_ph.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fde68a;'>⏳ Đang dựng 4 cảnh...</div>", unsafe_allow_html=True)
             else:
                 if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
@@ -1154,47 +1091,35 @@ if all_sc:
     # ==============================================================================
     if st.session_state.current_processing_id is not None:
         target_id_to_run = st.session_state.current_processing_id
-        success = False
-        error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang áp dụng ma trận khóa 5 lớp và dựng kịch bản chi tiết #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng khóa thực thể động, an toàn Veo 3 và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
-                st.session_state.active_script_id = int(target_id_to_run)
+                st.session_state.active_script_id = target_id_to_run
                 st.session_state.scroll_to_detail = True
-                success = True
+                st.toast(f"✅ Đã hoàn tất dựng kịch bản #{target_id_to_run}!")
         except Exception as e:
-            error_msg = str(e)
-            
-        st.session_state.current_processing_id = None
-        if success:
-            st.toast(f"✅ Đã hoàn tất dựng kịch bản #{target_id_to_run}!")
+            st.error(f"❌ Lỗi: {e}")
+        finally:
+            st.session_state.current_processing_id = None
             time.sleep(0.3)
             st.rerun()
-        else:
-            st.error(f"❌ Lỗi khi dựng kịch bản: {error_msg}")
 
     # ==============================================================================
     # KHỐI XỬ LÝ NHÂN BẢN KỊCH BẢN ĐƯỢC CHỌN (BIẾN HÓA LỜI THOẠI)
     # ==============================================================================
     if st.session_state.current_cloning_id is not None:
         clone_id_to_run = st.session_state.current_cloning_id
-        success = False
-        error_msg = ""
         try:
             with st.spinner(f"⏳ Đang biến hóa nội dung voice và nhân bản 5 biến thể cho kịch bản #{clone_id_to_run}..."):
                 new_clones = clone_script(clone_id_to_run)
                 st.session_state.cloned_scripts.extend(new_clones)
-                success = True
+                st.toast("✅ Đã nhân bản thành công 5 kịch bản voice mới!")
         except Exception as e:
-            error_msg = str(e)
-            
-        st.session_state.current_cloning_id = None
-        if success:
-            st.toast("✅ Đã nhân bản thành công 5 kịch bản voice mới!")
+            st.error(f"❌ Lỗi nhân bản: {e}")
+        finally:
+            st.session_state.current_cloning_id = None
             time.sleep(0.3)
             st.rerun()
-        else:
-            st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
 
     st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
