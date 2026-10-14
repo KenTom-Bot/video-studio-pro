@@ -89,7 +89,7 @@ def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas = text.count(',') + text.count(';')
     periods = text.count('.') + text.count('!') + text.count('?')
-    rate = 5.0 if is_tiktok_shop else 3.8
+    rate = 4.9 if is_tiktok_shop else 3.8
     comma_pause = 0.12 if is_tiktok_shop else 0.20
     period_pause = 0.20 if is_tiktok_shop else 0.35
     duration = (words / rate) + (commas * comma_pause) + (periods * period_pause)
@@ -97,21 +97,11 @@ def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
 
 # KHÓA TRẦN THỜI LƯỢNG: ĐẢM BẢO KHUNG PHÂN CẢNH LUÔN >= THỜI GIAN ĐỌC THỰC TẾ
 def snap_scene_bucket(stage: str, dur_sec: float) -> str:
-    stage_str = str(stage).lower()
-    if any(k in stage_str for k in ["attention", "action", "hook", "chốt"]):
-        if dur_sec <= 4.0: return "4s"
-        elif dur_sec <= 6.0: return "6s"
-        elif dur_sec <= 8.0: return "8s"
-        else: return f"{int(math.ceil(dur_sec))}s"
-    elif "interest" in stage_str:
-        if dur_sec <= 6.0: return "6s"
-        elif dur_sec <= 8.0: return "8s"
-        elif dur_sec <= 10.0: return "10s"
-        else: return f"{int(math.ceil(dur_sec))}s"
-    else:
-        if dur_sec <= 8.0: return "8s"
-        elif dur_sec <= 10.0: return "10s"
-        else: return f"{int(math.ceil(dur_sec))}s"
+    milestones = [4, 6, 8, 10, 12, 14, 16]
+    for m in milestones:
+        if dur_sec <= m:
+            return f"{m}s"
+    return f"{int(math.ceil(dur_sec))}s"
 
 def is_valid_phone(phone):
     phone = phone.strip()
@@ -364,12 +354,18 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 LUẬT KHỐNG CHẾ SỐ TỪ ĐỂ THỜI GIAN ĐỌC KHÔNG VƯỢT QUÁ KHUNG PHÂN CẢNH (RHYTHMIC TIME-CAP):
-    - Tốc độ đọc KOC TikTok Shop: 4.8 - 5.2 từ/giây.
-    - CẢNH 1 (ATTENTION - HOOK 6s): TỐI ĐA 22 - 25 TỪ (tối đa 1-2 dấu phẩy). TUYỆT ĐỐI CẤM viết dài hơn 25 từ!
-    - CẢNH 2 (INTEREST 8s): TỐI ĐA 30 - 34 TỪ (tối đa 2 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 34 từ!
-    - CẢNH 3 (DESIRE 10s): TỐI ĐA 38 - 42 TỪ (tối đa 2-3 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 42 từ!
-    - CẢNH 4 (ACTION 6s): TỐI ĐA 22 - 25 TỪ (tối đa 1-2 dấu phẩy). TUYỆT ĐỐI CẤM vượt quá 25 từ!
+    🛑 QUY TẮC BIÊN SOẠN THOẠI DÀI DẶN, GIÀU GIÁC QUAN & LIỀN MẠCH (NARRATIVE STORYTELLING):
+    1. LỜI THOẠI PHẢI ĐẦY ĐỦ, CÓ Ý NGHĨA SÂU SẮC, KHÔNG ĐƯỢC CỤT LỦN:
+       - 4 phân cảnh AIDA phải kết nối logic thành MỘT CÂU CHUYỆN HOÀN CHỈNH, sử dụng liên từ chuyển cảnh tự nhiên.
+       - Tốc độ đọc: 4.8 - 5.2 từ/giây.
+       - KHUNG SỐ TỪ CHUẨN XÁC:
+         + CẢNH 1 (ATTENTION - HOOK ~6s): Đạt độ dài từ 26 ĐẾN 32 TỪ. Đánh trúng nỗi đau thực tế đời thường, gợi cảm giác khó chịu chân thực.
+         + CẢNH 2 (INTEREST ~8s): Đạt độ dài từ 36 ĐẾN 45 TỪ. Chuyển sang giải pháp mượt mà, thao tác thực tế và giải phóng nỗi đau.
+         + CẢNH 3 (DESIRE ~10s): Đạt độ dài từ 44 ĐẾN 55 TỪ. Mô tả chi tiết trải nghiệm độ "sướng", cảm giác giác quan thèm muốn và bảng màu/combo.
+         + CẢNH 4 (ACTION ~6s): Đạt độ dài từ 26 ĐẾN 34 TỪ. Dồn toàn bộ đòn bẩy neo giá tương phản và kêu gọi chốt đơn dứt khoát.
+
+    2. TÍCH HỢP HIỆU ỨNG GIÁC QUAN THỰC TẾ (SENSORY ASMR & TACTILE TRIGGERS):
+       - Lời thoại và hành động phải gắn với kích thích giác quan: hơi khói bốc nghi ngút (*rising steam*), tiếng xèo xèo sôi sục (*sizzling*), độ nẩy êm ái đàn hồi (*springy softness*), vải nỉ mướt mịn sột soạt (*cozy tactile rustle*), âm thanh giòn rụm (*crisp crunch*).
 
     🛑 MA TRẬN KHÓA CỨNG 5 LỚP THỰC THỂ (STRICT 5-LAYER IDENTITY MATRIX LOCK) - CHỐNG ĐỔI ĐỒ VÀ ĐỔI TÓC 100%:
     BẮT BUỘC định nghĩa rõ ràng cấu trúc 'character_matrix':
@@ -413,19 +409,19 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK CẢNH 1: '{fixed_hook}' | BỐI CẢNH GỐC: {outline.get('setting', 'Không gian thực tế phù hợp')}
     THUYẾT MINH: {audio_instruction} | LOẠI: {mode} | CHỈ ĐẠO GIỌNG: {voice_guidance}
     
-    🛑 LỆNH CƯỠNG CHẾ KHỐNG CHẾ SỐ TỪ & KHÓA MA TRẬN 5 LỚP BẤT BIẾN:
-    1. KHỐNG CHẾ THỜI LƯỢNG MỖI CẢNH (ĐỂ KHUNG PHÂN CẢNH LUÔN >= THỜI LƯỢNG ĐỌC):
-       - Cảnh 1 (Attention): BẮT BUỘC tối đa 22-25 từ (khung 6s). TUYỆT ĐỐI CẤM viết dài hơn 25 từ!
-       - Cảnh 2 (Interest): Tối đa 30-34 từ (khung 8s).
-       - Cảnh 3 (Desire): Tối đa 38-42 từ (khung 10s).
-       - Cảnh 4 (Action): Tối đa 22-25 từ (khung 6s).
-    2. MA TRẬN KHÓA 5 LỚP (BẮT BUỘC ĐỊNH DANH CỤ THỂ):
+    🛑 LỆNH CƯỠNG CHẾ BIÊN TẬP THOẠI DÀI DẶN, CÂU CHUYỆN LIỀN MẠCH & MA TRẬN 5 LỚP:
+    1. ĐỘ DÀI VĂN BẢN VỪA VẶN, HAY VÀ CÓ NGHĨA (KHÔNG VIẾT NGẮN CỤT):
+       - Cảnh 1 (Attention): 26 ĐẾN 32 TỪ. Phát triển từ câu hook gốc '{fixed_hook}' thật tự nhiên, chạm cảm xúc.
+       - Cảnh 2 (Interest): 36 ĐẾN 45 TỪ. Nối tiếp giải pháp, thao tác thực tế công năng.
+       - Cảnh 3 (Desire): 44 ĐẾN 55 TỪ. Miêu tả độ sướng giác quan và lợi ích độc bản.
+       - Cảnh 4 (Action): 26 ĐẾN 34 TỪ. Đòn bẩy giá tương phản (neo giá gốc cao, giá sale sốc) và kêu gọi hành động.
+    2. HIỆU ỨNG GIÁC QUAN: Lồng ghép âm thanh thực tế ASMR, khói nóng, độ êm ái, búng tay nẩy tưng tưng...
+    3. MA TRẬN KHÓA 5 LỚP (BẮT BUỘC ĐỊNH DANH CỤ THỂ):
        - Áo trên: Định danh cụ thể 1 mẫu áo (chất vải, màu sắc, kiểu cổ, kiểu tay). CẤM ĐỔI ÁO!
        - Quần/Váy: Định danh cụ thể 1 mẫu quần/váy. CẤM ĐỔI!
        - Kiểu tóc: Định danh duy nhất 1 kiểu (ví dụ tóc xõa tự nhiên). CẤM đổi sang búi tóc hay buộc tóc!
        - Bối cảnh: Duy nhất 1 góc quay cố định xuyên suốt 4 cảnh.
-    3. AN TOÀN TRẺ EM: Nếu có trẻ em, người lớn luôn ở cạnh trong 100% các cảnh.
-    4. ĐÒN BẨY GIÁ Ở CẢNH 4: Neo giá gốc làm tròn tiến lên mốc cao, giá sale hạ sốc.
+    4. AN TOÀN TRẺ EM: Nếu có trẻ em, người lớn luôn ở cạnh trong 100% các cảnh.
     
     TRẢ VỀ JSON:
     {{
@@ -440,35 +436,35 @@ def create_scene_details(target_id, mode, style):
             "locked_setting": "Mô tả duy nhất 1 góc bối cảnh cố định bằng tiếng Anh (ví dụ: warm cozy Japandi living room corner with beige fabric sofa and light wooden table)",
             "locked_negative": "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed"
         }},
-        "prod_dna": "Photorealistic description matching the exact reference product, single instance.",
+        "prod_dna": "Photorealistic description matching the exact reference product, single instance with rich tactile sensory details.",
         "scenes": [
             {{
-                "scene": 1, "aida_stage": "Attention", "dur": "6s", "trans": "Chuyển cảnh mới",
+                "scene": 1, "aida_stage": "Attention", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 1 tại vị trí cố định...",
-                "action_en": "Natural engaging realistic human action manifesting the opening hook. Characters accompanied safely.",
-                "director": "Attention | Hook ngắn gọn dồn dập (tối đa 25 từ) | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại mở đầu phát triển từ câu hook gốc '{fixed_hook}' TUÂN THỦ TỐI ĐA 22-25 từ..."
+                "action_en": "Natural engaging realistic human action manifesting the opening hook with vivid sensory detail. Characters accompanied safely.",
+                "director": "Attention | Hook dẫn dắt câu chuyện cảm xúc đời thực | SFX giác quan mở màn | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại mở đầu dài từ 26 đến 32 từ, chạm trúng nỗi đau thực tế..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest", "dur": "8s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 2 tại cùng vị trí cố định...",
-                "action_en": "Medium close-up shot showing practical ergonomic demonstration of product with confident hand handling.",
-                "director": "Interest | Thao tác giải phóng nỗi đau (tối đa 34 từ) | SFX thực tế | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại giải thích tính năng vượt trội TUÂN THỦ TỐI ĐA 30-34 từ..."
+                "action_en": "Medium close-up shot showing practical ergonomic demonstration of product with satisfying tactile handling.",
+                "director": "Interest | Thao tác giải phóng nỗi đau | SFX thực tế ASMR | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại dài từ 36 đến 45 từ, giải thích giải pháp mượt mà, công năng vượt trội..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire", "dur": "10s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 3 tại cùng vị trí cố định...",
-                "action_en": "Sensory visual showcasing genuine comfort and tactile delight. Product presented attractively.",
-                "director": "Desire | Trực quan hóa giá trị giác quan (tối đa 42 từ) | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại nêu bật cảm giác thỏa mãn và chất lượng TUÂN THỦ TỐI ĐA 38-42 từ..."
+                "action_en": "Sensory visual showcasing genuine comfort and tactile delight. Product presented with premium texture appeal.",
+                "director": "Desire | Trực quan hóa giá trị giác quan & độ hài lòng | SFX sống động | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại dài từ 44 đến 55 từ, nêu bật cảm giác thỏa mãn giác quan và bảng màu/combo..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action", "dur": "6s", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 4 tại cùng vị trí cố định...",
-                "action_en": "Warm confident closing gesture: Smiling warmly at camera, open hand gesturing downward toward lower corner.",
-                "director": "Action | Chốt deal đòn bẩy giá tương phản (tối đa 25 từ) | SFX chuông vui tai | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại kết bài chốt deal đòn bẩy giá TUÂN THỦ TỐI ĐA 22-25 từ..."
+                "action_en": "Warm confident closing gesture: Smiling warmly at camera, energetic downward open palm gesture.",
+                "director": "Action | Chốt deal đòn bẩy giá tương phản dồn dập | SFX chuông ting vui tai | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại dài từ 26 đến 34 từ chốt deal đòn bẩy giá (giá gốc cao, giá sale sốc) và kêu gọi hành động..."
             }}
         ]
     }}
@@ -494,7 +490,6 @@ def create_scene_details(target_id, mode, style):
     locked_negative = c_mat.get("locked_negative", "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed")
     g_prod = res.get("prod_dna", "Photorealistic product matching reference image")
     
-    # TỔNG HỢP CHỦ THỂ ĐỒNG NHẤT TUYỆT ĐỐI
     unified_subject_description = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: wearing {locked_tops} and {locked_bottoms}"
     
     total_sec = 0.0
@@ -524,7 +519,7 @@ def create_scene_details(target_id, mode, style):
         )
         
         # TỰ ĐỘNG SINH VID_P VỚI MA TRẬN KHÓA 5 LỚP & KHỬ TỪ NHẠY CẢM VEO 3
-        audio_part = f' Audio: "{scn.get("voiceover", "")}", Layered SFX: [realistic ambient sounds].' if is_on_camera else ' Layered SFX: [realistic ambient sounds].'
+        audio_part = f' Audio: "{scn.get("voiceover", "")}", Layered SFX: [realistic ambient sensory sounds].' if is_on_camera else ' Layered SFX: [realistic ambient sensory sounds].'
         raw_vid = (
             f"Vertical 9:16 cinematic video. Wholesome commercial footage. {unified_subject_description}. "
             f"Setting: {locked_setting}. "
@@ -536,7 +531,7 @@ def create_scene_details(target_id, mode, style):
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Tốc độ bắn tỉa 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Nhịp đọc KOC dồn dập 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
     
     st.session_state.generated_details[target_id] = res
 
@@ -576,7 +571,7 @@ def clone_script(script_id):
     
     🛑 NHIỆM VỤ NHÂN BẢN NỘI DUNG VOICE & LINH HOẠT DIỄN VIÊN / BỐI CẢNH:
     1. BẢO TỒN 100% THÔNG SỐ SẢN PHẨM: USP, công năng, cơ chế, Hero SKU và đòn bẩy neo giá tương phản (giá gốc làm tròn cao, giá sale sốc).
-    2. BIẾN HÓA LỜI THOẠI (VOICE VARIATION): Viết 5 biến thể kịch bản thoại mới truyền tải cùng thông điệp giá trị nhưng bằng 5 phong cách kể chuyện khác nhau:
+    2. BIẾN HÓA LỜI THOẠI (VOICE VARIATION): Viết 5 biến thể kịch bản thoại mới truyền tải cùng thông điệp giá trị nhưng bằng 5 phong cách kể chuyện khác nhau, giàu cảm xúc và dài dặn:
        - Biến thể 1: Góc tình huống đời thường dở khóc dở cười.
        - Biến thể 2: Góc chia sẻ chân thành, giải quyết nỗi đau thầm kín.
        - Biến thể 3: Góc so sánh tương phản trước và sau khi dùng.
@@ -995,11 +990,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "hook_element": "Yếu tố giật gân 3 giây đầu",
                         "hero_sku_color": "Mã màu bán chạy nhất (Hero SKU)",
                         "color_palette": "Bảng màu toàn bộ",
-                        "what_and_unique": "Sản phẩm là gì & điểm độc bản",
-                        "target_user": "Sản phẩm dành cho ai",
-                        "why_buy": "Tại sao nên mua",
-                        "where_and_convenience": "Dùng ở đâu & tiện lợi",
-                        "how_to_use": "Cách sử dụng thực tế chuẩn công thái học",
+                        "what_and_unique": "SẢN PHẨM LÀ GÌ & CÓ GÌ ĐẶC BIỆT: Định danh sản phẩm và điểm độc bản (USP) vượt trội",
+                        "target_user": "SẢN PHẨM DÀNH CHO AI: Đối tượng cụ thể phù hợp nhất",
+                        "why_buy": "TẠI SAO NÊN MUA: Lý do thuyết phục không thể chối từ",
+                        "where_and_convenience": "DÙNG Ở ĐÂU & TIỆN LỢI LÀ GÌ: Hoàn cảnh ứng dụng thực tế",
+                        "how_to_use": "CÁCH SỬ DỤNG: Thao tác thực tế 1-2 bước trực quan chuẩn đời thực",
                         "product_size_class": "Phân loại kích thước",
                         "product_color_lock": "Khóa màu sắc và họa tiết Hero SKU",
                         "lid_mechanism": "Cơ chế hoạt động",
