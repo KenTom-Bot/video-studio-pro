@@ -89,7 +89,7 @@ def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas = text.count(',') + text.count(';')
     periods = text.count('.') + text.count('!') + text.count('?')
-    rate = 4.9 if is_tiktok_shop else 3.8
+    rate = 5.0 if is_tiktok_shop else 3.8
     comma_pause = 0.12 if is_tiktok_shop else 0.20
     period_pause = 0.20 if is_tiktok_shop else 0.35
     duration = (words / rate) + (commas * comma_pause) + (periods * period_pause)
@@ -387,8 +387,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
-    outline = next((sc for sc in all_combined if sc["id"] == target_id), None)
-    if not outline: return
+    outline = next((sc for sc in all_combined if str(sc.get("id")) == str(target_id)), None)
+    if not outline:
+        raise Exception(f"Không tìm thấy kịch bản #{target_id} trong danh sách dự án.")
     
     narrator_mode = outline.get("narrator_mode", st.session_state.get("last_narrator", "On-camera"))
     char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
@@ -446,21 +447,21 @@ def create_scene_details(target_id, mode, style):
                 "voiceover": "Đoạn thoại mở đầu dài từ 26 đến 32 từ, chạm trúng nỗi đau thực tế..."
             }},
             {{
-                "scene": 2, "aida_stage": "Interest", "dur": "8s", "trans": "Chuyển cảnh mới",
+                "scene": 2, "aida_stage": "Interest", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 2 tại cùng vị trí cố định...",
                 "action_en": "Medium close-up shot showing practical ergonomic demonstration of product with satisfying tactile handling.",
                 "director": "Interest | Thao tác giải phóng nỗi đau | SFX thực tế ASMR | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại dài từ 36 đến 45 từ, giải thích giải pháp mượt mà, công năng vượt trội..."
             }},
             {{
-                "scene": 3, "aida_stage": "Desire", "dur": "10s", "trans": "Chuyển cảnh mới",
+                "scene": 3, "aida_stage": "Desire", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 3 tại cùng vị trí cố định...",
                 "action_en": "Sensory visual showcasing genuine comfort and tactile delight. Product presented with premium texture appeal.",
                 "director": "Desire | Trực quan hóa giá trị giác quan & độ hài lòng | SFX sống động | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại dài từ 44 đến 55 từ, nêu bật cảm giác thỏa mãn giác quan và bảng màu/combo..."
             }},
             {{
-                "scene": 4, "aida_stage": "Action", "dur": "6s", "trans": "Chuyển cảnh mới",
+                "scene": 4, "aida_stage": "Action", "trans": "Chuyển cảnh mới",
                 "setting": "Mô tả bối cảnh cảnh 4 tại cùng vị trí cố định...",
                 "action_en": "Warm confident closing gesture: Smiling warmly at camera, energetic downward open palm gesture.",
                 "director": "Action | Chốt deal đòn bẩy giá tương phản dồn dập | SFX chuông ting vui tai | Khởi động: 0.00s",
@@ -478,22 +479,30 @@ def create_scene_details(target_id, mode, style):
     payload.append(prompt_text)
 
     res = call_gemini(payload, get_sys_inst_details(mode, style, narrator_mode, char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=7000)
-    if not res or "scenes" not in res: raise Exception("AI JSON Error.")
+    if not res:
+        raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng thử lại.")
+    
+    scenes = res.get("scenes") or res.get("script") or []
+    if not scenes:
+        raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng thử lại.")
     
     # TRÍCH XUẤT MA TRẬN 5 LỚP & ÉP BUỘC ĐỒNG NHẤT BẰNG PYTHON CODE
-    c_mat = res.get("character_matrix", {})
-    full_char = c_mat.get("full_characters_appearance", "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone")
-    locked_hair = c_mat.get("locked_hairstyles", "locked natural hair worn loose over shoulders")
-    locked_tops = c_mat.get("locked_tops", "locked specific long-sleeve knit sweater")
-    locked_bottoms = c_mat.get("locked_bottoms", "locked specific midi skirt")
-    locked_setting = c_mat.get("locked_setting", "Consistent single realistic room corner")
-    locked_negative = c_mat.get("locked_negative", "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed")
-    g_prod = res.get("prod_dna", "Photorealistic product matching reference image")
+    c_mat = res.get("character_matrix")
+    if not isinstance(c_mat, dict):
+        c_mat = {}
+        
+    full_char = c_mat.get("full_characters_appearance") or "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone"
+    locked_hair = c_mat.get("locked_hairstyles") or "natural dark hair worn loose over shoulders"
+    locked_tops = c_mat.get("locked_tops") or "cozy long-sleeve knit sweater"
+    locked_bottoms = c_mat.get("locked_bottoms") or "matching pleated midi skirt"
+    locked_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm cozy Japandi living room corner")
+    locked_negative = c_mat.get("locked_negative") or "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed"
+    g_prod = res.get("prod_dna") or "Photorealistic product matching reference image"
     
     unified_subject_description = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: wearing {locked_tops} and {locked_bottoms}"
     
     total_sec = 0.0
-    for scn in res.get("scenes", []):
+    for scn in scenes:
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
         
@@ -504,7 +513,6 @@ def create_scene_details(target_id, mode, style):
         scn["actual_speech_sec"] = actual_speech_time
         total_sec += float(standard_dur.replace("s", ""))
         
-        # DỌN DẸP HÀNH ĐỘNG CẢNH
         clean_action = scn.get("action_en", "")
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
         
@@ -530,10 +538,13 @@ def create_scene_details(target_id, mode, style):
         )
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         
+    res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Nhịp đọc KOC dồn dập 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung cảnh luôn ≥ thời gian đọc | Tốc độ bắn tỉa 4.8 - 5.2 từ/s) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
     
-    st.session_state.generated_details[target_id] = res
+    # LƯU KẾT QUẢ ĐỒNG THỜI DƯỚI CẢ INT VÀ STR ĐỂ CHỐNG LỆCH TYPE
+    st.session_state.generated_details[int(target_id)] = res
+    st.session_state.generated_details[str(target_id)] = res
 
 # ==============================================================================
 # HÀM NHÂN BẢN KỊCH BẢN (BIẾN ĐỔI VOICE, GIỮ SẢN PHẨM, LINH HOẠT DIỄN VIÊN/BỐI CẢNH)
@@ -542,11 +553,11 @@ def clone_script(script_id):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
-    target = next((sc for sc in all_combined if sc["id"] == script_id), None)
+    target = next((sc for sc in all_combined if str(sc.get("id")) == str(script_id)), None)
     if not target: return []
     
     cur_len = len(all_combined)
-    target_detail = st.session_state.generated_details.get(script_id, {})
+    target_detail = st.session_state.generated_details.get(int(script_id), st.session_state.generated_details.get(str(script_id), {}))
     
     original_voices = []
     if target_detail and "scenes" in target_detail:
@@ -875,7 +886,7 @@ with st.sidebar:
                         st.session_state.show_all_admin_accounts = True; st.rerun()
 
         st.markdown("---")
-        # WIDGET HỖ TRỢ TRỰC TIẾP
+        # WIDGET HỖ TRỢ TRỰC TIẾP: NỀN ĐỎ RUBY TRẦM, HOTLINE/ZALO HỒNG NHẠT, SỐ ĐIỆN THOẠI TRẮNG TINH 20PX
         support_iframe_code = """
         <!DOCTYPE html>
         <html>
@@ -1044,22 +1055,32 @@ if isinstance(ca, dict):
         st.markdown("##### 📌 **Visual DNA Lock:**")
         st.code(ca.get('prompt_dna_lock'), language="text")
 
+# QUẢN LÝ HIỂN THỊ DANH SÁCH KỊCH BẢN
 all_sc = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 if all_sc:
     st.divider()
-    comp_sc = [sc for sc in all_sc if sc["id"] in st.session_state.generated_details]
-    pend_sc = [sc for sc in all_sc if sc["id"] not in st.session_state.generated_details]
+    
+    # HÀM KIỂM TRA ĐỒNG NHẤT KHÓA ID (CHỐNG LỆCH INT VS STR)
+    def is_generated(sc_id):
+        return (sc_id in st.session_state.generated_details or 
+                str(sc_id) in st.session_state.generated_details or 
+                int(sc_id) in st.session_state.generated_details)
 
+    comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
+    pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
+
+    # KHUNG HIỂN THỊ CHI TIẾT KỊCH BẢN ĐƯỢC CHỌN
     if st.session_state.active_script_id is not None:
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
-        if st.button("⬅ Thu gọn danh sách kịch bản", disabled=is_system_busy):
+        if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None
             st.session_state.scroll_to_top = True
             st.rerun()
             
-        asc = st.session_state.generated_details.get(st.session_state.active_script_id, {})
+        active_id = st.session_state.active_script_id
+        asc = st.session_state.generated_details.get(int(active_id), st.session_state.generated_details.get(str(active_id), {}))
         vp = asc.get("voice", {})
-        st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title')).upper()}**")
+        st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title', '')).upper()}**")
         
         director_summary_html = asc.get('director_summary', '')
         if not director_summary_html:
@@ -1082,6 +1103,7 @@ if all_sc:
             if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Cử Chỉ Hình Thể KOC & SFX):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
+    # MỤC 1: KỊCH BẢN ĐÃ DỰNG CHI TIẾT
     st.markdown("### 🎬 **1. Kịch Bản Đã Dựng Chi Tiết**")
     for outline in comp_sc:
         sc_id = outline["id"]
@@ -1090,14 +1112,14 @@ if all_sc:
             c1.markdown(f"**#{sc_id}. {outline.get('title')}**")
             c1.caption(f"⚡ *{outline.get('hook')}*")
             
-            if sc_id != st.session_state.active_script_id:
+            if str(sc_id) != str(st.session_state.active_script_id):
                 if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
-                    st.session_state.active_script_id = sc_id
+                    st.session_state.active_script_id = int(sc_id)
                     st.session_state.scroll_to_detail = True
                     st.rerun()
             
             btn_clone_ph = c3.empty()
-            if st.session_state.current_cloning_id == sc_id:
+            if str(st.session_state.current_cloning_id) == str(sc_id):
                 btn_clone_ph.markdown("<div style='background: #fffbeb; color: #dc2626; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fca5a5;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
             else:
                 if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
@@ -1107,6 +1129,7 @@ if all_sc:
                         st.rerun()
                     else: st.error(msg)
 
+    # MỤC 2: KỊCH BẢN CHỜ DỰNG
     st.markdown("<br>### ⏳ **2. Kịch Bản Chờ Dựng**", unsafe_allow_html=True)
     for outline in pend_sc:
         sc_id = outline["id"]
@@ -1116,7 +1139,7 @@ if all_sc:
             c1.caption(f"⚡ *{outline.get('hook')}*")
             
             btn_detail_ph = c2.empty()
-            if st.session_state.current_processing_id == sc_id:
+            if str(st.session_state.current_processing_id) == str(sc_id):
                 btn_detail_ph.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fde68a;'>⏳ Đang dựng 4 cảnh...</div>", unsafe_allow_html=True)
             else:
                 if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
@@ -1131,35 +1154,47 @@ if all_sc:
     # ==============================================================================
     if st.session_state.current_processing_id is not None:
         target_id_to_run = st.session_state.current_processing_id
+        success = False
+        error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang áp dụng ma trận khóa 5 lớp, khống chế số từ và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng ma trận khóa 5 lớp và dựng kịch bản chi tiết #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
-                st.session_state.active_script_id = target_id_to_run
+                st.session_state.active_script_id = int(target_id_to_run)
                 st.session_state.scroll_to_detail = True
-                st.toast(f"✅ Đã hoàn tất dựng kịch bản #{target_id_to_run}!")
+                success = True
         except Exception as e:
-            st.error(f"❌ Lỗi: {e}")
-        finally:
-            st.session_state.current_processing_id = None
+            error_msg = str(e)
+            
+        st.session_state.current_processing_id = None
+        if success:
+            st.toast(f"✅ Đã hoàn tất dựng kịch bản #{target_id_to_run}!")
             time.sleep(0.3)
             st.rerun()
+        else:
+            st.error(f"❌ Lỗi khi dựng kịch bản: {error_msg}")
 
     # ==============================================================================
     # KHỐI XỬ LÝ NHÂN BẢN KỊCH BẢN ĐƯỢC CHỌN (BIẾN HÓA LỜI THOẠI)
     # ==============================================================================
     if st.session_state.current_cloning_id is not None:
         clone_id_to_run = st.session_state.current_cloning_id
+        success = False
+        error_msg = ""
         try:
             with st.spinner(f"⏳ Đang biến hóa nội dung voice và nhân bản 5 biến thể cho kịch bản #{clone_id_to_run}..."):
                 new_clones = clone_script(clone_id_to_run)
                 st.session_state.cloned_scripts.extend(new_clones)
-                st.toast("✅ Đã nhân bản thành công 5 kịch bản voice mới!")
+                success = True
         except Exception as e:
-            st.error(f"❌ Lỗi nhân bản: {e}")
-        finally:
-            st.session_state.current_cloning_id = None
+            error_msg = str(e)
+            
+        st.session_state.current_cloning_id = None
+        if success:
+            st.toast("✅ Đã nhân bản thành công 5 kịch bản voice mới!")
             time.sleep(0.3)
             st.rerun()
+        else:
+            st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
 
     st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
