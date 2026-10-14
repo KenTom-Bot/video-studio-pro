@@ -66,6 +66,52 @@ st.markdown("""
     .timing-badge { font-size: 13.5px; font-weight: 700; color: #1e40af; background: #dbeafe; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; display: inline-block; margin-bottom: 6px; }
     div[data-testid="stFileUploader"] section { padding: 4px; min-height: 2rem; border: 1.5px dashed #cbd5e1 !important; background-color: #f8fafc !important; }
     div[data-baseweb="input"] > div, div[data-baseweb="textarea"] > div { background-color: #f8fafc !important; border: 1.5px solid #cbd5e1 !important; border-radius: 8px !important; }
+    
+    /* GIAO DIỆN PHÂN TÍCH CHI TIẾT HIỆN ĐẠI, THOÁNG MẮT */
+    .dna-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .dna-card-title {
+        font-size: 15.5px;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 12px;
+        padding-bottom: 6px;
+        border-bottom: 1.5px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .dna-row {
+        margin-bottom: 9px;
+        line-height: 1.65;
+    }
+    .dna-label {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 14px;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .dna-text {
+        font-weight: 400 !important;
+        color: #334155 !important;
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+    }
+    .dna-bullet {
+        margin-left: 10px;
+        margin-top: 3px;
+        color: #334155;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.65;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -148,6 +194,23 @@ def sanitize_veo3_prompt(prompt_text: str) -> str:
     p = re.sub(r'\bpointing\s+(?:downward\s+)?(?:to\s+)?(?:corner|cart)\b', 'speaking with gentle welcoming open hands', p, flags=re.IGNORECASE)
     return p
 
+# HÀM LÀM SẠCH TIÊU ĐỀ LẶP TRONG NỘI DUNG PHÂN TÍCH
+def clean_analysis_text(text) -> str:
+    if not text: return ""
+    if isinstance(text, (dict, list)):
+        return format_analysis_field(text)
+    pattern = r'^(?:SẢN PHẨM LÀ GÌ\s*&?\s*(?:CÓ GÌ ĐẶC BIỆT)?|SẢN PHẨM DÀNH CHO AI|TẠI SAO NÊN MUA|DÙNG Ở ĐÂU\s*&?\s*(?:TIỆN LỢI LÀ GÌ)?|CÁCH SỬ DỤNG|MỤC ĐÍCH|ĐỐI TƯỢNG|LÝ DO MUA)\s*:\s*'
+    cleaned = re.sub(pattern, '', str(text).strip(), flags=re.IGNORECASE)
+    return cleaned.strip()
+
+def format_analysis_field(field_val) -> str:
+    if isinstance(field_val, dict): 
+        return "<br>".join([f"<span class='dna-label'>{str(k).replace('_', ' ').title()}:</span> <span class='dna-text'>{clean_analysis_text(v)}</span>" for k, v in field_val.items()])
+    if isinstance(field_val, list): 
+        return "<br>".join([f"<div class='dna-bullet'>• <span class='dna-text'>{clean_analysis_text(item)}</span></div>" for item in field_val])
+    val_str = clean_analysis_text(str(field_val))
+    return "".join([f"<div class='dna-bullet'>• <span class='dna-text'>{line.strip()}</span></div>" for line in val_str.split('<br>') if line.strip()])
+
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0869628316", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
     if not supabase: return accs
@@ -213,11 +276,6 @@ def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prom
     """
     components.html(html_code, height=45)
 
-def format_analysis_field(field_val) -> str:
-    if isinstance(field_val, dict): return "<br>".join([f"• <b>{str(k).replace('_', ' ').title()}:</b> {str(v)}" for k, v in field_val.items()])
-    if isinstance(field_val, list): return "<br>".join([f"• {str(item)}" for item in field_val])
-    return "".join([f"<div style='margin-left: 10px; margin-top: 3px;'>• {line.strip()}</div>" for line in str(field_val).split('<br>') if line.strip()])
-
 # ==============================================================================
 # KHỞI TẠO STATE & KIỂM SOÁT TIẾN TRÌNH TOÀN CỤC
 # ==============================================================================
@@ -229,7 +287,7 @@ for key, default_val in [
     ("current_input_context", ""), ("current_product_data_saved", None), ("current_product_data", None),
     ("reset_key", 0), ("scroll_to_top", False), ("scroll_to_detail", False),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
-    ("last_mode", ""), ("last_style", ""), ("last_narrator", ""),
+    ("last_mode", ""), ("last_style", ""), ("last_narrator", "On-camera"),
     ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
     ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
     ("current_processing_id", None), ("current_cloning_id", None)
@@ -1008,11 +1066,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "hook_element": "Yếu tố giật gân 3 giây đầu",
                         "hero_sku_color": "Mã màu bán chạy nhất (Hero SKU)",
                         "color_palette": "Bảng màu toàn bộ",
-                        "what_and_unique": "SẢN PHẨM LÀ GÌ & CÓ GÌ ĐẶC BIỆT: Định danh sản phẩm và điểm độc bản (USP) vượt trội",
-                        "target_user": "SẢN PHẨM DÀNH CHO AI: Đối tượng cụ thể phù hợp nhất",
-                        "why_buy": "TẠI SAO NÊN MUA: Lý do thuyết phục không thể chối từ",
-                        "where_and_convenience": "DÙNG Ở ĐÂU & TIỆN LỢI LÀ GÌ: Hoàn cảnh ứng dụng thực tế",
-                        "how_to_use": "CÁCH SỬ DỤNG: Thao tác thực tế 1-2 bước trực quan chuẩn đời thực",
+                        "what_and_unique": "Định danh sản phẩm và điểm độc bản (USP) vượt trội (chỉ viết nội dung, tuyệt đối không lặp lại tiêu đề)",
+                        "target_user": "Đối tượng cụ thể phù hợp nhất (chỉ viết nội dung, tuyệt đối không lặp lại tiêu đề)",
+                        "why_buy": "Lý do thuyết phục không thể chối từ (chỉ viết nội dung, tuyệt đối không lặp lại tiêu đề)",
+                        "where_and_convenience": "Hoàn cảnh ứng dụng thực tế và sự tiện lợi (chỉ viết nội dung, tuyệt đối không lặp lại tiêu đề)",
+                        "how_to_use": "Thao tác thực tế 1-2 bước trực quan chuẩn đời thực (chỉ viết nội dung, tuyệt đối không lặp lại tiêu đề)",
                         "product_size_class": "Phân loại kích thước",
                         "product_color_lock": "Khóa màu sắc và họa tiết Hero SKU",
                         "lid_mechanism": "Cơ chế hoạt động",
@@ -1048,16 +1106,56 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 st.toast("✅ Đã phân tích xong đầy đủ DNA!")
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
+# ==============================================================================
+# KHU VỰC HIỂN THỊ PHÂN TÍCH CHI TIẾT (ĐÃ THIẾT KẾ LẠI ĐẸP MẮT, KHÔNG BỊ TRÙNG LẶP)
+# ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
     st.divider()
-    st.markdown("### 🔍 **Phân Tích DNA Chi Tiết Theo Mô Hình AIDA & Hero SKU**")
-    with st.container(border=True):
-        col_dna1, col_dna2 = st.columns(2)
-        col_dna1.markdown(f"##### 🎯 **1. Chân dung Khách hàng & Hook 3s (Attention):**<br><div style='line-height: 1.8;'>{format_analysis_field(ca.get('target_audience', ''))}<br>{format_analysis_field(ca.get('pain_points', ''))}<br><b>⚡ Yếu tố Hook 3s đầu:</b> <span style='color:#d90429; font-weight:bold;'>{ca.get('hook_element', '')}</span></div>", unsafe_allow_html=True)
-        col_dna2.markdown(f"##### 🔥 **2. Mã Màu Bán Chạy Nhất (Hero SKU):**<br><div style='line-height: 1.8;'><b>⭐ Mẫu ưu tiên làm video:</b> <span style='color:#d90429; font-size:16px; font-weight:bold;'>{ca.get('hero_sku_color', 'Tự động')}</span><br><b>🎨 Toàn bộ bảng màu:</b> <span style='color:#0284c7;'>{format_analysis_field(ca.get('color_palette', ''))}</span></div>", unsafe_allow_html=True)
-        st.markdown(f"--- \n##### 💎 **3. Giải phẫu Sản phẩm Không Lộ Liễu (Interest & Desire):**<br><div style='line-height: 1.8;'><b>📦 Sản phẩm là gì & Điểm đặc biệt:</b> {ca.get('what_and_unique', '')}<br><b>👥 Sản phẩm dành cho ai:</b> {ca.get('target_user', '')}<br><b>🔥 Tại sao nên mua:</b> {ca.get('why_buy', '')}<br><b>📍 Dùng ở đâu & Tiện lợi:</b> {ca.get('where_and_convenience', '')}<br><b>🛠 Cách sử dụng chuẩn đời thực:</b> {ca.get('how_to_use', '')}</div>", unsafe_allow_html=True)
-        st.markdown(f"--- \n##### 🏭 **4. Vật lý, Cơ chế & Mức Giá OCR:**<br><div style='line-height: 1.8;'><b>📐 Thông số:</b> {ca.get('product_dimensions', '')}<br><b>🎨 Khóa màu chi tiết:</b> {ca.get('product_color_lock', '')}<br><b>⚙ Cơ chế hoạt động:</b> {ca.get('lid_mechanism', 'Bình thường')}</div><br><b>💰 Mức giá (OCR):</b> {ca.get('detected_prices', '')} <br><b>🎯 Đòn bẩy giá tương phản:</b> <span style='color:#dc2626; font-size:15px; font-weight:900;'>{ca.get('rounded_price_anchor', '')}</span>", unsafe_allow_html=True)
+    st.markdown("### 🔍 **Phân Tích Chi Tiết**")
+    
+    col_dna1, col_dna2 = st.columns(2)
+    with col_dna1:
+        st.markdown(f"""
+        <div class="dna-card">
+            <div class="dna-card-title">🎯 1. Chân dung Khách hàng & Hook 3s (Attention)</div>
+            <div class="dna-row"><span class="dna-label">👥 Tệp khách hàng:</span><span class="dna-text">{clean_analysis_text(ca.get('target_audience', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">💔 Nỗi đau thực tế:</span><span class="dna-text">{clean_analysis_text(ca.get('pain_points', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label" style="color:#d90429;">⚡ Yếu tố Hook 3s đầu:</span><span class="dna-text" style="color:#d90429; font-weight:600;">{clean_analysis_text(ca.get('hook_element', ''))}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_dna2:
+        st.markdown(f"""
+        <div class="dna-card">
+            <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy Nhất (Hero SKU)</div>
+            <div class="dna-row"><span class="dna-label">⭐ Mẫu ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))}</span></div>
+            <div class="dna-row"><span class="dna-label">🎨 Toàn bộ bảng màu:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="dna-card">
+        <div class="dna-card-title">💎 3. Giải phẫu Sản phẩm (Interest & Desire)</div>
+        <div class="dna-row"><span class="dna-label">📦 Sản phẩm là gì & Điểm đặc biệt:</span><span class="dna-text">{clean_analysis_text(ca.get('what_and_unique', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">👥 Sản phẩm dành cho ai:</span><span class="dna-text">{clean_analysis_text(ca.get('target_user', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">🔥 Tại sao nên mua:</span><span class="dna-text">{clean_analysis_text(ca.get('why_buy', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">📍 Hoàn cảnh sử dụng & Tiện lợi:</span><span class="dna-text">{clean_analysis_text(ca.get('where_and_convenience', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">🛠 Cách sử dụng chuẩn đời thực:</span><span class="dna-text">{clean_analysis_text(ca.get('how_to_use', ''))}</span></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="dna-card">
+        <div class="dna-card-title">⚙ 4. Vật lý, Cơ chế & Mức giá</div>
+        <div class="dna-row"><span class="dna-label">📐 Thông số kích thước:</span><span class="dna-text">{clean_analysis_text(ca.get('product_dimensions', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">🎨 Khóa màu chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">⚙ Cơ chế hoạt động:</span><span class="dna-text">{clean_analysis_text(ca.get('lid_mechanism', 'Bình thường'))}</span></div>
+        <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{clean_analysis_text(ca.get('detected_prices', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Đòn bẩy giá tương phản:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('rounded_price_anchor', ''))}</span></div>
+    </div>
+    """, unsafe_allow_html=True)
+
     if ca.get('prompt_dna_lock'):
         st.markdown("##### 📌 **Visual DNA Lock:**")
         st.code(ca.get('prompt_dna_lock'), language="text")
