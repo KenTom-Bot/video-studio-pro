@@ -35,7 +35,7 @@ ga_script = """
 """
 components.html(ga_script, width=0, height=0)
 
-# LỚP KHÓA CỨNG GIAO DIỆN (CHẶN HOÀN TOÀN CLICK CHUỘT KHI HỆ THỐNG ĐANG XỬ LÝ)
+# LỚP KHÓA CỨNG GIAO DIỆN CHỐNG CLICK ĐÈ KHI AI ĐANG CHẠY
 def lock_ui():
     st.markdown("""
     <style>
@@ -106,7 +106,7 @@ def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 # ==============================================================================
-# BỘ LỌC CHÍNH SÁCH BẢO VỆ ĐA NGÀNH NGHỀ
+# BỘ LỌC CHÍNH SÁCH ĐA NGÀNH NGHỀ & VEO 3 SAFE FILTER
 # ==============================================================================
 POLICY_REPLACEMENTS = {
     r'\btuyệt\s*đối\b': 'rất', r'\bhoàn\s*toàn\b': 'thực sự', r'\b100\s*%\b': 'rất nhiều',
@@ -126,10 +126,11 @@ def sanitize_policy_text(text: str) -> str:
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
     if not prompt_text: return ""
-    p = re.sub(r'\bunzipping\s+(?:front\s+)?(?:zipper\s+)?(?:halfway\s+)?(?:on\s+)?chest\b', 'smoothly showing the durable front zipper', prompt_text, flags=re.IGNORECASE)
+    p = re.sub(r'\bunzipping\s+(?:front\s+)?(?:zipper\s+)?(?:halfway\s+)?(?:on\s+)?chest\b', 'smoothly demonstrating the durable front zipper', prompt_text, flags=re.IGNORECASE)
     p = re.sub(r'\bparting\s+(?:front\s+)?lapel\b', 'displaying the jacket inner lining cleanly', p, flags=re.IGNORECASE)
     p = re.sub(r'\brevealing\b', 'showing', p, flags=re.IGNORECASE)
     p = re.sub(r'\bundressing\b', 'wearing outerwear', p, flags=re.IGNORECASE)
+    p = re.sub(r'\btouching\s+(?:the\s+)?child\b', 'standing gently beside child', p, flags=re.IGNORECASE)
     return p
 
 def load_licensed_accounts():
@@ -203,7 +204,7 @@ def format_analysis_field(field_val) -> str:
     return "".join([f"<div style='margin-left: 10px; margin-top: 3px;'>• {line.strip()}</div>" for line in str(field_val).split('<br>') if line.strip()])
 
 # ==============================================================================
-# KHỞI TẠO STATE & KIỂM TRA TRẠNG THÁI BẬN TOÀN CỤC
+# KHỞI TẠO STATE & KIỂM SOÁT TIẾN TRÌNH TOÀN CỤC
 # ==============================================================================
 if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
 for key, default_val in [
@@ -220,13 +221,11 @@ for key, default_val in [
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
-# BIẾN CỜ HỆ THỐNG ĐANG BẬN (GLOBAL BUSY STATE)
 is_system_busy = (
     st.session_state.get("current_processing_id") is not None or 
     st.session_state.get("current_cloning_id") is not None
 )
 
-# NẾU ĐANG BẬN: KHÓA TOÀN BỘ GIAO DIỆN NGAY LẬP TỨC TỪ ĐẦU TRANG
 if is_system_busy:
     lock_ui()
 
@@ -290,7 +289,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=7
 def build_voice_direction(mode, num_chars, character_profiles):
     is_tiktok_shop = "TikTok Shop" in mode
     if num_chars <= 1:
-        return "Giọng [Nam/Nữ] HÀ NỘI GỐC, tốc độ BẮN TỈA DỒN DẬP (4.8 - 5.2 từ/s), hình thể KOC chém nhịp dứt khoát." if is_tiktok_shop else "Giọng [Nam/Nữ] HÀ NỘI GỐC, biến thiên cảm xúc linh hoạt."
+        return "Giọng [Nam/Nữ] HÀ NỘI GỐC, tốc độ BẮN TỈA DỒN DẬP (4.8 - 5.2 từ/s), hình thể KOC rướn người, chém nhịp dứt khoát." if is_tiktok_shop else "Giọng [Nam/Nữ] HÀ NỘI GỐC, biến thiên cảm xúc linh hoạt."
     else:
         dirs = []
         for p in character_profiles:
@@ -359,7 +358,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     1. TỰ ĐỘNG CHỌN VÀ KHÓA CỨNG MÀU SẮC, KIỂU DÁNG TRANG PHỤC CỤ THỂ CHO TỪNG NHÂN VẬT:
        - Định danh chi tiết từng lớp: Áo ngoài, áo lót trong, quần/váy, kiểu tóc, giày dép.
        - CẤM TUYỆT ĐỐI nhân vật đổi quần áo, đổi màu áo, đổi kiểu tóc hay đổi áo khoác giữa các phân cảnh!
-    2. TỰ ĐỘNG CHỌN VÀ KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH LOGIC.
+    2. TỰ ĐỘNG CHỌN VÀ KHÓA CỐ ĐỊNH DUY NHẤT 1 BỐI CẢNH LOGIC XUYÊN SUỐT 4 CẢNH.
     3. HÀNH ĐỘNG CÔNG THÁI HỌC CHUẨN XÁC THEO LỜI THOẠI.
     4. 100% NGƯỜI VIỆT THUẦN TÚY:
        - Đầu prompt: "Authentic native Vietnamese [role description], natural Vietnamese facial features, warm skin tone, black hair".
@@ -463,11 +462,38 @@ def create_scene_details(target_id, mode, style):
     res = call_gemini(payload, get_sys_inst_details(mode, style, narrator_mode, char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=7000)
     if not res or "scenes" not in res: raise Exception("AI JSON Error.")
     
+    # KHẮC PHỤC LỖI LỌT NGOẶC VUÔNG: TỰ ĐỘNG THAY THẾ BIẾN THÀNH MÔ TẢ THỰC TẾ
+    g_id = res.get("global_identity_en", "Authentic native Vietnamese person")
+    g_outfit = res.get("global_outfit_en", "Specific locked outfit")
+    g_setting = res.get("global_setting_en", "Consistent single realistic room")
+    g_prod = res.get("prod_dna", "Realistic product matching reference")
+    
     total_sec = 0.0
     for scn in res.get("scenes", []):
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
-        if "vid_p" in scn: scn["vid_p"] = sanitize_veo3_prompt(scn["vid_p"])
+        
+        # Xử lý img_p: Triệt tiêu biến ngoặc vuông
+        if "img_p" in scn and scn["img_p"]:
+            ip = scn["img_p"]
+            ip = ip.replace("[global_setting_en]", g_setting)
+            ip = ip.replace("[global_identity_en]", g_id)
+            ip = ip.replace("[global_outfit_en]", g_outfit)
+            ip = ip.replace("[prod_dna]", g_prod)
+            ip = re.sub(r'\[.*?\]', '', ip).strip()
+            scn["img_p"] = ip
+            
+        # Xử lý vid_p: Triệt tiêu biến ngoặc vuông & Khử từ nhạy cảm Veo 3
+        if "vid_p" in scn and scn["vid_p"]:
+            vp = scn["vid_p"]
+            vp = vp.replace("[global_setting_en]", g_setting)
+            vp = vp.replace("[global_identity_en]", g_id)
+            vp = vp.replace("[global_outfit_en]", g_outfit)
+            vp = vp.replace("[prod_dna]", g_prod)
+            vp = vp.replace(f"[ĐIỀN ĐỦ 100% LỜI THOẠI CẢNH {scn.get('scene', '')}]", scn.get('voiceover', ''))
+            vp = vp.replace("[ĐIỀN ĐỦ 100% LỜI THOẠI]", scn.get('voiceover', ''))
+            vp = re.sub(r'\[.*?\]', '', vp).strip()
+            scn["vid_p"] = sanitize_veo3_prompt(vp)
         
         actual_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
         exact_dur_sec = max(3.0, round(actual_speech_time, 1))
@@ -476,25 +502,151 @@ def create_scene_details(target_id, mode, style):
         total_sec += exact_dur_sec
         
     res["total_dur"] = f"Khoảng {int(round(total_sec))} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>🛡️ <b>An toàn trẻ em & Veo 3:</b> Luôn có người lớn đồng hành 100% các cảnh, khử sạch từ khóa nhạy cảm<br>👗 <b>Đồng nhất diện mạo:</b> {res.get('outfit_vi', 'Khóa chết từng lớp trang phục suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> Duy nhất 1 không gian xác định xuyên suốt 4 cảnh"
+    res["director_summary"] = f"⏱ <b>Thời lượng thực tế:</b> Khoảng {int(round(total_sec))} giây (Đồng bộ nhịp đọc {('4.8 - 5.2 từ/s' if is_tiktok_shop else '3.8 - 4.0 từ/s')}) | 🎙 <b>Chỉ đạo giọng:</b> {voice_guidance}<br>🛡️ <b>An toàn trẻ em & Veo 3:</b> Luôn có người lớn đồng hành 100% các cảnh, khử sạch từ khóa nhạy cảm<br>👗 <b>Đồng nhất diện mạo:</b> {res.get('outfit_vi', 'Khóa chết từng lớp trang phục suốt 4 cảnh')}<br>📍 <b>Bối cảnh logic cố định:</b> {res.get('global_setting_en', 'Duy nhất 1 không gian xác định xuyên suốt 4 cảnh')}"
     
     st.session_state.generated_details[target_id] = res
 
+# ==============================================================================
+# HÀM NHÂN BẢN KỊCH BẢN (BIẾN ĐỔI VOICE, GIỮ SẢN PHẨM, LINH HOẠT DIỄN VIÊN/BỐI CẢNH)
+# ==============================================================================
 def clone_script(script_id):
     mode = st.session_state.get("last_mode", "Bán Hàng")
     style = st.session_state.get("last_style", "Điện ảnh")
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if sc["id"] == script_id), None)
-    cur_len = len(all_combined)
-    num_chars = target.get("actors", target.get("actor_count", 1))
+    if not target: return []
     
-    prompt = f"Nhân bản kịch bản #{script_id}: {json.dumps(target, ensure_ascii=False)} thành 5 biến thể AIDA mới tuân thủ chính sách, CẤM từ cam kết, trẻ em luôn có người lớn bên cạnh."
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target.get("narrator_mode", ""), "", num_chars, "Gốc"), max_tokens=3000)
+    cur_len = len(all_combined)
+    target_detail = st.session_state.generated_details.get(script_id, {})
+    
+    original_voices = []
+    if target_detail and "scenes" in target_detail:
+        for s in target_detail["scenes"]:
+            original_voices.append(f"- Cảnh {s.get('scene')} ({s.get('aida_stage')}): \"{s.get('voiceover')}\"")
+        full_voice_text = "\n".join(original_voices)
+    else:
+        full_voice_text = f"- Hook 3s đầu: \"{target.get('hook', '')}\""
+
+    prod_ctx = f"INPUT SẢN PHẨM: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)}"
+    dna_ctx = f"DNA SẢN PHẨM: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
+    
+    prompt = f"""
+    {prod_ctx}
+    {dna_ctx}
+    
+    KỊCH BẢN VOICE GỐC CẦN NHÂN BẢN (ID #{script_id}):
+    Tiêu đề: {target.get('title', '')}
+    Bối cảnh gốc: {target.get('setting', '')}
+    Nội dung lời thoại (Voice) gốc:
+    {full_voice_text}
+    
+    🛑 NHIỆM VỤ NHÂN BẢN NỘI DUNG VOICE & LINH HOẠT DIỄN VIÊN / BỐI CẢNH:
+    1. BẢO TỒN 100% THÔNG SỐ SẢN PHẨM: USP, công năng, cơ chế, Hero SKU và đòn bẩy neo giá tương phản (giá gốc làm tròn cao, giá sale sốc).
+    2. BIẾN HÓA LỜI THOẠI (VOICE VARIATION): Viết 5 biến thể kịch bản thoại mới truyền tải cùng thông điệp giá trị nhưng bằng 5 phong cách kể chuyện (storytelling) khác nhau:
+       - Biến thể 1: Góc tình huống đời thường dở khóc dở cười.
+       - Biến thể 2: Góc chia sẻ chân thành, giải quyết nỗi đau thầm kín.
+       - Biến thể 3: Góc so sánh tương phản trước và sau khi dùng.
+       - Biến thể 4: Góc trải nghiệm cảm giác giác quan cực đã.
+       - Biến thể 5: Góc deal hời / xả kho chốt đơn khẩn cấp.
+    3. LINH HOẠT DIỄN VIÊN & BỐI CẢNH: Không bị bó buộc vào dàn diễn viên cũ. Tự do sáng tạo nhân vật (ví dụ: Bố và con trai, Mẹ và bé gái, hoặc KOC một mình) và bối cảnh (phòng khách, hiên nhà, cổng trường, bàn bếp...) sao cho ăn khớp và sinh động nhất với câu chuyện thoại mới!
+    4. TUÂN THỦ CHÍNH SÁCH BÁN HÀNG ĐA NGÀNH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'. Nếu có trẻ em luôn có người lớn đồng hành.
+    
+    TRẢ VỀ JSON:
+    {{
+        "outlines": [
+            {{
+                "id": {cur_len+1},
+                "title": "Tên biến thể kịch bản thoại mới 1",
+                "setting": "Bối cảnh mới phù hợp với câu chuyện...",
+                "hook": "Câu hook 3s đầu mới mẻ cuốn hút...",
+                "actors": 2,
+                "character_roles": ["Mẹ trẻ", "Bé gái"]
+            }},
+            {{
+                "id": {cur_len+2},
+                "title": "Tên biến thể kịch bản thoại mới 2",
+                "setting": "Bối cảnh mới...",
+                "hook": "Câu hook 3s đầu mới...",
+                "actors": 1,
+                "character_roles": ["Nữ KOC Hà Nội"]
+            }},
+            {{
+                "id": {cur_len+3},
+                "title": "Tên biến thể kịch bản thoại mới 3",
+                "setting": "...",
+                "hook": "...",
+                "actors": 2,
+                "character_roles": ["Bố trẻ", "Bé trai"]
+            }},
+            {{
+                "id": {cur_len+4},
+                "title": "Tên biến thể kịch bản thoại mới 4",
+                "setting": "...",
+                "hook": "...",
+                "actors": 1,
+                "character_roles": ["Mẹ bỉm sữa KOC"]
+            }},
+            {{
+                "id": {cur_len+5},
+                "title": "Tên biến thể kịch bản thoại mới 5",
+                "setting": "...",
+                "hook": "...",
+                "actors": 2,
+                "character_roles": ["Mẹ", "Bé trai"]
+            }}
+        ]
+    }}
+    BẮT BUỘC ĐỦ 5 BIẾN THỂ KỊCH BẢN.
+    """
+    
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, target.get("narrator_mode", ""), "", target.get("actors", 1), "Nhân bản thoại"), max_tokens=3000)
     clones = res.get("outlines", res.get("script_outlines", []))
+    
+    formatted_clones = []
     for idx, cl in enumerate(clones):
-        if "hook" in cl: cl["hook"] = sanitize_policy_text(cl["hook"])
-        cl.update({"id": cur_len + idx + 1, "duration_instruction": target.get("duration_instruction", ""), "narrator_mode": target.get("narrator_mode", ""), "character_profiles": target.get("character_profiles", []), "actors": num_chars})
-    return clones
+        new_actors_count = cl.get("actors", 1)
+        raw_roles = cl.get("character_roles", [f"Diễn viên {i+1}" for i in range(new_actors_count)])
+        new_profiles = [{"id": i+1, "role": r} for i, r in enumerate(raw_roles)]
+        
+        hook_clean = sanitize_policy_text(cl.get("hook", ""))
+        formatted_clones.append({
+            "id": cur_len + idx + 1,
+            "title": cl.get("title", f"Biến thể kịch bản #{cur_len + idx + 1}"),
+            "setting": cl.get("setting", "Không gian phù hợp"),
+            "hook": hook_clean,
+            "actors": new_actors_count,
+            "character_profiles": new_profiles,
+            "duration_instruction": target.get("duration_instruction", "Khoảng 30 giây"),
+            "narrator_mode": target.get("narrator_mode", "Nhân vật xuất hiện (On-camera)")
+        })
+    return formatted_clones
+
+def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more, duration_inst, char_profiles):
+    mode = st.session_state.get("last_mode", "Bán Hàng")
+    style = st.session_state.get("last_style", "Điện ảnh")
+    char_rules = generate_char_rules_string(char_profiles)
+    cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
+    prod_ctx = f"INPUT: {st.session_state.current_input_context}"
+    dna_ctx = f"DNA: {json.dumps(st.session_state.content_analysis, ensure_ascii=False)}" if st.session_state.content_analysis else ""
+    
+    prompt = f"""
+    {prod_ctx} | {dna_ctx}
+    Sinh 5 kịch bản mới chuẩn AIDA: '{angle}'. Diễn viên: {num_chars} người Việt.
+    TUÂN THỦ CHÍNH SÁCH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn'. Trẻ em luôn có người lớn bên cạnh.
+    TRẢ VỀ JSON:
+    {{
+        "outlines": [
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản mới", "setting": "Bối cảnh chuẩn...", "hook": "Câu hook 3s đầu ngắn gọn...", "actors": {num_chars} }}
+        ]
+    }}
+    BẮT BUỘC ĐỦ 5 KỊCH BẢN.
+    """
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, narrator_mode_more, char_rules, num_chars, angle), max_tokens=3000)
+    more_scripts = res.get("outlines", res.get("script_outlines", []))
+    for idx, sc in enumerate(more_scripts):
+        if "hook" in sc: sc["hook"] = sanitize_policy_text(sc["hook"])
+        sc.update({"id": cur_len + idx + 1, "duration_instruction": duration_inst, "narrator_mode": narrator_mode_more, "character_profiles": char_profiles, "actors": num_chars})
+    return more_scripts
 
 def save_project_to_db(email, title, payload_data, project_id=None):
     if not supabase: return "Chưa kết nối Supabase."
@@ -953,15 +1105,15 @@ if all_sc:
             st.rerun()
 
     # ==============================================================================
-    # KHỐI XỬ LÝ NHÂN BẢN KỊCH BẢN ĐƯỢC CHỌN
+    # KHỐI XỬ LÝ NHÂN BẢN KỊCH BẢN ĐƯỢC CHỌN (BIẾN HÓA LỜI THOẠI)
     # ==============================================================================
     if st.session_state.current_cloning_id is not None:
         clone_id_to_run = st.session_state.current_cloning_id
         try:
-            with st.spinner(f"⏳ Đang nhân bản 5 biến thể cho kịch bản #{clone_id_to_run}..."):
+            with st.spinner(f"⏳ Đang biến hóa nội dung voice và nhân bản 5 biến thể cho kịch bản #{clone_id_to_run}..."):
                 new_clones = clone_script(clone_id_to_run)
                 st.session_state.cloned_scripts.extend(new_clones)
-                st.toast("✅ Đã nhân bản 5 kịch bản mới!")
+                st.toast("✅ Đã nhân bản thành công 5 kịch bản voice mới!")
         except Exception as e:
             st.error(f"❌ Lỗi nhân bản: {e}")
         finally:
