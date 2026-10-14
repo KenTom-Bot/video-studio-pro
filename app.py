@@ -322,32 +322,61 @@ if st.session_state.scroll_to_detail:
     components.html("""<script>setTimeout(() => { var el = window.parent.document.getElementById('detailed-view-anchor'); if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); } }, 300);</script>""", height=0)
     st.session_state.scroll_to_detail = False
 
+# ==============================================================================
+# HÀM GIẢI MÃ JSON CỨU HỘ THÔNG MINH (RESILIENT JSON PARSER)
+# ==============================================================================
 def repair_and_parse_json(text_content: str):
+    if not text_content:
+        raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
+    
     cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
+
+    # 1. Thử parse trực tiếp chuỗi hoàn chỉnh
+    try:
+        return json.loads(cleaned, strict=False)
+    except Exception:
+        pass
+
+    # 2. Tìm khối JSON bằng Regex
     match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
-    candidate = match.group(0) if match else cleaned
-
-    def try_parse(s):
+    if match:
         try:
-            p = json.loads(s, strict=False)
-            return p[0] if isinstance(p, list) and len(p) > 0 else p
-        except Exception: return None
+            return json.loads(match.group(0), strict=False)
+        except Exception:
+            pass
 
-    res = try_parse(candidate)
-    if res is not None: return res
-    candidate += "}" if candidate.count("{") > candidate.count("}") else ""
-    candidate += "]" if candidate.count("[") > candidate.count("]") else ""
-    res = try_parse(candidate)
-    if res is not None: return res
+    # 3. Vá cấu trúc bị cắt cụt (Truncated JSON Auto-Healing)
+    candidate = cleaned
+    fb = candidate.find('{')
+    if fb != -1:
+        candidate = candidate[fb:]
+    
+    # Kiểm tra đóng ngoặc kép chưa hoàn tất
+    unescaped_quotes = len(re.findall(r'(?<!\\)"', candidate))
+    if unescaped_quotes % 2 != 0:
+        candidate += '"'
+        
+    open_curly = candidate.count('{') - candidate.count('}')
+    open_square = candidate.count('[') - candidate.count(']')
+    
+    candidate += (']' * max(0, open_square)) + ('}' * max(0, open_curly))
+    
+    try:
+        return json.loads(candidate, strict=False)
+    except Exception:
+        pass
 
+    # 4. Thử bằng ast.literal_eval nếu json.loads vẫn lỗi cú pháp nhỏ
     try:
         py_str = candidate.replace('true', 'True').replace('false', 'False').replace('null', 'None')
         parsed = ast.literal_eval(py_str)
-        return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 else parsed
+        return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 and isinstance(parsed[0], dict) else parsed
     except Exception:
-        raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng thử lại.")
+        pass
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=3200):
+    raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng bấm tạo lại.")
+
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
     model_name = "gemini-3.8-flash"
     for attempt in range(2):
         try:
@@ -428,7 +457,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 TRIỆT TIÊU TOÀN BỘ ICON GIỎ HÀNG, NÚT BẤM VÀ PHỤ ĐỀ / CHỮ NỔI:
     - CẤM TUYỆT ĐỐI các cụm từ "chỉ tay xuống góc trái", "pointing to cart", "gesture to corner".
-    - Hành động Cảnh 4 mô tả: "Nhân vật mỉm cười thân thiện chân thành nhìn vào ống kính, hai bàn tay mở tự nhiên hướng về phía trước thể hiện sự gợi ý ấm áp và đáng tin cậy."
+    - Hành động Cảnh 4: "Nhân vật mỉm cười thân thiện chân thành nhìn vào ống kính, hai bàn tay mở tự nhiên hướng về phía trước thể hiện sự gợi ý ấm áp và đáng tin cậy."
     - CẤM tạo icon giỏ hàng vàng, CẤM nút bấm giả lập, CẤM chữ phụ đề nhấp nháy trên khung hình!
 
     🛑 ĐỘNG LỰC HỌC VẬT LÝ VẢI & CÔNG THÁI HỌC BÀN TAY (FABRIC PHYSICS & ERGONOMIC KINETICS):
@@ -446,12 +475,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 MA TRẬN KHÓA CỨNG 5 LỚP THỰC THỂ (STRICT 5-LAYER IDENTITY MATRIX LOCK):
     BẮT BUỘC định nghĩa 'character_matrix': (Face, Hair, Top, Bottom, Setting).
-    🛑 BỘ LỌC CHÍNH SÁCH: Cấm từ cam kết tuyệt đối. Trẻ em luôn có người lớn bên cạnh 100%. Veo 3: cấm từ nhạy cảm cơ thể trẻ em.
+    🛑 BỘ LỌC CHÍNH SÁCH: Cấm từ cam kết tuyệt đối. Trẻ em luôn có người lớn bên cạnh 100%[cite: 8]. Veo 3: cấm từ nhạy cảm cơ thể trẻ em.
     - {char_rules}
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - ĐÃ TỐI ƯU HÓA TOKEN TRIỆT ĐỂ
+# HÀM TẠO CHI TIẾT KỊCH BẢN - NÂNG TRẦN MAX_TOKENS 6500 (CHỐNG LỖI ĐỨT JSON)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -541,14 +570,16 @@ def create_scene_details(target_id, mode, style):
     }}
     """
     
-    res = call_gemini([prompt_text], get_sys_inst_details(mode, style, "On-camera", char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=3200)
+    # NÂNG TRẦN MAX_TOKENS LÊN 6500 ĐỂ AI KHÔNG BỊ NGẮT CỤT GIỮA CHỪNG GÂY LỖI JSON
+    res = call_gemini([prompt_text], get_sys_inst_details(mode, style, "On-camera", char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=6500)
     if not res:
-        raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng thử lại.")
+        raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
     scenes = res.get("scenes") or res.get("script") or []
     if not scenes:
-        raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng thử lại.")
+        raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
+    # TRÍCH XUẤT MA TRẬN 5 LỚP & ÉP BUỘC ĐỒNG NHẤT BẰNG PYTHON CODE
     c_mat = res.get("character_matrix")
     if not isinstance(c_mat, dict):
         c_mat = {}
@@ -558,7 +589,7 @@ def create_scene_details(target_id, mode, style):
     locked_tops = c_mat.get("locked_tops") or "cozy long-sleeve knit sweater"
     locked_bottoms = c_mat.get("locked_bottoms") or "matching pleated midi skirt"
     locked_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm cozy Japandi living room corner")
-    locked_negative = c_mat.get("locked_negative") or "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed, yellow shopping cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, creases, crumpled fabric, folding lines, deformed hands, extra fingers, missing fingers, morphing limbs, duplicate items, floating objects"
+    locked_negative = c_mat.get("locked_negative") or "Caucasian, white, European, blonde hair, blue eyes, t-shirt, short sleeves, hair bun, ponytail, tied hair, pants, jeans, dark clothes, outfit change, wardrobe jump, different clothes, bedroom, bed, yellow shopping cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, creases, crumpled fabric, folding lines, deformed hands, extra fingers, missing fingers, morphing limbs, duplicate items, ghost products, floating objects"
     g_prod = res.get("prod_dna") or "Photorealistic product matching reference image, pristine smooth wrinkle-free drape, completely ironed texture, seamless silky finish, zero crease lines"
     
     unified_subject_description = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: wearing {locked_tops} and {locked_bottoms}"
@@ -568,6 +599,7 @@ def create_scene_details(target_id, mode, style):
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
         
+        # TÍNH TOÁN THỜI LƯỢNG THỰC TẾ & KHÓA TUYỆT ĐỐI VÀO 4 MỐC: 4s, 6s, 8s, 10s (KHUNG CẢNH LUÔN >= THỜI GIAN ĐỌC)
         actual_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
         standard_dur = snap_scene_bucket(scn.get("aida_stage", ""), actual_speech_time)
         scn["dur"] = standard_dur
@@ -578,6 +610,7 @@ def create_scene_details(target_id, mode, style):
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
         camera_shot = scn.get("camera_shot", "Vertical 9:16 cinematic shot")
         
+        # TỰ ĐỘNG SINH IMG_P: KHÓA CHẶT VẬT LÝ VẢI KHÔNG NHĂN, TAY 5 NGÓN VÀ GÓC MACRO
         scn["img_p"] = (
             f"{camera_shot}. {unified_subject_description}. "
             f"Setting: {locked_setting}. "
@@ -588,6 +621,7 @@ def create_scene_details(target_id, mode, style):
             f"Negative prompt: {locked_negative}."
         )
         
+        # TỰ ĐỘNG SINH VID_P: KHÓA CHẶT VẬT LÝ VẢI, LIP-SYNC TRỰC TIẾP, CỬ ĐỘNG MƯỢT KHÔNG BIẾN DẠNG
         speaker_line = scn.get("voiceover", "")
         audio_part = f' Direct on-camera spoken dialogue at 0.00s. Character visibly speaking with natural lip-sync mouth movement. Audio: "{speaker_line}", Layered SFX: [realistic ambient sensory sounds].'
         raw_vid = (
@@ -605,6 +639,7 @@ def create_scene_details(target_id, mode, style):
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khóa tuyệt đối 4s/6s/8s/10s | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (Giọng Bắc Bộ bản địa)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>🧵 <b>Đặc tả vật lý vải:</b> Phẳng phiu tuyệt đối, rũ mịn không nhăn | 🖐 <b>Công thái học:</b> Bàn tay 5 ngón chuẩn xác không biến dạng<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
     
+    # LƯU KẾT QUẢ ĐỒNG THỜI DƯỚI CẢ INT VÀ STR ĐỂ CHỐNG LỆCH TYPE
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
 
@@ -662,7 +697,7 @@ def clone_script(script_id):
     }}
     """
     
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", target.get("actors", 1), "Nhân bản thoại"), max_tokens=1800)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", target.get("actors", 1), "Nhân bản thoại"), max_tokens=2200)
     clones = res.get("outlines", res.get("script_outlines", []))
     
     formatted_clones = []
@@ -708,7 +743,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     }}
     BẮT BUỘC ĐỦ 5 KỊCH BẢN.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, angle), max_tokens=1800)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, angle), max_tokens=2200)
     more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts):
         if "hook" in sc: sc["hook"] = sanitize_policy_text(sc["hook"])
