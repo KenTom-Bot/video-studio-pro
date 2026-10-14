@@ -15,7 +15,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & GA4
+# 1. CẤU HÌNH GIAO DIỆN & TÍCH HỢP GOOGLE ANALYTICS 4
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -27,8 +27,14 @@ ga_script = """
         script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
         script.async = true;
         window.parent.document.head.appendChild(script);
+
         var script2 = document.createElement('script');
-        script2.innerHTML = `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-19YJP7NJ6W');`;
+        script2.innerHTML = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-19YJP7NJ6W');
+        `;
         window.parent.document.head.appendChild(script2);
     }
 </script>
@@ -36,7 +42,11 @@ ga_script = """
 components.html(ga_script, width=0, height=0)
 
 def lock_ui():
-    st.markdown("""<style>div[data-testid="stAppViewContainer"] { pointer-events: none; opacity: 0.65; transition: opacity 0.3s ease; }</style>""", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+        div[data-testid="stAppViewContainer"] { pointer-events: none; opacity: 0.65; transition: opacity 0.3s ease; }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.markdown("""
 <style>
@@ -89,6 +99,9 @@ def compress_image_bytes(uploaded_file, max_dimension=1024, quality=80):
     except Exception:
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
+# ==============================================================================
+# BỘ LỌC CHÍNH SÁCH BẢO VỆ TỰ ĐỘNG
+# ==============================================================================
 POLICY_REPLACEMENTS = {
     r'\btuyệt\s*đối\b': 'rất', r'\bhoàn\s*toàn\b': 'thực sự', r'\b100\s*%\b': 'rất nhiều',
     r'\bchắc\s*chắn\b': 'rất có thể', r'\bcam\s*kết\b': 'an tâm', r'\bdứt\s*điểm\b': 'cải thiện',
@@ -173,6 +186,7 @@ def format_analysis_field(field_val) -> str:
     if isinstance(field_val, list): return "<br>".join([f"• {str(item)}" for item in field_val])
     return "".join([f"<div style='margin-left: 10px; margin-top: 3px;'>• {line.strip()}</div>" for line in str(field_val).split('<br>') if line.strip()])
 
+# State initialization
 if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
 for key, default_val in [
     ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
@@ -305,14 +319,14 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     🛑 BỘ LỌC CHÍNH SÁCH: CẤM 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
 
     🛑 ĐẠO DIỄN THỊ GIÁC KHỚP 100% VỚI LỜI THOẠI & CÔNG THÁI HỌC ĐỜI THỰC:
-    1. ĐỒNG NHẤT TUYỆT ĐỐI VỀ NHÂN VẬT & TRANG PHỤC:
-       - KHÓA CỐ ĐỊNH DUY NHẤT 1 BỘ TRANG PHỤC VÀ 1 KIỂU TÓC CHO MỖI NHÂN VẬT XUYÊN SUỐT TẤT CẢ 4 CẢNH (CẤM cảnh này mặc áo hoa, cảnh sau đổi sang đồ ngủ hay cardigan).
-       - BỐI CẢNH LOGIC ĐỒNG NHẤT: Cùng 1 không gian xác định (ví dụ: trước cửa nhà cạnh xe máy hoặc phòng khách ấm cúng), không nhảy cảnh vô lý.
+    1. ĐỒNG NHẤT VỀ NHÂN VẬT & TRANG PHỤC:
+       - KHÓA CỐ ĐỊNH DUY NHẤT 1 BỘ TRANG PHỤC VÀ 1 KIỂU TÓC CHO MỖI NHÂN VẬT XUYÊN SUỐT TẤT CẢ 4 CẢNH.
+       - BỐI CẢNH LOGIC ĐỒNG NHẤT: Cùng 1 không gian xác định, không nhảy cảnh vô lý.
     2. HÀNH ĐỘNG KHỚP TỪNG TỪ TRONG LỜI THOẠI:
-       - Cảnh 1 thoại nói 'chở bé bằng xe máy trời se lạnh' -> BẮT BUỘC hình ảnh/video quay cảnh mẹ và bé đứng cạnh xe máy trước cửa nhà, mẹ đội mũ bảo hiểm hoặc kéo khóa áo ấm cho bé.
-       - Cảnh 2 thoại nói 'lót lưới đen thoáng khí' -> BẮT BUỘC quay cận cảnh tay mẹ kéo khóa trước xuống một nửa, mở nhẹ vạt áo trước ngực để lộ rõ lớp lưới tổ ong màu đen. CẤM kéo lật vạt áo kỳ dị từ sau lưng!
-       - Cảnh 3 thoại nói 'Họa tiết Người Nhện, bo tay cản gió' -> Quay cận cảnh bo chun tay ôm cổ tay, sau đó bé xoay lưng tạo dáng khoe trọn họa tiết Người Nhện đỏ.
-       - Cảnh 4 thoại kêu gọi chốt đơn -> Mẹ ôm vai bé, cả hai cùng nhìn camera cười tươi, mẹ mở lòng bàn tay hướng nhẹ xuống góc trái.
+       - Cảnh 1 thoại nói xe máy/se lạnh -> Hình ảnh/video mẹ và bé đứng cạnh xe máy trước cửa nhà.
+       - Cảnh 2 thoại nói lót lưới thoáng khí -> Cận cảnh tay mở khóa áo phía trước ngực hé lớp lưới tổ ong.
+       - Cảnh 3 thoại nói Người Nhện, bo tay -> Cận cảnh bo chun tay ôm cổ tay, bé xoay lưng khoe họa tiết.
+       - Cảnh 4 chốt đơn -> Cả hai nhìn camera cười tươi, mở lòng bàn tay hướng nhẹ xuống góc trái.
     3. 100% NGƯỜI VIỆT THUẦN TÚY:
        - Luôn đặt đầu prompt: "Authentic native Vietnamese person, natural Vietnamese facial features, warm skin tone, black hair".
        - Luôn đặt cuối prompt: "Negative prompt: Caucasian, white, European, blonde hair, blue eyes, foreign face, wardrobe jump, outfit change, extra limbs, unnatural handling".
@@ -474,6 +488,9 @@ def save_project_to_db(email, title, payload_data, project_id=None):
         return True
     except Exception as e: return str(e)
 
+# ==============================================================================
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (CÓ LỊCH CHỌN NGÀY TÙY CHỈNH)
+# ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
         tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký Dùng Thử"])
@@ -564,53 +581,110 @@ with st.sidebar:
                         if st.button(f"🔽 Xem thêm {len(all_projects)-3} dự án", use_container_width=True):
                             st.session_state.show_all_projects = True; st.rerun()
 
+        # ==============================================================================
+        # QUẢN TRỊ ADMIN (ĐÃ TỐI ƯU LỊCH CHỌN NGÀY TÙY CHỈNH)
+        # ==============================================================================
         if st.session_state.current_email == ADMIN_EMAIL:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
-            with st.expander("➕ Cấp Quyền Mới", expanded=False):
+            
+            with st.expander("➕ Cấp Quyền Tài Khoản Mới", expanded=False):
                 adm_acc = st.text_input("Email:", autocomplete="new-password", key="adm_in_acc")
                 adm_phone = st.text_input("SĐT:", autocomplete="new-password", key="adm_in_phone")
                 adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password", key="adm_in_pass")
+                adm_roles_choice = st.multiselect("🎯 Thể loại cấp quyền:", ALL_MODULES, default=ALL_MODULES, key="adm_in_roles")
                 adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_in_plan")
-                adm_dur = st.selectbox("Thời hạn:", ["3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "Vĩnh viễn"], key="adm_in_dur")
-                dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}
-                calculated_exp_str = "2099-12-31" if adm_dur == "Vĩnh viễn" else (datetime.now() + timedelta(days=dur_map.get(adm_dur, 30))).strftime("%Y-%m-%d")
+                
+                dur_options = [
+                    "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", 
+                    "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Chọn ngày)"
+                ]
+                adm_dur = st.selectbox("Thời hạn:", dur_options, key="adm_in_dur")
+                
+                calculated_exp_str = "2099-12-31"
+                if adm_dur == "Tùy chỉnh (Chọn ngày)":
+                    custom_date = st.date_input("👉 Chọn ngày hết hạn cụ thể trên lịch:", value=date.today() + timedelta(days=30), min_value=date.today(), key="adm_custom_date")
+                    calculated_exp_str = custom_date.strftime("%Y-%m-%d")
+                    st.caption(f"📅 Hạn cấp mới: **{calculated_exp_str}**")
+                elif adm_dur == "Vĩnh viễn":
+                    calculated_exp_str = "2099-12-31"
+                    st.caption("📅 Hạn vĩnh viễn (2099-12-31)")
+                else:
+                    dur_days_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
+                    calculated_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(adm_dur, 30))).strftime("%Y-%m-%d")
+                    st.caption(f"📅 Hạn dự tính: **{calculated_exp_str}**")
 
-                if st.button("💾 Cấp Quyền", type="primary", use_container_width=True, key="btn_submit_grant_admin"):
-                    if adm_acc.strip() and adm_phone.strip() and adm_pass.strip():
+                if st.button("💾 Cấp Quyền Tài Khoản", type="primary", use_container_width=True, key="btn_submit_grant_admin"):
+                    if adm_acc.strip() and adm_phone.strip() and adm_pass.strip() and adm_roles_choice:
                         st.session_state.licensed_accounts[adm_acc.strip()] = {
-                            "roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(),
+                            "roles": adm_roles_choice, "phone": adm_phone.strip(), "password": adm_pass.strip(),
                             "expires_at": calculated_exp_str, "plan_type": adm_plan, "daily_usage_count": 0,
                             "last_generation_date": "", "active_session_id": ""
                         }
                         save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
-                        st.toast("✅ Đã cấp quyền!"); time.sleep(0.4); st.rerun()
+                        st.toast(f"✅ Đã cấp quyền đến {calculated_exp_str}!"); time.sleep(0.4); st.rerun()
+                    else: st.error("⚠️ Vui lòng nhập đầy đủ thông tin!")
 
-            st.markdown("##### 👥 Danh Sách Tài Khoản")
-            search_acc = st.text_input("🔍 Tìm tài khoản:", placeholder="Email/SĐT...", key="search_acc_input")
+            st.markdown("##### 👥 Danh Sách Tài Khoản & Gia Hạn")
+            search_acc = st.text_input("🔍 Tìm tài khoản:", placeholder="Nhập Email hoặc SĐT...", key="search_acc_input")
             other_accs = [item for item in st.session_state.licensed_accounts.items() if item[0] != ADMIN_EMAIL]
             filt_accs = [item for item in other_accs if search_acc.strip().lower() in item[0].lower() or search_acc.strip() in item[1].get('phone', '')] if search_acc.strip() else (other_accs if st.session_state.show_all_admin_accounts else other_accs[:3])
 
             for acc_mail, info in filt_accs:
                 with st.expander(f"👤 {acc_mail} ({info.get('plan_type')})"):
-                    st.write(f"📞 `{info.get('phone', 'N/A')}` | ⏳ `{info.get('expires_at')}`")
-                    new_plan = st.selectbox("Gói:", ["Trial", "Basic", "Advanced", "VIP"], index=["Trial", "Basic", "Advanced", "VIP"].index(info.get("plan_type", "Trial")), key=f"plan_sel_{acc_mail}")
-                    renew_choice = st.selectbox("Gia hạn:", ["Giữ nguyên", "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "Vĩnh viễn"], key=f"renew_opt_{acc_mail}")
+                    st.write(f"📞 SĐT: `{info.get('phone', 'N/A')}`")
+                    st.write(f"⏳ Hạn hiện tại: `{info.get('expires_at')}`")
+                    
+                    cur_roles = info.get("roles", ALL_MODULES)
+                    new_roles = st.multiselect("Đổi thể loại cấp phép:", ALL_MODULES, default=cur_roles, key=f"roles_sel_{acc_mail}")
+                    
+                    cur_plan = info.get("plan_type", "Trial")
+                    plan_idx = ["Trial", "Basic", "Advanced", "VIP"].index(cur_plan) if cur_plan in ["Trial", "Basic", "Advanced", "VIP"] else 0
+                    new_plan = st.selectbox("Đổi gói cước:", ["Trial", "Basic", "Advanced", "VIP"], index=plan_idx, key=f"plan_sel_{acc_mail}")
+                    
+                    renew_opts = [
+                        "Giữ nguyên hạn hiện tại", "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", 
+                        "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Chọn ngày)"
+                    ]
+                    renew_choice = st.selectbox("Gia hạn / Đổi thời hạn:", renew_opts, key=f"renew_opt_{acc_mail}")
+                    
                     target_exp_str = info.get("expires_at", "2099-12-31")
-                    if renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
-                    elif renew_choice != "Giữ nguyên":
-                        dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365}
+                    if renew_choice == "Tùy chỉnh (Chọn ngày)":
+                        try:
+                            cur_d = datetime.strptime(info.get("expires_at", ""), "%Y-%m-%d").date()
+                        except:
+                            cur_d = date.today() + timedelta(days=30)
+                        r_date = st.date_input("Chọn ngày hết hạn mới:", value=cur_d, min_value=date.today(), key=f"rdate_{acc_mail}")
+                        target_exp_str = r_date.strftime("%Y-%m-%d")
+                        st.caption(f"📅 Hạn mới: **{target_exp_str}**")
+                    elif renew_choice == "Vĩnh viễn":
+                        target_exp_str = "2099-12-31"
+                        st.caption("📅 Hạn mới: **Vĩnh viễn (2099-12-31)**")
+                    elif renew_choice != "Giữ nguyên hạn hiện tại":
+                        dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
                         target_exp_str = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        st.caption(f"📅 Hạn mới: **{target_exp_str}**")
 
                     c_act1, c_act2 = st.columns(2)
-                    if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True):
-                        st.session_state.licensed_accounts[acc_mail].update({"plan_type": new_plan, "expires_at": target_exp_str})
+                    if c_act1.button("🔄 Cập Nhật & Gia Hạn", key=f"save_renew_{acc_mail}", use_container_width=True):
+                        st.session_state.licensed_accounts[acc_mail]["roles"] = new_roles
+                        st.session_state.licensed_accounts[acc_mail]["plan_type"] = new_plan
+                        st.session_state.licensed_accounts[acc_mail]["expires_at"] = target_exp_str
                         save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
-                        st.toast("✅ Đã cập nhật!"); time.sleep(0.4); st.rerun()
-                    if c_act2.button("🗑 Xóa", key=f"del_acc_{acc_mail}", type="secondary", use_container_width=True):
+                        st.toast(f"✅ Đã cập nhật thành công!"); time.sleep(0.4); st.rerun()
+                    if c_act2.button("🗑 Xóa tài khoản", key=f"del_acc_{acc_mail}", type="secondary", use_container_width=True):
                         delete_single_account(acc_mail)
-                        del st.session_state.licensed_accounts[acc_mail]
+                        if acc_mail in st.session_state.licensed_accounts:
+                            del st.session_state.licensed_accounts[acc_mail]
                         st.toast("✅ Đã xóa!"); time.sleep(0.3); st.rerun()
+
+            if not search_acc.strip() and len(other_accs) > 3:
+                if st.session_state.show_all_admin_accounts:
+                    if st.button("🔼 Thu gọn danh sách tài khoản", use_container_width=True):
+                        st.session_state.show_all_admin_accounts = False; st.rerun()
+                else:
+                    if st.button(f"🔽 Xem thêm {len(other_accs)-3} tài khoản", use_container_width=True):
+                        st.session_state.show_all_admin_accounts = True; st.rerun()
 
         st.markdown("---")
         support_iframe_code = """
