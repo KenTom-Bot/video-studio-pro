@@ -130,13 +130,14 @@ client = genai.Client(api_key=api_key) if api_key else None
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text)) if text else 0
 
+# TÍNH TOÁN THỜI LƯỢNG THOẠI CHUẨN XÁC: TỐC ĐỘ BẮN TỈA 4.8 - 5.2 TỪ/S (TIKTOK SHOP)
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas = text.count(',') + text.count(';')
     periods = text.count('.') + text.count('!') + text.count('?')
-    rate = 5.0 if is_tiktok_shop else 3.8
-    comma_pause = 0.12 if is_tiktok_shop else 0.20
-    period_pause = 0.20 if is_tiktok_shop else 0.35
+    rate = 5.0 if is_tiktok_shop else 4.0
+    comma_pause = 0.08 if is_tiktok_shop else 0.15
+    period_pause = 0.12 if is_tiktok_shop else 0.25
     duration = (words / rate) + (commas * comma_pause) + (periods * period_pause)
     return round(duration, 1)
 
@@ -287,7 +288,7 @@ for key, default_val in [
     ("current_input_context", ""), ("current_product_data_saved", None), ("current_product_data", None),
     ("reset_key", 0), ("scroll_to_top", False), ("scroll_to_detail", False),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
-    ("last_mode", ""), ("last_style", ""), ("last_narrator", "On-camera"),
+    ("last_mode", "🛒 TikTok Shop & Bán Hàng"), ("last_style", "Điện Ảnh Chân Thực"), ("last_narrator", "On-camera"),
     ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
     ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
     ("current_processing_id", None), ("current_cloning_id", None)
@@ -383,25 +384,26 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6
             time.sleep(1)
 
 # ==============================================================================
-# HÀM CHỈ ĐẠO GIỌNG NÓI: 100% MIỀN BẮC & PHÂN TÁCH ÂM SẮC
+# HÀM CHỈ ĐẠO GIỌNG NÓI: 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI & TỐC ĐỘ 4.8 - 5.2 TỪ/S
 # ==============================================================================
 def build_voice_direction(mode, num_chars, character_profiles):
-    is_tiktok_shop = "TikTok Shop" in mode
+    is_tiktok_shop = ("Viral" not in mode)
+    speed_txt = "tốc độ BẮN TỈA DỒN DẬP (4.8 - 5.2 từ/s), rướn người, cử chỉ tay chém nhịp dứt khoát" if is_tiktok_shop else "tốc độ tự nhiên, biến thiên cảm xúc linh hoạt"
+    
     if num_chars <= 1:
-        speed_txt = "tốc độ BẮN TỈA DỒN DẬP (4.8 - 5.2 từ/s), rướn người, cử chỉ tay chém nhịp dứt khoát" if is_tiktok_shop else "tốc độ tự nhiên, biến thiên cảm xúc linh hoạt"
-        return f"Nhân vật nói trực tiếp (On-camera): 100% Giọng [Nam/Nữ] HÀ NỘI GỐC BẮC BỘ bản địa, phát âm chuẩn tròn vành rõ chữ, {speed_txt}."
+        return f"Nhân vật nói trực tiếp (On-camera): 100% Giọng [Nam/Nữ] HÀ NỘI CHUẨN bản địa đúng độ tuổi, phát âm chuẩn tròn vành rõ chữ, {speed_txt}."
     else:
         dirs = []
         for p in character_profiles:
             r = str(p.get('role', '')).lower()
             if any(k in r for k in ["bé", "con", "trẻ", "nhỏ", "gái", "trai", "thiếu nhi"]):
-                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng THIẾU NHI MIỀN BẮC trong trẻo, líu lo, ngây thơ, nói tự nhiên lém lỉnh, âm sắc cao và tươi sáng.")
+                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng THIẾU NHI HÀ NỘI CHUẨN đúng độ tuổi, trong trẻo, líu lo, ngây thơ, nói tự nhiên lém lỉnh, âm sắc cao và tươi sáng.")
             elif any(k in r for k in ["ông", "bà", "già", "cao tuổi"]):
-                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng NGƯỜI LỚN TUỔI MIỀN BẮC từ tốn, đôn hậu, trầm ấm, phúc hậu, giàu trải nghiệm, âm sắc trầm đục tự nhiên.")
+                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng NGƯỜI CAO TUỔI HÀ NỘI CHUẨN đúng độ tuổi, từ tốn, đôn hậu, trầm ấm, phúc hậu, giàu trải nghiệm, âm sắc trầm đục tự nhiên.")
             elif any(k in r for k in ["bố", "ba", "chồng", "nam", "anh", "bác trai"]):
-                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng NAM HÀ NỘI GỐC BẮC BỘ trầm ấm, chững chạc, nội lực, đĩnh đạc, ngữ điệu dứt khoát, đáng tin cậy.")
+                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng NAM HÀ NỘI CHUẨN đúng độ tuổi, trầm ấm, chững chạc, nội lực, đĩnh đạc, ngữ điệu dứt khoát, đáng tin cậy.")
             else:
-                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng NỮ HÀ NỘI CHUẨN BẮC BỘ thanh lịch, dịu dàng, ấm áp, truyền cảm, nhịp điệu dứt khoát, âm sắc trong sáng và tự tin.")
+                dirs.append(f"• NV {p['id']} ({p['role']}): 100% Giọng NỮ HÀ NỘI CHUẨN đúng độ tuổi, thanh lịch, ngọt ngào, dịu dàng, âm sắc trong sáng, giàu cảm xúc và năng lượng cao.")
         return " | ".join(dirs)
 
 def generate_char_rules_string(profiles):
@@ -418,8 +420,8 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP & VIRAL TRIỆU VIEW. PHONG CÁCH: {style}
     {strat_cmd} | {format_direction}
-    🛑 CƯỠNG CHẾ 100% GIỌNG MIỀN BẮC NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
-    - 100% phát âm chuẩn giọng Bắc Bộ / Hà Nội gốc. Phân biệt rõ giọng trẻ em líu lo, người già đôn hậu, nam trầm ấm, nữ thanh lịch.
+    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
+    - 100% phát âm chuẩn giọng Hà Nội bản địa. Phân biệt rõ giọng trẻ em líu lo, người già đôn hậu, nam trầm ấm, nữ thanh lịch.
     - TUYỆT ĐỐI KHÔNG CÓ GIỌNG THUYẾT MINH NGOÀI (NO OFF-SCREEN NARRATOR).
     🛑 BỘ LỌC CHÍNH SÁCH BÁN HÀNG ĐA NGÀNH NGHỀ:
     - CẤM: 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
@@ -433,7 +435,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     is_multi = (num_chars >= 2)
     voice_guidance = build_voice_direction(mode, num_chars, character_profiles)
 
-    dialogue_type_rule = f"🛑 ĐỐI THOẠI {num_chars} NHÂN VẬT: Tách từng câu thoại nói trực tiếp (Mẹ: '...' | Bé: '...'). Giọng thiếu nhi ngây thơ, mẹ dịu dàng." if is_multi else "🛑 ĐỘC THOẠI KOC: Lời thoại liền mạch do chính KOC mở miệng nói trực tiếp trước ống kính, tốc độ 4.8 - 5.2 từ/s."
+    dialogue_type_rule = f"🛑 ĐỐI THOẠI {num_chars} NHÂN VẬT: Tách từng câu thoại nói trực tiếp (Mẹ: '...' | Bé: '...'). Giọng thiếu nhi Hà Nội ngây thơ, mẹ dịu dàng đúng độ tuổi." if is_multi else "🛑 ĐỘC THOẠI KOC: Lời thoại liền mạch do chính KOC mở miệng nói trực tiếp trước ống kính, tốc độ bắn tỉa 4.8 - 5.2 từ/s."
     outro_instruction = "🛑 CẢNH 4 (VIRAL): Cả nhà cười tươi vẫy tay chào camera, mời follow." if "Viral" in mode else "🛑 CẢNH 4 (TIKTOK SHOP): Kêu gọi mua hàng ấm áp, nhân vật nói trực tiếp chia sẻ chân thành."
 
     return f"""
@@ -442,9 +444,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 CƯỠNG CHẾ 100% GIỌNG MIỀN BẮC NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
+    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
     - CẤM TUYỆT ĐỐI GIỌNG THUYẾT MINH / LỒNG TIẾNG NGOÀI (NO OFF-SCREEN NARRATOR/VOICEOVER).
-    - 100% ngữ điệu và phát âm chuẩn miền Bắc / Hà Nội bản địa.
+    - 100% ngữ điệu và phát âm chuẩn Hà Nội bản địa, khớp từng âm sắc với độ tuổi của nhân vật.
     - Nhân vật trên màn hình MỞ MIỆNG NÓI TRỰC TIẾP, cử động cơ miệng khớp từng từ với lời thoại.
 
     🛑 TRIỆT TIÊU TOÀN BỘ ICON GIỎ HÀNG, NÚT BẤM VÀ PHỤ ĐỀ / CHỮ NỔI:
@@ -463,7 +465,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     4. KHÓA DUY NHẤT 1 SẢN PHẨM HERO SKU: 'Strictly single hero product instance, zero ghost products, zero duplicate floating items'.
 
     🛑 QUY TẮC KHỐNG CHẾ SỐ TỪ CHUẨN XÁC ĐỂ PHÂN CẢNH CHỈ NẰM TRONG 4s, 6s, 8s, 10s:
-    - Tốc độ đọc: 4.8 - 5.2 từ/giây. TUYỆT ĐỐI KHÔNG VIẾT DÀI QUÁ 40 TỪ Ở BẤT KỲ CẢNH NÀO (CHỐNG LỖI TRÀN 12s)!
+    - Tốc độ đọc KOC bán hàng: 4.8 - 5.2 từ/giây. TUYỆT ĐỐI KHÔNG VIẾT DÀI QUÁ 40 TỪ Ở BẤT KỲ CẢNH NÀO (CHỐNG LỖI TRÀN 12s)!
     - CẢNH 1 (ATTENTION - HOOK): 20 ĐẾN 25 TỪ (Khớp khung 6s).
     - CẢNH 2 (INTEREST): 28 ĐẾN 34 TỪ (Khớp khung 8s).
     - CẢNH 3 (DESIRE): 34 ĐẾN 40 TỪ (Khớp khung 8s hoặc 10s).
@@ -487,8 +489,11 @@ def create_scene_details(target_id, mode, style):
     char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
     char_rules = generate_char_rules_string(char_profiles)
     num_chars = outline.get("actors", outline.get("actor_count", len(char_profiles) if char_profiles else 1))
-    voice_guidance = build_voice_direction(mode, num_chars, char_profiles)
-    is_tiktok_shop = "TikTok Shop" in mode
+    
+    # ĐẢM BẢO CHẾ ĐỘ LUÔN ƯU TIÊN TIKTOK SHOP NẾU KHÔNG PHẢI VIRAL
+    current_active_mode = mode or st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
+    is_tiktok_shop = ("Viral" not in current_active_mode)
+    voice_guidance = build_voice_direction(current_active_mode, num_chars, char_profiles)
     
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_hook = sanitize_policy_text(outline.get('hook', ''))
@@ -508,7 +513,7 @@ def create_scene_details(target_id, mode, style):
     prompt_text = f"""
     THÔNG TIN SẢN PHẨM & CẤU TRÚC ĐỜI THỰC: {json.dumps(condensed_dna, ensure_ascii=False)}
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK GỐC: '{fixed_hook}' | BỐI CẢNH: {outline.get('setting', 'Không gian thực tế phù hợp sản phẩm')}
-    HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình (On-camera Lip-sync) bằng Giọng Miền Bắc bản địa.
+    HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình (On-camera Lip-sync) bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ bắn tỉa 4.8 - 5.2 từ/s.
     
     🛑 LỆNH CƯỠNG CHẾ VẬT LÝ ĐỜI THỰC & CÔNG THÁI HỌC BÀN TAY:
     - BẮT BUỘC tả đúng hình thái và kết cấu sản phẩm từ DNA: '{condensed_dna.get("product")}', cơ chế: '{condensed_dna.get("mechanism")}'.
@@ -537,7 +542,7 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "action_en": "Natural human action. Character speaking directly to camera with expressive lip movements. Holding or interacting naturally with the product. Anatomically correct hands. Accompanied safely.",
-                "director": "Attention | Nhân vật nói trực tiếp giọng Bắc mở màn | Khởi động: 0.00s",
+                "director": "Attention | Nhân vật nói trực tiếp giọng Hà Nội chuẩn mở màn | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại nhân vật nói trực tiếp 20-25 từ..."
             }},
             {{
@@ -568,7 +573,7 @@ def create_scene_details(target_id, mode, style):
     }}
     """
     
-    res = call_gemini([prompt_text], get_sys_inst_details(mode, style, "On-camera", char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=6500)
+    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=6500)
     if not res:
         raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
@@ -630,7 +635,7 @@ def create_scene_details(target_id, mode, style):
         
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khóa tuyệt đối 4s/6s/8s/10s | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (Giọng Bắc Bộ bản địa)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>⚙ <b>Cơ chế vật lý sản phẩm:</b> {condensed_dna.get('mechanism')} | 🖐 <b>Công thái học:</b> Bàn tay 5 ngón chuẩn xác<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khóa tuyệt đối 4s/6s/8s/10s | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ bắn tỉa 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>⚙ <b>Cơ chế vật lý sản phẩm:</b> {condensed_dna.get('mechanism')} | 🖐 <b>Công thái học:</b> Bàn tay 5 ngón chuẩn xác<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
     
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -639,8 +644,8 @@ def create_scene_details(target_id, mode, style):
 # HÀM NHÂN BẢN KỊCH BẢN - ĐÃ TỐI ƯU HÓA TOKEN
 # ==============================================================================
 def clone_script(script_id):
-    mode = st.session_state.get("last_mode", "Bán Hàng")
-    style = st.session_state.get("last_style", "Điện ảnh")
+    mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
+    style = st.session_state.get("last_style", "Điện Ảnh Chân Thực")
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
     target = next((sc for sc in all_combined if str(sc.get("id")) == str(script_id)), None)
     if not target: return []
@@ -668,7 +673,7 @@ def clone_script(script_id):
     KỊCH BẢN GỐC #{script_id}: TIÊU ĐỀ: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
     
-    NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá, nhân bản thành 5 biến thể kịch bản thoại mới theo 5 góc kể chuyện (đời thường, chân thành, so sánh, trải nghiệm giác quan, deal hời). 100% nhân vật nói trực tiếp bằng giọng Bắc. Tự do đổi vai và bối cảnh.
+    NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá, nhân bản thành 5 biến thể kịch bản thoại mới theo 5 góc kể chuyện (đời thường, chân thành, so sánh, trải nghiệm giác quan, deal hời). 100% nhân vật nói trực tiếp bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. Tự do đổi vai và bối cảnh.
     
     TRẢ VỀ JSON:
     {{
@@ -712,8 +717,8 @@ def clone_script(script_id):
     return formatted_clones
 
 def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more, duration_inst, char_profiles):
-    mode = st.session_state.get("last_mode", "Bán Hàng")
-    style = st.session_state.get("last_style", "Điện ảnh")
+    mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
+    style = st.session_state.get("last_style", "Điện Ảnh Chân Thực")
     char_rules = generate_char_rules_string(char_profiles)
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
     
@@ -726,7 +731,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     
     prompt = f"""
     SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)} | CHIẾN LƯỢC: '{angle}' | DIỄN VIÊN: {num_chars} người Việt.
-    100% LỜI THOẠI LÀ DO NHÂN VẬT NÓI TRỰC TIẾP BẰNG GIỌNG MIỀN BẮC. Tuân thủ chính sách quảng cáo.
+    100% LỜI THOẠI LÀ DO NHÂN VẬT NÓI TRỰC TIẾP BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI (4.8 - 5.2 từ/s). Tuân thủ chính sách quảng cáo.
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -1057,7 +1062,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 prompt = f"""
                 INPUT: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: {custom_note}
                 DIỄN VIÊN: {num_chars} nhân vật 100% người Việt bản địa ({', '.join([p['role'] for p in st.session_state.character_profiles])}).
-                100% LỜI THOẠI LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH BẰNG GIỌNG MIỀN BẮC (ON-CAMERA LIP-SYNC).
+                100% LỜI THOẠI LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI (ON-CAMERA LIP-SYNC), TỐC ĐỘ 4.8 - 5.2 TỪ/S.
                 CHỈ ĐẠO HERO SKU: {override_instruction}
                 
                 BẮT BUỘC TRẢ VỀ JSON:
@@ -1200,11 +1205,15 @@ if all_sc:
             actual_words = count_words(vo_text)
             comma_count = vo_text.count(',') + vo_text.count(';')
             period_count = vo_text.count('.') + vo_text.count('!') + vo_text.count('?')
-            speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, "TikTok Shop" in st.session_state.get("last_mode", "")))
+            
+            # ĐẢM BẢO CHẾ ĐỘ LUÔN TÍNH THEO TIKTOK SHOP NẾU KHÔNG PHẢI VIRAL
+            curr_mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
+            is_tts = ("Viral" not in curr_mode)
+            speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} dấu phẩy, {period_count} dấu ngắt câu | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s)</span>", unsafe_allow_html=True)
-            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & Ngôn ngữ hình thể KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Bắc):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
+            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & Ngôn ngữ hình thể KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Hà Nội chuẩn đúng độ tuổi):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa Ma Trận 5 Lớp & Chi Tiết Sản Phẩm Chuẩn):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
             if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Cận Cảnh Macro 85mm & Không Biến Dạng):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
