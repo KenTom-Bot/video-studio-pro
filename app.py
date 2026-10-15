@@ -469,7 +469,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - THOẠI 0.00S & TÍCH HỢP HÌNH THỨC REVIEW/TRẢI NGHIỆM
+# HÀM TẠO CHI TIẾT KỊCH BẢN - ĐÃ SỬA LỖI BIẾN CỤC BỘ CLEAN_PROD_EN
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -507,6 +507,10 @@ def create_scene_details(target_id, mode, style):
         "anti_morph_targets": dna.get("strict_anti_morph_targets", "ống tiêm y tế xylanh, que nhựa đơn chiếc"),
         "visual_dna": dna.get("prompt_dna_lock", "")
     }
+
+    # KHỞI TẠO BIẾN TRƯỚC ĐỂ TRÁNH LỖI UNBOUNDLOCALERROR
+    fallback_prod_name = f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip()
+    clean_prod_en = sanitize_third_party_ip(fallback_prod_name)
 
     prompt_text = f"""
     THÔNG TIN SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)}
@@ -557,7 +561,7 @@ def create_scene_details(target_id, mode, style):
                 "camera_shot": "Vertical 9:16 eye-level medium shot framing character holding product with open packaging nearby",
                 "expression": "Ánh mắt đồng cảm, nụ cười hào hứng mở màn câu chuyện nhìn thẳng camera",
                 "sfx": "Tiếng mở nắp hộp bụp nhẹ hoặc tiếng lột tem giòn tai + tiếng cười nói mở màn",
-                "action_en": "Direct on-camera spoken hook: Character visibly looks into the camera lens and starts speaking immediately at 0.00s with clear natural lip-sync mouth movements, holding {clean_prod_en} securely at chest level.",
+                "action_en": "Direct on-camera spoken hook: Character visibly looks into the camera lens and starts speaking immediately at 0.00s with clear natural lip-sync mouth movements, holding the product securely at chest level.",
                 "director": "Attention | Nhân vật nói trực tiếp on-camera lip-sync bắt đầu ngay từ 0.00s | SFX chân thực | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại mở màn tự nhiên dưới 24 từ bằng tiếng Hà Nội chuẩn, dùng từ 'nghìn'..."
             }},
@@ -570,7 +574,7 @@ def create_scene_details(target_id, mode, style):
                 "camera_shot": "Vertical 9:16 eye-level medium close-up, clearly framing character's speaking face with moving lips and hands steadily demonstrating the genuine details of the product at chest level",
                 "expression": "Ánh mắt bừng sáng, chân mày giãn ra, thần thái hào hứng chia sẻ trực tiếp với người xem",
                 "sfx": "Tiếng gõ cộc cộc đanh chắc hoặc tiếng kéo khóa êm ru sột soạt ASMR",
-                "action_en": "Direct on-camera inspection: Character visibly looks into camera and speaks directly with natural lip-sync mouth movements starting at 0.00s. Mechanically anchored hands demonstrate the genuine product details ({condensed_dna.get('operational_mechanism')}) with steady grip at chest level, 100% rigid non-deformable structure.",
+                "action_en": "Direct on-camera inspection: Character visibly looks into camera and speaks directly with natural lip-sync mouth movements starting at 0.00s. Mechanically anchored hands demonstrate the genuine product details with steady grip at chest level, 100% rigid non-deformable structure.",
                 "director": "Interest | Nhân vật nói trực tiếp on-camera lip-sync khớp từ 0.00s (CẤM thuyết minh) | SFX thực tế ASMR | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng hô thân mật dưới 34 từ..."
             }},
@@ -620,7 +624,11 @@ def create_scene_details(target_id, mode, style):
     base_negative = c_mat.get("locked_negative") or "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, melting product, bending plastic, shifting geometry, liquid distortion, rubbery deformation, hand fusing into object, fingers merging into plastic, structural morphing, warping edges, disappearing buttons, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product, changing hairstyle, different haircut, different hair length, different hair parting, changing face, face morphing, different person, inconsistent actor, inconsistent character, different facial features, altering hairstyle, changing hair color, brown hair, light brown hair, auburn hair, chestnut hair, blonde hair, dyed hair, bleached hair, hair highlights, reddish hair tint, inconsistent hair color"
     
     is_fashion_styling = res.get("is_fashion_styling", False)
-    clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip())
+    
+    # CẬP NHẬT TÊN SẢN PHẨM NẾU AI TRẢ VỀ GIÁ TRỊ MỚI
+    if res.get("clean_product_name_en"):
+        clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en"))
+        
     connector_physics_en = res.get("connector_physics_en") or "translucent flexible silicone tube approx 20-25cm length, 6-8mm diameter, hanging with a natural loose U-shaped curved droop between hands"
     
     character_base_identity = (
@@ -1368,7 +1376,7 @@ if all_sc:
         else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
 
     # ==========================================================================
-    # KHU VỰC GỌI THÊM 5 KỊCH BẢN - ĐÃ TÍCH HỢP HÌNH THỨC & GHI CHÚ AI ƯU TIÊN
+    # KHỞI TẠO KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
     # ==========================================================================
     st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
