@@ -439,7 +439,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     outro_instruction = "🛑 CẢNH 4 (VIRAL): Cả nhà cười tươi vẫy tay chào camera, mời follow." if "Viral" in mode else "🛑 CẢNH 4 (TIKTOK SHOP): Kêu gọi mua hàng ấm áp, nhân vật nói trực tiếp chia sẻ chân thành."
 
     return f"""
-    BẠN LÀ BẬC THẦY BIÊN KỊCH TIKTOK THỰC CHIẾN VIỆT NAM (ĐA DẠNG MỌI NGÀNH HÀNG). PHONG CÁCH: {style}
+    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP ĐA GIÁC QUAN (AUDIO-VISUAL MASTER). PHONG CÁCH: {style}
     CHỈ ĐẠO GIỌNG: {voice_guidance}
     {dialogue_type_rule}
     {outro_instruction}
@@ -449,9 +449,22 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - 100% ngữ điệu và phát âm chuẩn Hà Nội bản địa, khớp từng âm sắc với độ tuổi của nhân vật.
     - Nhân vật trên màn hình MỞ MIỆNG NÓI TRỰC TIẾP, cử động cơ miệng khớp từng từ với lời thoại.
 
+    🛑 HỆ THỐNG HIỆU ỨNG ÂM THANH ĐẶC TẢ THỰC TẾ (LAYERED SFX & FOLEY STUDIO):
+    BẮT BUỘC biên soạn hiệu ứng âm thanh cụ thể (`sfx`) cho từng cảnh AIDA:
+    - Cảnh 1 (Attention - Hook): Tiếng 'vút' (whoosh) nhẹ mở màn 3s đầu + tiếng thở dài nhẹ hoặc tiếng sột soạt/lạo xạo thực tế mô tả nỗi đau đời thường.
+    - Cảnh 2 (Interest - Thao tác): Tiếng cơ học thực tế: gõ 'cộc cộc' đanh chắc vào thân bình/vật thể, tiếng xoay vặn nắp ren 'khục' chắc nịch, tiếng vuốt vải lụa mịn sột soạt ASMR, tiếng bật công tắc...
+    - Cảnh 3 (Desire - Giác quan): Tiếng kích thích thèm muốn: tiếng rót nước róc rách đá lạnh lách cách vang giòn, tiếng búng tay bo chun nẩy tưng tưng, tiếng vải rũ êm ái...
+    - Cảnh 4 (Action - Chốt deal): Tiếng chuông 'ting' (cash register / chime bell) trong trẻo vui tai kích thích chốt đơn.
+
+    🛑 VI BIỂU CẢM KHUÔN MẶT (MICRO-EXPRESSIONS) & HÌNH THỂ KOC:
+    BẮT BUỘC biên soạn cử chỉ và biểu cảm (`expression`) sống động:
+    - Cảnh 1: Ánh mắt đồng cảm, hơi nhíu mày trăn trở hoặc mở to ngạc nhiên, ngực rướn nhẹ.
+    - Cảnh 2: Ánh mắt sáng ngời, chân mày giãn ra, tự tin, hai tay thao tác công thái học chuẩn 5 ngón.
+    - Cảnh 3: Nụ cười thỏa mãn, gật đầu tán thưởng, cơ mặt rạng rỡ tận hưởng độ sướng của sản phẩm.
+    - Cảnh 4: Nụ cười tươi ấm áp, ánh mắt chân thành nhìn thẳng ống kính, hai bàn tay mở tự nhiên mời gọi.
+
     🛑 TRIỆT TIÊU TOÀN BỘ ICON GIỎ HÀNG, NÚT BẤM VÀ PHỤ ĐỀ / CHỮ NỔI:
     - CẤM TUYỆT ĐỐI các cụm từ "chỉ tay xuống góc trái", "pointing to cart", "gesture to corner".
-    - Hành động Cảnh 4: "Nhân vật mỉm cười thân thiện chân thành nhìn vào ống kính, hai bàn tay mở tự nhiên hướng về phía trước thể hiện sự gợi ý ấm áp và đáng tin cậy."
     - CẤM tạo icon giỏ hàng vàng, CẤM nút bấm giả lập, CẤM chữ phụ đề nhấp nháy trên khung hình!
 
     🛑 ĐỘNG LỰC HỌC VẬT LÝ & CÔNG THÁI HỌC BÀN TAY CHUẨN XÁC THEO TỪNG LOẠI SẢN PHẨM:
@@ -478,7 +491,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - ĐA NGÀNH HÀNG LINH HOẠT
+# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP SFX & MICRO-EXPRESSIONS MASTER
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -490,7 +503,6 @@ def create_scene_details(target_id, mode, style):
     char_rules = generate_char_rules_string(char_profiles)
     num_chars = outline.get("actors", outline.get("actor_count", len(char_profiles) if char_profiles else 1))
     
-    # ĐẢM BẢO CHẾ ĐỘ LUÔN ƯU TIÊN TIKTOK SHOP NẾU KHÔNG PHẢI VIRAL
     current_active_mode = mode or st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     is_tiktok_shop = ("Viral" not in current_active_mode)
     voice_guidance = build_voice_direction(current_active_mode, num_chars, char_profiles)
@@ -513,13 +525,13 @@ def create_scene_details(target_id, mode, style):
     prompt_text = f"""
     THÔNG TIN SẢN PHẨM & CẤU TRÚC ĐỜI THỰC: {json.dumps(condensed_dna, ensure_ascii=False)}
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK GỐC: '{fixed_hook}' | BỐI CẢNH: {outline.get('setting', 'Không gian thực tế phù hợp sản phẩm')}
-    HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình (On-camera Lip-sync) bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ bắn tỉa 4.8 - 5.2 từ/s.
+    HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình (On-camera Lip-sync) bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s.
     
-    🛑 LỆNH CƯỠNG CHẾ VẬT LÝ ĐỜI THỰC & CÔNG THÁI HỌC BÀN TAY:
-    - BẮT BUỘC tả đúng hình thái và kết cấu sản phẩm từ DNA: '{condensed_dna.get("product")}', cơ chế: '{condensed_dna.get("mechanism")}'.
-    - TUYỆT ĐỐI KHÔNG tự bịa ra các chi tiết dị thường (như núm vòi lạ trên nắp bình, hay cúc áo/khóa kéo sai lệch).
-    - Cảnh 2 và Cảnh 3 phải mô tả đúng thao tác đời thực của sản phẩm: '{condensed_dna.get("how_to_use")}'.
-    - Nếu là thời trang/vải vóc: Phẳng phiu không nhăn, rũ mịn. Nếu là đồ gia dụng/công nghệ/mỹ phẩm: Thao tác tay chuẩn xác 5 ngón.
+    🛑 LỆNH ĐẶC TẢ ÂM THANH SFX & VI BIỂU CẢM HÌNH THỂ KOC:
+    - Cảnh 1: SFX tiếng whoosh vút nhẹ + tiếng lạo xạo/thở dài | Biểu cảm nhíu mày trăn trở, ánh mắt đồng cảm nỗi đau.
+    - Cảnh 2: SFX tiếng gõ 'cộc cộc' hoặc tiếng nắp/vải/nút bấm cơ học thực tế | Biểu cảm ánh mắt sáng rỡ, hai tay thao tác 5 ngón chuẩn công thái học.
+    - Cảnh 3: SFX tiếng rót nước róc rách đá lạnh lách cách / tiếng búng vải nẩy tưng tưng / tiếng ASMR giác quan | Biểu cảm nụ cười thỏa mãn, gật đầu tán thưởng.
+    - Cảnh 4: SFX tiếng chuông 'ting' chốt đơn vui tai | Biểu cảm nụ cười tươi rạng rỡ, hai bàn tay mở tự nhiên chân thành.
     - Độ dài lời thoại: Cảnh 1 (20-25 từ | 6s), Cảnh 2 (28-34 từ | 8s), Cảnh 3 (34-40 từ | 8s hoặc 10s), Cảnh 4 (20-25 từ | 6s). TUYỆT ĐỐI CẤM vượt 40 từ ở bất kỳ cảnh nào (chống tràn 12s)!
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
@@ -541,7 +553,9 @@ def create_scene_details(target_id, mode, style):
                 "scene": 1, "aida_stage": "Attention",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
-                "action_en": "Natural human action. Character speaking directly to camera with expressive lip movements. Holding or interacting naturally with the product. Anatomically correct hands. Accompanied safely.",
+                "expression": "Ánh mắt đồng cảm chân thành, hơi nhíu mày trăn trở nỗi đau, ngực rướn nhẹ truyền tải hook",
+                "sfx": "Tiếng whoosh vút nhẹ mở màn 3s đầu kết hợp tiếng thở dài nhẹ thực tế",
+                "action_en": "Natural human action. Character speaking directly to camera with expressive lip movements. Empathetic facial micro-expression with authentic eye contact. Anatomically correct hands. Accompanied safely.",
                 "director": "Attention | Nhân vật nói trực tiếp giọng Hà Nội chuẩn mở màn | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại nhân vật nói trực tiếp 20-25 từ..."
             }},
@@ -549,7 +563,9 @@ def create_scene_details(target_id, mode, style):
                 "scene": 2, "aida_stage": "Interest",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Cinematic tight macro close-up with 85mm lens, shallow depth of field, razor-sharp focus on product details and hand ergonomics",
-                "action_en": "Character actively speaking while demonstrating authentic real-world handling ({condensed_dna.get('how_to_use')}) with steady natural five-finger hands. Realistic physics, zero distortion.",
+                "expression": "Ánh mắt bừng sáng, chân mày giãn ra, thần thái tự tin, khóe môi mỉm cười nhẹ khi giải phóng nỗi đau",
+                "sfx": "Tiếng gõ 'cộc cộc' đanh chắc hoặc tiếng xoay nắp ren 'khục' chắc nịch / tiếng vuốt vải sột soạt ASMR",
+                "action_en": "Character actively speaking while demonstrating authentic real-world handling ({condensed_dna.get('how_to_use')}) with steady natural five-finger hands. Confident bright facial micro-expression. Realistic physics, zero distortion.",
                 "director": "Interest | Cận cảnh Macro 85mm thao tác công năng chuẩn đời thực | SFX thực tế ASMR | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại nhân vật nói trực tiếp 28-34 từ..."
             }},
@@ -557,7 +573,9 @@ def create_scene_details(target_id, mode, style):
                 "scene": 3, "aida_stage": "Desire",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Cinematic tight macro shot showcasing sensory tactile satisfaction and premium product quality",
-                "action_en": "Sensory visual demonstration. Character speaking directly with delight while showcasing genuine comfort, capacity or tactile benefit of the product. Accurate five fingers per hand.",
+                "expression": "Nụ cười mãn nguyện, ánh mắt ánh lên sự thỏa mãn giác quan, gật đầu khẳng định chất lượng",
+                "sfx": "Tiếng rót nước róc rách đá lạnh lách cách vang giòn / tiếng búng vải nẩy tưng tưng / tiếng ASMR giác quan",
+                "action_en": "Sensory visual demonstration. Character speaking directly with delight while showcasing genuine comfort, capacity or tactile benefit of the product. Joyful satisfied micro-expression. Accurate five fingers per hand.",
                 "director": "Desire | Thể hiện độ hài lòng và trải nghiệm giác quan thực tế | SFX sống động | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại nhân vật nói trực tiếp 34-40 từ..."
             }},
@@ -565,6 +583,8 @@ def create_scene_details(target_id, mode, style):
                 "scene": 4, "aida_stage": "Action",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Vertical 9:16 warm eye-level medium closing shot",
+                "expression": "Nụ cười rạng rỡ, ánh mắt chân thành ấm áp, hai bàn tay mở tự nhiên hướng về camera",
+                "sfx": "Tiếng chuông 'ting' (cash register / chime bell) trong trẻo vui tai kích thích hành động",
                 "action_en": "Warm confident closing shot. Character smiling warmly into camera, speaking directly with sincere welcoming open-palm gestures. Pure cinematic frame without any UI buttons or graphics.",
                 "director": "Action | Nhân vật nói trực tiếp chốt deal đòn bẩy giá tương phản | SFX chuông ting vui tai | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại nhân vật nói trực tiếp 20-25 từ..."
@@ -609,11 +629,13 @@ def create_scene_details(target_id, mode, style):
         clean_action = scn.get("action_en", "")
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
         camera_shot = scn.get("camera_shot", "Vertical 9:16 cinematic shot")
+        sfx_sound = scn.get("sfx", "Layered realistic ambient sensory Foley sounds")
+        micro_expr = scn.get("expression", "Natural expressive facial micro-emotions with genuine direct eye contact")
         
         scn["img_p"] = (
             f"{camera_shot}. {unified_subject_description}. "
             f"Setting: {locked_setting}. "
-            f"Action & Handling: {clean_action}. Character speaking directly to camera. "
+            f"Action & Handling: {clean_action}. Expression: {micro_expr}. Character speaking directly to camera. "
             f"Product: {g_prod}. "
             f"Anatomy & Kinetics: Anatomically correct hands with exactly five fingers, natural realistic grip, physically grounded handling without warping. "
             f"Strictly pure camera footage: ABSOLUTELY NO yellow shopping cart icons, NO shopping bag graphics, NO floating buttons, NO UI overlays, NO text, NO typography, NO subtitles. "
@@ -621,11 +643,11 @@ def create_scene_details(target_id, mode, style):
         )
         
         speaker_line = scn.get("voiceover", "")
-        audio_part = f' Direct on-camera spoken dialogue at 0.00s. Character visibly speaking with natural lip-sync mouth movement. Audio: "{speaker_line}", Layered SFX: [realistic ambient sensory sounds].'
+        audio_part = f' Direct on-camera spoken dialogue at 0.00s. Character visibly speaking with natural lip-sync mouth movement. Audio: "{speaker_line}", Layered Foley SFX: [{sfx_sound}].'
         raw_vid = (
             f"{camera_shot}. Wholesome live-action commercial footage. {unified_subject_description}. "
             f"Setting: {locked_setting}. "
-            f"Action: {clean_action}.{audio_part} "
+            f"Action: {clean_action}. Micro-expression: {micro_expr}.{audio_part} "
             f"Product: {g_prod}. "
             f"Anatomy & Kinetics: Anatomically correct hands with strictly five fingers per hand, natural smooth hand gestures, zero limb morphing, zero finger melting. "
             f"Strictly pure live-action footage: ABSOLUTELY NO yellow shopping cart icons, NO animated buttons, NO UI stickers, NO overlays, NO on-screen subtitles, NO text, NO typography. "
@@ -635,7 +657,7 @@ def create_scene_details(target_id, mode, style):
         
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khóa tuyệt đối 4s/6s/8s/10s | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ bắn tỉa 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>⚙ <b>Cơ chế vật lý sản phẩm:</b> {condensed_dna.get('mechanism')} | 🖐 <b>Công thái học:</b> Bàn tay 5 ngón chuẩn xác<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khóa tuyệt đối 4s/6s/8s/10s | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ bắn tỉa 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>🎵 <b>Hệ thống đa giác quan:</b> Âm thanh SFX & Foley đa tầng | 😊 <b>Vi biểu cảm & hình thể KOC:</b> Biến thiên tự nhiên theo tâm lý AIDA<br>⚙ <b>Cơ chế vật lý sản phẩm:</b> {condensed_dna.get('mechanism')} | 🖐 <b>Công thái học:</b> Bàn tay 5 ngón chuẩn xác<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
     
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -1206,16 +1228,15 @@ if all_sc:
             comma_count = vo_text.count(',') + vo_text.count(';')
             period_count = vo_text.count('.') + vo_text.count('!') + vo_text.count('?')
             
-            # ĐẢM BẢO CHẾ ĐỘ LUÔN TÍNH THEO TIKTOK SHOP NẾU KHÔNG PHẢI VIRAL
             curr_mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
             is_tts = ("Viral" not in curr_mode)
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} dấu phẩy, {period_count} dấu ngắt câu | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s)</span>", unsafe_allow_html=True)
-            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**🎙 Đạo diễn & Ngôn ngữ hình thể KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Hà Nội chuẩn đúng độ tuổi):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
+            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Hà Nội chuẩn đúng độ tuổi):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa Ma Trận 5 Lớp & Chi Tiết Sản Phẩm Chuẩn):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
-            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Cận Cảnh Macro 85mm & Không Biến Dạng):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
+            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Âm Thanh SFX & Vi Biểu Cảm KOC):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
     # MỤC 1: KỊCH BẢN ĐÃ DỰNG CHI TIẾT
@@ -1272,7 +1293,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang phân tích kết cấu thực tế, ma trận khóa 5 lớp và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang tích hợp SFX, vi biểu cảm và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = int(target_id_to_run)
                 st.session_state.scroll_to_detail = True
