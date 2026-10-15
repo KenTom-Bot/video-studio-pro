@@ -134,15 +134,13 @@ POLICY_REPLACEMENTS = {
     r'\btốt\s*nhất\b': 'rất tốt', r'\bsố\s*1\b': 'hàng đầu', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên',
     r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'vóc dáng thon gọn', r'\bxóa\s*sạch\s*nám\b': 'mờ thâm sạm',
     r'\bthuốc\s*trị\b': 'sản phẩm hỗ trợ', r'\bđiều\s*trị\b': 'hỗ trợ cải thiện', r'\btriệt\s*để\b': 'hiệu quả',
-    # LOẠI BỎ TỪ HIỂU NHẦM LIVESTREAM THEO YÊU CẦU NGƯỜI DÙNG
-    r'\btrợ\s*giá\b': 'giảm giá',
+    r'\btrợ\s*giá\b': 'giảm giá sâu có hạn',
     r'\bphiên\s*live\b': 'đợt này',
     r'\btrên\s*live\b': 'đợt ưu đãi này',
     r'\blivestream\b': 'chương trình ưu đãi'
 }
 
 SOUTHERN_TO_HANOI = {
-    # DIỆT TRIỆT ĐỂ TỪ "NGÀN" -> CHUYỂN 100% THÀNH "NGHÌN"
     r'\bngàn\b': 'nghìn',
     r'\bngàn\s+đồng\b': 'nghìn đồng',
     r'\bmấy\s+ngàn\b': 'mấy nghìn',
@@ -170,9 +168,8 @@ def sanitize_policy_text(text: str) -> str:
     cleaned = normalize_hanoi_dialect(text)
     for pattern, rep in POLICY_REPLACEMENTS.items():
         cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
-    # Rà soát chốt chặn lần cuối đảm bảo sạch 100% từ "ngàn" và "trợ giá"
     cleaned = re.sub(r'\bngàn\b', 'nghìn', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\btrợ\s*giá\b', 'giảm giá', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btrợ\s*giá\b', 'giảm giá sâu có hạn', cleaned, flags=re.IGNORECASE)
     return cleaned
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
@@ -395,7 +392,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {strat_cmd} | {format_direction}
     🛑 ĐIỀU HƯỚNG BỐI CẢNH THEO CHIẾN LƯỢC:
     - Nếu là '⚡ Flash Sale & Deal hời': BẮT BUỘC đặt bối cảnh ở KHO HÀNG ĐÓNG GÓI THƯƠNG MẠI ĐIỆN TỬ HIỆN ĐẠI (E-commerce fulfillment warehouse with stacked packages/shelves), SHOWROOM TRƯNG BÀY CHÍNH HÃNG, hoặc STUDIO LIVESTREAM CHỐT ĐƠN RỰC RỠ.
-    - Nếu là '🎭 Nỗi đau (PAS)' / '🔍 Review' / '💡 Chia sẻ': Đặt bối cảnh ở KHÔNG GIAN SINH HOẠT ĐỜI THƯỜNG (phòng ngủ gia đình, phòng khách, phòng em bé, góc làm việc...).
+    - Nếu là '🎭 Nỗi đau (PAS)' / '🔍 Review' / '💡 Chia sẻ': Đặt bối cảnh ở KHÔNG GIAN SINH HOẠT ĐỜI THƯỜNG (phòng ngủ gia đình, phòng khách, phòng em bé, quán cafe, góc làm việc...).
     🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN'. 100% BẮT BUỘC DÙNG TỪ 'NGHÌN' (ví dụ: 'mấy chục nghìn', 'trăm nghìn').
     - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE' (tránh bị AI nền tảng phạt hiểu nhầm là livestream).
@@ -422,9 +419,18 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 KHÓA BẤT BIẾN TRANG PHỤC & BỐI CẢNH ĐỒNG NHẤT (STRICT INVARIANT WARDROBE & COHESIVE SETTING LOCK):
-    - NHÂN VẬT PHẢI MẶC ĐÚNG 1 BỘ TRANG PHỤC DUY NHẤT XUYÊN SUỐT 4 CẢNH (Cùng 1 màu áo, cùng 1 chất liệu, cùng 1 kiểu quần/váy).
-    - CẢ 4 CẢNH DIỄN RA TRONG CÙNG 1 KHÔNG GIAN BỐI CẢNH CHÍNH (Phòng khách, phòng ngủ hoặc kho hàng). Nếu cảnh 3 cần thử nước/rửa tay, bồn rửa phải nằm NGAY TRONG KHÔNG GIAN ĐÓ, TUYỆT ĐỐI CẤM TỰ Ý NHẢY RA SÂN VƯỜN NGOÀI TRỜI, VÀ NHÂN VẬT VẪN PHẢI MẶC NGUYÊN BỘ QUẦN ÁO ĐÓ (chỉ xắn nhẹ tay áo, CẤM THAY ĐỔI ÁO SANG ÁO THUN XÁM HAY BẤT KỲ MÀU NÀO KHÁC)!
+    🛑 KHÓA BẤT BIẾN TRANG PHỤC ĐA TẦNG 100% XUYÊN SUỐT 4 CẢNH (STRICT MULTI-LAYER INVARIANT WARDROBE LOCK):
+    - NHÂN VẬT BẮT BUỘC PHẢI MẶC ĐÚNG DUY NHẤT 1 BỘ QUẦN ÁO ĐA TẦNG CỐ ĐỊNH TỪ CẢNH 1 ĐẾN CẢNH 4:
+      • Định danh chi tiết: Áo chính / áo len / áo sơ mi cụ thể (màu sắc, chất vải) + Áo trong / áo khoác / tạp dề cụ thể (nếu có) + Quần / Váy cụ thể + Kiểu tóc + Khuôn mặt.
+      • DÙ BỐI CẢNH CÓ CHUYỂN ĐỔI (ở nhà, ra quán cafe, vào kho hàng hay bên bồn rửa tay), NHÂN VẬT BẮT BUỘC MẶC NGUYÊN BỘ TRANG PHỤC ĐÓ, KHÔNG ĐƯỢC THAY ĐỔI DÙ CHỈ LÀ MÀU ÁO HAY KIỂU ÁO!
+      • Tuyệt đối cấm AI tự ý đổi sang áo thun xám, cởi áo khoác hay thay đổi y phục giữa các cảnh.
+
+    🛑 BỐI CẢNH LINH HOẠT THEO LOGIC SẢN PHẨM & LỜI THOẠI (CONTEXTUAL DYNAMIC & LIVELY SETTINGS):
+    - ĐÁNH GIÁ TÍNH CHẤT SẢN PHẨM:
+      • Nếu là sản phẩm nội thất/giường ngủ cố định (gối ngủ, nệm, chăn ga): Giữ nguyên bối cảnh phòng ngủ/phòng khách gia đình ấm cúng.
+      • Nếu là Flash Sale: Bắt buộc ở kho hàng TMĐT đóng gói tấp nập nhiều kiện hàng hoặc showroom chính hãng.
+      • Nếu là sản phẩm di động, đời sống (đồng hồ, bình nước, đồ ăn, thời trang, dụng cụ cầm tay...): CHO PHÉP THAY ĐỔI BỐI CẢNH LINH HOẠT THEO TỪNG CẢNH VÀ LỜI THOẠI (Ví dụ: Cảnh 1 mở đầu ở bàn làm việc/nhà, Cảnh 2 cận cảnh macro chi tiết, Cảnh 3 trải nghiệm thực tế ở quán cafe ấm cúng có chiều sâu và người ngồi mờ phía xa / bồn rửa tay sạch sẽ, Cảnh 4 góc chốt deal rạng rỡ).
+      • BỐI CẢNH CÔNG CỘNG PHẢI SỐNG ĐỘNG: Nếu bối cảnh là quán cafe, văn phòng, phải mô tả có chiều sâu điện ảnh, không khí ấm cúng và khách ngồi mờ mịt ở hậu cảnh (realistic depth of field, warm lively cafe ambiance with soft blurred background), tuyệt đối không để ngoài trời vắng vẻ hoang vu!
 
     🛑 CƠ CHẾ THỜI LƯỢNG ĐỘNG & ĐỆM AN TOÀN TRÁNH CỤT TIẾNG (SAFE PADDING & DURATION SYNC):
     - KHÔNG BÓ CỨNG MẶC ĐỊNH MỖI CẢNH. AI tự do gán thời lượng '4s', '6s', '8s' hoặc '10s' cho từng phân cảnh.
@@ -439,12 +445,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       • Cảnh 1: Mở màn nêu bật trăn trở thực tế ('Đúng là tìm được một món đồ vừa bền, vừa tiện mà giá hợp lý công nhận khó thật sự...').
       • Cảnh 2: Mở đầu bằng từ nối tự nhiên ('Đấy, bí quyết là phải soi kỹ từng chi tiết như thế này này...'). Đi sâu vào cấu tạo, cơ chế và thao tác thực tế.
       • Cảnh 3: Mở đầu bằng từ nối trải nghiệm ('Mà công nhận dùng thực tế mới thấy sướng...', 'Thích nhất là cái đoạn...'). Đào sâu cảm giác xúc giác, sự tiện ích và an tâm khi dùng hàng ngày.
-      • Cảnh 4: Chuyển nhịp mượt mà sang chốt deal ('Thế nên đợt này ai đang cần thì bấm vào xem ngay nhé...'). Đủ 3 vế: Đòn bẩy giá tương phản (dùng 'nghìn', cấm dùng 'ngàn') + Câu miễn trừ giá có hạn (CẤM dùng 'trợ giá', dùng 'chương trình giảm giá có hạn') + Lời chào ấm áp.
+      • Cảnh 4: Chuyển nhịp mượt mà sang chốt deal ('Thế nên đợt này ai đang cần thì bấm vào xem ngay nhé...'). Đủ 3 vế: Đòn bẩy giá tương phản (dùng 'nghìn', cấm dùng 'ngàn') + Câu miễn trừ giá có hạn (CẤM dùng 'trợ giá', dùng 'chương trình giảm giá sâu có hạn theo khung giờ') + Lời chào ấm áp.
 
-    🛑 BỐ TRÍ 4 PHÂN CẢNH ẢNH KHÁC BIỆT HOÀN TOÀN VỀ GÓC MÁY (NHƯNG GIỮ NGUYÊN TRANG PHỤC VÀ KHÔNG GIAN):
-      • Cảnh 1 (Attention): Trung cảnh (Vertical 9:16 eye-level medium shot), nhân vật thể hiện nỗi đau, biểu cảm nhíu mày đồng cảm.
+    🛑 BỐ TRÍ 4 PHÂN CẢNH ẢNH KHÁC BIỆT HOÀN TOÀN VỀ GÓC MÁY:
+      • Cảnh 1 (Attention): Trung cảnh (Vertical 9:16 eye-level medium shot), KOC mở màn câu chuyện.
       • Cảnh 2 (Interest): CẬN CẢNH MACRO 85mm (Cinematic tight macro close-up with 85mm lens, shallow depth of field), ĐẶC TẢ CHI TIẾT CƠ HỌC VÀ CHẤT LIỆU SẢN PHẨM, bàn tay 5 ngón thao tác rõ ràng.
-      • Cảnh 3 (Desire): Trung cận cảnh (Medium close-up), TRẢI NGHIỆM ĐỜI SỐNG THỰC TẾ TRONG CÙNG KHÔNG GIAN ĐÓ VỚI NGUYÊN BỘ TRANG PHỤC ĐÓ.
+      • Cảnh 3 (Desire): Trung cận cảnh (Medium close-up), TRẢI NGHIỆM ĐỜI SỐNG THỰC TẾ PHÙ HỢP CÂU THOẠI VỚI NGUYÊN BỘ TRANG PHỤC ĐÓ.
       • Cảnh 4 (Action): Trung cảnh thương mại (Warm commercial eye-level closing shot), KOC cười tươi, hai bàn tay mở tự nhiên chân thành mời gọi nhận ưu đãi.
 
     🛑 CHỐNG VI PHẠM BẢN QUYỀN & LỢI ÍCH BÊN THỨ BA (THIRD-PARTY IP RIGHTS SAFEGUARD):
@@ -469,7 +475,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - KHÓA CỨNG TRANG PHỤC & BỐI CẢNH 100%
+# HÀM TẠO CHI TIẾT KỊCH BẢN - KHÓA CỨNG TRANG PHỤC ĐA TẦNG 100%
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -507,34 +513,36 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK GỐC: '{fixed_hook}' | BỐI CẢNH GỢI Ý: {outline.get('setting', 'Phù hợp chiến lược kịch bản')}
     HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
     
-    🛑 CHỈ THỊ KHÓA CỨNG TRANG PHỤC & BỐI CẢNH ĐỒNG NHẤT 100%:
-    1. KHÓA CỨNG TRANG PHỤC BẤT BIẾN: Cả 4 cảnh nhân vật BẮT BUỘC mặc đúng duy nhất 1 bộ trang phục (định nghĩa chi tiết áo trên 'locked_tops' và quần/váy 'locked_bottoms'). CẢNH 3 KHÔNG ĐƯỢC THAY SANG ÁO THUN KHÁC!
-    2. BỐI CẢNH ĐỒNG NHẤT: Cả 4 cảnh diễn ra trong cùng 1 không gian chính ('locked_setting'). Cảnh 3 không được nhảy ra sân vườn ngoài trời.
+    🛑 CHỈ THỊ KHÓA BẤT BIẾN TRANG PHỤC ĐA TẦNG & BỐI CẢNH LINH HOẠT THEO THOẠI:
+    1. KHÓA CỨNG TRANG PHỤC ĐA TẦNG 100%: Cả 4 cảnh nhân vật BẮT BUỘC mặc đúng duy nhất 1 bộ trang phục (định nghĩa chi tiết áo chính 'locked_tops', áo trong/khoác/tạp dề 'locked_outer_or_apron' nếu có, và quần/váy 'locked_bottoms'). CẢ 4 CẢNH MẶC ĐÚNG 1 BỘ NÀY, TUYỆT ĐỐI CẤM THAY ĐỔI ÁO SANG BẤT KỲ MÀU NÀO KHÁC!
+    2. BỐI CẢNH THỰC TẾ & SINH ĐỘNG: Mỗi cảnh tự do có bối cảnh thực tế phù hợp câu thoại (Cảnh 1 bàn làm việc/nhà, Cảnh 2 cận cảnh macro, Cảnh 3 quán cafe ấm cúng có chiều sâu và người ngồi mờ phía sau hoặc bồn rửa thực tế, Cảnh 4 góc chốt deal).
     3. AN TOÀN BẢN QUYỀN BÊN THỨ BA: Tuyệt đối CẤM viết tên thương hiệu riêng (Emoon, Marvel, Spider-Man...) hay tên sàn (TikTok, Shopee) vào các trường tiếng Anh. Thay thế bằng danh từ mô tả trung tính.
     4. TRẦN SỐ TỪ AN TOÀN (CHỐNG CỤT TIẾNG): Cảnh 1 (dưới 24 từ), Cảnh 2 (dưới 34 từ), Cảnh 3 (dưới 42 từ), Cảnh 4 (dưới 32 từ).
-    5. CẢNH 4 BẮT BUỘC ĐỦ 3 VẾ: Đòn bẩy giá tương phản (dùng từ 'nghìn') + Câu miễn trừ giá có hạn (CẤM dùng từ 'trợ giá', dùng 'chương trình giảm giá có hạn theo khung giờ') + Lời chào ấm áp.
+    5. CẢNH 4 BẮT BUỘC ĐỦ 3 VẾ: Đòn bẩy giá tương phản (dùng từ 'nghìn') + Câu miễn trừ giá có hạn (CẤM dùng 'trợ giá', dùng 'chương trình giảm giá sâu có hạn theo khung giờ') + Lời chào ấm áp.
     6. Trả về 'clean_product_name_en': Tên/mô tả sản phẩm tiếng Anh ngắn gọn dưới 15 từ, trung tính, không chứa thương hiệu riêng.
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
         "title": "{fixed_title}",
         "voice": {{"tone": "{voice_guidance}"}},
-        "outfit_vi": "Mô tả chi tiết: Áo trên cụ thể + Quần/Váy cụ thể + Kiểu tóc cụ thể khóa cứng 4 cảnh",
+        "outfit_vi": "Mô tả chi tiết: Áo chính cụ thể + Áo trong/khoác/tạp dề (nếu có) + Quần/Váy cụ thể + Kiểu tóc cụ thể khóa cứng 4 cảnh",
         "clean_product_name_en": "Concise photorealistic English description of the hero product under 15 words without proprietary brand names",
         "connector_physics_en": "Detailed English description of flexible tube/cord dimensions, length, diameter, and gravitational droop (if any)",
         "character_matrix": {{
             "full_characters_appearance": "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone",
             "locked_hairstyles": "Mô tả 1 kiểu tóc cố định phù hợp bối cảnh bằng tiếng Anh",
-            "locked_tops": "Mô tả 1 mẫu áo trên cụ thể (ví dụ: neat cozy beige long-sleeve knit sweater) cố định 100% suốt 4 cảnh",
+            "locked_tops": "Mô tả 1 mẫu áo chính cụ thể bằng tiếng Anh (ví dụ: neat cozy beige long-sleeve knit sweater) cố định 100% suốt 4 cảnh",
+            "locked_outer_or_apron": "Mô tả áo khoác, áo trong hoặc tạp dề cụ thể nếu có bằng tiếng Anh (hoặc 'none')",
             "locked_bottoms": "Mô tả 1 mẫu quần hoặc váy bằng tiếng Anh cố định suốt 4 cảnh",
-            "locked_setting": "Mô tả 1 không gian bối cảnh chính cố định suốt 4 cảnh bằng tiếng Anh (ví dụ: modern cozy indoor room with warm wooden furniture)",
-            "locked_negative": "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, changing clothes, different shirt, different colored shirt, costume change, wardrobe change, changing outfit, different colored top, outdoor garden, inconsistent wardrobe, inconsistent clothes"
+            "locked_setting": "Mô tả bối cảnh khởi đầu chính bằng tiếng Anh",
+            "locked_negative": "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, changing clothes, different shirt, different colored shirt, costume change, wardrobe change, changing outfit, different colored top, removing jacket, taking off apron, different pants, inconsistent wardrobe, inconsistent clothes"
         }},
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
                 "dur": "6s",
-                "setting": "Mô tả bối cảnh trong không gian chính...",
+                "setting": "Mô tả bối cảnh sinh động mở màn bằng tiếng Việt...",
+                "setting_en": "Detailed realistic setting description in English",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "expression": "Ánh mắt đồng cảm chân thành, hơi nhíu mày trăn trở nỗi đau",
                 "sfx": "Tiếng whoosh vút nhẹ mở màn 3s đầu kết hợp tiếng thở dài nhẹ thực tế",
@@ -545,7 +553,8 @@ def create_scene_details(target_id, mode, style):
             {{
                 "scene": 2, "aida_stage": "Interest",
                 "dur": "8s",
-                "setting": "Mô tả cận cảnh trong không gian chính...",
+                "setting": "Mô tả bối cảnh cận cảnh bàn thao tác...",
+                "setting_en": "Detailed setting description in English for close-up",
                 "camera_shot": "Cinematic tight macro close-up with 85mm lens, shallow depth of field, razor-sharp focus on product details and hand ergonomics",
                 "expression": "Ánh mắt bừng sáng, chân mày giãn ra, thần thái tự tin",
                 "sfx": "Tiếng gõ cộc cộc đanh chắc hoặc tiếng xoay nắp ren khục chắc nịch / tiếng vuốt vải sột soạt ASMR",
@@ -556,24 +565,26 @@ def create_scene_details(target_id, mode, style):
             {{
                 "scene": 3, "aida_stage": "Desire",
                 "dur": "10s",
-                "setting": "Mô tả trải nghiệm thực tế ngay trong không gian chính (giữ nguyên bộ trang phục)...",
+                "setting": "Mô tả bối cảnh trải nghiệm thực tế sinh động phù hợp lời thoại (quán cafe ấm cúng có khách ngồi mờ phía sau, hoặc bồn rửa sạch sẽ)...",
+                "setting_en": "Vivid contextual setting in English matching dialogue with realistic depth of field",
                 "camera_shot": "Vertical 9:16 medium close-up lifestyle experience shot",
                 "expression": "Nụ cười mãn nguyện, ánh mắt ánh lên sự thỏa mãn giác quan, gật đầu khẳng định",
                 "sfx": "Tiếng rót nước róc rách đá lạnh lách cách vang giòn / tiếng búng vải nẩy tưng tưng / tiếng ASMR giác quan",
-                "action_en": "Genuine lifestyle experience: Character happily demonstrating practical benefits in daily routine within the same room, wearing the exact same outfit.",
+                "action_en": "Genuine lifestyle experience: Character happily demonstrating practical benefits in daily routine within the contextual setting, wearing the exact same invariant outfit.",
                 "director": "Desire | Trung cận cảnh trải nghiệm đời thực sâu sắc | SFX sống động | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại đặc tả trải nghiệm thực tế dưới 42 từ nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
                 "dur": "8s",
-                "setting": "Mô tả bối cảnh chốt deal trong không gian chính...",
+                "setting": "Mô tả bối cảnh chốt deal ấm áp...",
+                "setting_en": "Warm commercial setting in English with clean appealing lighting",
                 "camera_shot": "Vertical 9:16 warm commercial eye-level medium closing shot",
                 "expression": "Nụ cười rạng rỡ, ánh mắt chân thành ấm áp, hai bàn tay mở tự nhiên hướng về camera",
                 "sfx": "Tiếng chuông ting trong trẻo vui tai kích thích hành động",
                 "action_en": "Warm commercial closing shot. Character smiling warmly into camera, speaking directly with sincere welcoming open-palm gestures.",
                 "director": "Action | Trung cảnh thương mại chốt deal đòn bẩy giá tương phản kèm câu miễn trừ giá hợp quy | SFX chuông ting vui tai | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại chốt deal dưới 32 từ gồm giá sốc (dùng từ 'nghìn') + câu rào chương trình giảm giá có hạn theo khung giờ (CẤM dùng 'trợ giá') + lời chào ấm áp..."
+                "voiceover": "Đoạn thoại chốt deal dưới 32 từ gồm giá sốc (dùng từ 'nghìn') + câu rào chương trình giảm giá sâu có hạn theo khung giờ (CẤM dùng 'trợ giá') + lời chào ấm áp..."
             }}
         ]
     }}
@@ -588,14 +599,18 @@ def create_scene_details(target_id, mode, style):
     full_char = c_mat.get("full_characters_appearance") or "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone"
     locked_hair = c_mat.get("locked_hairstyles") or "natural dark hair worn loose over shoulders"
     locked_tops = c_mat.get("locked_tops") or "neat cozy beige long-sleeve knit sweater"
+    locked_outer = c_mat.get("locked_outer_or_apron") or "none"
     locked_bottoms = c_mat.get("locked_bottoms") or "comfortable dark trousers"
-    locked_setting = c_mat.get("locked_setting") or (outline.get("setting") or "modern fulfillment warehouse packing station with parcels" if "Flash Sale" in str(outline.get("title", "")) else "warm cozy realistic indoor room")
-    locked_negative = c_mat.get("locked_negative") or "Caucasian, blonde, deformed hands, extra fingers, text, watermark, typography, subtitles, floating cart icon, distorted geometry, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product, changing clothes, different shirt, different colored shirt, costume change, wardrobe change, changing outfit, different colored top, outdoor garden, inconsistent wardrobe, inconsistent clothes"
+    default_setting = c_mat.get("locked_setting") or (outline.get("setting") or "modern fulfillment warehouse packing station with parcels" if "Flash Sale" in str(outline.get("title", "")) else "warm cozy realistic indoor room")
+    locked_negative = c_mat.get("locked_negative") or "Caucasian, blonde, deformed hands, extra fingers, text, watermark, typography, subtitles, floating cart icon, distorted geometry, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product, changing clothes, different shirt, different colored shirt, costume change, wardrobe change, changing outfit, different colored top, removing jacket, taking off apron, different pants, inconsistent wardrobe, inconsistent clothes"
     clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip())
     connector_physics_en = res.get("connector_physics_en") or "translucent flexible silicone tube approx 20-25cm length, 6-8mm diameter, hanging with a natural loose U-shaped curved droop between hands"
     
-    # KHÓA CHẶT BẤT BIẾN TRANG PHỤC CẢ 4 CẢNH
-    unified_subject = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: strictly wearing {locked_tops} and {locked_bottoms}"
+    # KHÓA CHẶT BẤT BIẾN TRANG PHỤC ĐA TẦNG CẢ 4 CẢNH
+    wardrobe_str = f"strictly wearing {locked_tops} and {locked_bottoms}"
+    if locked_outer and locked_outer.lower() != "none":
+        wardrobe_str += f" paired with {locked_outer}"
+    unified_subject = f"{full_char}, strictly with {locked_hair}. Invariant Locked Wardrobe: {wardrobe_str} with exact same color and fabric across all scenes"
     
     dur_map = {"4s": 4, "6s": 6, "8s": 8, "10s": 10}
     total_sec = 0.0
@@ -626,42 +641,42 @@ def create_scene_details(target_id, mode, style):
         total_sec += float(final_sec)
         
         clean_action = re.sub(r'\[.*?\]', '', scn.get("action_en", "")).strip()
-        # Loại bỏ các từ khóa AI tự ý bịa về thay quần áo hoặc chạy ra sân vườn trong clean_action
-        clean_action = re.sub(r'\b(?:wearing\s+(?:a\s+)?(?:t-shirt|gray\s+shirt|different\s+clothes)|in\s+an\s+outdoor\s+garden)\b', '', clean_action, flags=re.IGNORECASE).strip()
+        clean_action = re.sub(r'\b(?:wearing\s+(?:a\s+)?(?:t-shirt|gray\s+shirt|different\s+clothes))\b', '', clean_action, flags=re.IGNORECASE).strip()
         camera_shot = scn.get("camera_shot", "Vertical 9:16 cinematic shot")
         sfx_sound = scn.get("sfx", "Layered realistic ambient sensory Foley sounds")
         micro_expr = scn.get("expression", "Natural expressive facial micro-emotions")
         scene_num = scn.get("scene", 1)
         
-        # ======================================================================
-        # CẤU TRÚC PROMPT ẢNH: KHÓA BẤT BIẾN TRANG PHỤC & BỐI CẢNH Ở 100% CẢNH
-        # ======================================================================
+        # BỐI CẢNH LINH HOẠT THEO TỪNG CẢNH (NHƯNG TRANG PHỤC GIỮ NGUYÊN)
+        scene_setting_en = scn.get("setting_en") or scn.get("setting") or default_setting
+        
+        # CẤU TRÚC PROMPT ẢNH: KHÓA BẤT BIẾN TRANG PHỤC ĐA TẦNG + BỐI CẢNH THỰC TẾ SINH ĐỘNG
         if scene_num == 1:
-            scene_focus = f"Attention stage: Medium shot capturing {unified_subject} facing the camera with {micro_expr}, introducing {clean_prod_en} inside {locked_setting}."
+            scene_focus = f"Attention stage: Medium shot capturing {unified_subject} facing the camera with {micro_expr}, introducing {clean_prod_en} in {scene_setting_en}."
         elif scene_num == 2:
-            scene_focus = f"Interest stage: Cinematic 85mm macro close-up focusing directly on {clean_prod_en} inside {locked_setting}. Connector physics: {connector_physics_en}. Invariant character hands with sleeves matching {locked_tops} operating the mechanism precisely with clean surfaces and textures."
+            scene_focus = f"Interest stage: Cinematic 85mm macro close-up focusing directly on {clean_prod_en} in {scene_setting_en}. Connector physics: {connector_physics_en}. Invariant character hands with sleeves matching {locked_tops} operating the mechanism precisely with clean surfaces and textures."
         elif scene_num == 3:
-            scene_focus = f"Desire stage: Medium close-up lifestyle action shot. Action: {clean_action}. Character enjoying the real-life practical benefits and tactile satisfaction of {clean_prod_en} with {micro_expr} inside the exact same {locked_setting}, wearing the exact same invariant wardrobe ({locked_tops} and {locked_bottoms})."
+            scene_focus = f"Desire stage: Medium close-up lifestyle action shot in {scene_setting_en}. Action: {clean_action}. Character enjoying the real-life practical benefits and tactile satisfaction of {clean_prod_en} with {micro_expr}, strictly wearing the exact same invariant wardrobe ({wardrobe_str})."
         else:
-            scene_focus = f"Action stage: Warm commercial closing shot. {unified_subject} smiling with confident direct eye contact inside {locked_setting}, holding {clean_prod_en} with welcoming open-palm gestures."
+            scene_focus = f"Action stage: Warm commercial closing shot in {scene_setting_en}. {unified_subject} smiling with confident direct eye contact, holding {clean_prod_en} with welcoming open-palm gestures."
             
         raw_img = (
             f"{camera_shot}. {scene_focus} "
             f"Product Integrity: Authentic {clean_prod_en}, strictly rigid non-deformable structure, neutral clean typography. "
-            f"Quality: Photorealistic commercial photography, clean lighting, sharp focus. "
+            f"Quality: Photorealistic commercial photography, clean lighting, sharp focus, natural realistic environment. "
             f"Negative prompt: {locked_negative}."
         )
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         
-        # PROMPT VIDEO VEO 3 SAFE / KLING AI KHÓA BẤT BIẾN TRANG PHỤC & AN TOÀN BẢN QUYỀN
+        # PROMPT VIDEO VEO 3 SAFE / KLING AI KHÓA BẤT BIẾN TRANG PHỤC ĐA TẦNG & BỐI CẢNH THỰC TẾ
         speaker_line = scn.get("voiceover", "")
         audio_part = f' Direct on-camera spoken dialogue at 0.00s. Character visibly speaking with natural lip-sync mouth movement. Audio: "{speaker_line}", Layered Foley SFX: [{sfx_sound}].'
         raw_vid = (
             f"{camera_shot}. Wholesome live-action commercial footage. {unified_subject}. "
-            f"Setting: {locked_setting}. "
+            f"Setting: {scene_setting_en}. "
             f"Action: {clean_action}. Micro-expression: {micro_expr}.{audio_part} "
             f"Product Assembly & Invariance: Authentic {clean_prod_en}. Multi-component assembly strictly maintained: {connector_physics_en}. The connecting hose remains continuously visible bridging both hands without vanishing or morphing. "
-            f"Wardrobe Continuity: Invariant clothing across all frames, strictly wearing {locked_tops} and {locked_bottoms}, zero costume change. "
+            f"Wardrobe Continuity: Invariant clothing across all frames, strictly wearing {wardrobe_str}, zero costume change, zero shirt color change. "
             f"Anatomy & Kinetics: Invariant two-hand operation, anatomically correct hands with strictly five fingers per hand, zero limb morphing, ZERO syringe transformation. "
             f"Strictly pure footage: ABSOLUTELY NO yellow cart icons, NO animated buttons, NO UI stickers, NO on-screen subtitles, NO text. "
             f"Negative prompt: {locked_negative}."
@@ -670,7 +685,7 @@ def create_scene_details(target_id, mode, style):
         
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung hình luôn dài hơn thời gian đọc, có đệm an toàn chống cụt tiếng) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn, dùng từ 'nghìn', không dùng 'trợ giá' | Tốc độ 4.8 - 5.2 từ/s)<br>👗 <b>Khóa bất biến trang phục:</b> {res.get('outfit_vi', 'Khóa chết áo len/áo sơ mi, quần/váy và kiểu tóc 100% xuyên suốt 4 cảnh')}<br>🛡 <b>An toàn bản quyền:</b> Tự động trung tính hóa tên thương hiệu, chống quét lỗi vi phạm lợi ích bên thứ ba<br>📸 <b>Đa dạng hóa 4 góc máy:</b> Cảnh 1 (Trung cảnh mở màn) &rarr; Cảnh 2 (Macro 85mm chi tiết) &rarr; Cảnh 3 (Trung cận đời sống) &rarr; Cảnh 4 (Thương mại chốt deal)<br>🔗 <b>Động lực học dây nối:</b> {connector_physics_en} | 🚫 <b>Khóa đa linh kiện:</b> Triệt tiêu hoàn toàn lỗi biến thành ống tiêm xylanh<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ chương trình giảm giá có hạn theo khung giờ<br>📍 <b>Bối cảnh chuẩn chiến lược:</b> {locked_setting}"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung hình luôn dài hơn thời gian đọc, có đệm an toàn chống cụt tiếng) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn, dùng từ 'nghìn', không dùng 'trợ giá' | Tốc độ 4.8 - 5.2 từ/s)<br>👗 <b>Khóa bất biến trang phục đa tầng:</b> {res.get('outfit_vi', 'Khóa chết áo chính, áo trong/khoác/tạp dề, quần/váy và kiểu tóc 100% xuyên suốt 4 cảnh')}<br>🏙 <b>Bối cảnh sinh động linh hoạt:</b> Chuyển đổi thực tế theo logic sản phẩm & câu thoại (có chiều sâu, không gian ấm cúng sinh động)<br>📸 <b>Đa dạng hóa 4 góc máy:</b> Cảnh 1 (Trung cảnh mở màn) &rarr; Cảnh 2 (Macro 85mm chi tiết) &rarr; Cảnh 3 (Trung cận đời sống) &rarr; Cảnh 4 (Thương mại chốt deal)<br>🔗 <b>Động lực học dây nối:</b> {connector_physics_en} | 🚫 <b>Khóa đa linh kiện:</b> Triệt tiêu hoàn toàn lỗi biến thành ống tiêm xylanh<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ chương trình giảm giá sâu có hạn theo khung giờ"
     
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -707,7 +722,7 @@ def clone_script(script_id):
     TRẢ VỀ JSON:
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh mới...", "hook": "Câu hook ngắn gọn do nhân vật nói trực tiếp bằng tiếng Hà Nội chuẩn...", "actors": 1, "character_roles": ["Nữ KOC Hà Nội"] }},
+            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh mới sinh động...", "hook": "Câu hook ngắn gọn do nhân vật nói trực tiếp bằng tiếng Hà Nội chuẩn...", "actors": 1, "character_roles": ["Nữ KOC Hà Nội"] }},
             {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "...", "hook": "...", "actors": 1, "character_roles": ["Cô nàng công sở"] }},
             {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "...", "hook": "...", "actors": 2, "character_roles": ["Mẹ trẻ", "Bé gái"] }},
             {{ "id": {cur_len+4}, "title": "Tên biến thể 4", "setting": "...", "hook": "...", "actors": 1, "character_roles": ["KOC trẻ trung"] }},
@@ -1188,7 +1203,7 @@ if all_sc:
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm an toàn chống cụt: +{safe_cushion}s</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Hà Nội chuẩn, dùng 'nghìn', không dùng 'trợ giá'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
-            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Tinh Gọn, Khóa Cứng Trang Phục & Bối Cảnh Đồng Nhất):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
+            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Tinh Gọn, Khóa Cứng Trang Phục Đa Tầng 100%):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
             if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Bảo Tồn Dây Nối & Khóa Cứng Trang Phục):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
@@ -1232,7 +1247,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang áp dụng khóa cứng trang phục, khử sạch từ 'ngàn' và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng khóa cứng trang phục đa tầng, bối cảnh thực tế và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = int(target_id_to_run); st.session_state.scroll_to_detail = True; success = True
         except Exception as e: error_msg = str(e)
