@@ -362,7 +362,7 @@ def build_voice_direction(mode, num_chars, character_profiles):
     is_tiktok_shop = ("Viral" not in mode)
     speed_txt = "tốc độ BẮN TỈA DỒN DẬP (4.8 - 5.2 từ/s), rướn người, cử chỉ tay chém nhịp dứt khoát" if is_tiktok_shop else "tốc độ tự nhiên, biến thiên cảm xúc linh hoạt"
     if num_chars <= 1:
-        return f"Nhân vật nói trực tiếp (On-camera): 100% Giọng [Nam/Nữ] HÀ NỘI CHUẨN bản địa đúng độ tuổi, phát âm tròn vành rõ chữ, {speed_txt}. Giữ nguyên duy nhất một phong thái giọng Hà Nội nhất quán suốt 4 cảnh."
+        return f"Nhân vật nói trực tiếp (On-camera): 100% Giọng [Nam/Nữ] HÀ NỘI CHUẨN bản địa đúng độ tuổi, phát âm chuẩn tròn vành rõ chữ, {speed_txt}. Giữ nguyên duy nhất một phong thái giọng Hà Nội nhất quán suốt 4 cảnh."
     dirs = []
     for p in character_profiles:
         r = str(p.get('role', '')).lower()
@@ -383,21 +383,23 @@ def generate_char_rules_string(profiles):
         rules += f" - Diễn viên {p['id']} ({p['role']}): 100% thuần Việt, tóc đen tuyền tự nhiên. KHÓA DUY NHẤT 1 MÀU TÓC ĐEN TUYỀN, 1 KIỂU TÓC VÀ 1 KHUÔN MẶT XUYÊN SUỐT 4 CẢNH.\n"
     return rules
 
-def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note=""):
+def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle):
     is_multi = (num_chars >= 2)
     format_direction = f"ĐỊNH DẠNG: TIỂU PHẨM ĐỐI THOẠI {num_chars} NHÂN VẬT THUẦN VIỆT NÓI TRỰC TIẾP." if is_multi else "ĐỊNH DẠNG: ĐỘC THOẠI KOC THUẦN VIỆT NÓI TRỰC TIẾP."
     strat_cmd = "BẠN PHẢI MIX ĐA DẠNG 5 GÓC ĐỘ NỘI DUNG." if "Tự động mix" in angle else f"VIẾT CẢ 5 KỊCH BẢN THEO: '{angle}'."
-    override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG: '{custom_note}'. Bạn BẮT BUỘC phải thực hiện đúng chỉ thị này trong toàn bộ 5 kịch bản!" if custom_note else ""
-
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP & VIRAL TRIỆU VIEW. PHONG CÁCH: {style}
     {strat_cmd} | {format_direction}
-    {override_rule}
     
     🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
-    - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
-    - Phân tích linh hoạt theo đúng thực tế sản phẩm và góc độ kịch bản (Phòng ngủ gia đình, góc bếp/bàn ăn, bàn làm việc công sở, phòng khách ấm cúng, kho TMĐT Flash Sale...).
-    - TUYỆT ĐỐI KHÔNG KHÓA CỨNG vào bất kỳ bối cảnh đơn lẻ nào!
+    - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa các kịch bản).
+    - Phân tích linh hoạt theo đúng thực tế sản phẩm và góc độ kịch bản:
+      • Kịch bản 1: Không gian phòng ngủ gia đình (đặc biệt khi diễn tả nỗi đau đêm khuya, giấc ngủ, nghỉ ngơi).
+      • Kịch bản 2: Góc bếp hoặc bàn ăn gia đình lúc chuẩn bị đồ dùng / ăn uống.
+      • Kịch bản 3: Bàn làm việc công sở / văn phòng tranh thủ giờ giải lao.
+      • Kịch bản 4: Phòng khách ấm cúng hoặc ban công thoáng đãng.
+      • Kịch bản 5: Không gian chuẩn bị ra ngoài dạo phố hoặc kho hàng TMĐT đóng gói tấp nập (nếu là Flash Sale).
+    - TUYỆT ĐỐI KHÔNG KHÓA CỨNG vào bất kỳ bối cảnh đơn lẻ nào (như quán cafe hay phòng ngủ đơn điệu)!
 
     🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN'. 100% BẮT BUỘC DÙNG TỪ 'NGHÌN' (ví dụ: 'mấy chục nghìn', 'trăm nghìn').
@@ -413,38 +415,35 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     🛑 {char_rules}
     """
 
-def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note=""):
+def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles):
     is_multi = (num_chars >= 2)
     voice_guidance = build_voice_direction(mode, num_chars, character_profiles)
     dialogue_type_rule = f"🛑 ĐỐI THOẠI {num_chars} NHÂN VẬT: Tách từng câu thoại nói trực tiếp (Mẹ: '...' | Bé: '...'). Giọng thiếu nhi Hà Nội ngây thơ, mẹ dịu dàng đúng độ tuổi." if is_multi else "🛑 ĐỘC THOẠI KOC: Lời thoại liền mạch do chính KOC mở miệng nói trực tiếp trước ống kính, tốc độ bắn tỉa 4.8 - 5.2 từ/s."
     outro_instruction = "🛑 CẢNH 4 (VIRAL): Cả nhà cười tươi vẫy tay chào camera, mời follow." if "Viral" in mode else "🛑 CẢNH 4 (TIKTOK SHOP): Kêu gọi mua hàng ấm áp, chốt deal giá sốc kèm câu rào miễn trừ giá có hạn."
-    override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG (DIRECTOR'S SPECIAL OVERRIDE): '{custom_note}'. BẮT BUỘC tuân thủ 100% trong toàn bộ các phân cảnh, lời thoại, và cấu trúc prompt ảnh/video!" if custom_note else ""
 
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP ĐA GIÁC QUAN (AUDIO-VISUAL MASTER). PHONG CÁCH: {style}
     CHỈ ĐẠO GIỌNG: {voice_guidance}
     {dialogue_type_rule}
     {outro_instruction}
-    {override_rule}
     
-    🛑 PHÂN BIỆT 4 PHÂN CẢNH ẢNH HOÀN TOÀN KHÁC NHAU (TRÁNH LỖI 4 ẢNH GIỐNG HỆT NHAU):
-    - Cảnh 1 (Attention): Establishing shot - Trung cảnh bối cảnh đời thực, KOC mở màn với biểu cảm chân thật.
-    - Cảnh 2 (Interest): Functional demo - Cận cảnh đặc tả chính xác CƠ CHẾ HOẠT ĐỘNG THỰC TẾ của sản phẩm (tay kéo cần pít-tông, chạm màn hình cảm ứng, vặn xoay...), thấy rõ cả mặt KOC đang nói và tay thao tác.
-    - Cảnh 3 (Desire): Lifestyle experience - Trung cận cảnh trải nghiệm đời sống thực tế (áp nhẹ đầu hút mềm mại, đeo đồng hồ hoạt động trong bối cảnh...).
-    - Cảnh 4 (Action): Closing commercial - Trung cảnh chốt deal, KOC cười tươi, bàn tay mở hướng về camera mời gọi nhận ưu đãi.
+    🛑 PHÂN BIỆT RÕ RÀNG: SẢN PHẨM PHỐI ĐỒ THỜI TRANG (FASHION STYLING) VS SẢN PHẨM THƯỜNG:
+    1. NẾU LÀ SẢN PHẨM THỜI TRANG & NỘI DUNG LÀ PHỐI ĐỒ (LOOKBOOK, GỢI Ý CÁCH MẶC THEO HOÀN CẢNH):
+       - 'is_fashion_styling' = true.
+       - KHUÔN MẶT, MÀU TÓC ĐEN TUYỀN, KIỂU TÓC, TUỔI TÁC: KHÓA BẤT BIẾN 100% (cùng 1 người mẫu duy nhất).
+       - TRANG PHỤC ('scene_outfit_en'): CHO PHÉP VÀ BẮT BUỘC THAY ĐỔI THEO TỪNG CẢNH ĂN KHỚP VỚI CÂU THOẠI (Ví dụ: Cảnh 1 áo phối quần âu đi làm, Cảnh 3 phối chân váy đi dạo phố).
+    2. NẾU LÀ CÁC SẢN PHẨM KHÁC (GIA DỤNG, MẸ VÀ BÉ, CÔNG NGHỆ, MỸ PHẨM...) HOẶC THỜI TRANG MẶC 1 BỘ:
+       - 'is_fashion_styling' = false.
+       - TRANG PHỤC KHÓA BẤT BIẾN 100% CẢ 4 CẢNH dựa trên hoàn cảnh thực tế (ở nhà thì mặc đồ ở nhà đồng nhất, đi làm thì mặc đồ công sở đồng nhất suốt 4 cảnh).
 
-    🛑 KHÓA GHIM CƠ HỌC CHỐNG BIẾN DẠNG SẢN PHẨM:
-    - Chuyển động tập trung ở vùng đầu, mắt và khuôn miệng nói on-camera lip-sync.
-    - Hai bàn tay cầm giữ sản phẩm chắc chắn ngang ngực ở vị trí neo tĩnh (spatially pinned hands, steady grip), ranh giới ngón tay rành mạch, TUYỆT ĐỐI CẤM vung vẩy hay xoay cổ tay mạnh làm rách lưới điểm ảnh.
-
-    🛑 CƯỠNG CHẾ 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC CAMERA (ON-CAMERA LIP-SYNC):
-    - TUYỆT ĐỐI CẤM THUYẾT MINH NGOÀI Ở MỌI PHÂN CẢNH!
-    - Cảnh 2 KOC trực tiếp xưng tôi/mình/em, nói chuyện tâm sự tự nhiên với người xem.
-    - Đồng nhất 100% chất giọng, tông giọng, độ tuổi và kiểu thoại xuyên suốt cả 4 cảnh.
-
-    🛑 BỘ ĐÔI HOOK HOÀN HẢO Ở CẢNH 1: VISUAL HOOK (MẮT NHÌN) + AUDIO HOOK (TAI NGHE):
-    - Nhịp 1 (0.0s - 1.5s): Visual Hook giật gân (Stress Test / Tactile Demo / Tái hiện nỗi đau) + SFX whoosh mở màn.
-    - Nhịp 2 (1.5s - 6.0s): Voice Hook nói trực tiếp Giọng Hà Nội chuẩn kết nối ăn khớp với Nhịp 1.
+    🛑 BỐI CẢNH THỰC TẾ LINH HOẠT THEO LOGIC TỪNG KỊCH BẢN:
+    - Bối cảnh phải tự nhiên, ăn khớp với nỗi đau và câu chuyện đời thực:
+      • Nỗi đau Mẹ & Bé: phòng ngủ ban đêm ấm cúng, nôi em bé, bồn tắm vệ sinh.
+      • Nỗi đau Công sở: bàn làm việc máy tính, góc văn phòng hiện đại.
+      • Nỗi đau Nấu nướng/Gia dụng: bồn rửa bát, bàn ăn, góc bếp.
+      • Flash Sale: kho hàng TMĐT đóng gói nhiều bưu kiện hoặc showroom.
+      • Chỉ những kịch bản đi chơi dạo phố mới đưa bối cảnh quán cafe (với chiều sâu điện ảnh và khách ngồi mờ phía sau).
+    - CẢ 4 CẢNH TRONG CÙNG 1 KỊCH BẢN PHẢI GẮN KẾT LOGIC VỚI NHAU.
 
     🛑 CƠ CHẾ THỜI LƯỢNG ĐỘNG & ĐỆM AN TOÀN TRÁNH CỤT TIẾNG:
     - Tự do gán thời lượng '4s', '6s', '8s' hoặc '10s'.
@@ -452,7 +451,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 KỸ THUẬT KỂ CHUYỆN LIỀN MẠCH, ĐỜI THƯỜNG & ĐÀO SÂU CÔNG NĂNG:
     - 4 cảnh ghép lại thành 1 đoạn văn tâm sự tự nhiên bằng khẩu ngữ Hà Nội chuẩn.
-    - Cảnh 4 đủ 3 vế: Neo giá linh hoạt ('khoảng...', 'gần...', 'chưa tới...', 'tầm...') + Câu miễn trừ giá có hạn (CẤM 'trợ giá') + Lời chào ấm áp.
+    - Cảnh 4 đủ 3 vế: 
+      1. Đòn bẩy giá tương phản linh hoạt: cho phép nói 'khoảng...', 'gần...', 'chưa tới...', 'tầm...' (ví dụ: 'giá gốc gần 200 nghìn, nay giảm chỉ còn khoảng chín mươi mấy nghìn' hoặc 'chưa tới một trăm nghìn').
+      2. Câu miễn trừ giá có hạn: CẤM dùng 'trợ giá', dùng 'chương trình giảm giá sâu có hạn theo khung giờ'.
+      3. Lời chào ấm áp, thân thiện.
 
     🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN:
     - 100% dùng từ 'nghìn' (CẤM TUYỆT ĐỐI TỪ 'NGÀN').
@@ -464,7 +466,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP GHI CHÚ AI & CƠ CHẾ VẬN HÀNH THỰC TẾ
+# HÀM TẠO CHI TIẾT KỊCH BẢN - ĐA DẠNG BỐI CẢNH & NEO GIÁ LINH HOẠT
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -482,7 +484,6 @@ def create_scene_details(target_id, mode, style):
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_hook = sanitize_policy_text(outline.get('hook', ''))
     fixed_setting_base = outline.get('setting', 'Không gian thực tế phù hợp')
-    user_custom_note = st.session_state.get("current_input_context", "").strip()
     
     dna = st.session_state.get("content_analysis") or {}
     condensed_dna = {
@@ -491,11 +492,8 @@ def create_scene_details(target_id, mode, style):
         "color_lock": dna.get("product_color_lock", ""),
         "dimensions": dna.get("product_dimensions", ""),
         "mechanism": dna.get("lid_mechanism", "Kết cấu cơ học chuẩn xác theo đời thực"),
-        "operational_mechanism": dna.get("operational_mechanism", "Cơ chế vận hành thực tế chuẩn xác của sản phẩm"),
-        "correct_ergonomic_grip": dna.get("correct_ergonomic_grip", "Tư thế cầm nắm công thái học chuẩn đời thực"),
         "how_to_use": dna.get("how_to_use", "Thao tác sử dụng thực tế chuẩn công thái học"),
         "price_anchor": dna.get("rounded_price_anchor", ""),
-        "visual_hook_archetype": dna.get("visual_hook_archetype", "Thử thách thị giác / Tái hiện nỗi đau"),
         "connector_specs": dna.get("flexible_connector_specs", "Không có dây nối"),
         "assembly_structure": dna.get("product_assembly_structure", "Nguyên khối thực tế"),
         "anti_morph_targets": dna.get("strict_anti_morph_targets", "ống tiêm y tế xylanh, que nhựa đơn chiếc"),
@@ -505,23 +503,18 @@ def create_scene_details(target_id, mode, style):
     prompt_text = f"""
     THÔNG TIN SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)}
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK GỐC: '{fixed_hook}' | BỐI CẢNH KỊCH BẢN NÀY: {fixed_setting_base}
-    HÌNH THỨC: 100% Lời thoại do CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) TRONG CẢ 4 CẢNH (CẢNH 1, 2, 3, 4). TUYỆT ĐỐI CẤM THUYẾT MINH NGOÀI. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
+    HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
     
-    🛑 CHỈ THỊ ƯU TIÊN TỐI THƯỢNG TỪ NGƯỜI DÙNG (DIRECTOR'S SPECIAL OVERRIDE):
-    '{user_custom_note if user_custom_note else "Không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."}'
-    -> BẮT BUỘC thực thi đúng chỉ thị trên (Ví dụ: nếu người dùng yêu cầu 'oneshot chỉ cầm trên tay nói về sản phẩm để tránh biến dạng' thì toàn bộ kịch bản và prompt phải tuân thủ nghiêm ngặt dạng thức oneshot này)!
-
-    🛑 CƠ CHẾ VẬN HÀNH THỰC TẾ & KHÓA GHIM CƠ HỌC:
-    1. CƠ CHẾ HOẠT ĐỘNG CHUẨN XÁC: '{condensed_dna.get("operational_mechanism")}'. Bàn tay thao tác chuẩn xác theo tư thế '{condensed_dna.get("correct_ergonomic_grip")}'. TUYỆT ĐỐI KHÔNG BỊA RA HÀNH ĐỘNG SAI LỆCH VỚI BẢN CHẤT SẢN PHẨM.
-    2. ĐA DẠNG HÓA 4 CẢNH (TRÁNH 4 ẢNH GIỐNG NHAU):
-       - Cảnh 1: Trung cảnh thiết lập bối cảnh {fixed_setting_base} + Visual Hook.
-       - Cảnh 2: Medium close-up KOC vừa nói vừa thao tác CƠ CHẾ HOẠT ĐỘNG THỰC TẾ (tay kéo cần pít-tông, bấm nút cảm ứng...).
-       - Cảnh 3: Trải nghiệm ứng dụng thực tế sinh động trong bối cảnh.
-       - Cảnh 4: Commercial closing shot chốt deal rạng rỡ.
-    3. ĐỒNG NHẤT 100% GIỌNG HÀ NỘI CHUẨN XUYÊN SUỐT 4 CẢNH: Cùng 1 người nói, cùng 1 cao độ, cùng 1 nhịp đọc 4.8 - 5.2 từ/s.
-    4. NEO GIÁ LINH HOẠT Ở CẢNH 4: Dùng các từ 'khoảng...', 'gần...', 'chưa tới...', 'tầm...'. CẤM TUYỆT ĐỐI từ 'ngàn' và 'trợ giá'.
-    5. KHÓA BẤT BIẾN MÀU TÓC & KHUÔN MẶT: 100% tóc đen tuyền tự nhiên ('locked_hair_color'), cùng 1 kiểu tóc, cùng 1 khuôn mặt người Việt.
+    🛑 CHỈ THỊ BỐI CẢNH THỰC TẾ & NEO GIÁ LINH HOẠT:
+    1. BỐI CẢNH PHẢI ĐÚNG VỚI: '{fixed_setting_base}' (Bám sát kịch bản, không tự ý chuyển thành quán cafe nếu không liên quan). Bối cảnh phải chân thật, sinh động, có chiều sâu không gian.
+    2. NEO GIÁ LINH HOẠT Ở CẢNH 4: Cho phép và khuyến khích đa dạng hóa cách nói giá: dùng 'khoảng...', 'gần...', 'chưa tới...', 'tầm...' (ví dụ: 'Giá gốc gần [X] nghìn, nay chỉ còn khoảng [Y] nghìn' hoặc 'gần [Y] nghìn', 'chưa tới [Y] nghìn'). CẤM TUYỆT ĐỐI từ 'ngàn' và 'trợ giá'.
+    3. ĐÁNH GIÁ CHẾ ĐỘ PHỐI ĐỒ:
+       - Nếu là THỜI TRANG PHỐI ĐỒ theo hoàn cảnh: 'is_fashion_styling' = true (khuôn mặt & tóc đen tuyền giữ nguyên 100%, trang phục 'scene_outfit_en' đổi theo thoại).
+       - Nếu là CÁC SẢN PHẨM KHÁC: 'is_fashion_styling' = false (trang phục khóa cứng 1 bộ phù hợp hoàn cảnh suốt 4 cảnh).
+    4. KHÓA BẤT BIẾN MÀU TÓC & KHUÔN MẶT: 100% tóc đen tuyền tự nhiên ('locked_hair_color'), cùng 1 kiểu tóc, cùng 1 khuôn mặt người Việt.
+    5. AN TOÀN BẢN QUYỀN BÊN THỨ BA: Tuyệt đối CẤM viết tên thương hiệu riêng hay tên sàn vào các trường tiếng Anh.
     6. TRẦN SỐ TỪ AN TOÀN: Cảnh 1 (dưới 24 từ), Cảnh 2 (dưới 34 từ), Cảnh 3 (dưới 42 từ), Cảnh 4 (dưới 32 từ).
+    7. CẢNH 4 BẮT BUỘC ĐỦ 3 VẾ: Đòn bẩy giá tương phản linh hoạt + Câu miễn trừ giá có hạn theo khung giờ + Lời chào ấm áp.
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
@@ -539,7 +532,7 @@ def create_scene_details(target_id, mode, style):
             "locked_outer_or_apron": "Mô tả áo khoác/tạp dề nếu có (hoặc 'none')",
             "locked_bottoms": "Mô tả mẫu quần hoặc váy phù hợp",
             "locked_setting": "Mô tả bối cảnh {fixed_setting_base} bằng tiếng Anh với chiều sâu không gian chân thực",
-            "locked_negative": "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, melting product, bending plastic, shifting geometry, liquid distortion, rubbery deformation, hand fusing into object, fingers merging into plastic, structural morphing, warping edges, disappearing buttons, changing hairstyle, different haircut, different hair length, different hair parting, changing face, face morphing, different person, inconsistent actor, inconsistent character, different facial features, altering hairstyle, changing hair color, brown hair, light brown hair, auburn hair, chestnut hair, blonde hair, dyed hair, bleached hair, hair highlights, reddish hair tint, inconsistent hair color"
+            "locked_negative": "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, changing hairstyle, different haircut, different hair length, different hair parting, changing face, face morphing, different person, inconsistent actor, inconsistent character, different facial features, altering hairstyle, changing hair color, brown hair, light brown hair, auburn hair, chestnut hair, blonde hair, dyed hair, bleached hair, hair highlights, reddish hair tint, inconsistent hair color"
         }},
         "scenes": [
             {{
@@ -548,26 +541,25 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh mở màn bám sát {fixed_setting_base}...",
                 "setting_en": "Detailed realistic setting description in English based on {fixed_setting_base}",
                 "scene_outfit_en": "Mô tả trang phục cho cảnh 1 nếu is_fashion_styling = true",
-                "camera_shot": "Vertical 9:16 dynamic opening shot: 0.0s-1.5s visual kinetic hook, 1.5s-6.0s warm eye-level medium shot",
-                "expression": "0.0s-1.5s biểu cảm kịch tính/bất ngờ, 1.5s-6.0s ánh mắt đồng cảm chân thành nhìn thẳng camera",
-                "sfx": "Tiếng whoosh vút mạnh mở màn ở 0.0s kết hợp âm thanh va chạm thực tế + tiếng thở phào nhẹ nhõm",
-                "visual_hook_action": "Mô tả hành động thị giác giật gân ở 0.0s - 1.5s bằng tiếng Việt",
-                "action_en": "Establishing action: At 0.00s-1.50s, camera smoothly frames an immediate visual kinetic impact with rigidly pinned product geometry. At 1.50s-6.00s, character smoothly establishes warm direct eye contact with camera, speaking with natural expressive lip movements.",
-                "director": "Attention | Dual-Layer Hook: Nhịp 1 Visual Hook giật gân (0.0s-1.5s) + Nhịp 2 Voice Hook Hà Nội chuẩn (1.5s-6.0s) | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại mở màn tự nhiên dưới 24 từ bằng tiếng Hà Nội chuẩn, dùng từ 'nghìn', khớp với Visual Hook..."
+                "camera_shot": "Vertical 9:16 eye-level medium shot",
+                "expression": "Ánh mắt đồng cảm chân thành, hơi nhíu mày trăn trở nỗi đau",
+                "sfx": "Tiếng whoosh vút nhẹ mở màn 3s đầu kết hợp tiếng thở dài nhẹ thực tế",
+                "action_en": "Authentic situational storytelling. Character expressing empathy facing camera with expressive lip movements.",
+                "director": "Attention | Trung cảnh nêu bật vấn đề | Nhân vật nói trực tiếp giọng Hà Nội chuẩn | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại mở màn tự nhiên dưới 24 từ bằng tiếng Hà Nội chuẩn, dùng từ 'nghìn'..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
                 "dur": "8s",
-                "setting": "Mô tả bối cảnh góc quay ngang tầm mắt thấy rõ người và bàn thao tác...",
-                "setting_en": "Detailed setting description in English for medium close-up",
-                "scene_outfit_en": "Mô tả trang phục cho cảnh 2 nếu is_fashion_styling = true",
-                "camera_shot": "Vertical 9:16 eye-level medium close-up, clearly framing character's speaking face with moving lips and hands steadily demonstrating the genuine mechanism of the product at chest level",
-                "expression": "Ánh mắt bừng sáng, chân mày giãn ra, thần thái hào hứng chia sẻ trực tiếp với người xem",
+                "setting": "Mô tả bối cảnh cận cảnh bàn thao tác...",
+                "setting_en": "Detailed setting description in English for close-up",
+                "scene_outfit_en": "Mô tả trang phục cận cảnh cho cảnh 2 nếu is_fashion_styling = true",
+                "camera_shot": "Cinematic tight macro close-up with 85mm lens, shallow depth of field, razor-sharp focus on product details and hand ergonomics",
+                "expression": "Ánh mắt bừng sáng, chân mày giãn ra, thần thái tự tin",
                 "sfx": "Tiếng gõ cộc cộc đanh chắc hoặc tiếng xoay nắp ren khục chắc nịch / tiếng vuốt vải sột soạt ASMR",
-                "action_en": "Functional mechanism demonstration: Character visibly looks into camera and speaks directly with natural lip-sync mouth movements starting at 0.00s. Mechanically anchored hands demonstrate the genuine working mechanism ({condensed_dna.get('operational_mechanism')}) with steady five-finger grip at chest level, 100% rigid non-deformable structure.",
-                "director": "Interest | Đặc tả cơ chế hoạt động thực tế on-camera lip-sync khớp từ 0.00s (CẤM thuyết minh) | SFX thực tế ASMR | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng hô thân mật (ví dụ: 'Đấy, mọi người nhìn kỹ hộ em chỗ này này...') dưới 34 từ..."
+                "action_en": "Tight macro demonstration: Natural five-finger hands operating the product mechanism cleanly with matching sleeves visible.",
+                "director": "Interest | Cận cảnh Macro 85mm thao tác công năng chuẩn đời thực | SFX thực tế ASMR | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại đào sâu công năng dưới 34 từ nối tiếp mượt mà từ cảnh 1 bằng tiếng Hà Nội chuẩn..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -575,12 +567,12 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh trải nghiệm thực tế sinh động bám sát {fixed_setting_base}...",
                 "setting_en": "Vivid contextual setting in English matching {fixed_setting_base} with realistic depth of field",
                 "scene_outfit_en": "Mô tả trang phục phối đồ phong cách mới cho cảnh 3 nếu is_fashion_styling = true",
-                "camera_shot": "Vertical 9:16 medium close-up lifestyle experience shot, framing character visibly speaking on camera with steady handling",
+                "camera_shot": "Vertical 9:16 medium close-up lifestyle experience shot",
                 "expression": "Nụ cười mãn nguyện, ánh mắt ánh lên sự thỏa mãn giác quan, gật đầu khẳng định",
                 "sfx": "Tiếng rót nước róc rách đá lạnh lách cách vang giòn / tiếng búng vải nẩy tưng tưng / tiếng ASMR giác quan",
-                "action_en": "Direct on-camera lifestyle experience: Character happily speaks directly to the camera with natural lip-sync starting at 0.00s while demonstrating real-life practical benefits in {fixed_setting_base}, holding product steadily with zero deformation, identical face and deep black hair.",
-                "director": "Desire | Nhân vật nói trực tiếp on-camera lip-sync trải nghiệm đời thực sâu sắc | SFX sống động | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp đặc tả trải nghiệm thực tế dưới 42 từ nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn..."
+                "action_en": "Genuine lifestyle experience: Character happily demonstrating practical benefits in daily routine within {fixed_setting_base}, with identical face and identical deep black hair.",
+                "director": "Desire | Trung cận cảnh trải nghiệm đời thực sâu sắc | SFX sống động | Khởi động: 0.00s",
+                "voiceover": "Đoạn thoại đặc tả trải nghiệm thực tế dưới 42 từ nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
@@ -591,33 +583,34 @@ def create_scene_details(target_id, mode, style):
                 "camera_shot": "Vertical 9:16 warm commercial eye-level medium closing shot",
                 "expression": "Nụ cười rạng rỡ, ánh mắt chân thành ấm áp, hai bàn tay mở tự nhiên hướng về camera",
                 "sfx": "Tiếng chuông ting trong trẻo vui tai kích thích hành động",
-                "action_en": "Warm commercial closing shot: Character smiling warmly into camera, speaking directly with sincere welcoming open-palm gestures and clear lip-sync starting at 0.00s, product held steadily beside them.",
-                "director": "Action | Nhân vật nói trực tiếp on-camera chốt deal đòn bẩy giá tương phản linh hoạt kèm câu miễn trừ giá hợp quy | SFX chuông ting vui tai | Khởi động: 0.00s",
+                "action_en": "Warm commercial closing shot. Character smiling warmly into camera, speaking directly with sincere welcoming open-palm gestures.",
+                "director": "Action | Trung cảnh thương mại chốt deal đòn bẩy giá tương phản linh hoạt kèm câu miễn trừ giá hợp quy | SFX chuông ting vui tai | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại chốt deal dưới 32 từ gồm neo giá linh hoạt (dùng 'khoảng...', 'gần...', 'chưa tới...', từ 'nghìn') + câu rào chương trình giảm giá sâu có hạn theo khung giờ (CẤM dùng 'trợ giá') + lời chào ấm áp..."
             }}
         ]
     }}
     """
-    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động linh hoạt", num_chars, char_profiles, user_custom_note), max_tokens=6500)
+    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động linh hoạt", num_chars, char_profiles), max_tokens=6500)
     if not res: raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
     scenes = res.get("scenes") or res.get("script") or []
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
     c_mat = res.get("character_matrix") or {}
-    full_char = c_mat.get("full_characters_appearance") or "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone, identical facial bone structure and exact same age across all frames"
+    full_char = c_mat.get("full_characters_appearance") or "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone, identical face structure across all frames"
     locked_hair = c_mat.get("locked_hairstyles") or "natural dark hair styled in a neat tidy hairstyle, strictly invariant"
     locked_hair_color = c_mat.get("locked_hair_color") or "strictly uniform deep natural jet-black hair pigment, completely unaffected by ambient lighting color bleed, zero hair highlights, zero brown tint"
     locked_tops = c_mat.get("locked_tops") or "neat cozy casual top"
     locked_outer = c_mat.get("locked_outer_or_apron") or "none"
     locked_bottoms = c_mat.get("locked_bottoms") or "comfortable trousers"
     default_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm realistic indoor setting with natural depth of field")
-    base_negative = c_mat.get("locked_negative") or "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, melting product, bending plastic, shifting geometry, liquid distortion, rubbery deformation, hand fusing into object, fingers merging into plastic, structural morphing, warping edges, disappearing buttons, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product, changing hairstyle, different haircut, different hair length, different hair parting, changing face, face morphing, different person, inconsistent actor, inconsistent character, different facial features, altering hairstyle, changing hair color, brown hair, light brown hair, auburn hair, chestnut hair, blonde hair, dyed hair, bleached hair, hair highlights, reddish hair tint, inconsistent hair color"
+    base_negative = c_mat.get("locked_negative") or "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product, changing hairstyle, different haircut, different hair length, different hair parting, changing face, face morphing, different person, inconsistent actor, inconsistent character, different facial features, altering hairstyle, changing hair color, brown hair, light brown hair, auburn hair, chestnut hair, blonde hair, dyed hair, bleached hair, hair highlights, reddish hair tint, inconsistent hair color"
     
     is_fashion_styling = res.get("is_fashion_styling", False)
     clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip())
     connector_physics_en = res.get("connector_physics_en") or "translucent flexible silicone tube approx 20-25cm length, 6-8mm diameter, hanging with a natural loose U-shaped curved droop between hands"
     
+    # CHUỖI NHẬN DIỆN KHUÔN MẶT VÀ MÀU TÓC KHÓA BẤT BIẾN 100%
     character_base_identity = (
         f"Character Identity Lock: {full_char}. "
         f"Invariant Hair & Color Lock: strictly identical {locked_hair} with {locked_hair_color}, zero color shift across different scenes. "
@@ -636,6 +629,7 @@ def create_scene_details(target_id, mode, style):
         
         raw_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
         
+        # ĐỒNG BỘ ĐỆM AN TOÀN CHỐNG CỤT TIẾNG: Khung hình LUÔN LỚN HƠN thời gian đọc thực tế
         if raw_speech_time <= 3.2: calc_sec = 4
         elif raw_speech_time <= 5.2: calc_sec = 6
         elif raw_speech_time <= 7.2: calc_sec = 8
@@ -662,6 +656,9 @@ def create_scene_details(target_id, mode, style):
         scene_num = scn.get("scene", 1)
         scene_setting_en = scn.get("setting_en") or scn.get("setting") or default_setting
         
+        # ======================================================================
+        # XỬ LÝ TRANG PHỤC: PHỐI ĐỒ THỜI TRANG VS KHÓA CỨNG BẤT BIẾN
+        # ======================================================================
         if is_fashion_styling:
             scene_outfit = scn.get("scene_outfit_en") or wardrobe_str
             active_wardrobe_desc = f"Fashion Outfit Styling Look: expertly styled wearing {scene_outfit} highlighting {clean_prod_en}"
@@ -672,54 +669,46 @@ def create_scene_details(target_id, mode, style):
             
         full_identity_anchor = f"{character_base_identity} {active_wardrobe_desc}."
         
-        # CẤU TRÚC PROMPT ẢNH ĐA DẠNG HÓA 4 CẢNH RÕ RỆT
+        # CẤU TRÚC PROMPT ẢNH ĐA DẠNG HÓA 4 CẢNH
         if scene_num == 1:
-            scene_focus = (
-                f"Attention stage: Establishing vertical 9:16 medium shot inside {scene_setting_en}. "
-                f"{full_identity_anchor} "
-                f"Opening visual hook: Character introducing {clean_prod_en} with expressive micro-emotion ({micro_expr})."
-            )
+            scene_focus = f"Attention stage: Medium shot capturing {full_identity_anchor} Facing camera with {micro_expr}, introducing {clean_prod_en} in {scene_setting_en}."
         elif scene_num == 2:
             scene_focus = (
-                f"Interest stage: Vertical 9:16 eye-level medium close-up inside {scene_setting_en}. "
+                f"Interest stage: Cinematic 85mm macro close-up in {scene_setting_en}. "
                 f"{full_identity_anchor} "
-                f"Direct on-camera functional demonstration: Character visibly facing camera with mouth open speaking, holding {clean_prod_en} at chest level and clearly demonstrating its authentic mechanism ({condensed_dna.get('operational_mechanism')}) with steady five-finger hands. Razor-sharp focus on hand ergonomics and product details. Connector physics: {connector_physics_en}."
+                f"Close-up focus directly on {clean_prod_en}. Connector physics: {connector_physics_en}. "
+                f"Natural five-finger hands operating the product mechanism cleanly with crisp textures, hair color strictly deep black without ambient color shifts."
             )
         elif scene_num == 3:
             scene_focus = (
-                f"Desire stage: Vertical 9:16 lifestyle interaction shot inside {scene_setting_en}. "
+                f"Desire stage: Medium close-up lifestyle action shot in {scene_setting_en}. "
                 f"{full_identity_anchor} "
-                f"Action: {clean_action}. Character visibly demonstrating practical real-world benefits with {micro_expr}, holding product securely, strictly maintaining identical facial features and deep black hair."
+                f"Action: {clean_action}. Character enjoying the real-life practical benefits and tactile satisfaction of {clean_prod_en} with {micro_expr}, strictly maintaining identical facial features and deep black hair."
             )
         else:
-            scene_focus = (
-                f"Action stage: Vertical 9:16 commercial closing shot inside {scene_setting_en}. "
-                f"{full_identity_anchor} "
-                f"Character smiling warmly with direct eye contact into lens, holding {clean_prod_en} beside them with welcoming open-palm gesture."
-            )
+            scene_focus = f"Action stage: Warm commercial closing shot in {scene_setting_en}. {full_identity_anchor} Character smiling with confident direct eye contact, holding {clean_prod_en} with welcoming open-palm gestures."
             
         raw_img = (
             f"{camera_shot}. {scene_focus} "
-            f"Product Integrity: Authentic {clean_prod_en}, strictly rigid non-deformable structure, zero melting, zero bending plastic, neutral clean typography. "
+            f"Product Integrity: Authentic {clean_prod_en}, strictly rigid non-deformable structure, neutral clean typography. "
             f"Quality: Photorealistic commercial photography, clean lighting, sharp focus, natural realistic environment. "
             f"Negative prompt: {active_negative}."
         )
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         
-        # PROMPT VIDEO VEO 3 SAFE / KLING AI: KHÓA GHIM CƠ HỌC TÁCH BIỆT CHUYỂN ĐỘNG
+        # PROMPT VIDEO VEO 3 SAFE / KLING AI
         speaker_line = scn.get("voiceover", "")
-        audio_start_sec = "1.50s" if scene_num == 1 else "0.00s"
-        audio_part = f' Direct on-camera spoken dialogue at {audio_start_sec}. Character visibly facing camera with mouth and lips clearly moving in continuous natural lip-sync. Spoken audio: "{speaker_line}", Layered Foley SFX: [{sfx_sound}].'
+        audio_part = f' Direct on-camera spoken dialogue at 0.00s. Character visibly speaking with natural lip-sync mouth movement. Audio: "{speaker_line}", Layered Foley SFX: [{sfx_sound}].'
         continuity_note = "Identity Continuity: Invariant actor face, strictly uniform deep jet-black hair pigment across all scenes without ambient discoloration, matching styling looks." if is_fashion_styling else "Identity & Wardrobe Continuity: Invariant actor face, strictly uniform deep jet-black hair pigment across all scenes, invariant clothing across all frames, zero costume change."
         
         raw_vid = (
             f"{camera_shot}. Wholesome live-action commercial footage. {full_identity_anchor} "
             f"Setting: {scene_setting_en}. "
             f"Action: {clean_action}. Micro-expression: {micro_expr}.{audio_part} "
-            f"Decoupled Kinetic Anchoring & Authentic Mechanics: Authentic {clean_prod_en}. Motion is strictly confined to head, eyes and natural mouth lip-sync. Character hands hold {clean_prod_en} at chest level, accurately demonstrating its authentic mechanical operation ({condensed_dna.get('operational_mechanism')}) with steady immobilized grip, strictly preventing wrist wobble or motion blur. Multi-component assembly strictly maintained: {connector_physics_en}. The product retains 100% rigid non-melting non-deformable geometry across all frames. "
+            f"Product Assembly & Invariance: Authentic {clean_prod_en}. Multi-component assembly strictly maintained: {connector_physics_en}. The connecting hose remains continuously visible bridging both hands without vanishing or morphing. "
             f"{continuity_note} "
-            f"Anatomy & Kinetics: Invariant two-hand operation, anatomically correct hands with strictly five fingers per hand, zero limb morphing, zero fingers melting into plastic, ZERO syringe transformation. "
-            f"Strictly pure footage: ABSOLUTELY NO off-screen voiceover, ABSOLUTELY NO yellow cart icons, NO animated buttons, NO UI stickers, NO on-screen subtitles, NO text. "
+            f"Anatomy & Kinetics: Invariant two-hand operation, anatomically correct hands with strictly five fingers per hand, zero limb morphing, ZERO syringe transformation. "
+            f"Strictly pure footage: ABSOLUTELY NO yellow cart icons, NO animated buttons, NO UI stickers, NO on-screen subtitles, NO text. "
             f"Negative prompt: {active_negative}."
         )
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
@@ -728,7 +717,7 @@ def create_scene_details(target_id, mode, style):
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     wardrobe_summary_text = "👗 <b>Chế độ Thời trang Phối đồ:</b> Thay đổi outfit linh hoạt theo từng cảnh & câu thoại (Khuôn mặt, dáng người & màu tóc đen tuyền khóa bất biến 100%)" if is_fashion_styling else f"👗 <b>Khóa bất biến trang phục:</b> {res.get('outfit_vi', 'Khóa chết áo chính, áo trong/khoác/tạp dề, quần/váy 100%')}"
     
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung hình luôn dài hơn thời gian đọc, có đệm an toàn chống cụt tiếng) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp on-camera lip-sync (CẢ 4 CẢNH ĐỀU LÀ NHÂN VẬT NÓI, TRIỆT TIÊU THUYẾT MINH | 100% Giọng Hà Nội chuẩn, dùng 'nghìn', neo giá linh hoạt 'khoảng/gần/chưa tới', không dùng 'trợ giá')<br>🛠 <b>Cơ chế vận hành thực tế:</b> {condensed_dna.get('operational_mechanism')} | 🔒 <b>Khóa ghim cơ học:</b> Triệt tiêu hoàn toàn lỗi biến dạng / tan chảy khi di chuyển<br>🎯 <b>Chỉ thị từ Ghi chú AI:</b> {user_custom_note if user_custom_note else 'Mặc định chuẩn'}<br>👤 <b>Khóa bất biến nhân vật:</b> Màu tóc đen tuyền tự nhiên không biến đổi theo ánh sáng, khuôn mặt đồng nhất 100%<br>{wardrobe_summary_text}<br>🏙 <b>Bối cảnh bám sát kịch bản:</b> {fixed_setting_base} (chiều sâu không gian sinh động đời thực)<br>📸 <b>Đa dạng hóa 4 góc máy on-camera:</b> Cảnh 1 (Dual-Layer Hook) &rarr; Cảnh 2 (Medium close-up cơ chế thực tế) &rarr; Cảnh 3 (Trung cận đời sống) &rarr; Cảnh 4 (Thương mại chốt deal)<br>🔗 <b>Động lực học dây nối:</b> {connector_physics_en} | 🚫 <b>Khóa đa linh kiện:</b> Triệt tiêu hoàn toàn lỗi biến thành ống tiêm xylanh<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ chương trình giảm giá sâu có hạn theo khung giờ"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khung hình luôn dài hơn thời gian đọc, có đệm an toàn chống cụt tiếng) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn, dùng 'nghìn', neo giá linh hoạt 'khoảng/gần/chưa tới', không dùng 'trợ giá')<br>👤 <b>Khóa bất biến nhân vật:</b> Màu tóc đen tuyền tự nhiên không biến đổi theo ánh sáng, khuôn mặt đồng nhất 100%<br>{wardrobe_summary_text}<br>🏙 <b>Bối cảnh bám sát kịch bản:</b> {fixed_setting_base} (chiều sâu không gian sinh động đời thực)<br>📸 <b>Đa dạng hóa 4 góc máy:</b> Cảnh 1 (Trung cảnh mở màn) &rarr; Cảnh 2 (Macro 85mm chi tiết) &rarr; Cảnh 3 (Trung cận đời sống) &rarr; Cảnh 4 (Thương mại chốt deal)<br>🔗 <b>Động lực học dây nối:</b> {connector_physics_en} | 🚫 <b>Khóa đa linh kiện:</b> Triệt tiêu hoàn toàn lỗi biến thành ống tiêm xylanh<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ chương trình giảm giá sâu có hạn theo khung giờ"
     
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -742,7 +731,6 @@ def clone_script(script_id):
     
     cur_len = len(all_combined)
     target_detail = st.session_state.generated_details.get(int(script_id), st.session_state.generated_details.get(str(script_id), {}))
-    user_custom_note = st.session_state.get("current_input_context", "").strip()
     
     original_voices = []
     if target_detail and "scenes" in target_detail:
@@ -762,8 +750,7 @@ def clone_script(script_id):
     prompt = f"""
     SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)} | KỊCH BẢN GỐC #{script_id}: TIÊU ĐỀ: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
-    GHI CHÚ AI TỪ NGƯỜI DÙNG: '{user_custom_note}'
-    NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá kèm câu miễn trừ giá hợp quy chuẩn, nhân bản thành 5 biến thể kịch bản thoại mới theo 5 góc kể chuyện và 5 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP ON-CAMERA BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TỐC ĐỘ 4.8 - 5.2 TỪ/S (CẤM TUYỆT ĐỐI THUYẾT MINH). TUYỆT ĐỐI CẤM TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'. NEO GIÁ LINH HOẠT ('KHOẢNG...', 'GẦN...', 'CHƯA TỚI...').
+    NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá kèm câu miễn trừ giá hợp quy chuẩn, nhân bản thành 5 biến thể kịch bản thoại mới theo 5 góc kể chuyện và 5 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. 100% nhân vật nói trực tiếp bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'. NEO GIÁ LINH HOẠT ('KHOẢNG...', 'GẦN...', 'CHƯA TỚI...').
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -775,7 +762,7 @@ def clone_script(script_id):
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", target.get("actors", 1), "Nhân bản thoại", user_custom_note), max_tokens=2500)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", target.get("actors", 1), "Nhân bản thoại"), max_tokens=2500)
     clones = res.get("outlines", res.get("script_outlines", []))
     formatted_clones = []
     for idx, cl in enumerate(clones):
@@ -795,16 +782,14 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     style = st.session_state.get("last_style", "Điện Ảnh Chân Thực")
     char_rules = generate_char_rules_string(char_profiles)
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
-    user_custom_note = st.session_state.get("current_input_context", "").strip()
     dna = st.session_state.get("content_analysis") or {}
     condensed_dna = {
         "product": dna.get("what_and_unique", ""), "hero_sku": dna.get("hero_sku_color", ""), "price_anchor": dna.get("rounded_price_anchor", "")
     }
     prompt = f"""
     SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)} | CHIẾN LƯỢC: '{angle}' | DIỄN VIÊN: {num_chars} người Việt.
-    GHI CHÚ AI TỪ NGƯỜI DÙNG: '{user_custom_note}'
     BẮT BUỘC TẠO RA 5 KỊCH BẢN Ở 5 BỐI CẢNH ĐỜI THỰC HOÀN TOÀN KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
-    100% CẢ 4 PHÂN CẢNH ĐỀU LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP ON-CAMERA BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI (4.8 - 5.2 từ/s), TUYỆT ĐỐI CẤM THUYẾT MINH. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'. NEO GIÁ LINH HOẠT ('KHOẢNG...', 'GẦN...', 'CHƯA TỚI...').
+    100% LỜI THOẠI LÀ DO NHÂN VẬT NÓI TRỰC TIẾP BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI (4.8 - 5.2 từ/s). TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'. NEO GIÁ LINH HOẠT ('KHOẢNG...', 'GẦN...', 'CHƯA TỚI...').
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -817,7 +802,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     }}
     BẮT BUỘC ĐỦ 5 KỊCH BẢN.
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, angle, user_custom_note), max_tokens=2500)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, angle), max_tokens=2500)
     more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts):
         if "hook" in sc: sc["hook"] = sanitize_policy_text(sc["hook"])
@@ -888,7 +873,7 @@ with st.sidebar:
                 "current_project_id": None, "saved_reference_images": [], "character_profiles": [],
                 "current_processing_id": None, "current_cloning_id": None
             })
-            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')} commodities"
             st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án:", value=st.session_state.active_project_title)
@@ -1047,7 +1032,7 @@ if is_viral_mode:
     viral_persona = col_v1.text_input("👤 Định vị Kênh:", key=f"viral_persona_{st.session_state.reset_key}")
     viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, key=f"viral_topic_{st.session_state.reset_key}")
     up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI:", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
@@ -1058,7 +1043,7 @@ else:
     col_f1, col_f2 = st.columns([2, 1])
     up_files = col_f1.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
     hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Đỏ, Be, Size L...", key=f"hero_override_{st.session_state.reset_key}")
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_prod_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI:", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2 = st.columns(2)
 style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
@@ -1083,11 +1068,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars)]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
-                # LƯU CHẶT CHẼ GHI CHÚ CỦA NGƯỜI DÙNG VÀO STATE
-                st.session_state.update({
-                    "last_mode": mode, "last_style": style, "last_narrator": "On-camera", 
-                    "current_input_context": custom_note.strip()
-                })
+                st.session_state.update({"last_mode": mode, "last_style": style, "last_narrator": "On-camera", "current_input_context": custom_note})
                 st.session_state.current_product_data_saved = st.session_state.get("current_product_data", {})
                 
                 st.session_state["saved_reference_images"] = []
@@ -1101,7 +1082,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 prompt = f"""
                 INPUT: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: {custom_note}
                 DIỄN VIÊN: {num_chars} nhân vật 100% người Việt bản địa ({', '.join([p['role'] for p in st.session_state.character_profiles])}).
-                100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TỐC ĐỘ 4.8 - 5.2 TỪ/S (TUYỆT ĐỐI CẤM THUYẾT MINH).
+                100% LỜI THOẠI LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TỐC ĐỘ 4.8 - 5.2 TỪ/S.
                 🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN'. 100% BẮT BUỘC DÙNG TỪ 'NGHÌN'.
                 🛑 CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
                 🛑 CẤM TUYỆT ĐỐI KHẨU NGỮ MIỀN NAM. 100% dùng từ ngữ Hà Nội chuẩn.
@@ -1115,9 +1096,6 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "core_value": "Giá trị cốt lõi",
                         "pain_points": "Nỗi đau thực tế",
                         "hook_element": "Yếu tố giật gân 3 giây đầu",
-                        "visual_hook_archetype": "Dạng thức Visual Hook phù hợp nhất (Visual Stress Test / Visceral Pain / ASMR Tactile / Instant Contrast / Pattern Interrupt)",
-                        "operational_mechanism": "Phân tích bản chất cơ chế hoạt động thực tế từng bước (Ví dụ: kéo pít-tông tạo lực hút chân không truyền qua dây silicone gom dịch vào khoang chứa êm ái / chạm cảm ứng 1 chạm LED sáng số / cơ chế mở ren...). Tuyệt đối không bịa sai bản chất!",
-                        "correct_ergonomic_grip": "Tư thế cầm nắm công thái học chuẩn đời thực của sản phẩm",
                         "hero_sku_color": "Mã màu bán chạy nhất (Hero SKU - Ưu tiên tuyệt đối ô có tag '🔥 Hot' / 'Bán chạy')",
                         "color_palette": "Bảng màu toàn bộ",
                         "what_and_unique": "Định danh sản phẩm và điểm độc bản (USP) vượt trội (chỉ viết nội dung)",
@@ -1137,11 +1115,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
                     "outlines": [
-                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp bằng tiếng Hà Nội chuẩn...", "actors": {num_chars} }},
-                        {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": {num_chars} }},
-                        {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": {num_chars} }},
-                        {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": {num_chars} }},
-                        {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh đời thực 5...", "hook": "...", "actors": {num_chars} }}
+                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1 (ví dụ: Phòng ngủ gia đình nửa đêm)...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp bằng tiếng Hà Nội chuẩn...", "actors": {num_chars} }},
+                        {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh đời thực 2 (ví dụ: Góc bếp / bàn ăn lúc chuẩn bị)...", "hook": "...", "actors": {num_chars} }},
+                        {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh đời thực 3 (ví dụ: Bàn làm việc văn phòng giờ nghỉ)...", "hook": "...", "actors": {num_chars} }},
+                        {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh đời thực 4 (ví dụ: Phòng khách ấm cúng bên sofa)...", "hook": "...", "actors": {num_chars} }},
+                        {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh đời thực 5 (ví dụ: Góc chuẩn bị ra ngoài dạo phố hoặc kho TMĐT)...", "hook": "...", "actors": {num_chars} }}
                     ]
                 }}
                 """
@@ -1153,7 +1131,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=cb, mime_type=cm)])
                 payload.append(prompt)
                 
-                res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, initial_angle, custom_note.strip()), max_tokens=6000)
+                res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, initial_angle), max_tokens=6000)
                 st.session_state.content_analysis = res.get("content_analysis")
                 outlines = res.get("outlines", res.get("script_outlines", []))
                 
@@ -1179,7 +1157,6 @@ if isinstance(ca, dict):
             <div class="dna-row"><span class="dna-label">👥 Tệp khách hàng:</span><span class="dna-text">{clean_analysis_text(ca.get('target_audience', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">💔 Nỗi đau thực tế:</span><span class="dna-text">{clean_analysis_text(ca.get('pain_points', ''))}</span></div>
             <div class="dna-row"><span class="dna-label" style="color:#d90429;">⚡ Yếu tố Hook 3s đầu:</span><span class="dna-text" style="color:#d90429; font-weight:600;">{clean_analysis_text(ca.get('hook_element', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label" style="color:#2563eb;">🎬 Dạng thức Visual Hook:</span><span class="dna-text" style="color:#2563eb; font-weight:600;">{clean_analysis_text(ca.get('visual_hook_archetype', ''))}</span></div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1189,7 +1166,6 @@ if isinstance(ca, dict):
             <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy Nhất (Hero SKU)</div>
             <div class="dna-row"><span class="dna-label">⭐ Mẫu ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))}</span></div>
             <div class="dna-row"><span class="dna-label">🎨 Toàn bộ bảng màu:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">⚙ Cơ chế vận hành:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('operational_mechanism', 'Chuẩn đời thực'))}</span></div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1211,6 +1187,7 @@ if isinstance(ca, dict):
         <div class="dna-row"><span class="dna-label">🧩 Bóc tách cấu trúc linh kiện:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_assembly_structure', 'Nguyên khối'))}</span></div>
         <div class="dna-row"><span class="dna-label">🔗 Động lực học dây nối/ống dẫn:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{clean_analysis_text(ca.get('flexible_connector_specs', 'Không có dây nối'))}</span></div>
         <div class="dna-row"><span class="dna-label">🎨 Khóa màu chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">⚙ Cấu tạo cơ học thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('lid_mechanism', 'Bình thường'))}</span></div>
         <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{clean_analysis_text(ca.get('detected_prices', ''))}</span></div>
         <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Đòn bẩy giá tương phản linh hoạt:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('rounded_price_anchor', ''))}</span></div>
     </div>
@@ -1263,9 +1240,9 @@ if all_sc:
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm an toàn chống cụt: +{safe_cushion}s</span>", unsafe_allow_html=True)
-            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp on-camera (100% Giọng Hà Nội chuẩn, dùng 'nghìn', neo giá linh hoạt 'khoảng/gần/chưa tới'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
-            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Tinh Gọn, Khóa Cứng Mặt, Tóc Đen Tuyền & Khóa Ghim Cơ Học):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
-            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Khóa Ghim Cơ Học Chống Biến Dạng, 100% On-Camera):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
+            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Hà Nội chuẩn, dùng 'nghìn', neo giá linh hoạt 'khoảng/gần/chưa tới'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
+            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Tinh Gọn, Khóa Cứng Mặt, Tóc Đen Tuyền & Trang Phục Phù Hợp):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
+            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Bảo Tồn Dây Nối & Khóa Cứng Mặt, Tóc Đen):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
     st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
@@ -1308,7 +1285,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang áp dụng Ghi chú AI, cơ chế vận hành thực tế và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng cơ chế bối cảnh sinh động, neo giá linh hoạt và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = int(target_id_to_run); st.session_state.scroll_to_detail = True; success = True
         except Exception as e: error_msg = str(e)
