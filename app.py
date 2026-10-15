@@ -393,7 +393,6 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     
     🛑 CƠ CHẾ THỜI LƯỢNG ĐỘNG (FLEXIBLE DURATION BUCKETS - 4s, 6s, 8s, 10s):
     - KHÔNG BÓ CỨNG MẶC ĐỊNH MỖI CẢNH PHẢI CỐ ĐỊNH MẤY GIÂY. AI tự phân tích độ sâu của nội dung để tự do gán thời lượng '4s', '6s', '8s' hoặc '10s' cho từng phân cảnh.
-    - Hoàn toàn có thể cả 4 cảnh đều 10s (tổng 40s), hoặc Cảnh 1 (8s), Cảnh 2-3-4 (10s), hoặc bất kỳ sự kết hợp nào logic nhất với câu chuyện.
     - Khống chế số từ tương thích chính xác với mốc thời lượng mà AI đã chọn:
       • Khung 4s: ~16 - 20 từ (tốc độ 4.8 - 5.2 từ/s)
       • Khung 6s: ~24 - 28 từ
@@ -406,10 +405,16 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       • Cảnh 2: Mở đầu bằng từ nối tự nhiên ('Đấy, bí quyết là ở chỗ...', 'Điểm ăn tiền nhất của em này là...'). Đi sâu vào cấu tạo, cơ chế và thao tác thực tế.
       • Cảnh 3: Mở đầu bằng từ nối trải nghiệm ('Mà thích nhất cái đoạn...', 'Công nhận từ lúc có em này...'). Đào sâu cảm giác xúc giác, sự sung sướng và giá trị vượt trội khi dùng hàng ngày.
       • Cảnh 4: Chuyển nhịp mượt mà sang chốt deal ('Thế nên đợt này bác nào/mẹ nào đang cần thì...'). Đủ 3 vế: Đòn bẩy giá tương phản + Câu miễn trừ giá có hạn theo khung giờ + Lời kêu gọi ấm áp.
-    - CẤM văn phong quảng cáo vô hồn; dùng văn phong tâm sự, chia sẻ chân thành của người dùng thực tế.
+
+    🛑 QUY CHUẨN ĐỘNG LỰC HỌC DÂY NỐI / ỐNG DẪN MỀM & KHÓA ĐA LINH KIỆN (CONNECTOR TUBE DYNAMICS & MULTI-PART ASSEMBLY):
+    - BÓC TÁCH LINH KIỆN RÕ RÀNG (CHỐNG GỘP KHỐI SAI LỆCH): Nếu sản phẩm có dây dẫn/ống nối mềm (như máy hút mũi pít-tông, máy hút sữa, thiết bị y tế gia đình):
+      1. BẮT BUỘC mô tả đủ 3 phần: (1) Thân máy/ống bơm pít-tông có logo, (2) Ống dây dẫn silicone mềm bán trong suốt dài khoảng 20-25cm, đường kính 6-8mm, (3) Đầu hút/khoang chứa dịch rời.
+      2. ĐỘ CHÙNG TRỌNG LỰC: Dây dẫn silicone luôn võng cong hình chữ U tự nhiên mềm mại (`natural loose U-shaped curved droop`) nối liền giữa thân bơm và đầu hút. TUYỆT ĐỐI CẤM dây bị đứt, biến mất, hoặc cứng đơ như que nhựa.
+      3. CÔNG THÁI HỌC 2 TAY: Tay phải giữ thân bơm thao tác pít-tông, tay trái giữ đầu hút silicone, dây silicone bắc cầu liên tục giữa 2 tay.
+      4. TRIỆT TIÊU LỖI BIẾN HÌNH THÀNH ỐNG TIÊM XYLANH: Tuyệt đối CẤM biến sản phẩm thành ống tiêm y tế (medical syringe), que nhựa đơn khối!
 
     🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
-    - CẤM TUYỆT ĐỐI GIỌNG THUYẾT MINH NGOÀI. CẤM TRIỆT ĐỂ KHẨU NGỮ MIỀN NAM (xài, nè, nha, nghen, hén, tui, bận đồ, ly nước, muỗng, dùm, rùi, mần, thiệt, hổng...). Khẩu hình khớp từng từ với lời thoại.
+    - CẤM TUYỆT ĐỐI GIỌNG THUYẾT MINH NGOÀI. CẤM TRIỆT ĐỂ KHẨU NGỮ MIỀN NAM. Khẩu hình khớp từng từ với lời thoại.
 
     🛑 TÌNH HUỐNG TRẢI NGHIỆM ĐỜI THỰC & CHÍNH SÁCH ĐA NGÀNH:
     - Nếu là Mẹ & Bé: Bé trực tiếp trải nghiệm/sử dụng sản phẩm sinh động, người lớn LUÔN KỀ BÊN chăm sóc 100% khung hình.
@@ -430,7 +435,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - THỜI LƯỢNG ĐỘNG & THOẠI LIỀN MẠCH
+# HÀM TẠO CHI TIẾT KỊCH BẢN - KHÓA DÂY NỐI VẬT LÝ & THỜI LƯỢNG ĐỘNG
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -457,6 +462,9 @@ def create_scene_details(target_id, mode, style):
         "mechanism": dna.get("lid_mechanism", "Kết cấu cơ học chuẩn xác theo đời thực"),
         "how_to_use": dna.get("how_to_use", "Thao tác sử dụng thực tế chuẩn công thái học"),
         "price_anchor": dna.get("rounded_price_anchor", ""),
+        "connector_specs": dna.get("flexible_connector_specs", "Không có dây nối"),
+        "assembly_structure": dna.get("product_assembly_structure", "Nguyên khối thực tế"),
+        "anti_morph_targets": dna.get("strict_anti_morph_targets", "ống tiêm y tế xylanh, que nhựa đơn chiếc"),
         "visual_dna": dna.get("prompt_dna_lock", "")
     }
 
@@ -465,12 +473,15 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK GỐC: '{fixed_hook}' | BỐI CẢNH: {outline.get('setting', 'Không gian thực tế phù hợp')}
     HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ NGỮ MIỀN NAM.
     
-    🛑 CHỈ THỊ THỜI LƯỢNG ĐỘNG & NỘI DUNG LIỀN MẠCH:
-    1. TỰ DO GÁN THỜI LƯỢNG (4s, 6s, 8s, 10s): AI tự chọn thời lượng 'dur' ('4s', '6s', '8s', '10s') cho từng cảnh tùy theo lượng thông tin. Cả 4 cảnh đều 10s hoặc kết hợp linh hoạt đều được!
-    2. SỐ TỪ TƯƠNG ỨNG MỐC ĐÃ CHỌN: 4s (~16-20 từ), 6s (~24-28 từ), 8s (~34-38 từ), 10s (~44-50 từ). Tuyệt đối không quá 50 từ/cảnh.
-    3. MẠCH NỘI DUNG LIỀN KHÚC: Ghép 4 cảnh lại phải thành 1 đoạn văn tâm sự, chia sẻ hoàn chỉnh, tự nhiên, cuốn hút.
-    4. CẢNH 4 BẮT BUỘC ĐỦ 3 VẾ: Đòn bẩy giá tương phản + Câu miễn trừ giá có hạn theo khung giờ + Lời chào ấm áp.
-    5. Trả về 'clean_product_name_en': Tên/mô tả sản phẩm tiếng Anh ngắn gọn dưới 15 từ.
+    🛑 CHỈ THỊ ĐỘNG LỰC HỌC DÂY NỐI & KHÓA KẾT CẤU CHỐNG BIẾN DẠNG:
+    1. KHÓA CỨNG ĐA LINH KIỆN & DÂY NỐI VẬT LÝ: 
+       - Nếu sản phẩm có dây dẫn (như Emoon): Phải mô tả chính xác 3 phần tách biệt: (1) thân bơm pít-tông trong suốt có logo và tay kéo chữ nhật, (2) ống dây silicone mềm dài 20-25cm đường kính 6-8mm rũ võng chữ U tự nhiên (`natural loose U-shaped curved droop`), (3) đầu hút silicone rời.
+       - CẤM TUYỆT ĐỐI biến thành ống tiêm y tế (medical syringe), cấm làm mất dây dẫn silicone!
+    2. TỰ DO GÁN THỜI LƯỢNG (4s, 6s, 8s, 10s): AI tự chọn thời lượng 'dur' cho từng cảnh tùy theo lượng thông tin.
+    3. SỐ TỪ TƯƠNG ỨNG MỐC ĐÃ CHỌN: 4s (~16-20 từ), 6s (~24-28 từ), 8s (~34-38 từ), 10s (~44-50 từ). Tuyệt đối không quá 50 từ/cảnh.
+    4. MẠCH NỘI DUNG LIỀN KHÚC: Ghép 4 cảnh lại phải thành 1 đoạn văn tâm sự, chia sẻ hoàn chỉnh, tự nhiên, cuốn hút.
+    5. CẢNH 4 BẮT BUỘC ĐỦ 3 VẾ: Đòn bẩy giá tương phản + Câu miễn trừ giá có hạn theo khung giờ + Lời chào ấm áp.
+    6. Trả về 'clean_product_name_en': Tên/mô tả sản phẩm tiếng Anh ngắn gọn dưới 15 từ.
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
@@ -478,13 +489,14 @@ def create_scene_details(target_id, mode, style):
         "voice": {{"tone": "{voice_guidance}"}},
         "outfit_vi": "Mô tả chi tiết: Áo trên cụ thể + Quần/Váy cụ thể + Kiểu tóc cụ thể khóa cứng 4 cảnh",
         "clean_product_name_en": "Concise photorealistic English description of the hero product under 15 words",
+        "connector_physics_en": "Detailed English description of flexible tube/cord dimensions, length (approx 20-25cm), diameter (6-8mm), U-shaped gravitational droop and dual anchoring",
         "character_matrix": {{
             "full_characters_appearance": "Authentic native Vietnamese character(s), natural Vietnamese facial features, warm skin tone",
             "locked_hairstyles": "Mô tả 1 kiểu tóc cố định phù hợp bối cảnh bằng tiếng Anh",
             "locked_tops": "Mô tả 1 mẫu áo trên cụ thể phù hợp bối cảnh bằng tiếng Anh",
             "locked_bottoms": "Mô tả 1 mẫu quần hoặc váy bằng tiếng Anh",
             "locked_setting": "Mô tả 1 góc bối cảnh cố định phù hợp sản phẩm bằng tiếng Anh",
-            "locked_negative": "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker"
+            "locked_negative": "Caucasian, white, blonde hair, blue eyes, yellow cart icon, shopping bag graphic, animated button, simulated UI overlay, subtitles, on-screen text, typography, watermark, wrinkles, deformed hands, extra fingers, product morphing, shape shifting, disappearing label, fading text, blurred sticker, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product"
         }},
         "scenes": [
             {{
@@ -546,8 +558,9 @@ def create_scene_details(target_id, mode, style):
     locked_tops = c_mat.get("locked_tops") or "neat casual shirt"
     locked_bottoms = c_mat.get("locked_bottoms") or "straight trousers"
     locked_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm cozy realistic setting")
-    locked_negative = c_mat.get("locked_negative") or "Caucasian, blonde, deformed hands, extra fingers, text, watermark, typography, subtitles, floating cart icon, distorted geometry"
+    locked_negative = c_mat.get("locked_negative") or "Caucasian, blonde, deformed hands, extra fingers, text, watermark, typography, subtitles, floating cart icon, distorted geometry, medical syringe, injection needle, single handheld tube without hose, detached hose, vanishing tube, morphed product"
     clean_prod_en = res.get("clean_product_name_en") or f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip()
+    connector_physics_en = res.get("connector_physics_en") or "translucent flexible silicone tube approx 20-25cm length, 6-8mm diameter, hanging with a natural loose U-shaped curved droop between hands"
     
     unified_subject = f"{full_char}, strictly with {locked_hair}. Invariant Wardrobe: wearing {locked_tops} and {locked_bottoms}"
     
@@ -576,25 +589,25 @@ def create_scene_details(target_id, mode, style):
         sfx_sound = scn.get("sfx", "Layered realistic ambient sensory Foley sounds")
         micro_expr = scn.get("expression", "Natural expressive facial micro-emotions")
         
-        # PROMPT ẢNH TINH GỌN (FLUX / MIDJOURNEY)
+        # PROMPT ẢNH FLUX / MIDJOURNEY KHÓA CỨNG DÂY NỐI & CÔNG THÁI HỌC 2 TAY
         scn["img_p"] = (
             f"{camera_shot}. {unified_subject}. "
             f"Setting: {locked_setting}. "
-            f"Action: Holding and interacting naturally with {clean_prod_en}, looking directly at camera with {micro_expr}. "
-            f"Product Details: {clean_prod_en}, rigid non-deformable form, original intact label and clear textures. "
-            f"Quality: Anatomically correct five-finger hands with realistic grip, photorealistic commercial lifestyle photography, natural lighting. "
+            f"Action & Handling: Holding and demonstrating {clean_prod_en}. Connector Physics: {connector_physics_en}. Two-hand ergonomics with anatomically correct five-finger hands holding separate components linked continuously by the flexible tube, looking directly at camera with {micro_expr}. "
+            f"Product Details: {clean_prod_en}, strictly rigid non-deformable multi-part assembly, intact original logo and labels. "
+            f"Quality: Photorealistic commercial lifestyle photography, soft natural lighting. "
             f"Negative prompt: {locked_negative}."
         )
         
-        # PROMPT VIDEO VEO 3 SAFE / KLING AI
+        # PROMPT VIDEO VEO 3 SAFE / KLING AI KHÓA BẤT BIẾN CHỐNG BIẾN THÀNH ỐNG TIÊM
         speaker_line = scn.get("voiceover", "")
         audio_part = f' Direct on-camera spoken dialogue at 0.00s. Character visibly speaking with natural lip-sync mouth movement. Audio: "{speaker_line}", Layered Foley SFX: [{sfx_sound}].'
         raw_vid = (
             f"{camera_shot}. Wholesome live-action commercial footage. {unified_subject}. "
             f"Setting: {locked_setting}. "
             f"Action: {clean_action}. Micro-expression: {micro_expr}.{audio_part} "
-            f"Product Invariance: Authentic {clean_prod_en}, strictly rigid geometry, intact original manufacturer label, zero morphing. "
-            f"Anatomy: Anatomically correct hands with strictly five fingers per hand, natural smooth hand gestures, zero limb morphing. "
+            f"Product Assembly & Invariance: Authentic {clean_prod_en}. Multi-component assembly strictly maintained: {connector_physics_en}. The connecting hose remains continuously visible bridging both hands without vanishing or morphing. "
+            f"Anatomy & Kinetics: Invariant two-hand operation, anatomically correct hands with strictly five fingers per hand, zero limb morphing, ZERO syringe transformation. "
             f"Strictly pure footage: ABSOLUTELY NO yellow cart icons, NO animated buttons, NO UI stickers, NO on-screen subtitles, NO text. "
             f"Negative prompt: {locked_negative}."
         )
@@ -602,7 +615,7 @@ def create_scene_details(target_id, mode, style):
         
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Thời lượng động 4s/6s/8s/10s theo độ sâu nội dung | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ giá có hạn theo khung giờ<br>🔒 <b>Bảo tồn sản phẩm:</b> Khóa cứng kết cấu hình học bất biến, bảo tồn 100% tem nhãn và chữ in nguyên bản<br>🎵 <b>Hệ thống đa giác quan:</b> Âm thanh SFX & Foley đa tầng | 😊 <b>Vi biểu cảm & hình thể KOC:</b> Biến thiên tự nhiên theo tâm lý AIDA<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Thời lượng động 4s/6s/8s/10s theo độ sâu nội dung | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>🔗 <b>Động lực học dây nối:</b> {connector_physics_en} | 🚫 <b>Khóa đa linh kiện:</b> Triệt tiêu hoàn toàn lỗi biến thành ống tiêm xylanh<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ giá có hạn theo khung giờ<br>🔒 <b>Bảo tồn sản phẩm:</b> Khóa cứng kết cấu hình học bất biến, bảo tồn 100% tem nhãn và chữ in nguyên bản<br>🎵 <b>Hệ thống đa giác quan:</b> Âm thanh SFX & Foley đa tầng | 😊 <b>Vi biểu cảm & hình thể KOC:</b> Biến thiên tự nhiên theo tâm lý AIDA<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}"
     
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -983,6 +996,9 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "product_size_class": "Phân loại kích thước",
                         "product_color_lock": "Khóa màu sắc và họa tiết Hero SKU",
                         "lid_mechanism": "Cơ chế cơ học/kết cấu thực tế: Nắp vặn kín, cúc áo, khóa kéo, bo chun... TUYỆT ĐỐI KHÔNG BỊA RA CHI TIẾT DỊ THƯỜNG",
+                        "product_assembly_structure": "Bóc tách cấu trúc đa linh kiện: (1) Thân máy/ống pít-tông, (2) Dây dẫn/ống nối mềm (nếu có), (3) Đầu hút/vòi thao tác rời. Nếu nguyên khối thì ghi rõ nguyên khối.",
+                        "flexible_connector_specs": "Nếu có dây nối/ống silicone: Ghi rõ độ dài ước tính (20-25cm), đường kính ngoài (6-8mm), chất liệu silicone mờ dẻo, độ võng cong chữ U tự nhiên theo trọng lực nối giữa 2 tay. Nếu không có dây thì ghi 'Không có dây nối'.",
+                        "strict_anti_morph_targets": "Các vật thể AI dễ vẽ nhầm/hallucination (ví dụ: ống tiêm y tế xylanh, kim tiêm, que nhựa) để cấm tiệt.",
                         "detected_prices": "Quét OCR giá tiền (giá gốc và giá sale)",
                         "rounded_price_anchor": "TÂM LÝ HỌC NEO GIÁ TƯƠNG PHẢN: Làm tròn giá gốc TIẾN LÊN mốc số chẵn lớn gần nhất và làm mềm giá sale. Định dạng: 'Giá gốc gần [X] -> Nay giảm sốc chỉ còn [Y]'",
                         "product_dimensions": "Thông số kích thước",
@@ -1005,12 +1021,10 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     payload.extend([f"ACTOR {c['id']}:", types.Part.from_bytes(data=cb, mime_type=cm)])
                 payload.append(prompt)
                 
-                # NÂNG TRẦN MAX_TOKENS LÊN 6000 ĐỂ KHÔNG BỊ CẮT NGANG KHI SINH OUTLINES
                 res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, initial_angle), max_tokens=6000)
                 st.session_state.content_analysis = res.get("content_analysis")
                 outlines = res.get("outlines", res.get("script_outlines", []))
                 
-                # CHỐT CHẶN BẢO VỆ: Nếu outlines bị thiếu thì báo lỗi ngay thay vì nuốt lỗi
                 if not outlines:
                     raise Exception("AI bị ngắt quãng do kết nối mạng trong lúc sinh kịch bản. Vui lòng bấm tạo lại.")
                 
@@ -1058,8 +1072,10 @@ if isinstance(ca, dict):
 
     st.markdown(f"""
     <div class="dna-card">
-        <div class="dna-card-title">⚙ 4. Vật lý, Cơ chế & Mức giá</div>
+        <div class="dna-card-title">⚙ 4. Vật lý, Cơ chế, Động lực học Dây nối & Mức giá</div>
         <div class="dna-row"><span class="dna-label">📐 Thông số kích thước:</span><span class="dna-text">{clean_analysis_text(ca.get('product_dimensions', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">🧩 Bóc tách cấu trúc linh kiện:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_assembly_structure', 'Nguyên khối'))}</span></div>
+        <div class="dna-row"><span class="dna-label">🔗 Động lực học dây nối/ống dẫn:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{clean_analysis_text(ca.get('flexible_connector_specs', 'Không có dây nối'))}</span></div>
         <div class="dna-row"><span class="dna-label">🎨 Khóa màu chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', ''))}</span></div>
         <div class="dna-row"><span class="dna-label">⚙ Cấu tạo cơ học thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('lid_mechanism', 'Bình thường'))}</span></div>
         <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{clean_analysis_text(ca.get('detected_prices', ''))}</span></div>
@@ -1112,8 +1128,8 @@ if all_sc:
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} dấu phẩy, {period_count} dấu ngắt câu | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s)</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp (100% Giọng Hà Nội chuẩn đúng độ tuổi):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
-            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Tinh Gọn & Chuẩn Thực Tế):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
-            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Bảo Tồn Tem Nhãn & Trải Nghiệm Sống Động):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
+            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Tinh Gọn & Khóa Dây Nối Vật Lý):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
+            if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI / Hedra - Bảo Tồn Dây Nối & Chống Ống Tiêm):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
     st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
@@ -1156,7 +1172,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang áp dụng thời lượng động và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng động lực học dây nối, thời lượng động và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = int(target_id_to_run); st.session_state.scroll_to_detail = True; success = True
         except Exception as e: error_msg = str(e)
