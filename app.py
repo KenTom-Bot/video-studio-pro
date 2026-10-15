@@ -92,7 +92,7 @@ def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     period_pause = 0.12 if is_tiktok_shop else 0.25
     return round((words / rate) + (commas * comma_pause) + (periods * period_pause), 1)
 
-def snap_scene_bucket(stage: str, dur_sec: float) -> str:
+def snap_scene_bucket(dur_sec: float) -> str:
     if dur_sec <= 4.0: return "4s"
     elif dur_sec <= 6.0: return "6s"
     elif dur_sec <= 8.0: return "8s"
@@ -391,14 +391,25 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     
-    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
-    - CẤM TUYỆT ĐỐI GIỌNG THUYẾT MINH NGOÀI. CẤM TRIỆT ĐỂ KHẨU NGỮ MIỀN NAM. Khẩu hình khớp từng từ với lời thoại.
+    🛑 CƠ CHẾ THỜI LƯỢNG ĐỘNG (FLEXIBLE DURATION BUCKETS - 4s, 6s, 8s, 10s):
+    - KHÔNG BÓ CỨNG MẶC ĐỊNH MỖI CẢNH PHẢI CỐ ĐỊNH MẤY GIÂY. AI tự phân tích độ sâu của nội dung để tự do gán thời lượng '4s', '6s', '8s' hoặc '10s' cho từng phân cảnh.
+    - Hoàn toàn có thể cả 4 cảnh đều 10s (tổng 40s), hoặc Cảnh 1 (8s), Cảnh 2-3-4 (10s), hoặc bất kỳ sự kết hợp nào logic nhất với câu chuyện.
+    - Khống chế số từ tương thích chính xác với mốc thời lượng mà AI đã chọn:
+      • Khung 4s: ~16 - 20 từ (tốc độ 4.8 - 5.2 từ/s)
+      • Khung 6s: ~24 - 28 từ
+      • Khung 8s: ~34 - 38 từ
+      • Khung 10s: ~44 - 50 từ (TUYỆT ĐỐI CẤM vượt quá 50 từ/cảnh để tránh tràn sang 12s).
 
-    🛑 BẮT BUỘC CÂU MIỄN TRỪ GIÁ KIÊM THÚC GIỤC MUA NGAY Ở CẢNH 4 (CHỐNG PHẠT LỆCH GIÁ CHÍNH SÁCH SÀN):
-    - Lời thoại Cảnh 4 BẮT BUỘC gồm 3 vế liền mạch (khống chế 20 - 25 từ | khớp khung 6s):
-      1. Đòn bẩy giá tương phản (giá gốc làm tròn cao -> giá sale giảm sốc).
-      2. Câu rào miễn trừ giá kiêm kích cầu: 'Mã giảm có hạn theo khung giờ, mình kiểm tra ngay nhé!' hoặc 'Giá ưu đãi tùy từng đợt trợ giá, cả nhà bấm xem sớm kẻo hết nhé!'
-      3. Lời kêu gọi ấm áp, thân thiện.
+    🛑 KỸ THUẬT KỂ CHUYỆN LIỀN MẠCH & ĐÀO SÂU CÔNG NĂNG THỰC TẾ (SEAMLESS STORYTELLING & DEEP UTILITY):
+    - CẢ 4 CẢNH KHI GHÉP LẠI PHẢI TẠO THÀNH 1 ĐOẠN VĂN LIỀN KHÚC, TỰ NHIÊN, ĐỜI THƯỜNG, CÓ SỢI CHỈ ĐỎ DẪN DẮT CẢM XÚC:
+      • Cảnh 1: Mở màn nêu bật nỗi đau/tình huống đời thực chân thật bằng văn phong gần gũi.
+      • Cảnh 2: Mở đầu bằng từ nối tự nhiên ('Đấy, bí quyết là ở chỗ...', 'Điểm ăn tiền nhất của em này là...'). Đi sâu vào cấu tạo, cơ chế và thao tác thực tế.
+      • Cảnh 3: Mở đầu bằng từ nối trải nghiệm ('Mà thích nhất cái đoạn...', 'Công nhận từ lúc có em này...'). Đào sâu cảm giác xúc giác, sự sung sướng và giá trị vượt trội khi dùng hàng ngày.
+      • Cảnh 4: Chuyển nhịp mượt mà sang chốt deal ('Thế nên đợt này bác nào/mẹ nào đang cần thì...'). Đủ 3 vế: Đòn bẩy giá tương phản + Câu miễn trừ giá có hạn theo khung giờ + Lời kêu gọi ấm áp.
+    - CẤM văn phong quảng cáo vô hồn; dùng văn phong tâm sự, chia sẻ chân thành của người dùng thực tế.
+
+    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP (ON-CAMERA LIP-SYNC DIALOGUE):
+    - CẤM TUYỆT ĐỐI GIỌNG THUYẾT MINH NGOÀI. CẤM TRIỆT ĐỂ KHẨU NGỮ MIỀN NAM (xài, nè, nha, nghen, hén, tui, bận đồ, ly nước, muỗng, dùm, rùi, mần, thiệt, hổng...). Khẩu hình khớp từng từ với lời thoại.
 
     🛑 TÌNH HUỐNG TRẢI NGHIỆM ĐỜI THỰC & CHÍNH SÁCH ĐA NGÀNH:
     - Nếu là Mẹ & Bé: Bé trực tiếp trải nghiệm/sử dụng sản phẩm sinh động, người lớn LUÔN KỀ BÊN chăm sóc 100% khung hình.
@@ -414,15 +425,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 TRIỆT TIÊU TOÀN BỘ ICON GIỎ HÀNG, NÚT BẤM VÀ SUB NỔI:
     - CẤM cử chỉ chỉ tay xuống góc trái. Hai bàn tay mở tự nhiên chân thành.
-    
-    🛑 KHỐNG CHẾ SỐ TỪ CHUẨN XÁC (KHÓA 4s/6s/8s/10s, CẤM TRÀN 12s):
-    - Tốc độ đọc: 4.8 - 5.2 từ/s. Cảnh 1 (20-25 từ | 6s), Cảnh 2 (28-34 từ | 8s), Cảnh 3 (34-40 từ | 8s hoặc 10s), Cảnh 4 (20-25 từ | 6s).
     - BẮT BUỘC định nghĩa 'character_matrix': (Face, Hair, Top, Bottom, Setting).
     - {char_rules}
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - PROMPT ẢNH TINH GỌN & KHÓA SẢN PHẨM
+# HÀM TẠO CHI TIẾT KỊCH BẢN - THỜI LƯỢNG ĐỘNG & THOẠI LIỀN MẠCH
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -457,10 +465,12 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK GỐC: '{fixed_hook}' | BỐI CẢNH: {outline.get('setting', 'Không gian thực tế phù hợp')}
     HÌNH THỨC: 100% Lời thoại nhân vật nói trực tiếp trên hình bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ NGỮ MIỀN NAM.
     
-    YÊU CẦU ĐẶC BIỆT:
-    1. Tình huống đời thực sinh động theo đối tượng (trẻ em có người lớn bên cạnh chăm sóc an toàn, người lớn dùng thực tế).
-    2. Cảnh 4 BẮT BUỘC đủ 3 vế trong 20-25 từ: Đòn bẩy giá sốc + Câu miễn trừ giá có hạn theo khung giờ + Lời chào ấm áp.
-    3. Trả về 'clean_product_name_en': Tên và mô tả ngắn gọn sản phẩm bằng tiếng Anh (dưới 15 từ, ví dụ: 'light blue ergonomic baby U-shaped pillow with cute elephant pattern') để tối ưu Prompt ảnh.
+    🛑 CHỈ THỊ THỜI LƯỢNG ĐỘNG & NỘI DUNG LIỀN MẠCH:
+    1. TỰ DO GÁN THỜI LƯỢNG (4s, 6s, 8s, 10s): AI tự chọn thời lượng 'dur' ('4s', '6s', '8s', '10s') cho từng cảnh tùy theo lượng thông tin. Cả 4 cảnh đều 10s hoặc kết hợp linh hoạt đều được!
+    2. SỐ TỪ TƯƠNG ỨNG MỐC ĐÃ CHỌN: 4s (~16-20 từ), 6s (~24-28 từ), 8s (~34-38 từ), 10s (~44-50 từ). Tuyệt đối không quá 50 từ/cảnh.
+    3. MẠCH NỘI DUNG LIỀN KHÚC: Ghép 4 cảnh lại phải thành 1 đoạn văn tâm sự, chia sẻ hoàn chỉnh, tự nhiên, cuốn hút.
+    4. CẢNH 4 BẮT BUỘC ĐỦ 3 VẾ: Đòn bẩy giá tương phản + Câu miễn trừ giá có hạn theo khung giờ + Lời chào ấm áp.
+    5. Trả về 'clean_product_name_en': Tên/mô tả sản phẩm tiếng Anh ngắn gọn dưới 15 từ.
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
@@ -479,48 +489,52 @@ def create_scene_details(target_id, mode, style):
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
+                "dur": "6s",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "expression": "Ánh mắt đồng cảm chân thành, hơi nhíu mày trăn trở nỗi đau",
                 "sfx": "Tiếng whoosh vút nhẹ mở màn 3s đầu kết hợp tiếng thở dài nhẹ thực tế",
                 "action_en": "Authentic situational storytelling. Character interacting naturally in a real-life context with expressive lip movements.",
                 "director": "Attention | Tình huống đời thực mở màn | Nhân vật nói trực tiếp giọng Hà Nội chuẩn | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại nhân vật nói trực tiếp 20-25 từ bằng tiếng Hà Nội chuẩn..."
+                "voiceover": "Đoạn thoại mở màn tự nhiên bằng tiếng Hà Nội chuẩn..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
+                "dur": "8s",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Cinematic tight macro close-up with 85mm lens, shallow depth of field, razor-sharp focus on product details and hand ergonomics",
                 "expression": "Ánh mắt bừng sáng, chân mày giãn ra, thần thái tự tin",
                 "sfx": "Tiếng gõ cộc cộc đanh chắc hoặc tiếng xoay nắp ren khục chắc nịch / tiếng vuốt vải sột soạt ASMR",
                 "action_en": "Lively situational demonstration: Character actively interacting with the product in a real-world scenario with steady natural five-finger hands.",
                 "director": "Interest | Cận cảnh Macro 85mm thao tác công năng chuẩn đời thực | SFX thực tế ASMR | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại nhân vật nói trực tiếp 28-34 từ bằng tiếng Hà Nội chuẩn..."
+                "voiceover": "Đoạn thoại đào sâu công năng nối tiếp mượt mà từ cảnh 1 bằng tiếng Hà Nội chuẩn..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
+                "dur": "10s",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Cinematic tight macro shot showcasing sensory tactile satisfaction and premium quality",
                 "expression": "Nụ cười mãn nguyện, ánh mắt ánh lên sự thỏa mãn giác quan, gật đầu khẳng định",
                 "sfx": "Tiếng rót nước róc rách đá lạnh lách cách vang giòn / tiếng búng vải nẩy tưng tưng / tiếng ASMR giác quan",
                 "action_en": "Genuine lifestyle experience. Character enjoying the practical sensory benefits of the product. Joyful satisfied micro-expression.",
                 "director": "Desire | Thể hiện độ hài lòng và trải nghiệm giác quan thực tế | SFX sống động | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại nhân vật nói trực tiếp 34-40 từ bằng tiếng Hà Nội chuẩn..."
+                "voiceover": "Đoạn thoại đặc tả trải nghiệm thực tế sâu sắc nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
+                "dur": "8s",
                 "setting": "Mô tả bối cảnh...",
                 "camera_shot": "Vertical 9:16 warm eye-level medium closing shot",
                 "expression": "Nụ cười rạng rỡ, ánh mắt chân thành ấm áp, hai bàn tay mở tự nhiên hướng về camera",
                 "sfx": "Tiếng chuông ting trong trẻo vui tai kích thích hành động",
                 "action_en": "Warm confident closing shot. Character smiling warmly into camera, speaking directly with sincere welcoming open-palm gestures. Pure cinematic frame.",
                 "director": "Action | Nhân vật nói trực tiếp chốt deal đòn bẩy giá tương phản kèm câu miễn trừ giá hợp quy | SFX chuông ting vui tai | Khởi động: 0.00s",
-                "voiceover": "Đoạn thoại 20-25 từ bằng tiếng Hà Nội chuẩn gồm giá sốc + câu rào miễn trừ giá có hạn theo khung giờ + lời chào ấm áp..."
+                "voiceover": "Đoạn thoại chốt deal gồm giá sốc + câu rào miễn trừ giá có hạn theo khung giờ + lời chào ấm áp kết nối trọn vẹn toàn bộ kịch bản..."
             }}
         ]
     }}
     """
-    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Khoảng 30 giây", num_chars, char_profiles), max_tokens=6500)
+    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động linh hoạt", num_chars, char_profiles), max_tokens=6500)
     if not res: raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
     scenes = res.get("scenes") or res.get("script") or []
@@ -537,23 +551,33 @@ def create_scene_details(target_id, mode, style):
     
     unified_subject = f"{full_char}, strictly with {locked_hair}. Invariant Wardrobe: wearing {locked_tops} and {locked_bottoms}"
     
+    dur_map = {"4s": 4, "6s": 6, "8s": 8, "10s": 10}
     total_sec = 0.0
     for scn in scenes:
         if "voiceover" in scn: scn["voiceover"] = sanitize_policy_text(scn["voiceover"])
         if "director" in scn: scn["director"] = sanitize_policy_text(scn["director"])
         
         actual_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
-        standard_dur = snap_scene_bucket(scn.get("aida_stage", ""), actual_speech_time)
-        scn["dur"] = standard_dur
+        
+        # PHÂN BỔ THỜI LƯỢNG ĐỘNG: Lấy mốc AI chọn, đối soát với thời gian đọc thực tế để khung hình luôn >= thời gian đọc
+        ai_dur = scn.get("dur", "")
+        ai_sec = dur_map.get(ai_dur, 0)
+        calc_bucket = snap_scene_bucket(actual_speech_time)
+        calc_sec = dur_map.get(calc_bucket, 6)
+        
+        final_sec = max(ai_sec, calc_sec) if ai_sec > 0 else calc_sec
+        final_bucket = f"{final_sec}s"
+        
+        scn["dur"] = final_bucket
         scn["actual_speech_sec"] = actual_speech_time
-        total_sec += float(standard_dur.replace("s", ""))
+        total_sec += float(final_sec)
         
         clean_action = re.sub(r'\[.*?\]', '', scn.get("action_en", "")).strip()
         camera_shot = scn.get("camera_shot", "Vertical 9:16 cinematic shot")
         sfx_sound = scn.get("sfx", "Layered realistic ambient sensory Foley sounds")
         micro_expr = scn.get("expression", "Natural expressive facial micro-emotions")
         
-        # PROMPT ẢNH FLUX / MIDJOURNEY TINH GỌN (GIẢM 60% ĐỘ DÀI, TRIỆT TIÊU TỪ KHÓA RÁC)
+        # PROMPT ẢNH TINH GỌN (FLUX / MIDJOURNEY)
         scn["img_p"] = (
             f"{camera_shot}. {unified_subject}. "
             f"Setting: {locked_setting}. "
@@ -579,7 +603,7 @@ def create_scene_details(target_id, mode, style):
         
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
-    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Khóa tuyệt đối 4s/6s/8s/10s | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>🛡 <b>Tuân thủ chính sách giá:</b> Tích hợp câu miễn trừ giá hợp quy chống quét vi phạm sàn | 🎬 <b>Tình huống thực tế:</b> Tương tác sinh động chuẩn đời sống<br>🔒 <b>Bảo tồn sản phẩm:</b> Khóa cứng kết cấu hình học bất biến, bảo tồn 100% tem nhãn và chữ in nguyên bản<br>🎵 <b>Hệ thống đa giác quan:</b> Âm thanh SFX & Foley đa tầng | 😊 <b>Vi biểu cảm & hình thể KOC:</b> Biến thiên tự nhiên theo tâm lý AIDA<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
+    res["director_summary"] = f"⏱ <b>Thời lượng kịch bản:</b> Khoảng {int(total_sec)} giây (Thời lượng động 4s/6s/8s/10s theo độ sâu nội dung | Khung cảnh luôn ≥ thời gian đọc) | 🎙 <b>Chỉ đạo giọng:</b> 100% nhân vật nói trực tiếp trên hình (100% Giọng Hà Nội chuẩn đúng độ tuổi | Tốc độ 4.8 - 5.2 từ/s)<br>👗 <b>Ma trận khóa diện mạo 5 lớp:</b> {res.get('outfit_vi', 'Khóa chết áo, quần/váy, kiểu tóc và bối cảnh suốt 4 cảnh')}<br>📖 <b>Mạch truyện liền khúc:</b> 4 cảnh gắn kết logic thành 1 câu chuyện hoàn chỉnh | 🛡 <b>Tuân thủ chính sách:</b> Câu miễn trừ giá có hạn theo khung giờ<br>🔒 <b>Bảo tồn sản phẩm:</b> Khóa cứng kết cấu hình học bất biến, bảo tồn 100% tem nhãn và chữ in nguyên bản<br>🎵 <b>Hệ thống đa giác quan:</b> Âm thanh SFX & Foley đa tầng | 😊 <b>Vi biểu cảm & hình thể KOC:</b> Biến thiên tự nhiên theo tâm lý AIDA<br>📍 <b>Bối cảnh logic cố định:</b> {locked_setting}<br>🚫 <b>Bộ lọc thị giác:</b> Triệt tiêu hoàn toàn icon giỏ hàng, nút bấm ảo và chữ phụ đề nổi"
     
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -612,7 +636,7 @@ def clone_script(script_id):
     prompt = f"""
     SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)} | KỊCH BẢN GỐC #{script_id}: TIÊU ĐỀ: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
-    NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá kèm câu miễn trừ giá hợp quy chuẩn, nhân bản thành 5 biến thể kịch bản thoại mới theo 5 góc kể chuyện. 100% nhân vật nói trực tiếp bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ NGỮ MIỀN NAM.
+    NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá kèm câu miễn trừ giá hợp quy chuẩn, nhân bản thành 5 biến thể kịch bản thoại mới theo 5 góc kể chuyện liền mạch, hấp dẫn. 100% nhân vật nói trực tiếp bằng Giọng Hà Nội chuẩn đúng độ tuổi, tốc độ 4.8 - 5.2 từ/s. TUYỆT ĐỐI CẤM TỪ NGỮ MIỀN NAM.
     TRẢ VỀ JSON:
     {{
         "outlines": [
@@ -635,7 +659,7 @@ def clone_script(script_id):
             "id": cur_len + idx + 1, "title": cl.get("title", f"Biến thể kịch bản #{cur_len + idx + 1}"),
             "setting": cl.get("setting", "Không gian phù hợp"), "hook": sanitize_policy_text(cl.get("hook", "")),
             "actors": new_actors_count, "character_profiles": new_profiles,
-            "duration_instruction": target.get("duration_instruction", "Khoảng 30 giây"), "narrator_mode": "Nhân vật xuất hiện (On-camera)"
+            "duration_instruction": target.get("duration_instruction", "Thời lượng động"), "narrator_mode": "Nhân vật xuất hiện (On-camera)"
         })
     return formatted_clones
 
@@ -834,8 +858,8 @@ with st.sidebar:
                         target_exp_str = r_date.strftime("%Y-%m-%d")
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
-                        dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
+                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -987,7 +1011,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 outlines = res.get("outlines", res.get("script_outlines", []))
                 for o in outlines: 
                     if "hook" in o: o["hook"] = sanitize_policy_text(o["hook"])
-                    o.update({"duration_instruction": "Khoảng 30 giây", "narrator_mode": "Nhân vật xuất hiện (On-camera)", "character_profiles": st.session_state.character_profiles, "actors": num_chars})
+                    o.update({"duration_instruction": "Thời lượng động linh hoạt", "narrator_mode": "Nhân vật xuất hiện (On-camera)", "character_profiles": st.session_state.character_profiles, "actors": num_chars})
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
                 st.toast("✅ Đã phân tích xong đầy đủ DNA!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
@@ -1127,7 +1151,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng tình huống đời thực, tối ưu Prompt ảnh và kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang áp dụng thời lượng động và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = int(target_id_to_run); st.session_state.scroll_to_detail = True; success = True
         except Exception as e: error_msg = str(e)
@@ -1155,8 +1179,8 @@ if all_sc:
     a_opts = ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước"]
     c_ang = cg1.selectbox("🧭 Chiến lược mới:", a_opts, key=f"ea_{st.session_state.reset_key}")
     c_num = cg2.number_input("Số diễn viên:", 1, 8, num_chars, key=f"en_{st.session_state.reset_key}")
-    c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Tự động đồng bộ thoại", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
-    c_dur_str = f"Chính xác {cg3.number_input('Số giây:', 10, 300, 60, key=f'eds_{st.session_state.reset_key}')} giây." if "Tùy" in c_dur_choice else "Khoảng 30 giây."
+    c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Thời lượng động linh hoạt", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
+    c_dur_str = f"Chính xác {cg3.number_input('Số giây:', 10, 300, 60, key=f'eds_{st.session_state.reset_key}')} giây." if "Tùy" in c_dur_choice else "Thời lượng động linh hoạt"
     c_nar = cg4.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)"], key=f"ena_{st.session_state.reset_key}")
 
     e_chars = []
