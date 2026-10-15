@@ -370,10 +370,10 @@ def repair_and_parse_json(text_content: str):
     raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng bấm tạo lại.")
 
 # ==============================================================================
-# HÀM GỌI GEMINI NÂNG CẤP VỚI AUTO-FALLBACK & RETRY RESILIENCE (TRỊ LỖI 503/429/404)
+# HÀM GỌI GEMINI NÂNG CẤP: CHUẨN MODEL 3.8 FLASH & GIÃN CÁCH RETRY VƯỢT LỖI 503
 # ==============================================================================
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    models_to_try = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
+    models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
     last_exception = None
 
     for model_name in models_to_try:
@@ -394,22 +394,21 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6
                 last_exception = e
                 err_str = str(e).lower()
                 
-                # Nếu model không tồn tại trên hệ thống tài khoản (404), nhảy sang model tiếp theo ngay
+                # Nếu model 404 (không tồn tại), đổi model khác ngay lập tức
                 if "404" in err_str or "not_found" in err_str:
                     break
                 
-                # Nếu gặp lỗi máy chủ Google quá tải (503) hoặc chạm ngưỡng rate-limit (429)
+                # Nếu gặp 503 (quá tải tạm thời) hoặc 429 (rate-limit), chờ giãn cách rồi thử lại
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
-                    wait_time = (attempt + 1) * 2.5
-                    time.sleep(wait_time)
+                    time.sleep((attempt + 1) * 2.0)
                     continue
                 
-                time.sleep(1.5)
+                time.sleep(1.0)
 
     if last_exception:
         err_msg = str(last_exception)
         if "503" in err_msg or "unavailable" in err_msg.lower():
-            raise Exception("Máy chủ AI của Google đang bị quá tải tạm thời trên toàn cầu (503). Vui lòng đợi khoảng 5-10 giây rồi bấm tạo lại.")
+            raise Exception("Máy chủ AI của Google đang bị quá tải tạm thời (503). Vui lòng đợi khoảng 5-10 giây rồi bấm tạo lại.")
         raise last_exception
 
 # ==============================================================================
@@ -1108,7 +1107,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         cb, cm = compress_image_bytes(f, 768, 75)
                         st.session_state["saved_reference_images"].append((cb, cm))
 
-                override_instruction = f"BẮT BUỘC KHÓA HERO SKU LÀ: '{hero_sku_override.strip()}' theo yêu cầu trực tiếp của người dùng." if hero_sku_override.strip() else "QUÉT OCR ƯU TIÊN TUYỆT ĐỐI Ô PHÂN LOẠI CÓ GẮN ICON NGỌN LỬA '🔥', 'Hot', 'Bán chạy', 'Top 1'. Nếu ô có tag này, BẮT BUỘC 100% chọn ô đó là Hero SKU! Không chọn màu khác khi đã có tag Hot/Bán chạy."
+                override_instruction = f"BẮT BUỘC KHÓA HERO SKU LÀ: '{hero_sku_override.strip()}' theo yêu cầu trực tiếp của người dùng." if hero_sku_override.strip() else "QUÉT OCR ƯU TIÊN TUYỆT ĐỐI Ô PHÂN LOẠI CÓ GẮN ICON NGỌN LỬA '🔥', 'Hot', 'Bán chạy', 'Top 1'[cite: 6]. Nếu ô có tag này, BẮT BUỘC 100% chọn ô đó là Hero SKU! Không chọn màu khác khi đã có tag Hot/Bán chạy."
 
                 prompt = f"""
                 INPUT: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: {custom_note}
@@ -1322,7 +1321,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang tích hợp SFX, vi biểu cảm và dựng kịch bản #{target_id_to_run}..."):
+            with st.spinner(f"⏳ Đang phân tích kết cấu thực tế, ma trận khóa 5 lớp và dựng kịch bản #{target_id_to_run}..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, st.session_state.last_style)
                 st.session_state.active_script_id = int(target_id_to_run)
                 st.session_state.scroll_to_detail = True
