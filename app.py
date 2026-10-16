@@ -267,6 +267,33 @@ def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prom
     components.html(html_code, height=45)
 
 # ==============================================================================
+# QUẢN LÝ DỰ ÁN NÂNG CẤP: TỰ ĐỘNG KHÔI PHỤC KHI LƯU & ĐỔI TÊN DỄ DÀNG
+# ==============================================================================
+def save_project_to_db(email, title, payload_data, project_id=None):
+    if not supabase: return False, "Chưa kết nối cơ sở dữ liệu."
+    try:
+        clean_content = json.loads(json.dumps(payload_data, default=str))
+        if project_id:
+            res = supabase.table("saved_projects").update({
+                "project_title": title,
+                "script_content": clean_content
+            }).eq("id", project_id).execute()
+            if res.data and len(res.data) > 0:
+                return True, "Đã cập nhật dự án thành công!"
+        
+        res = supabase.table("saved_projects").insert({
+            "user_email": email,
+            "project_title": title,
+            "script_content": clean_content
+        }).execute()
+        if res.data and len(res.data) > 0:
+            st.session_state.current_project_id = res.data[0]['id']
+            return True, "Đã lưu thành dự án mới thành công!"
+        return False, "Không thể lưu dữ liệu dự án."
+    except Exception as e:
+        return False, str(e)
+
+# ==============================================================================
 # KHỞI TẠO STATE & KIỂM SOÁT TIẾN TRÌNH TOÀN CỤC
 # ==============================================================================
 if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
@@ -401,21 +428,15 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     
     🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
-    - Phân tích linh hoạt theo đúng thực tế sản phẩm và góc độ kịch bản (Phòng ngủ gia đình, góc bếp/bàn ăn, bàn làm việc công sở, phòng khách ấm cúng, kho TMĐT Flash Sale...).
-    - TUYỆT ĐỐI KHÔNG KHÓA CỨNG vào bất kỳ bối cảnh đơn lẻ nào!
+    - Phân tích linh hoạt theo đúng thực tế sản phẩm và góc độ kịch bản.
 
-    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP TỪ 0.00s (ON-CAMERA LIP-SYNC DIALOGUE):
+    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI NÓI TRỰC TIẾP TỪ 0.00s:
     - CẢ 4 CẢNH (CẢNH 1, 2, 3, 4) LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ GIÂY ĐẦU TIÊN (0.00s). KHẨU HÌNH NHÂN VẬT MỞ MIỆNG NÓI KHỚP LỜI THOẠI.
-    - CÂU THOẠI PHẢI XUÔI TAI, TỰ NHIÊN, CÓ Ý NGHĨA VÀ ĐẬM CHẤT ĐỜI THƯỜNG MIỀN BẮC (tránh lặp từ, tránh câu cú ngược ngữ pháp kiểu dịch máy).
-    - CẤM TUYỆT ĐỐI TỪ 'NGÀN'. 100% BẮT BUỘC DÙNG TỪ 'NGHÌN' (ví dụ: 'mấy chục nghìn', 'trăm nghìn').
-    - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE' (tránh bị AI nền tảng phạt hiểu nhầm là livestream).
-    - CẤM TUYỆT ĐỐI TỪ NGỮ VÀ KHẨU NGỮ MIỀN NAM: CẤM 'xài', 'nè', 'nha', 'nghen', 'hén', 'tui', 'bận đồ', 'ly nước', 'muỗng', 'dùm', 'giùm', 'rùi', 'mần', 'thiệt', 'hổng'.
-    - BẮT BUỘC 100% khẩu ngữ Hà Nội chuẩn: 'dùng', 'này', 'nhé', 'nhỉ', 'tôi/mình/em/mẹ', 'mặc đồ', 'cốc nước', 'thìa', 'hộ/giúp', 'rồi', 'thật', 'không'.
-    - TUYỆT ĐỐI KHÔNG CÓ GIỌNG THUYẾT MINH NGOÀI (NO OFF-SCREEN NARRATOR).
-    🛑 BỘ LỌC CHÍNH SÁCH ĐA NGÀNH HÀNG:
-    - CẤM: 'tuyệt đối', 'hoàn toàn', '100%', 'cam kết', 'dứt điểm', 'đặc trị', 'khỏi hẳn', 'vĩnh viễn'.
-    - AN TOÀN TRẺ EM: Trẻ em LUÔN CÓ NGƯỜI LỚN KỀ BÊN trong mọi cảnh, TUYỆT ĐỐI CẤM để bé một mình trong khung hình.
-    - DƯỢC / TPCN: Không nhận là thuốc điều trị, chỉ dùng từ 'hỗ trợ', 'bổ sung'.
+    - CÂU THOẠI PHẢI XUÔI TAI, TỰ NHIÊN, CÓ Ý NGHĨA VÀ ĐẬM CHẤT ĐỜI THƯỜNG MIỀN BẮC.
+    - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN').
+    - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
+    - CẤM TUYỆT ĐỐI KHẨU NGỮ MIỀN NAM. BẮT BUỘC 100% khẩu ngữ Hà Nội chuẩn.
+    - TUYỆT ĐỐI KHÔNG CÓ GIỌNG THUYẾT MINH NGOÀI.
     🛑 100% NGƯỜI VIỆT HƯ CẤU: Tuyệt đối cấm mặt ngoại quốc, cấm người nổi tiếng.
     🛑 {char_rules}
     """
@@ -515,7 +536,7 @@ def create_scene_details(target_id, mode, style):
         "product": dna.get("what_and_unique", ""),
         "hero_sku": dna.get("hero_sku_color", ""),
         "color_lock": dna.get("product_color_lock", ""),
-        "dimensions": dna.get("product_dimensions", ""),
+        "dimensions": dna.get("product_dimensions", "Kích thước đời thực chuẩn xác"),
         "product_scale_relative": dna.get("product_scale_relative", "Kích thước đời thực tương xứng bàn tay người lớn"),
         "mechanism": dna.get("lid_mechanism", "Kết cấu cơ học chuẩn xác theo đời thực"),
         "operational_mechanism": dna.get("operational_mechanism", "Cơ chế vận hành thực tế chuẩn xác của sản phẩm"),
@@ -553,7 +574,8 @@ def create_scene_details(target_id, mode, style):
     - Tuyệt đối không yêu cầu hiện chữ/text trên màn hình video!
 
     🛑 CHỈ THỊ ƯU TIÊN 3: KHÓA MẠCH TRUYỆN THEO ĐÚNG TIÊU ĐỀ '{fixed_title}' VÀ ĐỒNG NHẤT KÍCH THƯỚC VẬT LÝ
-    - Tỷ lệ kích thước sản phẩm: '{condensed_dna.get("product_scale_relative")}' (bất biến qua 4 cảnh).
+    - Số đo thực tế: '{condensed_dna.get("dimensions")}'.
+    - Tỷ lệ kích thước sản phẩm: '{condensed_dna.get("product_scale_relative")}' (bất biến qua 4 cảnh so với bàn tay và thân người).
     - CẢ 4 CẢNH BẮT ĐẦU NÓI NGAY TỪ 0.00S.
     - THỜI LƯỢNG KHỚP NHỊP ĐỌC: Nếu thoại dài từ 5.3s - 7.2s, BẮT BUỘC gán 'dur': '8s' (CẤM gán 10s nếu thoại chưa tới 7.2s!).
     - NẾU LÀ SẢN PHẨM THỜI TRANG (is_fashion_styling = true): Áp dụng các mẫu quần/chân váy cụ thể từ 'fashion_mix_and_match' vào 'scene_outfit_en'.
@@ -590,7 +612,7 @@ def create_scene_details(target_id, mode, style):
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "expression": "Ánh mắt đồng cảm, nụ cười hào hứng mở màn nhìn thẳng camera",
                 "sfx": "Tiếng mở hộp hoặc âm thanh đời thực nhẹ nhàng",
-                "action_en": "Fictional character looking directly into camera, speaking with natural lip-sync from 0.00s, holding the product steadily at chest level with invariant real-life scale.",
+                "action_en": "Fictional creator looking directly into camera, speaking with natural lip-sync from 0.00s, holding the product steadily at chest level with invariant real-life scale.",
                 "director": "Attention | Bám sát tiêu đề '{fixed_title}' | Nhân vật nói trực tiếp on-camera lip-sync từ 0.00s | Khởi động: 0.00s",
                 "voiceover": "Đoạn thoại mở màn tự nhiên dưới 24 từ bám sát tiêu đề '{fixed_title}' bằng tiếng Hà Nội chuẩn, dùng từ 'nghìn'..."
             }},
@@ -651,17 +673,15 @@ def create_scene_details(target_id, mode, style):
     locked_bottoms = c_mat.get("locked_bottoms") or "comfortable trousers"
     default_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm realistic indoor setting")
     
-    # BỘ PHỦ ĐỊNH CÔ ĐỌNG, MẬT ĐỘ CAO - BẢO VỆ TUYỆT ĐỐI CHỐNG LỖI CELEBRITY & SCALE SHIFTING
     base_negative = "celebrity likeness, famous person, recognizable public figure, deepfake, celebrity lookalike, inconsistent product scale, oversized product, miniaturized product, giant object, scale shifting, deformed hands, extra fingers, text, watermark, subtitles, UI overlay, cartoon graphics, changing clothes, changing hairstyle, morphed product, melting plastic, blurred edges"
     
     is_fashion_styling = res.get("is_fashion_styling", False)
     if res.get("clean_product_name_en"):
         clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en"))
         
-    product_scale_en = res.get("product_scale_en") or f"strictly invariant physical real-life dimensions matching adult human hand proportions ({condensed_dna.get('product_scale_relative')}), zero scale shifting"
+    product_scale_en = res.get("product_scale_en") or f"strictly invariant physical real-life dimensions matching adult human hand proportions ({condensed_dna.get('dimensions')}, {condensed_dna.get('product_scale_relative')}), zero scale shifting"
     connector_physics_en = res.get("connector_physics_en") or "flexible silicone tube connecting parts naturally"
     
-    # ĐỊNH DANH NHÂN VẬT TINH GỌN (CHỐNG LỖI NGƯỜI NỔI TIẾNG)
     actor_base = f"{full_char}, strictly invariant {locked_hair_color} in {locked_hair}"
     wardrobe_str = f"wearing {locked_tops} and {locked_bottoms}"
     if locked_outer and locked_outer.lower() != "none":
@@ -674,7 +694,6 @@ def create_scene_details(target_id, mode, style):
         
         raw_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
         
-        # THUẬT TOÁN THỜI LƯỢNG CHUẨN XÁC THEO NHỊP ĐỌC THỰC TẾ
         if raw_speech_time <= 3.2: 
             final_sec = 4
         elif raw_speech_time <= 5.2: 
@@ -711,25 +730,23 @@ def create_scene_details(target_id, mode, style):
             
         actor_full = f"{actor_base}, {active_outfit_desc}"
         
-        # PROMPT ẢNH TINH GỌN
         if scene_num == 1:
             scene_focus = f"Establishing shot in {scene_setting_en}. {actor_full}. Character looking at camera with {micro_expr}, holding {clean_prod_en} at chest level ({product_scale_en}), open packaging nearby."
         elif scene_num == 2:
-            scene_focus = f"Medium close-up in {scene_setting_en}. {actor_full}. Character speaking to camera with moving lips, holding {clean_prod_en} securely with steady five-finger hands to showcase details, {product_scale_en} strictly maintained."
+            scene_focus = f"Medium close-up in {scene_setting_en}. {actor_full}. Character speaking to camera with moving lips, holding {clean_prod_en} securely with steady five-finger hands to showcase details, camera frames closer without enlarging the object's physical scale relative to hands ({product_scale_en})."
         elif scene_num == 3:
-            scene_focus = f"Lifestyle shot in {scene_setting_en}. {actor_full}. Character happily demonstrating practical benefits of {clean_prod_en} with {micro_expr}, holding product steadily with zero deformation, {product_scale_en} invariant."
+            scene_focus = f"Lifestyle shot in {scene_setting_en}. {actor_full}. Character happily demonstrating practical benefits of {clean_prod_en} with {micro_expr}, holding product steadily with zero deformation, maintaining exact 1:1 physical dimensions ({product_scale_en})."
         else:
             scene_focus = f"Commercial closing in {scene_setting_en}. {actor_full}. Character smiling warmly into lens, welcoming open-palm gesture, holding {clean_prod_en} beside them with {product_scale_en}."
             
         raw_img = (
             f"{camera_shot}. {scene_focus} "
-            f"Product: Authentic {clean_prod_en}, strictly rigid non-deformable structure, invariant physical scale. "
+            f"Product: Authentic {clean_prod_en}, strictly rigid non-deformable structure, invariant real-life physical scale ({condensed_dna.get('dimensions')}). "
             f"Commercial photography, clean lighting, sharp focus. "
             f"Negative prompt: {active_negative}."
         )
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         
-        # PROMPT VIDEO TINH GỌN (VEO 3 SAFE)
         speaker_line = scn.get("voiceover", "")
         raw_vid = (
             f"{camera_shot}. Commercial live-action footage. {actor_full}. "
@@ -744,12 +761,11 @@ def create_scene_details(target_id, mode, style):
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     
-    # BẢNG TỔNG QUAN TINH GỌN CHỈ 4 DÒNG CỐT LÕI
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s | 🎬 <b>Hình thức:</b> {presentation_format}",
         f"🏙 <b>Bối cảnh:</b> {fixed_setting_base}",
         f"👗 <b>Trang phục:</b> {res.get('outfit_vi', 'Trang phục đời thường phù hợp bối cảnh')}",
-        f"🛠 <b>Đặc điểm sản phẩm:</b> {condensed_dna.get('operational_mechanism', '')}"
+        f"🛠 <b>Đặc điểm sản phẩm:</b> {condensed_dna.get('dimensions')} - {condensed_dna.get('operational_mechanism', '')}"
     ]
     
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
@@ -863,19 +879,8 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
         })
     return more_scripts
 
-def save_project_to_db(email, title, payload_data, project_id=None):
-    if not supabase: return "Chưa kết nối Supabase."
-    try:
-        clean_content = json.loads(json.dumps(payload_data, default=str))
-        if project_id: supabase.table("saved_projects").update({"project_title": title, "script_content": clean_content}).eq("id", project_id).execute()
-        else:
-            res = supabase.table("saved_projects").insert({"user_email": email, "project_title": title, "script_content": clean_content}).execute()
-            if res.data: st.session_state.current_project_id = res.data[0]['id']
-        return True
-    except Exception as e: return str(e)
-
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN (LỊCH CHỌN NGÀY)
+# 3. THANH BÊN (SIDEBAR) & QUẢN LÝ DỰ ÁN NÂNG CẤP
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -930,11 +935,22 @@ with st.sidebar:
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.rerun()
             
-        st.session_state.active_project_title = st.text_input("Tên dự án:", value=st.session_state.active_project_title)
-        if st.button("💾 Lưu Dự Án", use_container_width=True, disabled=is_system_busy):
+        st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", value=st.session_state.active_project_title)
+        
+        c_save1, c_save2 = st.columns(2)
+        if c_save1.button("💾 Lưu Dự Án", use_container_width=True, disabled=is_system_busy):
             payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context"]}
-            if save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id):
-                st.toast("✅ Đã lưu dự án!")
+            success, msg = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
+            if success: st.toast(f"✅ {msg}")
+            else: st.error(f"❌ {msg}")
+            
+        if c_save2.button("📑 Lưu Bản Mới", use_container_width=True, disabled=is_system_busy, help="Lưu nội dung hiện tại thành một dự án mới hoàn toàn"):
+            payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context"]}
+            success, msg = save_project_to_db(st.session_state.current_email, f"{st.session_state.active_project_title} (Bản sao)", payload, project_id=None)
+            if success: 
+                st.session_state.active_project_title = f"{st.session_state.active_project_title} (Bản sao)"
+                st.toast("✅ Đã lưu thành dự án mới độc lập!"); time.sleep(0.4); st.rerun()
+            else: st.error(f"❌ {msg}")
         
         st.markdown("---")
         st.markdown("### 📂 KHO DỰ ÁN")
@@ -951,6 +967,14 @@ with st.sidebar:
             else:
                 for p in display_projects:
                     with st.expander(f"🎬 {p['project_title']}"):
+                        new_p_name = st.text_input("Đổi tên dự án:", value=p['project_title'], key=f"ren_txt_{p['id']}")
+                        if st.button("✏️ Cập Nhật Tên", key=f"ren_btn_{p['id']}", use_container_width=True, disabled=is_system_busy):
+                            if new_p_name.strip() and new_p_name.strip() != p['project_title']:
+                                supabase.table("saved_projects").update({"project_title": new_p_name.strip()}).eq("id", p['id']).execute()
+                                if str(st.session_state.get("current_project_id")) == str(p['id']):
+                                    st.session_state.active_project_title = new_p_name.strip()
+                                st.toast("✅ Đã đổi tên dự án thành công!"); time.sleep(0.3); st.rerun()
+                        
                         col_o, col_d = st.columns(2)
                         if col_o.button("📂 Mở", key=f"o_{p['id']}", use_container_width=True, disabled=is_system_busy):
                             sd = p.get("script_content", {})
@@ -968,7 +992,9 @@ with st.sidebar:
                             st.rerun()
                         if col_d.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True, disabled=is_system_busy):
                             supabase.table("saved_projects").delete().eq("id", p['id']).execute()
-                            st.toast("✅ Đã xóa!"); time.sleep(0.3); st.rerun()
+                            if str(st.session_state.get("current_project_id")) == str(p['id']):
+                                st.session_state.current_project_id = None
+                            st.toast("✅ Đã xóa dự án!"); time.sleep(0.3); st.rerun()
 
                 if not search_proj.strip() and len(all_projects) > 3:
                     if st.session_state.show_all_projects:
@@ -1072,7 +1098,7 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH - TÍCH HỢP HỘP XEM TRƯỚC ẢNH ĐÃ TẢI LÊN (ẨN GỌN)
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
@@ -1086,6 +1112,15 @@ if is_viral_mode:
     viral_persona = col_v1.text_input("👤 Định vị Kênh:", key=f"viral_persona_{st.session_state.reset_key}")
     viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, key=f"viral_topic_{st.session_state.reset_key}")
     up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
+    
+    # HỘP XEM TRƯỚC ẢNH GẬP GỌN (TIÊU THỤ 0 TOKEN)
+    if up_files:
+        with st.expander(f"👁 Xem lại {len(up_files)} ảnh đã tải lên", expanded=False):
+            n_cols = min(len(up_files), 4)
+            cols = st.columns(n_cols)
+            for idx, f in enumerate(up_files):
+                cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                
     custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
@@ -1097,6 +1132,15 @@ else:
     col_f1, col_f2 = st.columns([2, 1])
     up_files = col_f1.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
     hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Đỏ, Be, Size L...", key=f"hero_override_{st.session_state.reset_key}")
+    
+    # HỘP XEM TRƯỚC ẢNH GẬP GỌN (TIÊU THỤ 0 TOKEN)
+    if up_files:
+        with st.expander(f"👁 Xem lại {len(up_files)} ảnh sản phẩm đã tải lên", expanded=False):
+            n_cols = min(len(up_files), 4)
+            cols = st.columns(n_cols)
+            for idx, f in enumerate(up_files):
+                cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                
     custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2, col_opt3 = st.columns([1.2, 1.2, 1.2])
@@ -1195,7 +1239,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "flexible_connector_specs": "Nếu có dây nối/ống silicone: Ghi rõ độ dài ước tính (20-25cm), đường kính ngoài (6-8mm), chất liệu silicone mờ dẻo, độ võng cong chữ U tự nhiên theo trọng lực nối giữa 2 tay. Nếu không có dây thì ghi 'Không có dây nối'.",
                         "strict_anti_morph_targets": "Các vật thể AI dễ vẽ nhầm/hallucination (ví dụ: ống tiêm y tế xylanh, kim tiêm, que nhựa) để cấm tiệt.",
                         "detected_prices": "Quét OCR giá tiền (giá gốc và giá sale)",
-                        "rounded_price_anchor": "TÂM LÝ HỌC NEO GIÁ TƯƠNG PHẢN LINH HOẠT (100% DÙNG TỪ 'NGHÌN', CẤM 'NGÀN', CẤM 'TRỢ GIÁ'): Làm tròn giá gốc TIẾN LÊN mốc chẵn cao hơn, giá sale linh hoạt dùng các từ 'khoảng...', 'gần...', 'chưa tới...', 'tầm...'. Ví dụ: 'Giá gốc gần [X] nghìn -> Nay giảm chỉ còn khoảng [Y] nghìn' hoặc 'gần [Y] nghìn', 'chưa tới [Y] nghìn'",
+                        "rounded_price_anchor": "TÂM LÝ HỌC NEO GIÁ TƯƠNG PHẢN LINH HOẠT (100% DÙNG TỪ 'NGHÌN', CẤM 'NGÀN', CẤM 'TRỢ GIÁ'): Làm tròn giá gốc TIẾN LÊN mốc chẵn cao hơn, giá sale linh hoạt dùng các từ 'khoảng...', 'gần...', 'chưa tới...', 'tầm...'.",
                         "product_dimensions": "Thông số kích thước",
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
