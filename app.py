@@ -170,6 +170,52 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
     return cleaned
 
 # ==============================================================================
+# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC BẤT BIẾN (HỖ TRỢ ĐƠN & ĐA NHÂN VẬT)
+# ==============================================================================
+def get_demographics_description(char_profiles):
+    if not char_profiles:
+        return "female", "A 26-year-old native Vietnamese woman"
+    
+    parts = []
+    primary_gender = "female"
+    for idx, p in enumerate(char_profiles):
+        role_lower = str(p.get("role", "")).lower()
+        if any(k in role_lower for k in ["bố", "ba", "chồng", "bác trai"]):
+            desc = "a 28-year-old native Vietnamese father"
+            if idx == 0: primary_gender = "male"
+        elif any(k in role_lower for k in ["nam", "anh", "trai", "thanh niên"]):
+            desc = "a 26-year-old native Vietnamese young man"
+            if idx == 0: primary_gender = "male"
+        elif any(k in role_lower for k in ["ông", "già", "bác già", "ông nội", "ông ngoại"]):
+            desc = "a 65-year-old native Vietnamese elderly man"
+            if idx == 0: primary_gender = "male"
+        elif any(k in role_lower for k in ["bà", "bà nội", "bà ngoại"]):
+            desc = "a 65-year-old native Vietnamese elderly woman"
+            if idx == 0: primary_gender = "female"
+        elif any(k in role_lower for k in ["bé trai", "con trai"]):
+            desc = "a cute 4-year-old native Vietnamese boy"
+            if idx == 0: primary_gender = "male"
+        elif any(k in role_lower for k in ["bé gái", "con gái"]):
+            desc = "a cute 3-year-old native Vietnamese girl"
+            if idx == 0: primary_gender = "female"
+        elif any(k in role_lower for k in ["mẹ", "chị", "cô", "vợ"]):
+            desc = "a 26-year-old native Vietnamese mother"
+            if idx == 0: primary_gender = "female"
+        else:
+            desc = f"a 26-year-old native Vietnamese {'man' if 'nam' in role_lower else 'woman'}"
+            if idx == 0: primary_gender = "male" if 'nam' in role_lower else "female"
+        parts.append(desc)
+    
+    if len(parts) == 1:
+        full_demo = parts[0].capitalize()
+    elif len(parts) == 2:
+        full_demo = f"{parts[0].capitalize()} and {parts[1]}"
+    else:
+        full_demo = f"{', '.join(parts[:-1]).capitalize()} and {parts[-1]}"
+    
+    return primary_gender, full_demo
+
+# ==============================================================================
 # BỘ LỌC BẢN QUYỀN & NGƯỜI NỔI TIẾNG (IP & CELEBRITY SAFEGUARD)
 # ==============================================================================
 def sanitize_third_party_ip(text: str) -> str:
@@ -552,9 +598,11 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {outro_instruction}
     {override_rule}
     
-    🛑 GIẢI PHÓNG THỜI LƯỢNG KỂ CHUYỆN (UNCONSTRAINED NARRATIVE PACING):
-    - TUYỆT ĐỐI KHÔNG ÉP CỨNG THỜI LƯỢNG (Cảnh 1 hoàn toàn có thể dài 8s, 10s nếu mở đầu bằng một câu chuyện hay hoặc tình huống kịch tính; các Cảnh 2, 3, 4 có thể linh hoạt từ 4s đến 12s tùy theo mạch cảm xúc).
-    - ƯU TIÊN HÀNG ĐẦU LÀ KỊCH BẢN PHẢI CUỐN HÚT, GIÀU CẢM XÚC, LOGIC MẠCH LẠC, VĂN NÓI TỰ NHIÊN NHƯ NGƯỜI BẢN ĐỊA NÓI CHUYỆN, TUYỆT ĐỐI KHÔNG BỊ GƯỢNG GẠO KIỂU DỊCH MÁY.
+    🛑 GIỚI HẠN CỨNG THỜI LƯỢNG VEO 3 (TỐI ĐA 10 GIÂY / PHÂN CẢNH):
+    - MỖI PHÂN CẢNH (CẢNH 1, 2, 3, 4) CÓ THỜI LƯỢNG LINH HOẠT TỪ 4s ĐẾN TỐI ĐA 10 GIÂY (đã bao gồm đệm diễn xuất tự nhiên).
+    - CẢNH 1 HOÀN TOÀN CÓ THỂ DÀI 7s, 8s, 9s HOẶC 10s nếu mở đầu bằng một câu chuyện hay, tình huống kịch tính hoặc tâm sự chạm cảm xúc.
+    - TUYỆT ĐỐI CẤM BẤT KỲ CẢNH NÀO VƯỢT QUÁ 10 GIÂY (để đảm bảo tương thích 100% với AI Veo 3).
+    - ĐỂ THỜI LƯỢNG KHÔNG QUÁ 10s: Số từ của mỗi phân cảnh BẮT BUỘC nằm trong khoảng từ 16 đến TỐI ĐA 36 TỪ!
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU (SPOKEN-SYNTAX DIRECTIVE):
     - Lời thoại phải xuôi tai, gãy gọn, đúng văn phong nói chuyện hằng ngày của người Hà Nội: Chủ ngữ -> Vị ngữ -> Hiệu quả thực tế.
@@ -596,7 +644,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - NÂNG CẤP BIÊN KỊCH TRIỆU VIEW & THỜI LƯỢNG SINH HỌC
+# HÀM TẠO CHI TIẾT KỊCH BẢN - THỜI LƯỢNG ĐỘNG TỐI ĐA 10 GIÂY CHO VEO 3
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -612,26 +660,7 @@ def create_scene_details(target_id, mode, style):
     is_viral = ("Viral" in current_active_mode)
     voice_guidance = build_voice_direction(current_active_mode, num_chars, char_profiles)
     
-    first_role = char_profiles[0].get("role", "") if char_profiles else ""
-    role_lower = first_role.lower()
-    if any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "bác trai"]):
-        detected_gender = "male"
-        detected_demographic_en = "A 28-year-old native Vietnamese man"
-    elif any(k in role_lower for k in ["ông", "già", "bác già", "ông nội", "ông ngoại"]):
-        detected_gender = "male"
-        detected_demographic_en = "A 65-year-old native Vietnamese elderly man"
-    elif any(k in role_lower for k in ["bà", "bà nội", "bà ngoại"]):
-        detected_gender = "female"
-        detected_demographic_en = "A 65-year-old native Vietnamese elderly woman"
-    elif any(k in role_lower for k in ["bé trai", "con trai"]):
-        detected_gender = "male"
-        detected_demographic_en = "A 4-year-old native Vietnamese boy with his mother"
-    elif any(k in role_lower for k in ["bé gái", "con gái"]):
-        detected_gender = "female"
-        detected_demographic_en = "A 3-year-old native Vietnamese girl with her mother"
-    else:
-        detected_gender = "female"
-        detected_demographic_en = "A 26-year-old native Vietnamese woman"
+    detected_gender, detected_demographic_en = get_demographics_description(char_profiles)
 
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_hook = sanitize_policy_text(outline.get('hook', ''))
@@ -669,22 +698,23 @@ def create_scene_details(target_id, mode, style):
     if is_viral:
         scene4_instruction = """
         🛑 CHỈ THỊ CẢNH 4 CHO THỂ LOẠI VIRAL & XÂY KÊNH (TUYỆT ĐỐI KHÔNG BÁN HÀNG):
-        - Đoạn thoại chuẩn giọng Hà Nội tự nhiên ấm áp, câu văn mượt mà truyền cảm.
+        - Đoạn thoại dưới 28 từ, chuẩn giọng Hà Nội tự nhiên ấm áp, câu văn mượt mà truyền cảm.
         - Kêu gọi tương tác, đặt câu hỏi gợi mở thảo luận hoặc chia sẻ mẹo hay + mời Follow kênh đón xem video tiếp theo.
         - TUYỆT ĐỐI CẤM: Không nhắc đến giá tiền, voucher, giảm giá, mua hàng hay giỏ hàng!
         """
-        scene4_sample = "Đoạn thoại kết nối người xem tự nhiên: Đặt câu hỏi thảo luận hoặc kết bài học sâu sắc + mời bấm follow kênh đón xem video sau!"
+        scene4_sample = "Đoạn thoại kết nối người xem tự nhiên dưới 28 từ: Đặt câu hỏi thảo luận hoặc kết bài học sâu sắc + mời bấm follow kênh đón xem video sau!"
     else:
         scene4_instruction = f"""
         🛑 CHỈ THỊ CẢNH 4 CHO TIKTOK SHOP (CHỐT DEAL AN TOÀN, KHÔNG TEXT):
+        - Đoạn thoại dưới 28 từ, chuẩn giọng Hà Nội, tuân thủ đúng công thức 3 vế xuôi tai.
         - ĐỌC CHUẨN XÁC SỐ TIỀN BẰNG CHỮ: Tham khảo phiên âm chuẩn: '{condensed_dna.get("price_anchor")}'. Đọc chuẩn xác các hàng đơn vị, chục, trăm, nghìn (CẤM đọc lộn số!).
-        - Đúng công thức 3 vế xuôi tai:
+        - Đúng công thức 3 vế:
           1. Giá gốc làm tròn tiến lên: 'Bình thường gần [X] nghìn...' (hoặc 'Giá gốc gần [X] tư...')
           2. Báo giá voucher ước lượng đuôi mấy chục (hoặc đọc đúng chữ): 'áp hết mã đợt này chỉ còn tầm [Y] mấy nghìn thôi...'
           3. Rào kiểm tra tài khoản + CTA: 'các mẹ bấm giỏ hàng góc trái kiểm tra xem tài khoản mình được giảm bao nhiêu nhé!'
         - Tuyệt đối không yêu cầu hiện chữ/text trên màn hình video!
         """
-        scene4_sample = "Đoạn thoại chốt deal xuôi tai đúng chuẩn 3 vế: Giá gốc gần [X] -> Áp hết mã còn tầm [Y mấy nghìn] -> Bấm giỏ hàng góc trái xem tài khoản mình được giảm bao nhiêu nhé!"
+        scene4_sample = "Đoạn thoại chốt deal xuôi tai dưới 28 từ đúng chuẩn 3 vế: Giá gốc gần [X] -> Áp hết mã còn tầm [Y mấy nghìn] -> Bấm giỏ hàng góc trái xem tài khoản mình được giảm bao nhiêu nhé!"
 
     prompt_text = f"""
     THÔNG TIN NỀN TẢNG: {json.dumps(condensed_dna, ensure_ascii=False)}
@@ -694,12 +724,14 @@ def create_scene_details(target_id, mode, style):
     - HOOK GỐC: '{fixed_hook}'
     - BỐI CẢNH KỊCH BẢN: {fixed_setting_base}
     - HÌNH THỨC VIDEO: '{presentation_format}'
-    - DIỄN VIÊN CHỈ ĐỊNH: {first_role or 'KOC Việt Nam'} -> BẮT BUỘC KHÓA CHẶT: {detected_demographic_en} (CẤM ĐỔI GIỚI TÍNH QUA CÁC CẢNH!).
+    - DIỄN VIÊN CHỈ ĐỊNH: BẮT BUỘC KHÓA CHẶT: {detected_demographic_en} (CẤM ĐỔI GIỚI TÍNH/DIỆN MẠO QUA CÁC CẢNH!).
     - HÌNH THỨC NÓI: 100% Lời thoại do CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S Ở CẢ 4 CẢNH (CẢNH 1, 2, 3, 4). TUYỆT ĐỐI CẤM THUYẾT MINH NGOÀI. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
     
-    🛑 CHỈ THỊ ƯU TIÊN 1: NGHỆ THUẬT KỂ CHUYỆN TRIỆU VIEW & KHÔNG ÉP CỨNG THỜI LƯỢNG
-    - CẢNH 1 HOÀN TOÀN CÓ THỂ DÀI 8S HOẶC 10S nếu cần mở đầu bằng câu chuyện đời thường ấn tượng, tình huống kịch tính hoặc nỗi niềm chạm cảm xúc.
-    - CÁC CẢNH 2, 3, 4 LINH HOẠT THỜI LƯỢNG tùy theo độ sâu của nội dung và trải nghiệm thực tế.
+    🛑 CHỈ THỊ ƯU TIÊN 1: NGHỆ THUẬT KỂ CHUYỆN VĂN HỌC & GIỚI HẠN THỜI LƯỢNG VEO 3 (TỐI ĐA 10 GIÂY/CẢNH)
+    - CẢNH 1 HOÀN TOÀN CÓ THỂ DÀI 7s, 8s, 9s HOẶC 10s nếu mở đầu bằng một câu chuyện đời thường ấn tượng, tình huống kịch tính hoặc nỗi niềm chạm cảm xúc.
+    - CÁC CẢNH 2, 3, 4 LINH HOẠT THỜI LƯỢNG tùy theo mạch kể chuyện.
+    - BẮT BUỘC MỖI PHÂN CẢNH DÀI TỐI ĐA 10 GIÂY (đã bao gồm đệm diễn xuất).
+    - TRẦN SỐ TỪ AN TOÀN CHO MỖI CẢNH (ĐỂ KHÔNG VƯỢT QUÁ 10 GIÂY VEO 3): Cảnh 1 (18-36 từ), Cảnh 2 (20-36 từ), Cảnh 3 (20-36 từ), Cảnh 4 (dưới 26 từ).
     - Câu thoại viết theo lối văn nói trực diện của người Hà Nội: Chủ ngữ -> Vị ngữ -> Cảm xúc/Hiệu quả. CẤM mở câu bằng 'Với thiết kế...', 'Được làm từ...'.
     - Lời thoại phải xuôi tai, cuốn hút, kết nối mượt mà giữa 4 cảnh, nói tự nhiên như người thật trò chuyện, tuyệt đối không lủng củng như dịch máy!
     
@@ -744,7 +776,7 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "looking at camera with an empathetic warm smile",
                 "sfx": "Tiếng mở hộp hoặc âm thanh đời thực nhẹ nhàng",
                 "director": "Attention | Bám sát tiêu đề '{fixed_title}' | Câu xuôi chuẩn tiếng Hà Nội | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại mở màn cuốn hút tự nhiên bám sát tiêu đề '{fixed_title}' bằng tiếng Hà Nội chuẩn xuôi tai, dùng từ 'nghìn'..."
+                "voiceover": "Đoạn thoại mở màn cuốn hút tự nhiên bám sát tiêu đề '{fixed_title}' (từ 18-36 từ) bằng tiếng Hà Nội chuẩn xuôi tai, dùng từ 'nghìn'..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -756,7 +788,7 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
                 "sfx": "Tiếng cơ học đanh chắc hoặc tiếng vuốt chất liệu ASMR",
                 "director": "Interest | Đặc tả chi tiết cơ chế hoặc giá trị bài học bám sát tiêu đề '{fixed_title}' | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng hô thân mật câu văn xuôi tai đào sâu đúng nội dung '{fixed_title}'..."
+                "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng hô thân mật câu văn xuôi tai đào sâu đúng nội dung '{fixed_title}' (từ 20-36 từ)..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -768,7 +800,7 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "smiling contentedly with an approving head nod",
                 "sfx": "Tiếng giác quan đời sống thực tế",
                 "director": "Desire | Trải nghiệm công năng hoặc góc nhìn sâu sắc bám sát tiêu đề '{fixed_title}' | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp đặc tả trải nghiệm thực tế bám sát '{fixed_title}' nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn xuôi tai..."
+                "voiceover": "Đoạn thoại KOC nói trực tiếp đặc tả trải nghiệm thực tế bám sát '{fixed_title}' nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn xuôi tai (từ 20-36 từ)..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
@@ -785,7 +817,7 @@ def create_scene_details(target_id, mode, style):
         ]
     }}
     """
-    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động sinh học", num_chars, char_profiles, user_custom_note, presentation_format), max_tokens=6500)
+    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động sinh học tối đa 10s", num_chars, char_profiles, user_custom_note, presentation_format), max_tokens=6500)
     if not res: raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
     scenes = res.get("scenes") or res.get("script") or []
@@ -816,15 +848,22 @@ def create_scene_details(target_id, mode, style):
             scn["director"] = sanitize_policy_text(scn["director"])
         
         # ======================================================================
-        # THUẬT TOÁN THỜI LƯỢNG ĐỘNG SINH HỌC (BIO-PACING ENGINE - HOÀN TOÀN TỰ DO)
+        # THUẬT TOÁN THỜI LƯỢNG ĐỘNG SINH HỌC - KHÓA CỨNG TỐI ĐA 10 GIÂY VEO 3
         # ======================================================================
         raw_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
-        acting_cushion = 1.0 if is_tiktok_shop else 1.4
-        dynamic_scene_sec = max(4, math.ceil(raw_speech_time + acting_cushion))
+        acting_cushion = 1.0 if is_tiktok_shop else 1.3
         
+        # Giới hạn phân cảnh tối thiểu 4s và TỐI ĐA 10s cho Veo 3
+        dynamic_scene_sec = min(10, max(4, math.ceil(raw_speech_time + acting_cushion)))
+        
+        if raw_speech_time >= dynamic_scene_sec:
+            actual_speech_time = round(dynamic_scene_sec - 0.8, 1)
+        else:
+            actual_speech_time = raw_speech_time
+            
         final_bucket = f"{dynamic_scene_sec}s"
         scn["dur"] = final_bucket
-        scn["actual_speech_sec"] = raw_speech_time
+        scn["actual_speech_sec"] = actual_speech_time
         total_sec += float(dynamic_scene_sec)
         
         camera_shot = scn.get("camera_shot", "Vertical 9:16 eye-level medium shot")
@@ -870,10 +909,15 @@ def create_scene_details(target_id, mode, style):
         
         # PROMPT VIDEO SIÊU TINH GỌN (VEO 3 SAFE, SẠCH RÁC CODE)
         speaker_line = scn.get("voiceover", "")
+        if is_viral and scene_num == 4:
+            action_phrase = "Hands in welcoming natural open-palm gestures, speaking directly into camera"
+        else:
+            action_phrase = f"Hands mechanically pinned at chest level, holding rigid {clean_prod_en} ({product_scale_en}){connector_phrase} with steady grip, zero wrist wobble, zero plastic morphing"
+
         raw_vid = (
             f"{camera_shot}. Commercial live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}. "
             f"Action: Visibly speaking directly to camera with natural on-camera lip-sync from 0.00s. Spoken audio: \"{speaker_line}\", Foley: [{sfx_sound}]. "
-            f"Hands mechanically pinned at chest level, holding rigid {clean_prod_en} ({product_scale_en}){connector_phrase} with steady grip, zero wrist wobble, zero plastic morphing. "
+            f"{action_phrase}. "
             f"Pure camera footage, strictly no text, no subtitles, no UI overlay. "
             f"Negative prompt: {vid_neg}."
         )
@@ -884,9 +928,8 @@ def create_scene_details(target_id, mode, style):
     
     # BẢNG TỔNG QUAN TINH GỌN 4 DÒNG CỐT LÕI
     goal_badge = "🌟 <b>Định hướng:</b> Xây Kênh & Kéo Tương Tác / Follow (Không bán hàng)" if is_viral else "🛒 <b>Định hướng:</b> Chốt đơn TikTok Shop an toàn"
-    char_gender_text = "Nữ" if detected_gender == "female" else "Nam"
     summary_lines = [
-        f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Thời lượng động sinh học) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {char_gender_text} ({detected_demographic_en})",
+        f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Thời lượng động sinh học $\le$ 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🏙 <b>Bối cảnh:</b> {fixed_setting_base} | {goal_badge}",
         f"👗 <b>Trang phục:</b> {res.get('outfit_vi', 'Trang phục đời thường phù hợp bối cảnh')}",
         f"🛠 <b>Đặc điểm sản phẩm:</b> {condensed_dna.get('dimensions')} - {condensed_dna.get('operational_mechanism', '')}"
@@ -928,40 +971,42 @@ def clone_script(script_id):
         "price_anchor": dna.get("rounded_price_anchor", "")
     }
 
+    target_actors_count = target.get("actors", 1)
+    target_char_profiles = target.get("character_profiles", st.session_state.get("character_profiles", []))
+
     if is_viral:
-        mission_text = "NHIỆM VỤ: Giữ nguyên 100% giá trị kiến thức và phong cách chia sẻ đời thường, nhân bản thành 5 biến thể kịch bản thoại mới thu hút tương tác và follow. Câu văn xuôi tai chuẩn văn nói người Hà Nội. 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP ON-CAMERA BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI TỪ 0.00S (3.8 - 4.2 TỪ/S). CẢNH 4 KÊU GỌI THẢO LUẬN HOẶC FOLLOW KÊNH. TUYỆT ĐỐI CẤM BÁN HÀNG, CẤM NHẮC GIÁ, CẤM GIỎ HÀNG!"
+        mission_text = "NHIỆM VỤ: Giữ nguyên 100% giá trị kiến thức và phong cách chia sẻ đời thường, nhân bản thành 5 biến thể kịch bản thoại mới thu hút tương tác và follow. Câu văn xuôi tai chuẩn văn nói người Hà Nội, tối đa 36 từ/cảnh. 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP ON-CAMERA BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI TỪ 0.00S (3.8 - 4.2 TỪ/S). CẢNH 4 KÊU GỌI THẢO LUẬN HOẶC FOLLOW KÊNH. TUYỆT ĐỐI CẤM BÁN HÀNG, CẤM NHẮC GIÁ, CẤM GIỎ HÀNG!"
     else:
-        mission_text = "NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá kèm câu miễn trừ giá hợp quy chuẩn, nhân bản thành 5 biến thể kịch bản thoại mới bám sát chủ đề tiêu đề. Câu văn xuôi tai chuẩn văn nói người Hà Nội, đọc chính xác từng con số tiền. 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP ON-CAMERA BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI TỪ 0.00S, TỐC ĐỘ 4.8 - 5.2 TỪ/S (CẤM TUYỆT ĐỐI THUYẾT MINH). TUYỆT ĐỐI CẤM TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'. NEO GIÁ LINH HOẠT ('KHOẢNG...', 'GẦN...', 'CHƯA TỚI...')."
+        mission_text = "NHIỆM VỤ: Giữ nguyên 100% công năng và đòn bẩy neo giá kèm câu miễn trừ giá hợp quy chuẩn, nhân bản thành 5 biến thể kịch bản thoại mới bám sát chủ đề tiêu đề. Câu văn xuôi tai chuẩn văn nói người Hà Nội, đọc chính xác từng con số tiền, tối đa 36 từ/cảnh. 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP ON-CAMERA BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI TỪ 0.00S, TỐC ĐỘ 4.8 - 5.2 TỪ/S (CẤM TUYỆT ĐỐI THUYẾT MINH). TUYỆT ĐỐI CẤM TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'. NEO GIÁ LINH HOẠT ('KHOẢNG...', 'GẦN...', 'CHƯA TỚI...')."
 
     prompt = f"""
     SẢN PHẨM / CHỦ ĐỀ: {json.dumps(condensed_dna, ensure_ascii=False)} | KỊCH BẢN GỐC #{script_id}: TIÊU ĐỀ: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
     HÌNH THỨC VIDEO: '{presentation_format}'
     GHI CHÚ AI TỪ NGƯỜI DÙNG: '{user_custom_note}'
+    DIỄN VIÊN KHÓA CỐ ĐỊNH: {target_actors_count} nhân vật theo kịch bản gốc.
     {mission_text}
     TRẢ VỀ JSON:
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh đời thực 1...", "hook": "Câu hook ngắn gọn do nhân vật nói trực tiếp bằng tiếng Hà Nội chuẩn xuôi tai...", "actors": 1, "character_roles": ["Nữ KOC Hà Nội"] }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": 1, "character_roles": ["Cô nàng công sở"] }},
-            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": 2, "character_roles": ["Mẹ trẻ", "Bé gái"] }},
-            {{ "id": {cur_len+4}, "title": "Tên biến thể 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": 1, "character_roles": ["KOC trẻ trung"] }},
-            {{ "id": {cur_len+5}, "title": "Tên biến thể 5", "setting": "Bối cảnh đời thực 5...", "hook": "...", "actors": 2, "character_roles": ["Đôi bạn thân"] }}
+            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh đời thực 1...", "hook": "Câu hook ngắn gọn do nhân vật nói trực tiếp bằng tiếng Hà Nội chuẩn xuôi tai...", "actors": {target_actors_count} }},
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": {target_actors_count} }},
+            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": {target_actors_count} }},
+            {{ "id": {cur_len+4}, "title": "Tên biến thể 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": {target_actors_count} }},
+            {{ "id": {cur_len+5}, "title": "Tên biến thể 5", "setting": "Bối cảnh đời thực 5...", "hook": "...", "actors": {target_actors_count} }}
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", target.get("actors", 1), "Nhân bản thoại", user_custom_note, presentation_format), max_tokens=2500)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", target_actors_count, "Nhân bản thoại", user_custom_note, presentation_format), max_tokens=2500)
     clones = res.get("outlines", res.get("script_outlines", []))
     formatted_clones = []
     for idx, cl in enumerate(clones):
-        new_actors_count = cl.get("actors", 1)
-        raw_roles = cl.get("character_roles", [f"Diễn viên {i+1}" for i in range(new_actors_count)])
-        new_profiles = [{"id": i+1, "role": r} for i, r in enumerate(raw_roles)]
         formatted_clones.append({
             "id": cur_len + idx + 1, "title": cl.get("title", f"Biến thể kịch bản #{cur_len + idx + 1}"),
             "setting": cl.get("setting", f"Bối cảnh sinh hoạt #{idx+1}"), "hook": sanitize_policy_text(cl.get("hook", "")),
-            "actors": new_actors_count, "character_profiles": new_profiles,
-            "duration_instruction": target.get("duration_instruction", "Thời lượng động"), "narrator_mode": "Nhân vật xuất hiện (On-camera)",
+            "actors": target_actors_count, "character_profiles": target_char_profiles,
+            "duration_instruction": target.get("duration_instruction", "Thời lượng động sinh học tối đa 10s"), 
+            "narrator_mode": "Nhân vật xuất hiện (On-camera)",
             "custom_note": user_custom_note,
             "presentation_format": presentation_format
         })
@@ -981,9 +1026,9 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     }
 
     if is_viral:
-        special_viral_rule = "THỂ LOẠI VIRAL & XÂY KÊNH: Tập trung vào nội dung giữ chân, chia sẻ kiến thức, bài học thực tế, câu chuyện chạm cảm xúc. Câu văn xuôi tai chuẩn văn nói người Hà Nội. Cảnh 4 kêu gọi thảo luận hoặc follow kênh. TUYỆT ĐỐI KHÔNG BÁN HÀNG, KHÔNG NHẮC ĐẾN GIÁ CẢ, VOUCHER HAY GIỎ HÀNG."
+        special_viral_rule = "THỂ LOẠI VIRAL & XÂY KÊNH: Tập trung vào nội dung giữ chân, chia sẻ kiến thức, bài học thực tế, câu chuyện chạm cảm xúc. Câu văn xuôi tai chuẩn văn nói người Hà Nội, tối đa 36 từ/cảnh. Cảnh 4 kêu gọi thảo luận hoặc follow kênh. TUYỆT ĐỐI KHÔNG BÁN HÀNG, KHÔNG NHẮC ĐẾN GIÁ CẢ, VOUCHER HAY GIỎ HÀNG."
     else:
-        special_viral_rule = "THỂ LOẠI TIKTOK SHOP: 100% dùng từ 'nghìn', cấm từ 'ngàn', cấm 'trợ giá'. Câu văn xuôi tai chuẩn văn nói người Hà Nội, đọc chính xác từng con số tiền. Neo giá linh hoạt và chốt deal giỏ hàng an toàn."
+        special_viral_rule = "THỂ LOẠI TIKTOK SHOP: 100% dùng từ 'nghìn', cấm từ 'ngàn', cấm 'trợ giá'. Câu văn xuôi tai chuẩn văn nói người Hà Nội, đọc chính xác từng con số tiền, tối đa 36 từ/cảnh. Neo giá linh hoạt và chốt deal giỏ hàng an toàn."
 
     prompt = f"""
     SẢN PHẨM / CHỦ ĐỀ: {json.dumps(condensed_dna, ensure_ascii=False)} | CHIẾN LƯỢC: '{angle}' | DIỄN VIÊN: {num_chars} người Việt.
@@ -1122,10 +1167,16 @@ with st.sidebar:
                                 except: pass
                                 loaded_details[str(k)] = v
                             st.session_state.update({
-                                "content_analysis": sd.get("content_analysis"), "all_scripts": sd.get("all_scripts", []),
-                                "cloned_scripts": sd.get("cloned_scripts", []), "expanded_scripts": sd.get("expanded_scripts", []),
-                                "generated_details": loaded_details, "character_profiles": sd.get("character_profiles", []),
-                                "current_project_id": p['id'], "active_project_title": p['project_title'], "scroll_to_detail": True
+                                "content_analysis": sd.get("content_analysis"), 
+                                "all_scripts": sd.get("all_scripts", []),
+                                "cloned_scripts": sd.get("cloned_scripts", []), 
+                                "expanded_scripts": sd.get("expanded_scripts", []),
+                                "generated_details": loaded_details, 
+                                "character_profiles": sd.get("character_profiles", []),
+                                "current_input_context": sd.get("current_input_context", ""),
+                                "current_project_id": p['id'], 
+                                "active_project_title": p['project_title'], 
+                                "scroll_to_detail": True
                             })
                             st.rerun()
                         if col_d.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True, disabled=is_system_busy):
@@ -1245,10 +1296,11 @@ mode = st.selectbox("🎯 Thể loại:", user_allowed_modules, key=f"mode_sel_{
 is_viral_mode = "Viral" in mode
 
 up_files, custom_note = [], ""
+viral_persona, viral_topic = "", ""
 if is_viral_mode:
     col_v1, col_v2 = st.columns(2)
-    viral_persona = col_v1.text_input("👤 Định vị Kênh:", key=f"viral_persona_{st.session_state.reset_key}")
-    viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, key=f"viral_topic_{st.session_state.reset_key}")
+    viral_persona = col_v1.text_input("👤 Định vị Kênh:", placeholder="Ví dụ: Mẹ bỉm sữa thông thái, Bác sĩ da liễu...", key=f"viral_persona_{st.session_state.reset_key}")
+    viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, placeholder="Ví dụ: 3 sai lầm khiến da khô mụn, mẹo chọn giày dép...", key=f"viral_topic_{st.session_state.reset_key}")
     up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
     
     if up_files:
@@ -1316,7 +1368,16 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                     "last_presentation_format": selected_presentation_format,
                     "current_input_context": custom_note.strip()
                 })
-                st.session_state.current_product_data_saved = st.session_state.get("current_product_data", {})
+                
+                if is_viral_mode:
+                    st.session_state.current_product_data_saved = {
+                        "channel_persona": viral_persona.strip(),
+                        "topic_or_tips": viral_topic.strip()
+                    }
+                    input_context_str = f"KÊNH / ĐỊNH VỊ: '{viral_persona.strip()}' | CHỦ ĐỀ / MẸO: '{viral_topic.strip()}' | NOTE: '{custom_note.strip()}'"
+                else:
+                    st.session_state.current_product_data_saved = st.session_state.get("current_product_data", {})
+                    input_context_str = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: '{custom_note.strip()}'"
                 
                 st.session_state["saved_reference_images"] = []
                 if up_files:
@@ -1329,7 +1390,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 special_prompt_mode = "MỤC TIÊU VIRAL & XÂY KÊNH: Kích thích tương tác thảo luận, tạo bài học hữu ích hoặc sự thật bất ngờ, kéo Follower. TUYỆT ĐỐI KHÔNG BÁN HÀNG." if is_viral_mode else "MỤC TIÊU BÁN HÀNG TIKTOK SHOP: Tập trung vào giải quyết vấn đề, công năng và chốt đơn an toàn."
 
                 prompt = f"""
-                INPUT: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: {custom_note}
+                INPUT: {input_context_str}
                 THỂ LOẠI: '{mode}' ({special_prompt_mode})
                 HÌNH THỨC VIDEO YÊU CẦU: '{selected_presentation_format}'
                 DIỄN VIÊN: {num_chars} nhân vật 100% người Việt bản địa ({', '.join([p['role'] for p in st.session_state.character_profiles])}).
@@ -1409,7 +1470,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 for o in outlines: 
                     if "hook" in o: o["hook"] = sanitize_policy_text(o["hook"])
                     o.update({
-                        "duration_instruction": "Thời lượng động sinh học", 
+                        "duration_instruction": "Thời lượng động sinh học tối đa 10s", 
                         "narrator_mode": "Nhân vật xuất hiện (On-camera)", 
                         "character_profiles": st.session_state.character_profiles, 
                         "actors": num_chars,
@@ -1442,41 +1503,64 @@ if isinstance(ca, dict):
         """, unsafe_allow_html=True)
 
     with col_row1_right:
-        st.markdown(f"""
-        <div class="dna-card">
-            <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy Nhất (Hero SKU)</div>
-            <div class="dna-row"><span class="dna-label">⭐ Mẫu ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))}</span></div>
-            <div class="dna-row"><span class="dna-label">🎨 Toàn bộ bảng màu:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">📏 Tỷ lệ kích thước chuẩn:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_scale_relative', 'Chuẩn đời thực'))}</span></div>
-            <div class="dna-row"><span class="dna-label">⚙ Cơ chế vận hành:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('operational_mechanism', 'Chuẩn đời thực'))}</span></div>
-        </div>
-        """, unsafe_allow_html=True)
+        if is_viral_mode:
+            st.markdown(f"""
+            <div class="dna-card">
+                <div class="dna-card-title">🌟 2. Định Vị Kênh & Thông Điệp Cốt Lõi</div>
+                <div class="dna-row"><span class="dna-label">👤 Định vị kênh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('target_user', viral_persona or 'KOC Chuyên gia đời sống'))}</span></div>
+                <div class="dna-row"><span class="dna-label">💎 Giá trị cốt lõi:</span><span class="dna-text">{clean_analysis_text(ca.get('core_value', ''))}</span></div>
+                <div class="dna-row"><span class="dna-label">📏 Tỷ lệ kích thước vật thể:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_scale_relative', 'Chuẩn đời thực 1:1'))}</span></div>
+                <div class="dna-row"><span class="dna-label">⚙ Cơ chế vận hành / Đời sống:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('operational_mechanism', 'Thao tác đời sống chuẩn xác'))}</span></div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div class="dna-card">
+                <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy Nhất (Hero SKU)</div>
+                <div class="dna-row"><span class="dna-label">⭐ Mẫu ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🎨 Toàn bộ bảng màu:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
+                <div class="dna-row"><span class="dna-label">📏 Tỷ lệ kích thước chuẩn:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_scale_relative', 'Chuẩn đời thực'))}</span></div>
+                <div class="dna-row"><span class="dna-label">⚙ Cơ chế vận hành:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('operational_mechanism', 'Chuẩn đời thực'))}</span></div>
+            </div>
+            """, unsafe_allow_html=True)
 
     col_row2_left, col_row2_right = st.columns(2)
     with col_row2_left:
         st.markdown(f"""
         <div class="dna-card">
-            <div class="dna-card-title">💎 3. Giải phẫu Sản phẩm (Interest & Desire)</div>
-            <div class="dna-row"><span class="dna-label">📦 Sản phẩm là gì & Điểm đặc biệt:</span><span class="dna-text">{clean_analysis_text(ca.get('what_and_unique', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">👥 Sản phẩm dành cho ai:</span><span class="dna-text">{clean_analysis_text(ca.get('target_user', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">🔥 Tại sao nên mua:</span><span class="dna-text">{clean_analysis_text(ca.get('why_buy', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">📍 Hoàn cảnh sử dụng & Tiện lợi:</span><span class="dna-text">{clean_analysis_text(ca.get('where_and_convenience', ''))}</span></div>
+            <div class="dna-card-title">💎 3. Giải phẫu Sản phẩm & Nội Dung (Interest & Desire)</div>
+            <div class="dna-row"><span class="dna-label">📦 Chủ đề & Điểm đặc biệt:</span><span class="dna-text">{clean_analysis_text(ca.get('what_and_unique', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">👥 Đối tượng phù hợp:</span><span class="dna-text">{clean_analysis_text(ca.get('target_user', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">🔥 Tại sao nên xem/mua:</span><span class="dna-text">{clean_analysis_text(ca.get('why_buy', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">📍 Hoàn cảnh & Tiện ích:</span><span class="dna-text">{clean_analysis_text(ca.get('where_and_convenience', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🛠 Thao tác & Cách dùng chuẩn thực tế:</span><span class="dna-text">{clean_analysis_text(ca.get('how_to_use', ''))}</span></div>
         </div>
         """, unsafe_allow_html=True)
 
     with col_row2_right:
-        st.markdown(f"""
-        <div class="dna-card">
-            <div class="dna-card-title">⚙ 4. Vật lý, Cơ chế, Động lực học Dây nối & Mức giá</div>
-            <div class="dna-row"><span class="dna-label">📐 Thông số kích thước:</span><span class="dna-text">{clean_analysis_text(ca.get('product_dimensions', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">🧩 Bóc tách cấu trúc linh kiện:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_assembly_structure', 'Nguyên khối'))}</span></div>
-            <div class="dna-row"><span class="dna-label">🔗 Động lực học dây nối/ống dẫn:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{clean_analysis_text(ca.get('flexible_connector_specs', 'Không có dây nối'))}</span></div>
-            <div class="dna-row"><span class="dna-label">🎨 Khóa màu chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{clean_analysis_text(ca.get('detected_prices', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Đòn bẩy giá tương phản linh hoạt:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('rounded_price_anchor', ''))}</span></div>
-        </div>
-        """, unsafe_allow_html=True)
+        if is_viral_mode:
+            st.markdown(f"""
+            <div class="dna-card">
+                <div class="dna-card-title">💡 4. Bài Học Thực Chiến & Mẹo Đời Sống</div>
+                <div class="dna-row"><span class="dna-label">📐 Quy chuẩn vật lý:</span><span class="dna-text">{clean_analysis_text(ca.get('product_dimensions', 'Kích thước đời thực'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🧩 Bóc tách cấu trúc:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_assembly_structure', 'Đời thường'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🔗 Động lực học chuyển động:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{clean_analysis_text(ca.get('flexible_connector_specs', 'Không có dây nối'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🎨 Khóa phối cảnh chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', 'Tự nhiên'))}</span></div>
+                <div class="dna-row"><span class="dna-label" style="color:#15803d;">📣 Kêu gọi tương tác (CTA):</span><span class="dna-text" style="color:#15803d; font-weight:700;">Thảo luận, chia sẻ mẹo hay & Follow kênh đón xem tập sau</span></div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div class="dna-card">
+                <div class="dna-card-title">⚙ 4. Vật lý, Cơ chế, Động lực học Dây nối & Mức giá</div>
+                <div class="dna-row"><span class="dna-label">📐 Thông số kích thước:</span><span class="dna-text">{clean_analysis_text(ca.get('product_dimensions', ''))}</span></div>
+                <div class="dna-row"><span class="dna-label">🧩 Bóc tách cấu trúc linh kiện:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('product_assembly_structure', 'Nguyên khối'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🔗 Động lực học dây nối/ống dẫn:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{clean_analysis_text(ca.get('flexible_connector_specs', 'Không có dây nối'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🎨 Khóa màu chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', ''))}</span></div>
+                <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{clean_analysis_text(ca.get('detected_prices', ''))}</span></div>
+                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Đòn bẩy giá tương phản linh hoạt:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('rounded_price_anchor', ''))}</span></div>
+            </div>
+            """, unsafe_allow_html=True)
 
     f_rules = ca.get('fashion_mix_and_match_rules', {})
     if isinstance(f_rules, dict) and f_rules.get('is_fashion_item', False):
@@ -1540,7 +1624,7 @@ if all_sc:
             safe_cushion = round(max(0.0, dur_int - speech_sec), 1)
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
-            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
+            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp on-camera từ 0.00s (100% Giọng Hà Nội chuẩn, dùng 'nghìn'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Siêu Tinh Gọn, Khóa Giới Tính & Kích Thước Thật):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
             if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Tinh Gọn Mật Độ Cao, Khóa Cứng Diễn Viên & Thoại 0.00s):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
@@ -1618,7 +1702,7 @@ if all_sc:
     c_ang = cg1.selectbox("🧭 Chiến lược mới:", a_opts, key=f"ea_{st.session_state.reset_key}")
     c_num = cg2.number_input("Số diễn viên:", 1, 8, num_chars, key=f"en_{st.session_state.reset_key}")
     c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Thời lượng động sinh học", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
-    c_dur_str = f"Chính xác {cg3.number_input('Số giây:', 10, 300, 60, key=f'eds_{st.session_state.reset_key}')} giây." if "Tùy" in c_dur_choice else "Thời lượng động sinh học"
+    c_dur_str = f"Chính xác {cg3.number_input('Số giây:', 10, 300, 60, key=f'eds_{st.session_state.reset_key}')} giây." if "Tùy" in c_dur_choice else "Thời lượng động sinh học (tối đa 10s/cảnh)"
     c_nar = cg4.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)"], key=f"ena_{st.session_state.reset_key}")
 
     c_format_more = st.selectbox(
