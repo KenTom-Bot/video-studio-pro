@@ -112,7 +112,6 @@ def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
 # THUẬT TOÁN PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT CHUẨN XÁC TỪNG CON SỐ (EXACT CURRENCY)
 # ==============================================================================
 def number_to_vietnamese_words(n: int) -> str:
-    """Phiên âm số tiền thành chữ viết tiếng Việt chuẩn xác từng hàng đơn vị, chục, trăm, nghìn"""
     if n == 0: return "không đồng"
     digits = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"]
     
@@ -158,7 +157,6 @@ def number_to_vietnamese_words(n: int) -> str:
     return text + " đồng"
 
 def extract_and_convert_prices_in_text(raw_text: str) -> str:
-    """Tự động tìm kiếm các con số tiền trong văn bản và phiên âm thành chữ chuẩn xác"""
     if not raw_text: return ""
     def replace_num(match):
         num_str = match.group(1).replace('.', '').replace(',', '')
@@ -510,7 +508,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU (SPOKEN-SYNTAX DIRECTIVE):
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI: Chủ ngữ -> Vị ngữ -> Cảm xúc/Hiệu quả.
     - TUYỆT ĐỐI CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY: Cấm mở đầu câu bằng 'Với thiết kế...', 'Được làm từ...', 'Giúp cho việc...'.
-    - Mỗi câu chỉ chứa 1 ý trọn vẹn, độ dài từ 8 đến 14 từ, nghe tự nhiên, dễ hiểu ngay lập tức.
+    - Lối văn kể chuyện tự nhiên, cuốn hút, giàu tính gợi hình, liên kết logic mạch lạc giữa các ý.
     - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s.
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN').
     - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
@@ -530,14 +528,14 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         outro_instruction = """
         🛑 QUY TẮC CẢNH 4 CHO THỂ LOẠI 'VIRAL & XÂY KÊNH' (ENGAGEMENT & RETENTION - KHÔNG BÁN HÀNG):
         - Mục tiêu: Giữ chân người xem, tạo cảm giác gần gũi, kích thích người xem comment thảo luận, lưu video và bấm Follow kênh.
-        - Lời thoại Cảnh 4 BẮT BUỘC dưới 28 từ, chuẩn giọng Hà Nội tự nhiên.
+        - Lời thoại Cảnh 4 chuẩn giọng Hà Nội tự nhiên, câu văn mượt mà ấm áp.
         - Công thức: Đặt câu hỏi thảo luận hoặc kết lại bài học tâm đắc + Kêu gọi bấm follow đón xem video tiếp theo.
         - TUYỆT ĐỐI CẤM: Không nhắc đến giá tiền, không mã giảm giá, không voucher, không giỏ hàng, không mua hàng!
         """
     else:
         outro_instruction = """
-        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU AN TOÀN (< 28 TỪ, KHÔNG CẦN CHỮ TRÊN MÀN HÌNH):
-        - Lời thoại Cảnh 4 BẮT BUỘC dưới 28 từ, chuẩn giọng Hà Nội, tuân thủ đúng công thức 3 vế:
+        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU AN TOÀN (KHÔNG CẦN CHỮ TRÊN MÀN HÌNH):
+        - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng công thức 3 vế xuôi tai:
           1. Giá gốc làm tròn tiến lên: 'Bình thường gần [X] nghìn...' (hoặc 'Giá gốc gần [X] tư...')
           2. Báo giá voucher ước lượng đuôi mấy chục (hoặc đọc chính xác bằng chữ): 'áp hết mã đợt này chỉ còn tầm [Y] mấy nghìn thôi...'
           3. Rào voucher tài khoản + CTA: 'các mẹ bấm giỏ hàng góc trái kiểm tra xem tài khoản mình được giảm bao nhiêu nhé!'
@@ -554,10 +552,14 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {outro_instruction}
     {override_rule}
     
+    🛑 GIẢI PHÓNG THỜI LƯỢNG KỂ CHUYỆN (UNCONSTRAINED NARRATIVE PACING):
+    - TUYỆT ĐỐI KHÔNG ÉP CỨNG THỜI LƯỢNG (Cảnh 1 hoàn toàn có thể dài 8s, 10s nếu mở đầu bằng một câu chuyện hay hoặc tình huống kịch tính; các Cảnh 2, 3, 4 có thể linh hoạt từ 4s đến 12s tùy theo mạch cảm xúc).
+    - ƯU TIÊN HÀNG ĐẦU LÀ KỊCH BẢN PHẢI CUỐN HÚT, GIÀU CẢM XÚC, LOGIC MẠCH LẠC, VĂN NÓI TỰ NHIÊN NHƯ NGƯỜI BẢN ĐỊA NÓI CHUYỆN, TUYỆT ĐỐI KHÔNG BỊ GƯỢNG GẠO KIỂU DỊCH MÁY.
+
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU (SPOKEN-SYNTAX DIRECTIVE):
     - Lời thoại phải xuôi tai, gãy gọn, đúng văn phong nói chuyện hằng ngày của người Hà Nội: Chủ ngữ -> Vị ngữ -> Hiệu quả thực tế.
     - CẤM TUYỆT ĐỐI câu bị động, câu đảo ngữ rườm rà kiểu dịch máy ('Với thiết kế...', 'Được may từ...').
-    - Câu thoại ngắn gọn, súc tích (8-14 từ/câu), liên kết tự nhiên, có trợ từ ngữ khí ('nhé', 'luôn', 'này', 'đây này').
+    - Từng câu thoại liên kết tự nhiên, có trợ từ ngữ khí ('nhé', 'luôn', 'này', 'đây này', 'cơ', 'ạ').
 
     🛑 KHÓA CHẶT GIỚI TÍNH & ĐỘ TUỔI DIỄN VIÊN BẤT BIẾN (STRICT DEMOGRAPHIC INVARIANCE):
     - BẮT BUỘC phải xác định rõ ràng và duy trì duy nhất 1 GIỚI TÍNH CỤ THỂ ('a Vietnamese woman' hoặc 'a Vietnamese man') và ĐỘ TUỔI CỤ THỂ ('approx 26 years old') xuyên suốt cả 4 phân cảnh!
@@ -594,7 +596,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - THỜI LƯỢNG ĐỘNG SINH HỌC & PROMPT SIÊU TINH GỌN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - NÂNG CẤP BIÊN KỊCH TRIỆU VIEW & THỜI LƯỢNG SINH HỌC
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -667,14 +669,14 @@ def create_scene_details(target_id, mode, style):
     if is_viral:
         scene4_instruction = """
         🛑 CHỈ THỊ CẢNH 4 CHO THỂ LOẠI VIRAL & XÂY KÊNH (TUYỆT ĐỐI KHÔNG BÁN HÀNG):
-        - Đoạn thoại dưới 28 từ, câu văn xuôi tai chuẩn văn nói người Hà Nội, truyền cảm.
+        - Đoạn thoại chuẩn giọng Hà Nội tự nhiên ấm áp, câu văn mượt mà truyền cảm.
         - Kêu gọi tương tác, đặt câu hỏi gợi mở thảo luận hoặc chia sẻ mẹo hay + mời Follow kênh đón xem video tiếp theo.
         - TUYỆT ĐỐI CẤM: Không nhắc đến giá tiền, voucher, giảm giá, mua hàng hay giỏ hàng!
         """
-        scene4_sample = "Đoạn thoại kết nối người xem dưới 28 từ: Đặt câu hỏi thảo luận hoặc kết bài học sâu sắc + mời bấm follow kênh đón xem video sau!"
+        scene4_sample = "Đoạn thoại kết nối người xem tự nhiên: Đặt câu hỏi thảo luận hoặc kết bài học sâu sắc + mời bấm follow kênh đón xem video sau!"
     else:
         scene4_instruction = f"""
-        🛑 CHỈ THỊ CẢNH 4 CHO TIKTOK SHOP (CHỐT DEAL AN TOÀN < 28 TỪ, KHÔNG TEXT):
+        🛑 CHỈ THỊ CẢNH 4 CHO TIKTOK SHOP (CHỐT DEAL AN TOÀN, KHÔNG TEXT):
         - ĐỌC CHUẨN XÁC SỐ TIỀN BẰNG CHỮ: Tham khảo phiên âm chuẩn: '{condensed_dna.get("price_anchor")}'. Đọc chuẩn xác các hàng đơn vị, chục, trăm, nghìn (CẤM đọc lộn số!).
         - Đúng công thức 3 vế xuôi tai:
           1. Giá gốc làm tròn tiến lên: 'Bình thường gần [X] nghìn...' (hoặc 'Giá gốc gần [X] tư...')
@@ -682,7 +684,7 @@ def create_scene_details(target_id, mode, style):
           3. Rào kiểm tra tài khoản + CTA: 'các mẹ bấm giỏ hàng góc trái kiểm tra xem tài khoản mình được giảm bao nhiêu nhé!'
         - Tuyệt đối không yêu cầu hiện chữ/text trên màn hình video!
         """
-        scene4_sample = "Đoạn thoại chốt deal dưới 28 từ đúng chuẩn 3 vế: Giá gốc gần [X] -> Áp hết mã còn tầm [Y mấy nghìn] -> Bấm giỏ hàng góc trái xem tài khoản mình được giảm bao nhiêu nhé!"
+        scene4_sample = "Đoạn thoại chốt deal xuôi tai đúng chuẩn 3 vế: Giá gốc gần [X] -> Áp hết mã còn tầm [Y mấy nghìn] -> Bấm giỏ hàng góc trái xem tài khoản mình được giảm bao nhiêu nhé!"
 
     prompt_text = f"""
     THÔNG TIN NỀN TẢNG: {json.dumps(condensed_dna, ensure_ascii=False)}
@@ -695,9 +697,11 @@ def create_scene_details(target_id, mode, style):
     - DIỄN VIÊN CHỈ ĐỊNH: {first_role or 'KOC Việt Nam'} -> BẮT BUỘC KHÓA CHẶT: {detected_demographic_en} (CẤM ĐỔI GIỚI TÍNH QUA CÁC CẢNH!).
     - HÌNH THỨC NÓI: 100% Lời thoại do CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S Ở CẢ 4 CẢNH (CẢNH 1, 2, 3, 4). TUYỆT ĐỐI CẤM THUYẾT MINH NGOÀI. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
     
-    🛑 CHỈ THỊ ƯU TIÊN 1: CÂU TỪ XUÔI CHIỀU, GÃY GỌN & TỰ NHIÊN CHUẨN TIẾNG HÀ NỘI
-    - Câu thoại viết theo lối văn nói trực diện: Chủ ngữ -> Vị ngữ -> Hiệu quả. CẤM mở câu bằng 'Với thiết kế...', 'Được làm từ...'.
-    - Lời thoại phải xuôi tai, nói như một người Hà Nội thực thụ đang chia sẻ trước ống kính, tuyệt đối không lủng củng như dịch máy!
+    🛑 CHỈ THỊ ƯU TIÊN 1: NGHỆ THUẬT KỂ CHUYỆN TRIỆU VIEW & KHÔNG ÉP CỨNG THỜI LƯỢNG
+    - CẢNH 1 HOÀN TOÀN CÓ THỂ DÀI 8S HOẶC 10S nếu cần mở đầu bằng câu chuyện đời thường ấn tượng, tình huống kịch tính hoặc nỗi niềm chạm cảm xúc.
+    - CÁC CẢNH 2, 3, 4 LINH HOẠT THỜI LƯỢNG tùy theo độ sâu của nội dung và trải nghiệm thực tế.
+    - Câu thoại viết theo lối văn nói trực diện của người Hà Nội: Chủ ngữ -> Vị ngữ -> Cảm xúc/Hiệu quả. CẤM mở câu bằng 'Với thiết kế...', 'Được làm từ...'.
+    - Lời thoại phải xuôi tai, cuốn hút, kết nối mượt mà giữa 4 cảnh, nói tự nhiên như người thật trò chuyện, tuyệt đối không lủng củng như dịch máy!
     
     🛑 CHỈ THỊ ƯU TIÊN 2: KHÓA CHẶT GIỚI TÍNH VÀ ĐỘ TUỔI QUA CẢ 4 CẢNH
     - Diễn viên chính: {detected_demographic_en}.
@@ -711,7 +715,6 @@ def create_scene_details(target_id, mode, style):
     - CẢ 4 CẢNH BẮT ĐẦU NÓI NGAY TỪ 0.00S.
     - NẾU LÀ SẢN PHẨM THỜI TRANG (is_fashion_styling = true): Áp dụng các mẫu quần/chân váy cụ thể từ 'fashion_mix_and_match' vào 'scene_outfit_en'.
     - KHÓA GHIM CƠ HỌC: Tay cầm sản phẩm chắc chắn ngang ngực, ranh giới ngón tay rõ ràng, không vung vẩy làm méo hình.
-    - TRẦN SỐ TỪ AN TOÀN: Cảnh 1 (dưới 24 từ), Cảnh 2 (dưới 34 từ), Cảnh 3 (dưới 42 từ), Cảnh 4 (dưới 28 từ).
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
@@ -741,7 +744,7 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "looking at camera with an empathetic warm smile",
                 "sfx": "Tiếng mở hộp hoặc âm thanh đời thực nhẹ nhàng",
                 "director": "Attention | Bám sát tiêu đề '{fixed_title}' | Câu xuôi chuẩn tiếng Hà Nội | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại mở màn tự nhiên dưới 24 từ bám sát tiêu đề '{fixed_title}' bằng tiếng Hà Nội chuẩn xuôi tai, dùng từ 'nghìn'..."
+                "voiceover": "Đoạn thoại mở màn cuốn hút tự nhiên bám sát tiêu đề '{fixed_title}' bằng tiếng Hà Nội chuẩn xuôi tai, dùng từ 'nghìn'..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -753,7 +756,7 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
                 "sfx": "Tiếng cơ học đanh chắc hoặc tiếng vuốt chất liệu ASMR",
                 "director": "Interest | Đặc tả chi tiết cơ chế hoặc giá trị bài học bám sát tiêu đề '{fixed_title}' | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng hô thân mật câu văn xuôi tai đào sâu đúng nội dung '{fixed_title}' dưới 34 từ..."
+                "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng hô thân mật câu văn xuôi tai đào sâu đúng nội dung '{fixed_title}'..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -765,7 +768,7 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "smiling contentedly with an approving head nod",
                 "sfx": "Tiếng giác quan đời sống thực tế",
                 "director": "Desire | Trải nghiệm công năng hoặc góc nhìn sâu sắc bám sát tiêu đề '{fixed_title}' | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp đặc tả trải nghiệm thực tế bám sát '{fixed_title}' dưới 42 từ nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn xuôi tai..."
+                "voiceover": "Đoạn thoại KOC nói trực tiếp đặc tả trải nghiệm thực tế bám sát '{fixed_title}' nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn xuôi tai..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
@@ -776,13 +779,13 @@ def create_scene_details(target_id, mode, style):
                 "expression": "Nụ cười rạng rỡ, ánh mắt chân thành ấm áp, hai bàn tay mở tự nhiên hướng về camera",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
                 "sfx": "Tiếng chuông ting trong trẻo vui tai",
-                "director": "{'Action | Kêu gọi tương tác thảo luận & follow kênh (CẤM giá/giỏ hàng) | Khởi động: 0.00s' if is_viral else 'Action | Chốt deal đòn bẩy giá an toàn tuyệt đối dưới 28 từ (CẤM chữ trên màn hình) | Khởi động: 0.00s'}",
+                "director": "{'Action | Kêu gọi tương tác thảo luận & follow kênh (CẤM giá/giỏ hàng) | Khởi động: 0.00s' if is_viral else 'Action | Chốt deal đòn bẩy giá an toàn tuyệt đối (CẤM chữ trên màn hình) | Khởi động: 0.00s'}",
                 "voiceover": "{scene4_sample}"
             }}
         ]
     }}
     """
-    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động linh hoạt", num_chars, char_profiles, user_custom_note, presentation_format), max_tokens=6500)
+    res = call_gemini([prompt_text], get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "Thời lượng động sinh học", num_chars, char_profiles, user_custom_note, presentation_format), max_tokens=6500)
     if not res: raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
     scenes = res.get("scenes") or res.get("script") or []
@@ -794,10 +797,6 @@ def create_scene_details(target_id, mode, style):
     locked_tops = c_mat.get("locked_tops") or "casual top"
     locked_bottoms = c_mat.get("locked_bottoms") or "comfortable trousers"
     default_setting = c_mat.get("locked_setting") or (outline.get("setting") or "warm realistic indoor setting")
-    
-    # Negative Prompt Siêu Tinh Gọn (Gọn hơn 40%, không lặp từ)
-    img_neg = "opposite gender, celebrity likeness, public figure, inconsistent scale, oversized, miniaturized, deformed hands, extra fingers, text, watermark, subtitles, changing clothes, morphed plastic"
-    vid_neg = "opposite gender, celebrity likeness, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, changing clothes, morphed object"
     
     is_fashion_styling = res.get("is_fashion_styling", False)
     clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or fallback_prod_name)
@@ -817,14 +816,10 @@ def create_scene_details(target_id, mode, style):
             scn["director"] = sanitize_policy_text(scn["director"])
         
         # ======================================================================
-        # THUẬT TOÁN THỜI LƯỢNG ĐỘNG SINH HỌC (BIO-PACING ENGINE - KHÔNG ÉP CỨNG)
+        # THUẬT TOÁN THỜI LƯỢNG ĐỘNG SINH HỌC (BIO-PACING ENGINE - HOÀN TOÀN TỰ DO)
         # ======================================================================
         raw_speech_time = calculate_speech_duration(scn.get("voiceover", ""), is_tiktok_shop)
-        
-        # Đệm diễn xuất tự nhiên (Bio Cushion):
-        # TikTok Shop: 0.8s - 1.1s (nhịp điệu dồn dập, gãy gọn)
-        # Viral Xây Kênh: 1.2s - 1.5s (nhịp điệu truyền cảm, có khoảng lắng kết nối)
-        acting_cushion = 0.9 if is_tiktok_shop else 1.3
+        acting_cushion = 1.0 if is_tiktok_shop else 1.4
         dynamic_scene_sec = max(4, math.ceil(raw_speech_time + acting_cushion))
         
         final_bucket = f"{dynamic_scene_sec}s"
@@ -838,12 +833,21 @@ def create_scene_details(target_id, mode, style):
         scene_num = scn.get("scene", 1)
         scene_setting_en = scn.get("setting_en") or default_setting
         
-        active_outfit = (scn.get("scene_outfit_en") or wardrobe_str) if is_fashion_styling else wardrobe_str
+        # ======================================================================
+        # TỐI ƯU TRANG PHỤC & NEGATIVE PROMPT PHÂN TẦNG HOÀN HẢO
+        # ======================================================================
+        if is_fashion_styling:
+            active_outfit = f"wearing {scn.get('scene_outfit_en') or wardrobe_str}"
+            img_neg = "opposite gender, celebrity likeness, public figure, inconsistent scale, oversized, miniaturized, deformed hands, extra fingers, text, watermark, subtitles, morphed plastic"
+            vid_neg = "opposite gender, celebrity likeness, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, morphed object"
+        else:
+            active_outfit = f"strictly wearing identical {wardrobe_str} across all scenes"
+            img_neg = "opposite gender, changing clothes, different outfit, celebrity likeness, public figure, inconsistent scale, oversized, miniaturized, deformed hands, extra fingers, text, watermark, subtitles, morphed plastic"
+            vid_neg = "opposite gender, changing clothes, different outfit, celebrity likeness, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, morphed object"
+            
         actor_full = f"{actor_base}, {active_outfit}"
         
-        # ======================================================================
-        # TẠO PROMPT ẢNH SIÊU TINH GỌN (100% TIẾNG ANH, CẮT BỎ 40% TỪ THỪA)
-        # ======================================================================
+        # PROMPT ẢNH SIÊU TINH GỌN (100% TIẾNG ANH, CẮT BỎ 40% TỪ THỪA)
         if scene_num == 1:
             scene_focus = f"Establishing shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding {clean_prod_en} at chest level ({product_scale_en}), open packaging nearby."
         elif scene_num == 2:
@@ -864,9 +868,7 @@ def create_scene_details(target_id, mode, style):
         )
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         
-        # ======================================================================
-        # TẠO PROMPT VIDEO SIÊU TINH GỌN (VEO 3 SAFE, SẠCH RÁC CODE)
-        # ======================================================================
+        # PROMPT VIDEO SIÊU TINH GỌN (VEO 3 SAFE, SẠCH RÁC CODE)
         speaker_line = scn.get("voiceover", "")
         raw_vid = (
             f"{camera_shot}. Commercial live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}. "
@@ -1627,7 +1629,7 @@ if all_sc:
 
     extra_custom_note = st.text_area(
         "✍ Ghi chú AI cho kịch bản thêm (Ưu tiên cao nhất):", 
-        placeholder="Ví dụ: Làm dạng oneshot chỉ cầm trên tay nói chuyện để chống biến dạng, hoặc tập trung vào bóc hộp soi đường may khóa kéo...", 
+        placeholder="Ví dụ: Kịch bản mở đầu bằng câu chuyện 8-10 giây giàu cảm xúc, chuyển cảnh mượt mà, văn nói chuẩn người Hà Nội...", 
         key=f"extra_custom_note_{st.session_state.reset_key}"
     )
 
