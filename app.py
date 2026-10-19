@@ -662,12 +662,12 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
     - Phân tích linh hoạt theo đúng thực tế sản phẩm và góc độ kịch bản.
 
-    🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
+    🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU, ẨM THỰC ĐA GIÁC QUAN & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI: Chủ ngữ -> Vị ngữ -> Cảm xúc/Hiệu quả.
     - TUYỆT ĐỐI CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY: Cấm mở đầu câu bằng 'Với thiết kế...', 'Được làm từ...', 'Giúp cho việc...'.
     - TUYỆT ĐỐI CẤM các từ ngữ công nghệ/máy móc sáo rỗng: CẤM 'thuật toán gợi ý', CẤM 'máy vừa phân tích', CẤM 'hệ thống vừa báo', CẤM 'AI phát hiện'.
     - QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư').
-    - Lối văn kể chuyện tự nhiên, cuốn hút, giàu tính gợi hình, liên kết logic mạch lạc giữa các ý.
+    - NẾU LÀ ĐỒ ĂN / ẨM THỰC: Mô tả kích thích tối đa tam giác giác quan (thị giác: độ bóng/khói, xúc giác: độ giòn/bẻ đôi xốp tan, thính giác: tiếng cắn rộp rộp ASMR).
     - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s.
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN').
     - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
@@ -733,6 +733,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - Trạng thái cạp áo (sơ vin nhét vào cạp quần HOẶC buông thõng tự nhiên) được quyết định dựa vào phân tích thời trang và hoàn cảnh thực tế, sau đó BẮT BUỘC phải đồng nhất 100% xuyên suốt cả 4 phân cảnh!
     - Tuyệt đối cấm cảnh trước sơ vin mà cảnh sau lại thả áo buông thõng.
 
+    🛑 NGUYÊN TẮC ĐẠO DIỄN ẨM THỰC ĐA GIÁC QUAN (SENSORY FOOD-PORN DIRECTIVE):
+    - Khi làm về đồ ăn/thực phẩm:
+      • Thị giác: Góc máy Macro / Close-Up đặc tả độ bóng sốt mắm, khói nóng bốc lên, ruột xốp rỗng.
+      • Xúc giác: Hành động bẻ đôi rơi vụn giòn tan, chấm ngập bát sốt sền sệt, đầu ngón tay dính sốt chân thật.
+      • Thính giác: Âm thanh cắn 'rộp rộp' giòn tan, tiếng bẻ 'rắc', tiếng mỡ sôi xèo xèo.
+      • Vi biểu cảm: 3 nhịp sinh học: Hít hà mùi thơm -> Cắn giòn mở to mắt bất ngờ -> Nhắm mắt gật đầu thảng thốt khen ngon.
+
     🛑 QUY TẮC PHÁT ÂM SỐ BỐN CHUẨN THỰC TẾ:
     - 100% các con số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm, bốn triệu...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư', CẤM 'hai tư nghìn').
 
@@ -778,7 +785,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V160.0 HOÀN HẢO TOÀN DIỆN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V161.0 HOÀN HẢO TOÀN DIỆN
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -821,10 +828,19 @@ def create_scene_details(target_id, mode, style):
     
     if not locked_tuck_en:
         lower_setting = setting_archetype.lower()
-        if is_fixed_location or any(k in lower_setting for k in ["bếp", "kitchen", "tắm", "phòng khách", "mặc nhà"]):
+        if is_fixed_location or any(k in lower_setting for k in ["bếp", "kitchen", "tắm", "phòng khách", "mặc nhà", "bàn ăn"]):
             locked_tuck_en = "shirt hem strictly cleanly untucked, resting naturally at hips for casual home comfort"
         else:
             locked_tuck_en = "shirt hem strictly neatly tucked into waistband with a clean flat waistline"
+
+    # PHÂN TÍCH ẨM THỰC ĐA GIÁC QUAN
+    culinary_info = dna.get("culinary_dna", {})
+    is_culinary = False
+    if isinstance(culinary_info, dict) and culinary_info.get("is_culinary"):
+        is_culinary = True
+    else:
+        prod_kw = str(dna.get("what_and_unique", "")).lower()
+        is_culinary = any(k in prod_kw for k in ["ăn", "thịt", "bánh", "tóp mỡ", "sốt", "mắm", "chả", "nem", "gà", "cá", "ẩm thực", "đồ ăn", "món"])
 
     condensed_dna = {
         "product": dna.get("what_and_unique", ""),
@@ -841,6 +857,8 @@ def create_scene_details(target_id, mode, style):
         "audience_pronoun": audience_pronoun,
         "setting_archetype": setting_archetype,
         "is_fixed_location": is_fixed_location,
+        "is_culinary": is_culinary,
+        "culinary_sensory": culinary_info.get("sensory_cues", {}) if isinstance(culinary_info, dict) else {},
         "locked_tuck_en": locked_tuck_en,
         "recommended_setting_en": dna.get("recommended_setting_en", "tidy modern Vietnamese townhouse kitchen with clean stainless steel sink"),
         "recommended_wardrobe_en": dna.get("recommended_wardrobe_en", f"cream-white casual tee {locked_tuck_en} with beige linen apron"),
@@ -878,6 +896,14 @@ def create_scene_details(target_id, mode, style):
         """
         scene4_sample = f"Bình thường khoảng [X] nghìn, áp voucher còn tầm [Y mấy nghìn] thôi, nhưng giá từng thời điểm có thể khác nhau, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!"
 
+    culinary_special_directive = """
+    🛑 CHỈ ĐẠO ĐẶC BIỆT DÀNH CHO ẨM THỰC / MÓN ĂN:
+    - Cảnh 1: Cận cảnh/Macro Food-porn cắn thử miếng ăn bóng bẩy hoặc mỡ sôi giòn rụm, âm thanh cắn giòn ASMR.
+    - Cảnh 2: Siêu cận bẻ đôi chậm rãi lộ ruột xốp rỗng, vụn giòn rơi nhẹ.
+    - Cảnh 3: Góc 45 độ chấm ngập vào bát sốt sền sệt, vi biểu cảm 3 nhịp hưởng thụ vị giác đỉnh cao.
+    - Cảnh 4: Kết thúc với đĩa/hộp thành phẩm sạch sẽ hấp dẫn.
+    """ if is_culinary else ""
+
     prompt_text = f"""
     THÔNG TIN NỀN TẢNG: {json.dumps(condensed_dna, ensure_ascii=False)}
     THỂ LOẠI VIDEO: '{current_active_mode}'
@@ -891,6 +917,7 @@ def create_scene_details(target_id, mode, style):
     - QUY CHUẨN BỐI CẢNH: {setting_archetype} ({'Khóa 1 vị trí cố định qua cả 4 cảnh' if is_fixed_location else 'Chuyển cảnh theo mạch truyện'}). CẤM nhà cấp 4 tồi tàn, CẤM biệt thự xa hoa.
     - QUY CHUẨN SƠ VIN: Khóa cứng '{locked_tuck_en}' đồng nhất 100% qua cả 4 phân cảnh.
     - HÌNH THỨC NÓI: 100% Lời thoại do CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S Ở CẢ 4 CẢNH (CẢNH 1, 2, 3, 4). TUYỆT ĐỐI CẤM THUYẾT MINH NGOÀI. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
+    {culinary_special_directive}
     
     🛑 CHỈ THỊ ƯU TIÊN 1: NGHỆ THUẬT KỂ CHUYỆN VĂN HỌC & GIỚI HẠN THỜI LƯỢNG VEO 3 (TỐI ĐA 10 GIÂY/CẢNH)
     - CẢNH 1 HOÀN TOÀN CÓ THỂ DÀI 7s, 8s, 9s HOẶC 10s nếu mở đầu bằng một câu chuyện đời thường ấn tượng, tình huống kịch tính hoặc nỗi niềm chạm cảm xúc.
@@ -913,7 +940,7 @@ def create_scene_details(target_id, mode, style):
     - Tỷ lệ kích thước sản phẩm: '{condensed_dna.get("product_scale_relative")}' (bất biến qua 4 cảnh so với bàn tay và thân người).
     - CẢ 4 CẢNH BẮT ĐẦU NÓI NGAY TỪ 0.00S.
     - NẾU LÀ SẢN PHẨM THỜI TRANG (is_fashion_styling = true): Áp dụng các mẫu quần/chân váy cụ thể từ 'fashion_mix_and_match' vào 'scene_outfit_en'.
-    - HÀNH ĐỘNG THỰC TẾ SỐNG ĐỘNG (action_en): Mô tả hành động cụ thể chân thực bằng tiếng Anh gắn liền với tính năng sản phẩm mà không lặp lại từ 'Character' (ví dụ: foaming sponge with dense bubbles, scrubbing greasy pan, rinsing under clean running water, gently applying cream...).
+    - HÀNH ĐỘNG THỰC TẾ SỐNG ĐỘNG (action_en): Mô tả hành động cụ thể chân thực bằng tiếng Anh gắn liền với tính năng/hương vị sản phẩm mà không lặp lại từ 'Character'.
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
@@ -939,11 +966,11 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh mở màn bám sát {fixed_setting_base}...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "scene_outfit_en": "Mô tả trang phục phối đồ nếu is_fashion_styling = true",
-                "camera_shot": "Vertical 9:16 eye-level medium shot",
+                "camera_shot": "{'Vertical 9:16 macro close-up food shot' if is_culinary else 'Vertical 9:16 eye-level medium shot'}",
                 "expression": "Ánh mắt đồng cảm, nụ cười hào hứng mở màn nhìn thẳng camera",
-                "expression_en": "looking at camera with an empathetic warm smile",
-                "action_en": "holding product steadily at chest level with invariant real-life scale, establishing clear focus",
-                "sfx": "Tiếng mở hộp hoặc âm thanh đời thực nhẹ nhàng",
+                "expression_en": "{'anticipating delicious bite with focused appetite' if is_culinary else 'looking at camera with an empathetic warm smile'}",
+                "action_en": "{'taking a crisp loud bite of the glistening food close to camera, tiny crumbs falling' if is_culinary else 'holding product steadily at chest level with invariant real-life scale, establishing clear focus'}",
+                "sfx": "{'Tiếng cắn rộp rộp đanh giòn ASMR' if is_culinary else 'Tiếng mở hộp hoặc âm thanh đời thực nhẹ nhàng'}",
                 "director": "Attention | Bám sát tiêu đề '{fixed_title}' | Câu xuôi chuẩn tiếng Hà Nội | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn cuốn hút tự nhiên bám sát tiêu đề '{fixed_title}' (từ 18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' bằng tiếng Hà Nội chuẩn xuôi tai, dùng từ 'nghìn', số 4 đọc là 'bốn'..."
             }},
@@ -952,11 +979,11 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh góc quay ngang tầm mắt thấy rõ người và bàn thao tác...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "scene_outfit_en": "Mô tả trang phục nếu is_fashion_styling = true",
-                "camera_shot": "Vertical 9:16 eye-level medium close-up",
+                "camera_shot": "{'Vertical 9:16 extreme macro close-up cross-section shot' if is_culinary else 'Vertical 9:16 eye-level medium close-up'}",
                 "expression": "Ánh mắt bừng sáng, thần thái hào hứng chia sẻ trực tiếp với người xem",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
-                "action_en": "demonstrating key functional texture or mechanism with steady hands in sharp focus",
-                "sfx": "Tiếng cơ học đanh chắc hoặc tiếng vuốt chất liệu ASMR",
+                "action_en": "{'slowly snapping the food in half with fingers to display airy hollow crisp interior texture' if is_culinary else 'demonstrating key functional texture or mechanism with steady hands in sharp focus'}",
+                "sfx": "{'Tiếng bẻ rắc giòn tan đanh chắc' if is_culinary else 'Tiếng cơ học đanh chắc hoặc tiếng vuốt chất liệu ASMR'}",
                 "director": "Interest | Đặc tả chi tiết cơ chế hoặc giá trị bài học bám sát tiêu đề '{fixed_title}' | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp bằng tiếng Hà Nội chuẩn xưng '{self_pronoun}' gọi '{audience_pronoun}' câu văn xuôi tai đào sâu đúng nội dung '{fixed_title}' (từ 20-35 từ)..."
             }},
@@ -965,11 +992,11 @@ def create_scene_details(target_id, mode, style):
                 "setting": "Mô tả bối cảnh trải nghiệm thực tế sinh động bám sát {fixed_setting_base}...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "scene_outfit_en": "Mô tả trang phục nếu is_fashion_styling = true",
-                "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
+                "camera_shot": "{'Vertical 9:16 close-up 45-degree tasting shot' if is_culinary else 'Vertical 9:16 eye-level lifestyle shot'}",
                 "expression": "Nụ cười mãn nguyện, ánh mắt ánh lên sự thỏa mãn, gật đầu khẳng định",
-                "expression_en": "smiling contentedly with an approving head nod",
-                "action_en": "performing practical real-world task with the product, displaying immediate effective results",
-                "sfx": "Tiếng giác quan đời sống thực tế",
+                "expression_en": "{'eyes widening in delightful flavor shock then nodding approvingly with pure satisfaction' if is_culinary else 'smiling contentedly with an approving head nod'}",
+                "action_en": "{'dipping deeply into rich glistening thick sauce and chewing contentedly' if is_culinary else 'performing practical real-world task with the product, displaying immediate effective results'}",
+                "sfx": "{'Tiếng nhai giòn rụm và tiếng chấm sốt sền sệt' if is_culinary else 'Tiếng giác quan đời sống thực tế'}",
                 "director": "Desire | Trải nghiệm công năng hoặc góc nhìn sâu sắc bám sát tiêu đề '{fixed_title}' | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đặc tả trải nghiệm thực tế bám sát '{fixed_title}' xưng '{self_pronoun}' gọi '{audience_pronoun}' nối tiếp tự nhiên từ cảnh 2 bằng tiếng Hà Nội chuẩn xuôi tai (từ 20-35 từ)..."
             }},
@@ -1076,15 +1103,22 @@ def create_scene_details(target_id, mode, style):
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
         
         # PROMPT ẢNH SIÊU TINH GỌN (100% TIẾNG ANH, KHÔNG LẶP TỪ)
-        if scene_num == 1:
-            scene_focus = f"Establishing shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding {clean_prod_en} at chest level, open packaging nearby."
-        elif scene_num == 2:
-            scene_focus = f"Medium close-up in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}, holding {clean_prod_en} with steady hands."
-        elif scene_num == 3:
-            scene_focus = f"Lifestyle shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}, demonstrating practical benefits."
+        if is_culinary:
+            if scene_num == 1:
+                scene_focus = f"Macro close-up food shot in {scene_setting_en}. {clean_prod_en} glistening with rich glossy sauce, steam rising. {actor_full}. {micro_expr_en}, {clean_action}."
+            elif scene_num == 2:
+                scene_focus = f"Extreme macro food cross-section in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}, highlighting airy crisp texture."
+            elif scene_num == 3:
+                scene_focus = f"Close-up 45-degree tasting shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}."
+            else:
+                scene_focus = f"Warm closing shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding authentic package of {clean_prod_en}."
         else:
-            if is_viral:
-                scene_focus = f"Closing engagement shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, natural posture connecting directly with audience."
+            if scene_num == 1:
+                scene_focus = f"Establishing shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding {clean_prod_en} at chest level, open packaging nearby."
+            elif scene_num == 2:
+                scene_focus = f"Medium close-up in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}, holding {clean_prod_en} with steady hands."
+            elif scene_num == 3:
+                scene_focus = f"Lifestyle shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}, demonstrating practical benefits."
             else:
                 scene_focus = f"Commercial closing in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding {clean_prod_en} beside them."
             
@@ -1625,8 +1659,14 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
 
                 🛑 QUY CHUẨN PHÂN TÍCH SƠ VIN THỜI TRANG ĐỘNG (DYNAMIC TUCK-IN ANALYSIS):
                 - Đánh giá hoàn cảnh sử dụng và phom dáng trang phục để ra quyết định sơ vin hay thả ngoài:
-                  • Đồ bếp, làm sạch, nội trợ, ở nhà, áo phông rộng, áo len nỉ dày -> decision = 'untucked', en_prompt_lock = 'shirt hem strictly cleanly untucked, resting naturally at hips for casual comfort'.
+                  • Đồ bếp, làm sạch, nội trợ, ở nhà, ăn uống, áo phông rộng, áo len nỉ dày -> decision = 'untucked', en_prompt_lock = 'shirt hem strictly cleanly untucked, resting naturally at hips for casual comfort'.
                   • Công sở, văn phòng, đồ công nghệ, áo phông/sơ mi ôm cạp cao -> decision = 'tucked', en_prompt_lock = 'shirt hem strictly neatly tucked into waistband with a clean flat waistline'.
+
+                🛑 QUY CHUẨN ẨM THỰC ĐA GIÁC QUAN (CULINARY SENSORY ANALYSIS):
+                - Nếu là đồ ăn/thực phẩm/nấu nướng:
+                  • visual_cues: đặc tả độ bóng sốt mắm tỏi ớt màu hổ phách, khói nóng bốc lên, hạt ớt/tỏi óng ả.
+                  • tactile_cues: bẻ đôi chậm rãi thấy ruột rỗng xốp, chấm đẫm sốt sền sệt, đầu ngón tay dính sốt.
+                  • auditory_cues: tiếng bẻ 'rắc', tiếng nhai 'rộp rộp' giòn tan ASMR.
 
                 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TUYỆT ĐỐI CẤM THUYẾT MINH.
                 🛑 CÂU THOẠI PHẢI XUÔI TAI, TỰ NHIÊN, CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY.
@@ -1646,8 +1686,17 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "is_fixed_location": true/false,
                         "tuck_in_analysis": {{
                             "decision": "tucked / untucked",
-                            "fashion_reason": "Lý do thời trang thực tế (ví dụ: làm bếp cần thoải mái nên thả áo ngoài tự nhiên)",
+                            "fashion_reason": "Lý do thời trang thực tế (ví dụ: làm bếp/ăn uống cần thoải mái nên thả áo ngoài tự nhiên)",
                             "en_prompt_lock": "shirt hem strictly cleanly untucked, resting naturally at hips (hoặc strictly neatly tucked into waistband)"
+                        }},
+                        "culinary_dna": {{
+                            "is_culinary": true/false,
+                            "texture_profile": "Cấu trúc giòn tan/sền sệt/xốp mềm của món ăn",
+                            "sensory_cues": {{
+                                "visual_en": "golden crispy crackling glistening with amber sauce, rising steam",
+                                "tactile_en": "slowly breaking piece in half with fingers showing airy hollow interior",
+                                "auditory_foley": "loud sharp crunch snap and crispy chewing mastication"
+                            }}
                         }},
                         "recommended_setting_en": "Realistic clean modern Vietnamese townhouse or apartment setting under 15 words",
                         "recommended_wardrobe_en": "Appropriate contextual outfit under 12 words (e.g. casual tee with beige linen apron)",
@@ -1724,11 +1773,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma trận Nhân xưng, Bối cảnh & Khóa sơ vin động chuẩn xác!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Ma trận Giác quan, Nhân xưng & Bối cảnh chuẩn cho 5 kịch bản!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
-# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5 CHỈ HIỆN KHI LÀ THỜI TRANG
+# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5 CHỈ HIỆN KHI LÀ THỜI TRANG / ẨM THỰC
 # ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
@@ -1812,6 +1861,20 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Đòn bẩy giá tương phản linh hoạt:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('rounded_price_anchor', ''))}</span></div>
             </div>
             """, unsafe_allow_html=True)
+
+    # THẺ HIỂN THỊ ĐẶC BIỆT DÀNH CHO ẨM THỰC / F&B
+    c_dna = ca.get('culinary_dna', {})
+    if isinstance(c_dna, dict) and c_dna.get('is_culinary', False):
+        sensory = c_dna.get('sensory_cues', {})
+        st.markdown(f"""
+        <div class="dna-card" style="border-left: 4px solid #f97316; margin-top: 6px;">
+            <div class="dna-card-title" style="color:#ea580c;">🍗 5. Giải Phẫu Kích Hoạt Đa Giác Quan Ẩm Thực (Food-Porn Sensory Matrix)</div>
+            <div class="dna-row"><span class="dna-label">✨ Cấu trúc vật lý:</span><span class="dna-text" style="font-weight:600; color:#c2410c;">{clean_analysis_text(c_dna.get('texture_profile', 'Giòn rụm xốp tan'))}</span></div>
+            <div class="dna-row"><span class="dna-label">👁 Kích thích Thị giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('visual_en', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">🖐 Kích thích Xúc giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('tactile_en', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">👂 Kích thích Thính giác (ASMR):</span><span class="dna-text" style="color:#15803d; font-weight:600;">{clean_analysis_text(sensory.get('auditory_foley', ''))}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
 
     f_rules = ca.get('fashion_mix_and_match_rules', {})
     if isinstance(f_rules, dict) and f_rules.get('is_fashion_item', False):
