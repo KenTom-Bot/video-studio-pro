@@ -257,6 +257,14 @@ SOUTHERN_TO_HANOI = {
     r'\btrăm\s+ngàn\b': 'trăm nghìn', r'\bchục\s+ngàn\b': 'chục nghìn', r'\bvài\s+ngàn\b': 'vài nghìn',
     r'\bxài\b': 'dùng', r'\bbận\s+đồ\b': 'mặc đồ', r'\bbận\s+áo\b': 'mặc áo', r'\bbận\s+quần\b': 'mặc quần',
     r'\bbận\s+váy\b': 'mặc váy', r'\bbận\b(?=\s+[a-zà-ỹ]+)': 'mặc',
+    r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước',
+    r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho',
+    r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru',
+    r'\bgiữa\s+tiếng\s+còi\s+xe\s+inh\s+ỏi\b': 'ngoài đường còi xe ồn ào',
+    r'\bkèm\s+dây\s+đeo\s+cực\s+kỳ\s+tiện\s+lợi\b': 'có sẵn cả dây đeo tiện lắm',
+    r'\bvỏ\s+ngoài\b': 'bên ngoài',
+    r'\bnét\s+căng\b': 'rõ mồn một',
+    r'\bkhỏe\s+mạnh\s+hẳn\s+ra\b': 'khỏe khoắn hẳn',
     r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá',
     r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ',
     r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi',
@@ -266,7 +274,7 @@ SOUTHERN_TO_HANOI = {
     r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bcưng\s+ghê\b': 'yêu thế', r'\bba\s+đê\b': '3D',
     r'\bcoi\b': 'xem', r'\bcoi\s+nè\b': 'xem này', r'\bmua\s+liền\b': 'mua ngay', r'\bliền\s+tay\b': 'ngay tay',
     r'\bbữa\s+nay\b': 'hôm nay', r'\bbữa\s+hổm\b': 'hôm trước', r'\bhổm\s+rày\b': 'dạo này',
-    r'\bmấy\s+chế\b': 'các mẹ', r'\bmấy\s+bà\b': 'các mẹ', r'\bmấy\s+bồ\b': 'các bạn',
+    r'\bmấy\s+chế\b': 'các chị em', r'\bmấy\s+bà\b': 'các chị em', r'\bmấy\s+bồ\b': 'các bạn',
     r'\bưng\s+bụng\b': 'vừa ý', r'\bdữ\s+dằn\b': 'rất nhiều', r'\bdữ\s+dội\b': 'rất nhiều',
     r'\bhổng\s+chừng\b': 'có khi', r'\bchèn\s+ơi\b': 'ôi trời', r'\btrời\s+đất\s+ơi\b': 'ôi trời',
     r'\bthiệt\s+sự\b': 'thực sự', r'\bquẹo\s+lựa\b': 'chọn ngay'
@@ -666,7 +674,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V157.0 HOÀN HẢO TOÀN DIỆN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V158.0 HOÀN HẢO TOÀN DIỆN
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -966,8 +974,10 @@ def create_scene_details(target_id, mode, style):
         )
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         
-        # PROMPT VIDEO SIÊU TINH GỌN (VEO 3 SAFE, SẠCH RÁC CODE & GIỮ HÀNH ĐỘNG CHÂN THỰC)
+        # PROMPT VIDEO SIÊU TINH GỌN (VEO 3 SAFE: MỎ NEO NGỮ ÂM HÀ NỘI CHUẨN, SẠCH RÁC CODE & GIỮ HÀNH ĐỘNG CHÂN THỰC)
         speaker_line = scn.get("voiceover", "")
+        audio_anchor = "Audio Direction: Spoken in clear authentic native Northern Vietnamese Hanoi accent, local Hanoi urban cadence, crisp natural conversational pacing, zero Southern dialect bleed."
+        
         if is_viral and scene_num == 4:
             action_phrase = "Hands in welcoming natural open-palm gestures, speaking directly into camera"
         else:
@@ -975,7 +985,7 @@ def create_scene_details(target_id, mode, style):
 
         raw_vid = (
             f"{camera_shot}. Commercial live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}. "
-            f"Action: Visibly speaking directly to camera with natural on-camera lip-sync from 0.00s. Spoken audio: \"{speaker_line}\", Foley: [{sfx_sound}]. "
+            f"Action: Visibly speaking directly to camera with natural on-camera lip-sync from 0.00s. {audio_anchor} Spoken audio: \"{speaker_line}\", Foley: [{sfx_sound}]. "
             f"{action_phrase}. "
             f"Pure camera footage, strictly no text, no subtitles, no UI overlay. "
             f"Negative prompt: {vid_neg}."
