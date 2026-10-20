@@ -109,7 +109,7 @@ def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 def clean_html(raw_html: str) -> str:
-    """Loại bỏ triệt để khoảng thụt đầu dòng (leading indentation) để CommonMark không biến HTML thành thẻ code <pre><code>"""
+    """Loại bỏ triệt để khoảng thụt đầu dòng để CommonMark không biến HTML thành thẻ code <pre><code>"""
     if not raw_html: return ""
     return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
 
@@ -180,21 +180,58 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
     cleaned = re.sub(r'(\b\d{1,3}(?:[.,]\d{3})+\b)', replace_num, text)
     return cleaned
 
-def convert_to_soft_price_range(price_text: str) -> str:
-    if not price_text: return "mấy chục nghìn"
+# ==============================================================================
+# THUẬT TOÁN TÂM LÝ HỌC NEO GIÁ: LÀM TRÒN LÊN (GỐC) & LÀM TRÒN XUỐNG (GIẢM)
+# ==============================================================================
+def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_raw_str: str = "") -> str:
+    combined = f"{exact_raw_str} {price_text}".lower().strip()
+    num_matches = [int(n.replace('.', '').replace(',', '')) for n in re.findall(r'\b\d{1,3}(?:[.,]\d{3})+\b', combined)]
+    
+    if num_matches:
+        val = num_matches[0]
+        if is_orig:
+            if 100000 <= val <= 125000:
+                return "gần một trăm hai mươi nghìn"
+            elif val > 1000000:
+                ceil_mil = math.ceil(val / 1000000)
+                return f"gần {number_to_vietnamese_words(ceil_mil * 1000000).replace(' đồng', '')}"
+            elif val > 100000:
+                ceil_hundred = math.ceil(val / 100000) * 100000
+                if val % 100000 > 70000:
+                    return f"gần {number_to_vietnamese_words(ceil_hundred).replace(' đồng', '')}"
+                ceil_ten = math.ceil(val / 10000) * 10000
+                return f"gần {number_to_vietnamese_words(ceil_ten).replace(' đồng', '')}"
+            else:
+                ceil_ten = math.ceil(val / 10000) * 10000
+                return f"gần {number_to_vietnamese_words(ceil_ten).replace(' đồng', '')}"
+        else:
+            if val < 50000:
+                return "mấy chục nghìn"
+            elif val < 100000:
+                floor_ten = math.floor(val / 10000) * 10000
+                return f"hơn {number_to_vietnamese_words(floor_ten).replace(' đồng', '')}"
+            elif val < 1000000:
+                floor_hundred = math.floor(val / 100000) * 100000
+                return f"hơn {number_to_vietnamese_words(floor_hundred).replace(' đồng', '')}"
+            else:
+                floor_mil = math.floor(val / 1000000) * 1000000
+                return f"hơn {number_to_vietnamese_words(floor_mil).replace(' đồng', '')}"
+                
     p_lower = str(price_text).lower().strip()
-    p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+)+', '', p_lower).strip()
-    if "triệu" in p_lower:
-        match = re.search(r'([a-zà-ỹ\s]+triệu)', p_lower)
-        if match:
-            return f"hơn {match.group(1).strip()}"
-    if "trăm" in p_lower:
-        match = re.search(r'([a-zà-ỹ\s]+trăm)', p_lower)
-        if match:
-            return f"hơn {match.group(1).strip()} nghìn"
-    if any(k in p_lower for k in ["mươi", "mười"]):
-        return "mấy chục nghìn"
-    return f"hơn {p_lower}"
+    p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+|gần\s+)+', '', p_lower).strip()
+    if is_orig:
+        if "trăm mười chín" in p_lower or "119" in p_lower:
+            return "gần một trăm hai mươi nghìn"
+        if "trăm" in p_lower:
+            return f"gần {p_lower}"
+        return f"gần {p_lower}"
+    else:
+        if any(k in p_lower for k in ["ba mươi", "37", "38", "hai mươi", "mấy chục"]):
+            return "mấy chục nghìn"
+        if "trăm" in p_lower:
+            match = re.search(r'([a-zà-ỹ\s]+trăm)', p_lower)
+            if match: return f"hơn {match.group(1).strip()} nghìn"
+        return f"hơn {p_lower}"
 
 # ==============================================================================
 # HÀM XÁC ĐỊNH NHÂN KHẨU HỌC BẤT BIẾN
@@ -440,15 +477,24 @@ def format_product_name_bold(text: str) -> str:
         return f"<b style='color:#0f172a; font-weight:800; font-size:15px;'>{parts[0].strip()}</b> - {parts[1].strip()}"
     return f"<b style='color:#0f172a; font-weight:800; font-size:15px;'>{clean}</b>"
 
+# ==============================================================================
+# HÀM HIỂN THỊ CHÍNH XÁC MỨC GIÁ OCR TỪNG SỐ VÀ TIỀN TỐ (VÍ DỤ: 119.999đ | Từ 37.998đ)
+# ==============================================================================
 def format_ocr_prices(ca_data: dict) -> str:
     if not isinstance(ca_data, dict): return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
+    exact_orig = ca_data.get('exact_original_price_ocr', '')
+    exact_sale = ca_data.get('exact_sale_price_ocr', '')
     det = ca_data.get('detected_prices', '')
+    
+    if exact_orig and exact_sale:
+        return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700; font-size:14px;'>{clean_analysis_text(exact_orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15.5px;'>{clean_analysis_text(exact_sale)}</span>"
+    elif det and ("-" in det or "|" in det or "đ" in det.lower()):
+        return f"<span style='color:#dc2626; font-weight:800; font-size:14.5px;'>{clean_analysis_text(det)}</span>"
+    
     orig = ca_data.get('original_price_spoken', '')
     sale = ca_data.get('sale_price_spoken', '')
     if orig and sale:
         return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
-    elif det:
-        return f"<span style='color:#dc2626; font-weight:800; font-size:14.5px;'>{clean_analysis_text(det)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
 # ==============================================================================
@@ -832,9 +878,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         outro_instruction = f"""
         🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU AN TOÀN VÀ KÍCH THÍCH (KHÓA KÉP 'KHOẢNG' & 'NAY GIẢM'):
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng 3 vế xuôi tai:
-          1. Neo khoảng giá tương đối mềm (TUYỆT ĐỐI KHÔNG BÁO GIÁ CỨNG TRỰC TIẾP):
-             'Bình thường khoảng [khoảng giá gốc ước chừng], nay giảm chỉ còn khoảng [khoảng giá sale ước chừng] thôi...'
-             (BẮT BUỘC DÙNG 'KHOẢNG' CHO CẢ GIÁ GỐC LẪN GIÁ SALE, BẮT BUỘC DÙNG TỪ 'NAY GIẢM', CẤM NÓI GIÁ CỨNG CHÍNH XÁC TỪNG SỐ ĐỂ TRÁNH VI PHẠM KHI SHOP ĐỔI GIÁ, CẤM 'ÁP MÃ', CẤM 'ÁP VOUCHER').
+          1. Neo khoảng giá tâm lý học (TUYỆT ĐỐI KHÔNG BÁO GIÁ CỨNG TRỰC TIẾP):
+             'Bình thường khoảng [giá gốc làm tròn LÊN], nay giảm chỉ còn khoảng [giá sale làm tròn XUỐNG] thôi...'
+             (BẮT BUỘC DÙNG 'KHOẢNG' CHO CẢ GIÁ GỐC LẪN GIÁ SALE, BẮT BUỘC DÙNG TỪ 'NAY GIẢM', CẤM NÓI GIÁ CỨNG TỪNG CON SỐ ĐỂ TRÁNH VI PHẠM KHI SHOP ĐỔI GIÁ, CẤM 'ÁP MÃ', CẤM 'ÁP VOUCHER').
           2. Mệnh đề miễn trừ thời điểm phòng ngừa quét chính sách:
              'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...' (hoặc 'tùy thời điểm giá sẽ chênh lệch một chút...')
           3. Rào voucher tài khoản cá nhân & CTA:
@@ -872,7 +918,6 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       • Áo mẫu chính giữ nguyên 100%, chỉ phối đổi quần/chân váy theo nguyên tắc thời trang.
 
     🛑 CHUỖI HÀNH ĐỘNG TUẦN TỰ KHÔNG BIẾN DẠNG (SEQUENTIAL ACTION TIMELINE):
-    - Cho phép nhân vật thao tác nhiều hành động liên hoàn sinh động (mở nắp, nhấn nút, cắm sạc, kiểm tra, thoa kem, múc nguyên liệu...).
     - BẮT BUỘC viết cấu trúc action_en theo liên từ thời gian tuần tự nối tiếp: 'First, [action 1]; then smoothly, [action 2]; while [action 3]'.
     - KHÓA TIẾP XÚC CƠ HỌC (BOUNDARY CONTACT LOCK): Ngón tay và bàn tay nhân vật tiếp xúc ngoài dứt khoát, không bao giờ hòa tan, dính liền hay chảy vào thân vỏ sản phẩm.
     - KHÓA VẬT THỂ RẮN 100% (RIGID SOLID INVARIANCE): Sản phẩm là khối vật lý rắn 100% giữ nguyên kích thước hình học, không morphing, không biến dạng, không tự phát sinh thêm chi tiết thừa (zero phantom parts).
@@ -889,7 +934,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - Câu thoại viết liền mạch, cấm dấu chấm lửng '...', chỉ dùng dấu phẩy và dấu chấm rõ ràng.
 
     🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI:
-    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại (ngồi sofa xem phim, cắm sạc bàn làm việc, vội đi làm, đứng nấu cơm...).
+    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại.
 
     🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI:
     - CẢNH 2 (Thử thách trực quan): Thao tác bóc tách, thử nghiệm thực tế.
@@ -915,7 +960,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V179.0 (MASTER COMPLETE ENGINE)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V181.0 (PROMPT SWEET-SPOT 75-85 WORDS & FULL MATRIX)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -943,6 +988,8 @@ def create_scene_details(target_id, mode, style):
     
     raw_orig_price = dna.get("original_price_spoken", "")
     raw_sale_price = dna.get("sale_price_spoken", "")
+    exact_orig_raw = str(dna.get("exact_original_price_ocr", ""))
+    exact_sale_raw = str(dna.get("exact_sale_price_ocr", ""))
     
     if not raw_orig_price or not raw_sale_price:
         detected_p = str(dna.get("detected_prices", ""))
@@ -962,8 +1009,9 @@ def create_scene_details(target_id, mode, style):
     orig_price_spoken = clean_and_normalize_voiceover(raw_orig_price)
     sale_price_spoken = clean_and_normalize_voiceover(raw_sale_price)
 
-    soft_orig_price = convert_to_soft_price_range(orig_price_spoken)
-    soft_sale_price = convert_to_soft_price_range(sale_price_spoken)
+    # THUẬT TOÁN TÂM LÝ HỌC NEO GIÁ: Giá gốc làm tròn LÊN, Giá giảm làm tròn XUỐNG
+    soft_orig_price = dna.get("rounded_soft_original_spoken") or convert_to_soft_price_range(orig_price_spoken, is_orig=True, exact_raw_str=exact_orig_raw)
+    soft_sale_price = dna.get("rounded_soft_sale_spoken") or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
 
     self_pronoun = dna.get("self_pronoun") or "em"
     audience_pronoun = dna.get("audience_pronoun") or ("các chị em" if not is_viral else "mọi người")
@@ -1047,6 +1095,8 @@ def create_scene_details(target_id, mode, style):
         "dimensions": dna.get("product_dimensions", "Kích thước chuẩn đời thực"),
         "dimensions_3d_ratio": dim_3d_ratio_txt,
         "product_scale_relative": volumetric_form_en,
+        "exact_original_price_ocr": exact_orig_raw,
+        "exact_sale_price_ocr": exact_sale_raw,
         "original_price_spoken": orig_price_spoken,
         "sale_price_spoken": sale_price_spoken,
         "soft_orig_price": soft_orig_price,
@@ -1077,7 +1127,7 @@ def create_scene_details(target_id, mode, style):
     QUY CHUẨN TỈ LỆ THỰC TẾ: {volumetric_form_en}
     KHÓA TRANG PHỤC MASTER DUY NHẤT 4 CẢNH: {master_wardrobe_locked}
     SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
-    KHOẢNG GIÁ GỐC AN TOÀN (CẢNH 4): '{soft_orig_price}' | KHOẢNG GIÁ SALE AN TOÀN (CẢNH 4): '{soft_sale_price}'
+    KHOẢNG GIÁ GỐC LÀM TRÒN LÊN (CẢNH 4): '{soft_orig_price}' | KHOẢNG GIÁ SALE LÀM TRÒN XUỐNG (CẢNH 4): '{soft_sale_price}'
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
@@ -1176,7 +1226,7 @@ def create_scene_details(target_id, mode, style):
         master_outfit_string = f"strictly wearing identical {master_wardrobe_locked}{asym_append} across all scenes without variation"
 
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
-    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale, morphing, melting, liquid distortion, deformed object, changing parts, detachable artifacts, phantom parts, rubbery movement, unstable geometry"
+    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale, morphing, melting, liquid distortion, deformed object, changing parts, detachable artifacts, phantom parts, rubbery movement, unstable geometry, finger melting, finger clipping"
     wardrobe_negatives = ", changing clothes, different clothes, different outfit, wardrobe inconsistency, altered dress, changing clothing color, inconsistent outfit, changing hairstyle"
     speech_negatives = ", stutter, stammer, repeated speech, looped audio, echo dialogue, repeating speech, stuttering audio, looping voice, echoing words"
     base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}{speech_negatives}"
@@ -1229,37 +1279,24 @@ def create_scene_details(target_id, mode, style):
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
-        if scene_num == 1:
-            depth_3d_lock = f", three-quarter perspective capturing authentic physical scale matching situational placement ({volumetric_form_en})"
-        elif scene_num in [2, 3]:
-            depth_3d_lock = f", optical camera physically zooming closer, maintaining invariant authentic scale ({volumetric_form_en}), camera moving closer without artificial enlargement of object"
-        else:
-            depth_3d_lock = f", authentic proportions matching [{volumetric_form_en}]"
-
-        rigid_boundary_lock = "Hands maintain clean external contact with surfaces without finger-melting artifacts. Product remains a 100% rigid solid physical object with invariant geometry, strictly zero morphing, zero phantom parts throughout all motions."
-
-        img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
-            
+        # Tối ưu Midjourney Prompt tinh gọn, sắc nét
+        img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en})"
         raw_img = f"{img_core}, 8k resolution, soft natural lighting, sharp focus --ar 9:16 --style raw --v 6.1"
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         scn["img_neg"] = base_negative_prompt
         
+        # Làm sạch câu thoại để Veo 3 đọc trôi chảy, tuyệt đối không có dấu chấm lửng '...'
         clean_vo_for_audio = re.sub(r'\.{2,}', '.', vo_line).strip()
         clean_vo_for_audio = re.sub(r'\s*-\s*', ', ', clean_vo_for_audio).strip()
 
-        audio_anchor = "Audio Direction: Spoken in clear native Northern Vietnamese Hanoi accent, natural conversational pacing."
-        if is_viral and scene_num == 4:
-            action_phrase = "speaking with welcoming open-palm gestures directly to lens"
-        else:
-            action_phrase = f"Character visibly performing: {clean_action}, interacting with {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
+        audio_anchor = "Spoken in clear native Northern Vietnamese Hanoi accent."
 
+        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): Tinh gọn, không lặp token, đạt độ ổn định vật lý cao nhất
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}{asym_pose_anchor}. "
-            f"Action: Visibly speaks dialogue to camera with natural lip-sync from 0.00s, speaks the sentence smoothly once, "
-            f"then closes mouth into a warm approving smile while continuing natural physical movement without speaking further. "
-            f"{action_phrase}. {rigid_boundary_lock} "
-            f"{audio_anchor} Spoken audio: \"{clean_vo_for_audio}\", strictly spoken only once from start to finish, zero word repetition, zero stutter. "
-            f"Foley: [{sfx_sound}]. Pure camera footage, strictly no text overlay."
+            f"Action: {clean_action}, interacting with solid {clean_prod_en} ({product_scale_en}). "
+            f"Visibly speaks dialogue once with lip-sync from 0.00s, then closes mouth smiling warmly while finishing motion. "
+            f"{audio_anchor} Spoken audio: \"{clean_vo_for_audio}\". Foley: [{sfx_sound}]. Pure camera footage, no text."
         )
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         scn["vid_neg"] = base_negative_prompt
@@ -1782,10 +1819,14 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                   • Củ sạc, phụ kiện công nghệ: aspect_ratio_3d = 'Phụ kiện công nghệ bỏ túi (Cầm tay hoặc cắm ổ điện)', geometric_form_factor_en = 'compact palm-sized electronic accessory, cased in matte anti-fingerprint shell, braided flexible cable, held or plugged effortlessly with fingers'.
                   • Son, mỹ phẩm, bỏ túi: aspect_ratio_3d = 'Nhỏ gọn cầm tay / bỏ túi', geometric_form_factor_en = 'compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers'.
 
-                🛑 QUY CHUẨN BÓC TÁCH GIÁ TIỀN CHUẨN XÁC TỪNG MỨC GIÁ:
+                🛑 QUY CHUẨN BÓC TÁCH GIÁ TIỀN CHÍNH XÁC OCR VÀ TÂM LÝ HỌC NEO GIÁ:
                 - Quét OCR giá tiền trên ảnh:
-                  • original_price_spoken: Phiên âm giá gốc đầy đủ bằng chữ (ví dụ: 'ba trăm năm mươi nghìn đồng' - CẤM '1 trăm', CẤM 'tư', CẤM 'tứ').
-                  • sale_price_spoken: Phiên âm giá sale đầy đủ bằng chữ (ví dụ: 'hai trăm chín mươi nghìn đồng' - CẤM '1 trăm', CẤM 'tư', CẤM 'tứ').
+                  • exact_original_price_ocr: Ghi CHÍNH XÁC số tiền gốc hiển thị trên ảnh kèm chữ nếu có (ví dụ: '119.999đ', '350.000đ').
+                  • exact_sale_price_ocr: Ghi CHÍNH XÁC số tiền sale hiển thị trên ảnh kèm chữ nếu có (ví dụ: 'Từ 37.998đ', '37.998đ', '290.000đ').
+                  • original_price_spoken: Phiên âm giá gốc đầy đủ bằng chữ (ví dụ: 'một trăm hai mươi nghìn đồng' - CẤM '1 trăm', CẤM 'tư', CẤM 'tứ').
+                  • sale_price_spoken: Phiên âm giá sale đầy đủ bằng chữ (ví dụ: 'ba mươi tám nghìn đồng' - CẤM '1 trăm', CẤM 'tư', CẤM 'tứ').
+                  • rounded_soft_original_spoken: Làm tròn LÊN mốc tròn trên gần nhất (ví dụ: 119.999đ -> 'gần một trăm hai mươi nghìn'; 350.000đ -> 'hơn ba trăm nghìn' hoặc 'gần bốn trăm nghìn').
+                  • rounded_soft_sale_spoken: Làm tròn XUỐNG mốc tròn dưới gần nhất (ví dụ: 37.998đ -> 'mấy chục nghìn' hoặc 'hơn ba mươi nghìn'; 290.000đ -> 'hơn hai trăm nghìn').
 
                 🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ:
                   • Váy xẻ tà bên sườn phải người mặc:
@@ -1840,8 +1881,12 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                             "auditory_asmr": "Kích thích thính giác ASMR (tiếng tách cắm sạc Type-C, tiếng click nắp, tiếng rít sạch...)",
                             "functional_delight": "Cảm xúc hài lòng (sạc nhanh không nóng, đầm tay chắc chắn, an tâm tuyệt đối...)"
                         }},
-                        "original_price_spoken": "Giá gốc phiên âm bằng chữ chuẩn (ví dụ: ba trăm năm mươi nghìn)",
-                        "sale_price_spoken": "Giá sale phiên âm bằng chữ chuẩn (ví dụ: hai trăm chín mươi nghìn)",
+                        "exact_original_price_ocr": "119.999đ",
+                        "exact_sale_price_ocr": "Từ 37.998đ",
+                        "original_price_spoken": "một trăm hai mươi nghìn đồng",
+                        "sale_price_spoken": "ba mươi tám nghìn đồng",
+                        "rounded_soft_original_spoken": "gần một trăm hai mươi nghìn",
+                        "rounded_soft_sale_spoken": "mấy chục nghìn",
                         "recommended_setting_en": "Realistic clean modern townhouse setting under 15 words",
                         "recommended_wardrobe_en": "cream-white casual short-sleeve tee with comfortable trousers",
                         "target_audience": "Tệp khách hàng mục tiêu",
@@ -1992,8 +2037,12 @@ if isinstance(ca, dict):
         else:
             orig_p_display = ca.get('original_price_spoken', '')
             sale_p_display = ca.get('sale_price_spoken', '')
-            soft_orig = convert_to_soft_price_range(orig_p_display) if orig_p_display else "hơn một trăm nghìn"
-            soft_sale = convert_to_soft_price_range(sale_p_display) if sale_p_display else "mấy chục nghìn"
+            exact_orig_raw = str(ca.get('exact_original_price_ocr', ''))
+            exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
+            
+            soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
+            
             c4_html = clean_html(f"""
             <div class="dna-card">
                 <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh, Động Lực Học & Mức Giá</div>
@@ -2027,7 +2076,6 @@ if isinstance(ca, dict):
         })
 
     # MỤC 6: GIẢI PHẪU KÍCH HOẠT ĐA GIÁC QUAN ĐỜI SỐNG (UNIVERSAL MULTI-SENSORY ASMR)
-    # Áp dụng tự động cho MỌI ngành hàng (Công nghệ, Mỹ phẩm, Gia dụng, Ẩm thực, Mẹ & Bé)
     s_info = ca.get('universal_sensory_matrix', {})
     if not isinstance(s_info, dict) or not s_info.get('tactile_feel'):
         s_info = {
