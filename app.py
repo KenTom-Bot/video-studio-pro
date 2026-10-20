@@ -362,6 +362,7 @@ SOUTHERN_TO_HANOI = {
     r'\bhổm\s+rày\b': 'dạo này',
     r'\bmấy\s+chế\b': 'các chị em',
     r'\bmấy\s+bà\b': 'các chị em',
+    r'\bmấy\s+bồ\b': 'các bạn',
     r'\bưng\s+bụng\b': 'vừa ý'
 }
 
@@ -729,6 +730,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       2. Cấm bối cảnh biệt thự cung điện xa hoa lộng lẫy, dát vàng giả tạo.
     - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH (ví dụ: bồn rửa bát inox đôi sạch sẽ), chỉ thay đổi góc máy quay!
 
+    🛑 KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG (STRICT ANATOMICAL ASYMMETRY LOCK):
+    - Khi trang phục hoặc sản phẩm có chi tiết bất đối xứng (ví dụ: xẻ tà váy, túi ngực, vạt áo chéo, khóa kéo lệch):
+      • BẮT BUỘC phải mô tả vị trí từ GÓC NHÌN GIẢI PHẪU CỦA NGƯỜI MẶC: 'wearer's anatomical right leg / side seam' hoặc 'wearer's anatomical left leg / side seam'.
+      • NẾU XẺ BÊN HÔNG: Bắt buộc dùng 'side-seam slit', TUYỆT ĐỐI CẤM nhầm thành 'front slit' (xẻ trước).
+      • Trong Negative Prompt bắt buộc có: 'mirrored slit, slit on wrong leg, front slit, inverted design'.
+
     🛑 KHÓA TRẠNG THÁI SƠ VIN TRANG PHỤC ĐỒNG BỘ THEO PHÂN TÍCH THỰC TẾ:
     - Trạng thái cạp áo (sơ vin nhét vào cạp quần HOẶC buông thõng tự nhiên) được quyết định dựa vào phân tích thời trang và hoàn cảnh thực tế, sau đó BẮT BUỘC phải đồng nhất 100% xuyên suốt cả 4 phân cảnh!
     - Tuyệt đối cấm cảnh trước sơ vin mà cảnh sau lại thả áo buông thõng.
@@ -785,7 +792,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V161.0 HOÀN HẢO TOÀN DIỆN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V162.0 HOÀN HẢO TOÀN DIỆN
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -833,6 +840,14 @@ def create_scene_details(target_id, mode, style):
         else:
             locked_tuck_en = "shirt hem strictly neatly tucked into waistband with a clean flat waistline"
 
+    # PHÂN TÍCH KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG
+    asym_data = dna.get("spatial_asymmetry_analysis", {})
+    asym_lock_en = ""
+    asym_neg_en = ""
+    if isinstance(asym_data, dict) and asym_data.get("has_asymmetry", False):
+        asym_lock_en = asym_data.get("en_prompt_lock", "")
+        asym_neg_en = asym_data.get("negative_prompt_lock", "mirrored slit, slit on wrong leg, front slit, inverted design")
+
     # PHÂN TÍCH ẨM THỰC ĐA GIÁC QUAN
     culinary_info = dna.get("culinary_dna", {})
     is_culinary = False
@@ -860,6 +875,7 @@ def create_scene_details(target_id, mode, style):
         "is_culinary": is_culinary,
         "culinary_sensory": culinary_info.get("sensory_cues", {}) if isinstance(culinary_info, dict) else {},
         "locked_tuck_en": locked_tuck_en,
+        "asym_lock_en": asym_lock_en,
         "recommended_setting_en": dna.get("recommended_setting_en", "tidy modern Vietnamese townhouse kitchen with clean stainless steel sink"),
         "recommended_wardrobe_en": dna.get("recommended_wardrobe_en", f"cream-white casual tee {locked_tuck_en} with beige linen apron"),
         "recommended_format": dna.get("recommended_format", "Review bóc hộp kết hợp trải nghiệm thực tế"),
@@ -916,6 +932,7 @@ def create_scene_details(target_id, mode, style):
     - MA TRẬN NHÂN XƯNG CƯỠNG CHẾ: KOC tự xưng là '{self_pronoun}', gọi người xem là '{audience_pronoun}'. CẢ 4 PHÂN CẢNH BẮT BUỘC tuân thủ đúng cặp nhân xưng này!
     - QUY CHUẨN BỐI CẢNH: {setting_archetype} ({'Khóa 1 vị trí cố định qua cả 4 cảnh' if is_fixed_location else 'Chuyển cảnh theo mạch truyện'}). CẤM nhà cấp 4 tồi tàn, CẤM biệt thự xa hoa.
     - QUY CHUẨN SƠ VIN: Khóa cứng '{locked_tuck_en}' đồng nhất 100% qua cả 4 phân cảnh.
+    - KHÓA TỌA ĐỘ BẤT ĐỐI XỨNG: {asym_lock_en if asym_lock_en else 'none'} (Khóa góc nhìn giải phẫu học cơ thể người mặc, cấm vẽ sai bên, cấm xẻ đằng trước).
     - HÌNH THỨC NÓI: 100% Lời thoại do CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S Ở CẢ 4 CẢNH (CẢNH 1, 2, 3, 4). TUYỆT ĐỐI CẤM THUYẾT MINH NGOÀI. TUYỆT ĐỐI CẤM TỪ 'NGÀN' (PHẢI DÙNG TỪ 'NGHÌN'). TUYỆT ĐỐI CẤM TỪ 'TRỢ GIÁ'.
     {culinary_special_directive}
     
@@ -1046,10 +1063,12 @@ def create_scene_details(target_id, mode, style):
     connector_phrase = f", {connector_physics_en}" if connector_physics_en and connector_physics_en.lower() not in ["none", "không có dây nối", "no cable"] else ""
     
     actor_base = f"{full_char}, neat {locked_hair}"
-    wardrobe_str = f"wearing {locked_tops}, {locked_tuck}, and {locked_bottoms}"
+    asym_append = f", {asym_lock_en}" if asym_lock_en else ""
+    wardrobe_str = f"wearing {locked_tops}, {locked_tuck}, and {locked_bottoms}{asym_append}"
     
-    # BỘ CHẶN ĐỜI THỰC THẤU CẢM: TRIỆT TIÊU NHÀ CẤP 4 TỒI TÀN & BIỆT THỰ XA HOA & LỆCH SƠ VIN
-    realism_blockers = "dilapidated house, old rural hut, dirty kitchen, stained wall, peeling paint, messy background, luxury palace, ultra-luxury mansion, golden decorations, hyper-luxurious penthouse, tucked shifting to untucked, untucked shifting to tucked, inconsistent waistband"
+    # BỘ CHẶN ĐỜI THỰC THẤU CẢM: TRIỆT TIÊU NHÀ CẤP 4 TỒI TÀN & BIỆT THỰ XA HOA & LỆCH SƠ VIN & LỆCH TỌA ĐỘ BẤT ĐỐI XỨNG
+    spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
+    realism_blockers = f"dilapidated house, old rural hut, dirty kitchen, stained wall, peeling paint, messy background, luxury palace, ultra-luxury mansion, golden decorations, hyper-luxurious penthouse, tucked shifting to untucked, untucked shifting to tucked, inconsistent waistband{spatial_neg}"
     
     total_sec = 0.0
     for scn in scenes:
@@ -1364,7 +1383,7 @@ with st.sidebar:
                 "current_project_id": None, "saved_reference_images": [], "character_profiles": [],
                 "current_processing_id": None, "current_cloning_id": None
             })
-            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')} commodities"
             st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", value=st.session_state.active_project_title)
@@ -1559,7 +1578,7 @@ if is_viral_mode:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: váy xẻ tà bên sườn phải người mặc, oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
@@ -1578,7 +1597,7 @@ else:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_prod_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: váy xẻ tà bên sườn phải người mặc, oneshot chỉ cầm trên tay nói chuyện):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2, col_opt3 = st.columns([1.2, 1.2, 1.2])
 style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
@@ -1608,7 +1627,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
     can_run, msg = check_usage_limit(st.session_state.current_email)
     if not can_run: st.error(msg)
     else:
-        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, định danh nhân xưng chuẩn xác và thiết lập bối cảnh..."):
+        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, định vị giải phẫu không gian & ma trận nhân xưng..."):
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars)]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -1657,6 +1676,12 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 - Cắm cờ is_fixed_location = true/false (true nếu sản phẩm gắn với 1 vị trí cố định như bồn rửa bát, thiết bị cắm điện).
                 - Mô tả recommended_setting_en: chuẩn nhà ở trung lưu Việt Nam sạch sẽ, ánh sáng tự nhiên.
 
+                🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG (SPATIAL ANATOMICAL INVARIANCE):
+                - Quét kỹ hình ảnh và mô tả để phát hiện chi tiết bất đối xứng (ví dụ: xẻ tà váy, túi ngực lệch, vạt chéo, khóa kéo lệch, họa tiết một bên):
+                  • Nếu có xẻ tà: Xác định CHÍNH XÁC từ góc nhìn cơ thể người mặc (wearer's anatomical perspective).
+                  • Ví dụ: Váy xẻ tà sườn phải người mặc -> en_prompt_lock = 'asymmetrical high side-seam slit strictly positioned on the wearer anatomical right leg (camera frame left), strictly along the side seam with zero front slit', negative_prompt_lock = 'mirrored slit, slit on wrong leg, front slit, inverted design'.
+                  • CẤM nhầm bên phải người mặc thành bên phải khung hình! CẤM nhầm xẻ sườn thành xẻ trước!
+
                 🛑 QUY CHUẨN PHÂN TÍCH SƠ VIN THỜI TRANG ĐỘNG (DYNAMIC TUCK-IN ANALYSIS):
                 - Đánh giá hoàn cảnh sử dụng và phom dáng trang phục để ra quyết định sơ vin hay thả ngoài:
                   • Đồ bếp, làm sạch, nội trợ, ở nhà, ăn uống, áo phông rộng, áo len nỉ dày -> decision = 'untucked', en_prompt_lock = 'shirt hem strictly cleanly untucked, resting naturally at hips for casual comfort'.
@@ -1686,8 +1711,15 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "is_fixed_location": true/false,
                         "tuck_in_analysis": {{
                             "decision": "tucked / untucked",
-                            "fashion_reason": "Lý do thời trang thực tế (ví dụ: làm bếp/ăn uống cần thoải mái nên thả áo ngoài tự nhiên)",
+                            "fashion_reason": "Lý do thời trang thực tế",
                             "en_prompt_lock": "shirt hem strictly cleanly untucked, resting naturally at hips (hoặc strictly neatly tucked into waistband)"
+                        }},
+                        "spatial_asymmetry_analysis": {{
+                            "has_asymmetry": true/false,
+                            "feature_type": "xẻ tà / vạt chéo / túi ngực lệch / nơ vai / khóa kéo sườn",
+                            "anatomical_location_vi": "Vị trí giải phẫu chuẩn xác (ví dụ: xẻ bên sườn phải người mặc, không xẻ đằng trước)",
+                            "en_prompt_lock": "asymmetrical high side-seam slit strictly positioned on the wearer anatomical right leg (camera frame left), strictly along side seam with zero front slit",
+                            "negative_prompt_lock": "mirrored slit, slit on wrong leg, front slit, inverted design"
                         }},
                         "culinary_dna": {{
                             "is_culinary": true/false,
@@ -1773,11 +1805,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma trận Giác quan, Nhân xưng & Bối cảnh chuẩn cho 5 kịch bản!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Ma trận Tọa độ Giải phẫu, Giác quan & Nhân xưng chuẩn xác!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
-# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5 CHỈ HIỆN KHI LÀ THỜI TRANG / ẨM THỰC
+# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5 CHỈ HIỆN KHI LÀ THỜI TRANG / ẨM THỰC / TỌA ĐỘ
 # ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
@@ -1862,13 +1894,25 @@ if isinstance(ca, dict):
             </div>
             """, unsafe_allow_html=True)
 
+    # THẺ HIỂN THỊ ĐẶC BIỆT DÀNH CHO KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG
+    asym_info = ca.get('spatial_asymmetry_analysis', {})
+    if isinstance(asym_info, dict) and asym_info.get('has_asymmetry', False):
+        st.markdown(f"""
+        <div class="dna-card" style="border-left: 4px solid #8b5cf6; margin-top: 6px;">
+            <div class="dna-card-title" style="color:#7c3aed;">📐 5. Khóa Tọa Độ Giải Phẫu & Cắt May Bất Đối Xứng (Spatial Asymmetry Lock)</div>
+            <div class="dna-row"><span class="dna-label">✂️ Chi tiết bất đối xứng:</span><span class="dna-text" style="font-weight:700; color:#6d28d9;">{clean_analysis_text(asym_info.get('feature_type', 'Xẻ tà'))}</span></div>
+            <div class="dna-row"><span class="dna-label">📍 Tọa độ người mặc:</span><span class="dna-text" style="font-weight:600; color:#4c1d95;">{clean_analysis_text(asym_info.get('anatomical_location_vi', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">🛡 Cưỡng chế Prompt EN:</span><span class="dna-text"><code>{asym_info.get('en_prompt_lock', '')}</code></span></div>
+        </div>
+        """, unsafe_allow_html=True)
+
     # THẺ HIỂN THỊ ĐẶC BIỆT DÀNH CHO ẨM THỰC / F&B
     c_dna = ca.get('culinary_dna', {})
     if isinstance(c_dna, dict) and c_dna.get('is_culinary', False):
         sensory = c_dna.get('sensory_cues', {})
         st.markdown(f"""
         <div class="dna-card" style="border-left: 4px solid #f97316; margin-top: 6px;">
-            <div class="dna-card-title" style="color:#ea580c;">🍗 5. Giải Phẫu Kích Hoạt Đa Giác Quan Ẩm Thực (Food-Porn Sensory Matrix)</div>
+            <div class="dna-card-title" style="color:#ea580c;">🍗 6. Giải Phẫu Kích Hoạt Đa Giác Quan Ẩm Thực (Food-Porn Sensory Matrix)</div>
             <div class="dna-row"><span class="dna-label">✨ Cấu trúc vật lý:</span><span class="dna-text" style="font-weight:600; color:#c2410c;">{clean_analysis_text(c_dna.get('texture_profile', 'Giòn rụm xốp tan'))}</span></div>
             <div class="dna-row"><span class="dna-label">👁 Kích thích Thị giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('visual_en', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🖐 Kích thích Xúc giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('tactile_en', ''))}</span></div>
@@ -1884,7 +1928,7 @@ if isinstance(ca, dict):
 
         st.markdown(f"""
         <div class="dna-card" style="border-left: 4px solid #ec4899; margin-top: 6px;">
-            <div class="dna-card-title" style="color:#db2777;">👗 5. Gợi Ý Phối Đồ Chuẩn Fashionista (Mix & Match Styling DNA)</div>
+            <div class="dna-card-title" style="color:#db2777;">👗 7. Gợi Ý Phối Đồ Chuẩn Fashionista (Mix & Match Styling DNA)</div>
             <div class="dna-row"><span class="dna-label">📐 Phom dáng & Chất liệu:</span><span class="dna-text">{clean_analysis_text(f_rules.get('silhouette_and_fabric', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">⚖ Quy tắc tỷ lệ hình khối:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(f_rules.get('proportion_formula', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🎨 Nguyên tắc phối màu:</span><span class="dna-text">{clean_analysis_text(f_rules.get('color_harmony', ''))}</span></div>
@@ -1940,7 +1984,7 @@ if all_sc:
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp on-camera từ 0.00s (100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
-            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Siêu Tinh Gọn, Khóa Giới Tính, Cạp Áo & Kích Thước Thật):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
+            if scn.get('img_p'): st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa Giới Tính, Cạp Áo, Tọa Độ Giải Phẫu & Kích Thước Thật):**"); st.code(img_p := scn.get('img_p'), language="text"); safe_copy_button(img_p, f"📋 Sao Chép Ảnh Cảnh {idx}")
             if scn.get('vid_p'): st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Tinh Gọn Mật Độ Cao, Mỏ Neo Giọng Hà Nội, Khóa Cứng Diễn Viên & Thoại 0.00s):**"); st.code(vid_p := scn.get('vid_p'), language="text"); safe_copy_button(vid_p, f"📋 Sao Chép Video Cảnh {idx}")
             st.markdown("---")
 
