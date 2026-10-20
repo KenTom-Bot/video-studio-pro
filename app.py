@@ -175,6 +175,21 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
     cleaned = re.sub(r'(\b\d{1,3}(?:[.,]\d{3})+\b)', replace_num, text)
     return cleaned
 
+def convert_to_soft_price_range(price_text: str) -> str:
+    if not price_text: return "mấy chục nghìn"
+    p_lower = price_text.lower().strip()
+    if "triệu" in p_lower:
+        match = re.search(r'([a-zà-ỹ\s]+triệu)', p_lower)
+        if match:
+            return f"hơn {match.group(1).strip()}"
+    if "trăm" in p_lower:
+        match = re.search(r'([a-zà-ỹ\s]+trăm)', p_lower)
+        if match:
+            return f"hơn {match.group(1).strip()} nghìn"
+    if any(k in p_lower for k in ["mươi", "mười"]):
+        return "mấy chục nghìn"
+    return f"hơn {price_text}"
+
 # ==============================================================================
 # HÀM XÁC ĐỊNH NHÂN KHẨU HỌC BẤT BIẾN
 # ==============================================================================
@@ -305,7 +320,7 @@ SOUTHERN_TO_HANOI = {
     r'\bmuỗng\b': 'thìa',
     r'\bbàn\s*ủi\b': 'bàn là',
     r'\bbao\s*rác\b': 'túi rác',
-    r'\chổi\s*lông\s*gà\b': 'chổi phất trần',
+    r'\bchổi\s*lông\s*gà\b': 'chổi phất trần',
     r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru',
     r'\bêm\s+ái\b': 'êm ru',
     r'\bgiữa\s+tiếng\s+còi\s+xe\s+inh\s+ỏi\b': 'ngoài đường còi xe ồn ào',
@@ -439,14 +454,14 @@ def extract_situational_scenario_en(vo_text: str):
     if any(k in vo_lower for k in ["xem phim", "cày phim", "coi phim", "xem tivi", "lướt phim", "chiếu phim"]):
         return {
             "setting": "cozy living room with comfortable sofa, ambient glowing reflection from TV screen in darkened room",
-            "action": "sitting comfortably curled up on soft sofa, holding product naturally while enjoying TV screen",
+            "action": "sitting comfortably curled up on soft sofa, holding or placing product naturally while enjoying TV screen",
             "sfx": "subtle movie background audio, quiet late-night room ambiance",
             "is_indoor": True
         }
     elif any(k in vo_lower for k in ["đi làm", "sáng sớm", "dậy muộn", "vội vã", "ra ngoài", "chuẩn bị đi"]):
         return {
             "setting": "bright modern apartment entryway beside vanity mirror with crisp morning sunlight",
-            "action": "preparing to head out, holding product with brisk realistic morning momentum",
+            "action": "preparing to head out, holding or wearing product with brisk realistic morning momentum",
             "sfx": "morning birds chirping outside, key chime",
             "is_indoor": True
         }
@@ -808,11 +823,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         """
     else:
         outro_instruction = f"""
-        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU KÍCH THÍCH & AN TOÀN TUYỆT ĐỐI (DƯỚI 30 TỪ):
+        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU AN TOÀN VÀ KÍCH THÍCH (KHÓA KÉP 'KHOẢNG' & 'NAY GIẢM'):
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng 3 vế xuôi tai:
-          1. Neo giá thực tế & Báo giá giảm kích thích:
-             'Bình thường khoảng [Giá gốc thực tế đã phiên âm], nay giảm chỉ còn tầm [Giá sale thực tế đã phiên âm] thôi...' (BẮT BUỘC DÙNG 'NAY GIẢM', TUYỆT ĐỐI CẤM DÙNG 'ÁP MÃ', CẤM 'ÁP VOUCHER'!)
-          2. Miễn trừ thời điểm phòng ngừa quét chính sách:
+          1. Neo khoảng giá tương đối mềm (TUYỆT ĐỐI KHÔNG BÁO GIÁ CỨNG TRỰC TIẾP):
+             'Bình thường khoảng [khoảng giá gốc ước chừng], nay giảm chỉ còn khoảng [khoảng giá sale ước chừng] thôi...'
+             (BẮT BUỘC DÙNG 'KHOẢNG' CHO CẢ GIÁ GỐC LẪN GIÁ SALE, BẮT BUỘC DÙNG TỪ 'NAY GIẢM', CẤM NÓI GIÁ CỨNG CHÍNH XÁC TỪNG SỐ ĐỂ TRÁNH VI PHẠM KHI SHOP ĐỔI GIÁ, CẤM 'ÁP MÃ', CẤM 'ÁP VOUCHER').
+          2. Mệnh đề miễn trừ thời điểm phòng ngừa quét chính sách:
              'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...' (hoặc 'tùy thời điểm giá sẽ chênh lệch một chút...')
           3. Rào voucher tài khoản cá nhân & CTA:
              '{audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'
@@ -854,7 +870,11 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       • Đồ lớn / Nội thất (Tủ lạnh, tivi, sofa, đệm, giường, bàn ghế): Kê đặt vững chắc trên sàn nhà (grounded on floor / wall-mounted), nhân vật đứng cạnh, mở cửa, ngồi hoặc nằm lên cân xứng với chiều cao 1m65 của con người và căn phòng.
       • Đồ vừa / Cầm tay (Máy xay, chảo, nồi, cốc, bình): Cầm 1-2 tay hoặc đặt trên kệ/bếp/bồn rửa tự nhiên, tỉ lệ nhỏ gọn hơn cẳng tay và vai người.
       • Đồ nhỏ / Cá nhân (Son, phấn, trang sức): Cầm ngón tay, bỏ túi, đặt khay trang điểm.
-    - TUYỆT ĐỐI CẤM LỖI PHÓNG ĐẠI: Không bao giờ vẽ sản phẩm phình to bất thường choán hết màn hình.
+    - KHÓA KHUNG XƯƠNG CƠ HỌC VẬT RẮN (RIGID SOLID INVARIANCE): Sản phẩm giữ nguyên cấu trúc vật rắn 100%, cấm biến dạng méo mó, cấm sinh chi tiết thừa, tay cầm tiếp xúc ngoài sạch sẽ không bị dính tan vào vỏ máy.
+
+    🛑 TỐI ƯU VEO 3 CHỐNG VẤP VÀ CHỐNG LẶP LỜI THOẠI (VEO 3 AUDIO-VISUAL TAIL ANCHOR):
+    - Cấu trúc prompt Veo 3 chia rõ 2 thì: Nhân vật nói câu thoại duy nhất một lần từ 0.00s, sau khi dứt lời ngậm miệng mỉm cười tự nhiên và tiếp tục hoàn tất cử chỉ hành động đến hết thời lượng video.
+    - Câu thoại viết liền mạch, cấm dấu chấm lửng '...', chỉ dùng dấu phẩy và dấu chấm rõ ràng.
 
     🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI:
     - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại (ngồi sofa xem phim, vội đi làm, đứng nấu cơm...).
@@ -883,7 +903,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V176.0 (KHÓA TỈ LỆ VẬT LÝ THEO NGỮ CẢNH LINH HOẠT)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V177.0 (VEO 3 SAFE & SOFT RANGE PRICING)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -929,6 +949,10 @@ def create_scene_details(target_id, mode, style):
 
     orig_price_spoken = clean_and_normalize_voiceover(raw_orig_price)
     sale_price_spoken = clean_and_normalize_voiceover(raw_sale_price)
+
+    # Chuyển đổi sang khoảng giá ước chừng an toàn cho Cảnh 4
+    soft_orig_price = convert_to_soft_price_range(orig_price_spoken)
+    soft_sale_price = convert_to_soft_price_range(sale_price_spoken)
 
     self_pronoun = dna.get("self_pronoun") or "em"
     audience_pronoun = dna.get("audience_pronoun") or ("các chị em" if not is_viral else "mọi người")
@@ -977,22 +1001,18 @@ def create_scene_details(target_id, mode, style):
     # THIẾT LẬP MỎ NEO TỈ LỆ THỰC TẾ & BẢN THỂ HỌC ĐỘNG (KHÔNG GÒ BÓ MẶT BÀN)
     prod_type_lower = str(dna.get("what_and_unique", "")).lower()
     
-    # 1. Đồ nội thất, điện máy lớn (Tủ lạnh, tivi, sofa, đệm, giường, máy giặt...)
     if any(k in prod_type_lower for k in ["tủ lạnh", "refrigerator", "tivi", "tv", "sofa", "đệm", "nệm", "mattress", "giường", "bed", "máy giặt", "tủ quần áo", "bàn ăn", "ghế massage"]):
         volumetric_form_en = "authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human (standing beside refrigerator, sitting on sofa, or resting on mattress), natural spacious room presence"
         dim_3d_ratio_txt = "Kích thước nội thất lớn (Tỉ lệ chuẩn theo vóc dáng 1m65 & sàn phòng)"
-    # 2. Thiết bị gia dụng vừa & cầm tay (Máy xay, nồi, chảo, bình nước...)
     elif any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor", "osaka"]):
         volumetric_form_en = "compact 2-liter electric food processor, total height approx 25cm (noticeably shorter than adult forearm), clear glass bowl diameter 15cm, motorized top power base held or operated comfortably with female hands, positioned naturally according to situational action"
         dim_3d_ratio_txt = "Cao 25cm x Cối 15cm (Nhỏ hơn cẳng tay, cầm/đặt tự nhiên)"
     elif any(k in prod_type_lower for k in ["chảo", "nồi", "cookware"]):
         volumetric_form_en = "standard cookware approx 28cm diameter, proportioned accurately against human torso and stovetop, handled naturally with one or two hands"
         dim_3d_ratio_txt = "Đường kính 28cm x Cao 6cm (Cầm/đặt trên bếp tự nhiên)"
-    # 3. Đồ bỏ túi, mỹ phẩm nhỏ (Son, phấn, serum, trang sức...)
     elif any(k in prod_type_lower for k in ["son", "lipstick", "mascara", "chì kẻ", "bút", "nhẫn", "serum", "cushion"]):
         volumetric_form_en = "compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers, placed or held naturally matching situational action"
         dim_3d_ratio_txt = "Nhỏ gọn cầm tay / bỏ túi (Cầm ngón tay hoặc đặt khay tự nhiên)"
-    # 4. Các vật thể tiêu chuẩn khác
     else:
         volumetric_form_en = "invariant 1:1 real-world physical scale, accurately proportioned against adult human body and setting architecture, naturally placed or held matching situational context"
         dim_3d_ratio_txt = "Tỉ lệ đời thực chuẩn xác (Đặt/cầm linh hoạt theo tình huống)"
@@ -1013,6 +1033,8 @@ def create_scene_details(target_id, mode, style):
         "product_scale_relative": volumetric_form_en,
         "original_price_spoken": orig_price_spoken,
         "sale_price_spoken": sale_price_spoken,
+        "soft_orig_price": soft_orig_price,
+        "soft_sale_price": soft_sale_price,
         "self_pronoun": self_pronoun,
         "audience_pronoun": audience_pronoun,
         "setting_archetype": setting_archetype,
@@ -1040,7 +1062,7 @@ def create_scene_details(target_id, mode, style):
     QUY CHUẨN TỈ LỆ THỰC TẾ: {volumetric_form_en}
     KHÓA TRANG PHỤC MASTER DUY NHẤT 4 CẢNH: {master_wardrobe_locked}
     SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
-    GIÁ GỐC THỰC TẾ: '{orig_price_spoken}' | GIÁ SALE THỰC TẾ: '{sale_price_spoken}'
+    KHOẢNG GIÁ GỐC AN TOÀN (CẢNH 4): '{soft_orig_price}' | KHOẢNG GIÁ SALE AN TOÀN (CẢNH 4): '{soft_sale_price}'
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
@@ -1102,8 +1124,8 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "smiling warmly into lens with open welcoming hands",
                 "action_en": "speaking with welcoming open-palm gestures, product naturally situated nearby",
                 "sfx": "Tiếng chuông ting trong trẻo",
-                "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá nay giảm an toàn'}",
-                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng hơn {orig_price_spoken}, nay giảm chỉ còn tầm {sale_price_spoken} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!'}"
+                "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá khoảng và nay giảm an toàn'}",
+                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'}"
             }}
         ]
     }}
@@ -1139,9 +1161,10 @@ def create_scene_details(target_id, mode, style):
         master_outfit_string = f"strictly wearing identical {master_wardrobe_locked}{asym_append} across all scenes without variation"
 
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
-    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale"
+    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale, morphing, melting, liquid distortion, deformed object, changing parts, extra limbs, rubbery movement, unstable geometry"
     wardrobe_negatives = ", changing clothes, different clothes, different outfit, wardrobe inconsistency, altered dress, changing clothing color, inconsistent outfit, changing hairstyle"
-    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}"
+    speech_negatives = ", repeating speech, stuttering audio, looping voice, echoing words"
+    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}{speech_negatives}"
     
     total_sec = 0.0
     for scn in scenes:
@@ -1199,6 +1222,9 @@ def create_scene_details(target_id, mode, style):
         else:
             depth_3d_lock = f", authentic proportions matching [{volumetric_form_en}]"
 
+        # Khóa chống biến dạng vật lý và chống dính tay vào sản phẩm
+        rigid_boundary_lock = "Hands maintain clean external contact with surfaces without fingers melting into product casing. Product remains a rigid solid physical object maintaining fixed geometry throughout all motions."
+
         if is_culinary:
             img_core = f"Macro food photography, {clean_prod_en} glistening with rich glossy sauce, steam rising, {actor_full}, {clean_action}{depth_3d_lock}"
         else:
@@ -1208,18 +1234,24 @@ def create_scene_details(target_id, mode, style):
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         scn["img_neg"] = base_negative_prompt
         
+        # Làm sạch câu thoại để Veo 3 đọc không bị vấp dấu câu
+        clean_vo_for_audio = re.sub(r'\.{2,}', '.', vo_line).strip()
+        clean_vo_for_audio = re.sub(r'\s*-\s*', ', ', clean_vo_for_audio).strip()
+
         audio_anchor = "Audio Direction: Spoken in clear native Northern Vietnamese Hanoi accent, natural conversational pacing."
         if is_viral and scene_num == 4:
             action_phrase = "speaking with welcoming open-palm gestures directly to lens"
         else:
             action_phrase = f"Character visibly performing: {clean_action}, interacting with {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
 
+        # Cấu trúc Veo 3 chia rõ 2 thì: Nói 1 lần duy nhất từ 0.00s -> sau đó ngậm miệng mỉm cười hoàn tất cử chỉ
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}{asym_pose_anchor}. "
-            f"Action: Visibly speaking to camera with natural on-camera lip-sync from 0.00s. "
-            f"{action_phrase}. "
-            f"{audio_anchor} Spoken audio: \"{vo_line}\", Foley: [{sfx_sound}]. "
-            f"Pure camera footage, strictly no text overlay."
+            f"Action: Visibly speaks dialogue to camera with natural lip-sync from 0.00s, speaks the sentence smoothly once, "
+            f"then closes mouth into a warm approving smile while continuing natural physical movement without speaking further. "
+            f"{action_phrase}. {rigid_boundary_lock} "
+            f"{audio_anchor} Spoken audio: \"{clean_vo_for_audio}\", strictly spoken only once from start to finish, zero word repetition, zero stutter. "
+            f"Foley: [{sfx_sound}]. Pure camera footage, strictly no text overlay."
         )
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         scn["vid_neg"] = base_negative_prompt
@@ -1232,7 +1264,7 @@ def create_scene_details(target_id, mode, style):
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
         f"👗 <b>Khóa trang phục Master duy nhất:</b> {master_wardrobe_locked} (Đồng nhất 100% cả 4 cảnh)",
-        f"💰 <b>Mức giá đồng bộ (Cảnh 4):</b> Bình thường ~{orig_price_spoken}, nay giảm ~{sale_price_spoken}",
+        f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}",
         f"📐 <b>Tỉ lệ thực tế:</b> {dim_3d_ratio_txt}"
     ]
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
@@ -1563,7 +1595,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1950,7 +1982,7 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
                 <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
-                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường ~{ca.get('original_price_spoken', '')}, nay giảm ~{ca.get('sale_price_spoken', '')}</span></div>
+                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}</span></div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -2090,7 +2122,7 @@ if all_sc:
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
-            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx} (Chặn méo tỉ lệ & phình to)", expanded=False):
+            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx} (Chặn méo tỉ lệ, lặp tiếng & phình to)", expanded=False):
                 neg_val = scn.get('vid_neg', 'opposite gender, celebrity likeness, extra fingers, text, watermark')
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
