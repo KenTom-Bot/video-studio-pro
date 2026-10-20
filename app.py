@@ -254,7 +254,6 @@ POLICY_REPLACEMENTS = {
 }
 
 SOUTHERN_TO_HANOI = {
-    # KHÓA CỨNG TOÀN BỘ BIẾN THỂ "TƯ", "TỨ", "1 TRĂM" THÀNH "MỘT TRĂM BỐN MƯƠI"
     r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi',
     r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi',
     r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi',
@@ -277,8 +276,6 @@ SOUTHERN_TO_HANOI = {
     r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn',
     r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn',
     r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn',
-
-    # KHẨU NGỮ HÀ NỘI CHUẨN
     r'\bba\s*rọi\b': 'ba chỉ',
     r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn',
     r'\bchiên\b': 'rán',
@@ -408,7 +405,7 @@ def clean_and_normalize_voiceover(text: str) -> str:
     return cleaned
 
 # ==============================================================================
-# BỘ XỬ LÝ ĐỒNG BỘ HOẠT CẢNH ĐỜI THỰC & HÀNH VI TÌNH HUỐNG (SITUATIONAL BEHAVIOR)
+# BỘ XỬ LÝ ĐỒNG BỘ HOẠT CẢNH ĐỜI THỰC & HÀNH VI TÌNH HUỐNG
 # ==============================================================================
 def extract_situational_scenario_en(vo_text: str):
     if not vo_text: return None
@@ -421,7 +418,6 @@ def extract_situational_scenario_en(vo_text: str):
             "sfx": "subtle movie background audio, quiet late-night room ambiance",
             "is_indoor": True
         }
-        
     elif any(k in vo_lower for k in ["đi làm", "sáng sớm", "dậy muộn", "vội vã", "ra ngoài", "chuẩn bị đi"]):
         return {
             "setting": "bright modern apartment entryway beside vanity mirror with crisp morning sunlight",
@@ -429,7 +425,6 @@ def extract_situational_scenario_en(vo_text: str):
             "sfx": "morning birds chirping outside, key chime",
             "is_indoor": True
         }
-        
     elif any(k in vo_lower for k in ["nấu ăn", "nấu cơm", "bữa cơm", "vào bếp", "đang rán", "đang nấu", "chiều muộn"]):
         return {
             "setting": "tidy modern townhouse kitchen beside sleek induction cooktop with clean cookware",
@@ -437,7 +432,6 @@ def extract_situational_scenario_en(vo_text: str):
             "sfx": "gentle sizzling cooking sounds, kitchen Foley",
             "is_indoor": True
         }
-        
     elif any(k in vo_lower for k in ["đi làm về", "về đến nhà", "mệt mỏi sau", "sau giờ làm", "tan ca"]):
         return {
             "setting": "warm apartment entryway hallway or cozy living armchair with gentle homecoming ambient lighting",
@@ -445,7 +439,6 @@ def extract_situational_scenario_en(vo_text: str):
             "sfx": "door softly closing, gentle sigh of relief",
             "is_indoor": True
         }
-        
     elif any(k in vo_lower for k in ["đi ngủ", "lên giường", "trước khi ngủ", "nằm lướt", "dưỡng da ban đêm"]):
         return {
             "setting": "peaceful modern bedroom with soft bedding, warm gentle bedside lamp lighting",
@@ -453,11 +446,10 @@ def extract_situational_scenario_en(vo_text: str):
             "sfx": "peaceful nighttime room silence",
             "is_indoor": True
         }
-        
     return None
 
 # ==============================================================================
-# BỘ XỬ LÝ ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT ĐỘNG (DYNAMIC WEATHER & ATMOSPHERIC PARSER)
+# BỘ XỬ LÝ ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT ĐỘNG
 # ==============================================================================
 def extract_environmental_lighting_and_weather(vo_text: str, base_setting_en: str = "", is_indoor: bool = True):
     if not vo_text: return "", ""
@@ -471,21 +463,18 @@ def extract_environmental_lighting_and_weather(vo_text: str, base_setting_en: st
         else:
             weather_desc.append("rainy atmospheric weather, wet reflective pavement with water puddles, gentle raindrops falling")
         weather_sfx.append("ambient soft rain pattering against window")
-        
     elif any(k in vo_lower for k in ["nắng gắt", "nắng nóng", "trưa hè", "chói chang", "40 độ", "oi bức", "nắng hè", "nắng nôi"]):
         if is_indoor:
             weather_desc.append("bright intense natural summer daylight streaming through windows with warm sun flare")
         else:
             weather_desc.append("intense hot sunny midday summer light, bright natural sun glare, warm golden tones")
         weather_sfx.append("subtle warm breeze")
-        
     elif any(k in vo_lower for k in ["ban đêm", "tối muộn", "đêm muộn", "nửa đêm", "tối trời", "buổi tối"]):
         if is_indoor:
             weather_desc.append("dark cozy nighttime ambiance, warm soft interior lamp lighting, dark evening sky outside window")
         else:
             weather_desc.append("nighttime urban lighting, evening streetlamps casting warm ambient glows")
         weather_sfx.append("quiet night ambiance")
-        
     elif any(k in vo_lower for k in ["gió mùa", "lạnh buốt", "gió rét", "mùa đông", "se lạnh", "sương mù", "rét mướt", "giá rét"]):
         weather_desc.append("cold chilly winter atmosphere, soft misty cool-toned lighting, subtle breath fog on glass")
         weather_sfx.append("soft gentle chilly wind")
@@ -828,6 +817,11 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - TUYỆT ĐỐI CẤM 2 THÁI CỰC PHI THỰC TẾ: Cấm nhà cấp 4 cũ kỹ nhếch nhác, Cấm biệt thự xa hoa lộng lẫy dát vàng.
     - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH, chỉ thay đổi góc máy quay!
 
+    🛑 KHÓA KÍCH THƯỚC VẬT LÝ VÀ TỶ LỆ HÌNH HỌC BẤT BIẾN (PHYSICAL SCALE INVARIANCE LOCK):
+    - Sản phẩm BẮT BUỘC giữ nguyên một kích thước vật lý đời thực nhất quán xuyên suốt từ Cảnh 1 đến Cảnh 4 so với cơ thể người và bàn tay.
+    - KHI CẬN CẢNH / MACRO (CẢNH 2 & 3): BẮT BUỘC dùng cơ chế 'optical camera close-up on standard-sized item', TUYỆT ĐỐI CẤM phóng to kích thước của vật thể!
+    - TUYỆT ĐỐI CẤM lỗi biến dạng kích thước (lúc to khổng lồ chiếm trọn khung hình, lúc lại teo nhỏ xíu như đồ chơi).
+
     🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI (SITUATIONAL BEHAVIORAL SYNC):
     - TUYỆT ĐỐI CẤM nhân vật đứng thẳng đơ giữa nhà chào mẫu ('standing stiffly in room holding product at chest level') nếu lời thoại đang nói về một tình huống cụ thể (xem phim, đi làm, nấu ăn, đi ngủ, nghỉ ngơi, chăm con...).
     - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại:
@@ -851,7 +845,6 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       • TUYỆT ĐỐI KHÔNG dùng từ đối lập 'camera frame left' trong câu lệnh dương tính vì sẽ làm AI bị lộn bên!
       • NẾU XẺ BÊN PHẢI NGƯỜI MẶC: Bắt buộc dùng cú pháp khóa tuyệt đối: 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, while the entire left side and front panel are completely solid unbroken fabric with zero slit'.
       • ĐẶC BIỆT ĐỘ SÂU XẺ: Phân tích kỹ ảnh gốc: Nếu xẻ nhẹ ngang gối thì ghi 'subtle modest knee-length slit', nếu xẻ cao thì ghi 'high thigh slit'. TUYỆT ĐỐI KHÔNG tự ý biến xẻ nhẹ thành xẻ cao bạo liệt!
-      • Trong Negative Prompt bắt buộc có: 'mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, high slit'.
 
     🛑 KHÓA TRẠNG THÁI SƠ VIN TRANG PHỤC ĐỒNG BỘ THEO PHÂN TÍCH THỰC TẾ:
     - Trạng thái cạp áo (sơ vin nhét vào cạp quần HOẶC buông thõng tự nhiên) được quyết định dựa vào phân tích thời trang và hoàn cảnh thực tế, sau đó BẮT BUỘC phải đồng nhất 100% xuyên suốt cả 4 phân cảnh!
@@ -881,10 +874,6 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - Toàn bộ 4 phân cảnh (từ Cảnh 1 đến Cảnh 4) BẮT BUỘC phải phát triển nội dung, hành động và lời thoại bám sát 100% tiêu đề kịch bản và câu Hook gốc!
     - TUYỆT ĐỐI CẤM tiêu đề ghi một đằng mà nội dung 4 cảnh lại viết một nẻo.
 
-    🛑 KHÓA KÍCH THƯỚC VẬT LÝ VÀ TỶ LỆ CHUẨN XÁC CỦA SẢN PHẨM (PHYSICAL SCALE INVARIANCE LOCK):
-    - Sản phẩm BẮT BUỘC phải giữ nguyên một kích thước vật lý đời thực nhất quán xuyên suốt từ Cảnh 1 đến Cảnh 4 so với cơ thể người và bàn tay.
-    - TUYỆT ĐỐI CẤM lỗi biến dạng kích thước (lúc to khổng lồ chiếm trọn khung hình, lúc lại teo nhỏ xíu như đồ chơi).
-
     🛑 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP NGAY TỪ 0.00s (ON-CAMERA LIP-SYNC DIALOGUE AT 0.00s):
     - CẢ 4 CẢNH (CẢNH 1, 2, 3, 4) LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s, KHẨU HÌNH NHÂN VẬT KHỚP TỪNG TỪ.
     - CẢNH 1: Bắt đầu ngay bằng câu Voice Hook ấn tượng do nhân vật nói trực tiếp trước camera tại 0.00s!
@@ -897,7 +886,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V169.0 HOÀN HẢO TOÀN DIỆN (FIX DỨT ĐIỂM SỐ TIỀN & XẺ TÀ)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V170.0 (KHÓA KÍCH THƯỚC VẬT LÝ & TỶ LỆ HÌNH HỌC)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -961,11 +950,25 @@ def create_scene_details(target_id, mode, style):
         prod_kw = str(dna.get("what_and_unique", "")).lower()
         is_culinary = any(k in prod_kw for k in ["ăn", "thịt", "bánh", "tóp mỡ", "sốt", "mắm", "chả", "nem", "gà", "cá", "ẩm thực", "đồ ăn", "món"])
 
+    # THIẾT LẬP MỎ NEO TỶ LỆ HÌNH HỌC CÔNG THÁI HỌC (GEOMETRIC GRIP-TO-SCALE MATRIX)
+    raw_dim = dna.get("product_dimensions", "Kích thước chuẩn đời thực")
+    raw_dim_lower = str(raw_dim).lower()
+    prod_type_lower = str(dna.get("what_and_unique", "")).lower()
+    
+    if any(k in prod_type_lower for k in ["son", "lipstick", "kem mắt", "serum", "nhẫn", "chì kẻ", "mascara", "nước hoa mini", "earphone"]):
+        geometric_scale_en = "compact pocket-sized, approx 8cm in length, held effortlessly between thumb and index finger, resting completely inside adult palm"
+    elif any(k in prod_type_lower for k in ["cốc", "bình", "tumbler", "chai", "hộp kem", "cushion", "bọt biển", "miếng rửa"]):
+        geometric_scale_en = "standard handheld item, approx 15-20cm, four fingers wrapping comfortably two-thirds around body, proportioned against adult hand"
+    elif any(k in prod_type_lower for k in ["chảo", "nồi", "balo", "túi xách", "quạt", "decor", "đèn", "máy xay"]):
+        geometric_scale_en = "tabletop-sized rigid item, approx 25-35cm, resting flat on surface or held with two hands, proportioned naturally against adult torso"
+    else:
+        geometric_scale_en = dna.get("product_scale_relative", "invariant 1:1 adult hand scale")
+
     condensed_dna = {
         "product": dna.get("what_and_unique", ""),
         "hero_sku": dna.get("hero_sku_color", ""),
-        "dimensions": dna.get("product_dimensions", "Kích thước chuẩn đời thực"),
-        "product_scale_relative": dna.get("product_scale_relative", "1:1 real-life hand scale"),
+        "dimensions": raw_dim,
+        "product_scale_relative": geometric_scale_en,
         "price_anchor": spelled_out_price_anchor or raw_price_anchor,
         "self_pronoun": self_pronoun,
         "audience_pronoun": audience_pronoun,
@@ -990,6 +993,7 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK: '{fixed_hook}' | BỐI CẢNH: {fixed_setting_base}
     DIỄN VIÊN KHÓA CỨNG: {detected_demographic_en}.
     KHÓA CẮT MAY BẤT ĐỐI XỨNG: {asym_lock_en if asym_lock_en else 'none'}
+    KHÓA KÍCH THƯỚC HÌNH HỌC: {geometric_scale_en}
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
@@ -1000,7 +1004,7 @@ def create_scene_details(target_id, mode, style):
         "voice": {{"tone": "{voice_guidance}"}},
         "outfit_vi": "Mô tả trang phục phù hợp với {fixed_setting_base}",
         "clean_product_name_en": "Concise photorealistic product name under 8 words",
-        "product_scale_en": "invariant 1:1 adult hand scale",
+        "product_scale_en": "{geometric_scale_en}",
         "character_matrix": {{
             "full_characters_appearance": "{detected_demographic_en}, natural Vietnamese facial features, warm skin tone",
             "locked_hairstyles": "neat tidy jet-black hair",
@@ -1085,14 +1089,15 @@ def create_scene_details(target_id, mode, style):
     
     is_fashion_styling = res.get("is_fashion_styling", True)
     clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or fallback_prod_name)
-    product_scale_en = res.get("product_scale_en") or "1:1 adult hand scale"
+    product_scale_en = res.get("product_scale_en") or geometric_scale_en
     
     actor_base = f"{full_char}, neat {locked_hair}"
     asym_append = f", {asym_lock_en}" if asym_lock_en else ""
     wardrobe_str = f"wearing {locked_tops}, {locked_tuck}, and {locked_bottoms}{asym_append}"
     
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
-    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}"
+    scale_negatives = ", giant object, oversized product, enlarged scale, miniature human, disproportionate dimensions, scaling artifacts, distorted physical size"
+    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}"
     
     total_sec = 0.0
     for scn in scenes:
@@ -1145,10 +1150,16 @@ def create_scene_details(target_id, mode, style):
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
-        if is_culinary:
-            img_core = f"Macro food photography, {clean_prod_en} glistening with rich glossy sauce, steam rising, {actor_full}, {clean_action}"
+        # KHÓA CƯỠNG CHẾ QUANG HỌC MACRO (OPTICAL MACRO CAMERA LOCK CHO CẢNH CẬN)
+        if scene_num in [2, 3]:
+            optical_macro_lock = ", optical camera close-up on standard-sized item, camera lens physically moving closer, invariant rigid real-world scale, strictly no giant enlarged object"
         else:
-            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, holding {clean_prod_en} ({product_scale_en})"
+            optical_macro_lock = ""
+
+        if is_culinary:
+            img_core = f"Macro food photography, {clean_prod_en} glistening with rich glossy sauce, steam rising, {actor_full}, {clean_action}{optical_macro_lock}"
+        else:
+            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, holding {clean_prod_en} ({product_scale_en}){optical_macro_lock}"
             
         raw_img = f"{img_core}, 8k resolution, soft natural studio lighting, sharp focus --ar 9:16 --style raw --v 6.1"
         scn["img_p"] = sanitize_third_party_ip(raw_img)
@@ -1158,7 +1169,7 @@ def create_scene_details(target_id, mode, style):
         if is_viral and scene_num == 4:
             action_phrase = "speaking with welcoming open-palm gestures directly to lens"
         else:
-            action_phrase = f"Character visibly performing: {clean_action}, interacting with {clean_prod_en} ({product_scale_en})"
+            action_phrase = f"Character visibly performing: {clean_action}, interacting with {clean_prod_en} ({product_scale_en}){optical_macro_lock}"
 
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}{asym_pose_anchor}. "
@@ -1178,6 +1189,7 @@ def create_scene_details(target_id, mode, style):
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
         f"👗 <b>Trang phục & Cạp áo:</b> {res.get('outfit_vi', 'Trang phục đời thường phù hợp bối cảnh')} (Đồng nhất 100%)",
+        f"📏 <b>Khóa kích thước hình học:</b> {product_scale_en}",
         f"🛠 <b>Đặc điểm sản phẩm:</b> {condensed_dna.get('dimensions')} - {condensed_dna.get('product', '')}"
     ]
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
@@ -1508,7 +1520,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1679,10 +1691,10 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
 
                 🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC:
                 - Phân tích kỹ bức ảnh xem vết xẻ nằm ở đâu và độ sâu như thế nào:
-                  • Váy xẻ tà bên sườn phải người mặc (dù chụp ảnh góc nào):
+                  • Váy xẻ tà bên sườn phải người mặc:
                     en_prompt_lock = 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, with subtle modest knee-level slit depth, while the entire left side and front panel are completely solid unbroken fabric with zero slit'
                     negative_prompt_lock = 'mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut, high thigh slit'
-                  • TUYỆT ĐỐI KHÔNG dùng từ 'camera frame left' trong câu lệnh dương tính vì sẽ làm AI bị lộn bên!
+                  • TUYỆT ĐỐI KHÔNG dùng từ 'camera frame left' trong câu lệnh dương tính!
 
                 🛑 QUY CHUẨN PHÂN TÍCH SƠ VIN THỜI TRANG ĐỘNG:
                   • Đồ bếp, làm sạch, nội trợ, ở nhà, ăn uống, áo phông rộng, áo len nỉ dày -> decision = 'untucked', en_prompt_lock = 'shirt hem strictly cleanly untucked, resting naturally at hips for casual comfort'.
@@ -1716,8 +1728,8 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "visual_proof_dna": {{
                             "category_type": "beauty_cosmetics / home_cleaning / mom_and_baby / kids_toy / home_decor / wellness_nutrition / general",
                             "before_visual": "Mô tả trạng thái trước khi dùng (nỗi đau thị giác)",
-                            "catalyst_action_en": "Mô tả hành động thử nghiệm trực quan trong Cảnh 2 bằng tiếng Anh (ví dụ: applying rich pigmented lipstick swatch / firmly wiping greasy pan / pressing dry napkin onto diaper)",
-                            "after_transformation_en": "Mô tả kết quả lột xác trong Cảnh 3 bằng tiếng Anh (ví dụ: plump dewy hydrated finish / mirror-like sparkling reflection / bone-dry paper towel / warm ambient room glow)",
+                            "catalyst_action_en": "Mô tả hành động thử nghiệm trực quan trong Cảnh 2 bằng tiếng Anh",
+                            "after_transformation_en": "Mô tả kết quả lột xác trong Cảnh 3 bằng tiếng Anh",
                             "proof_sfx": "Âm thanh ASMR thực tế (squeaky clean friction / lipstick click glide / fizzing bubbles)"
                         }},
                         "culinary_dna": {{
