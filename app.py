@@ -129,13 +129,13 @@ def number_to_vietnamese_words(n: int) -> str:
         elif t == 1:
             res.append("mười")
             if u == 1: res.append("một")
-            elif u == 4: res.append("bốn")
+            elif u == 4: res.append("bốn")   # KHÓA CỨNG "mười bốn" (TUYỆT ĐỐI KHÔNG DÙNG "TƯ", "TỨ")
             elif u == 5: res.append("lăm")
             elif u != 0: res.append(digits[u])
         else:
             res.append(digits[t] + " mươi")
             if u == 1: res.append("mốt")
-            elif u == 4: res.append("bốn")
+            elif u == 4: res.append("bốn")   # KHÓA CỨNG "hai mươi bốn..." (TUYỆT ĐỐI KHÔNG DÙNG "TƯ", "TỨ")
             elif u == 5: res.append("lăm")
             elif u != 0: res.append(digits[u])
         return " ".join(res)
@@ -161,7 +161,7 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
     if not raw_text: return ""
     def replace_k(match):
         val = int(match.group(1)) * 1000
-        return number_to_vietnamese_words(val)
+        return number_to_vietnamese_words(val).replace(" đồng", "")
     text = re.sub(r'\b(\d{1,4})\s*[kK]\b', replace_k, raw_text)
 
     def replace_num(match):
@@ -169,7 +169,7 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
         try:
             val = int(num_str)
             if val >= 1000:
-                return number_to_vietnamese_words(val)
+                return number_to_vietnamese_words(val).replace(" đồng", "")
         except: pass
         return match.group(0)
     cleaned = re.sub(r'(\b\d{1,3}(?:[.,]\d{3})+\b)', replace_num, text)
@@ -254,20 +254,31 @@ POLICY_REPLACEMENTS = {
 }
 
 SOUTHERN_TO_HANOI = {
-    r'\btư\s+mươi\b': 'bốn mươi',
-    r'\bmười\s+tư\b': 'mười bốn',
-    r'\btrăm\s+tư\b': 'trăm bốn mươi',
-    r'\bnghìn\s+tư\b': 'nghìn bốn trăm',
-    r'\b(\w+)\s+mươi\s+tư\b': r'\1 mươi bốn',
-    r'\bbốn\s+tư\b': 'bốn mươi bốn',
-    r'\bnăm\s+tư\b': 'năm mươi bốn',
-    r'\bsáu\s+tư\b': 'sáu mươi bốn',
-    r'\bbảy\s+tư\b': 'bảy mươi bốn',
-    r'\btám\s+tư\b': 'tám mươi bốn',
-    r'\bchín\s+tư\b': 'chín mươi bốn',
-    r'\bhai\s+tư\b': 'hai mươi bốn',
-    r'\bba\s+tư\b': 'ba mươi bốn',
-    r'\bhăm\s+tư\b': 'hai mươi bốn',
+    # KHÓA CỨNG TOÀN BỘ BIẾN THỂ "TƯ", "TỨ", "1 TRĂM" THÀNH "MỘT TRĂM BỐN MƯƠI"
+    r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi',
+    r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi',
+    r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi',
+    r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi',
+    r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi',
+    r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi',
+    r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi',
+    r'\bmười\s+(?:tư|tứ)\b': 'mười bốn',
+    r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm',
+    r'\b1\s+trăm\b': 'một trăm',
+    r'\b1\s+nghìn\b': 'một nghìn',
+    r'\b1\s+triệu\b': 'một triệu',
+    r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn',
+    r'\bbốn\s+(?:tư|tứ)\b': 'bốn mươi bốn',
+    r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn',
+    r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn',
+    r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn',
+    r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn',
+    r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn',
+    r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn',
+    r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn',
+    r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn',
+
+    # KHẨU NGỮ HÀ NỘI CHUẨN
     r'\bba\s*rọi\b': 'ba chỉ',
     r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn',
     r'\bchiên\b': 'rán',
@@ -374,10 +385,24 @@ def clean_and_normalize_voiceover(text: str) -> str:
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
     for pattern, rep in [
+        (r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b', 'một trăm bốn mươi'),
+        (r'\b1\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
+        (r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b', 'một trăm bốn mươi'),
+        (r'\bmột\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
+        (r'\btrăm\s*(?:tư|tứ)\s*mươi\b', 'trăm bốn mươi'),
+        (r'\btrăm\s*(?:tư|tứ)\b', 'trăm bốn mươi'),
+        (r'\b1\s*trăm\b', 'một trăm'),
+        (r'\b1\s*nghìn\b', 'một nghìn'),
+        (r'\b1\s*triệu\b', 'một triệu'),
+        (r'\b140\s*(?:k|nghìn|ngàn)\b', 'một trăm bốn mươi nghìn'),
+        (r'\b140\b', 'một trăm bốn mươi'),
         (r'\b14\b', 'mười bốn'), (r'\b24\b', 'hai mươi bốn'), (r'\b34\b', 'ba mươi bốn'),
         (r'\b40\b', 'bốn mươi'), (r'\b44\b', 'bốn mươi bốn'), (r'\b4\b', 'bốn'),
-        (r'\bmười\s+tư\b', 'mười bốn'), (r'\bhai\s+tư\b', 'hai mươi bốn'),
-        (r'\btrăm\s+tư\b', 'trăm bốn mươi'), (r'\btư\s+mươi\b', 'bốn mươi')
+        (r'\bmười\s+(?:tư|tứ)\b', 'mười bốn'),
+        (r'\bhai\s+(?:tư|tứ)\b', 'hai mươi bốn'),
+        (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'),
+        (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'),
+        (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn')
     ]:
         cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
@@ -739,8 +764,11 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI: Chủ ngữ -> Vị ngữ -> Cảm xúc/Hiệu quả.
     - TUYỆT ĐỐI CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY: Cấm mở đầu câu bằng 'Với thiết kế...', 'Được làm từ...', 'Giúp cho việc...'.
     - TUYỆT ĐỐI CẤM các từ ngữ công nghệ/máy móc sáo rỗng: CẤM 'thuật toán gợi ý', CẤM 'máy vừa phân tích', CẤM 'hệ thống vừa báo', CẤM 'AI phát hiện'.
-    - QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư').
-    - 🛑 ĐỒNG BỘ THỜI TIẾT VÀ BỐI CẢNH: Nếu câu chuyện trong kịch bản diễn ra vào ngày mưa, trưa hè nắng gắt, đêm muộn... hãy ghi rõ yếu tố thời tiết đó vào bối cảnh (ví dụ: 'Gian bếp ấm cúng ngày mưa rào, cửa sổ mờ hơi nước').
+    - 🛑 QUY TẮC PHÁT ÂM SỐ BỐN & CHỮ SỐ 1 TRONG LỜI THOẠI:
+      • 100% BẮT BUỘC viết và đọc là 'bốn' (bốn mươi, mười bốn, hai mươi bốn, một trăm bốn mươi nghìn...).
+      • TUYỆT ĐỐI CẤM dùng từ 'tư' hoặc 'tứ' (CẤM TUYỆT ĐỐI 'tứ mươi', 'tư mươi', 'trăm tư', 'trăm tứ', 'mười tứ', 'mười tư').
+      • TUYỆT ĐỐI CẤM viết '1 trăm' thành chữ số '1', BẮT BUỘC viết rõ bằng chữ là 'một trăm' (ví dụ: 'một trăm bốn mươi nghìn').
+    - 🛑 ĐỒNG BỘ THỜI TIẾT VÀ BỐI CẢNH: Nếu câu chuyện trong kịch bản diễn ra vào ngày mưa, trưa hè nắng gắt, đêm muộn... hãy ghi rõ yếu tố thời tiết đó vào bối cảnh.
     - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s.
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN').
     - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
@@ -770,12 +798,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU KÍCH THÍCH & AN TOÀN TUYỆT ĐỐI (DƯỚI 30 TỪ):
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng 3 vế xuôi tai:
           1. Neo giá thực tế & Báo giá giảm kích thích:
-             'Bình thường set này hơn [X] nghìn, đợt này áp mã voucher vào chỉ còn khoảng [Y] mấy nghìn thôi...' (hoặc 'giá gốc khoảng [X] nghìn, hiện tại áp mã còn tầm [Y] mấy nghìn...')
+             'Bình thường set này hơn một trăm bốn mươi nghìn, đợt này áp mã voucher vào chỉ còn khoảng...' (BẮT BUỘC VIẾT 'MỘT TRĂM BỐN MƯƠI NGHÌN', CẤM '1 TRĂM TỨ MƯƠI'!)
           2. Miễn trừ thời điểm phòng ngừa quét chính sách:
              'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...' (hoặc 'tùy thời điểm giá sẽ chênh lệch một chút...')
           3. Rào voucher tài khoản cá nhân & CTA:
              '{audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'
-        - QUY TẮC SỐ BỐN: Đọc là 'bốn' (bốn mươi nghìn, một trăm bốn mươi nghìn...). CẤM TUYỆT ĐỐI 'tư'.
+        - QUY TẮC SỐ BỐN: Đọc là 'bốn' (bốn mươi nghìn, một trăm bốn mươi nghìn...). CẤM TUYỆT ĐỐI 'tư', CẤM 'tứ'.
         - CẤM TUYỆT ĐỐI các từ: 'phiên live', 'trên live', 'trợ giá'.
         - CẤM gọi 'các mẹ' nếu đại từ khán giả quy định là '{audience_pronoun}'.
         - TUYỆT ĐỐI KHÔNG yêu cầu hiện text/chữ/subtitles trên video để tránh lỗi font/chính tả của AI Veo 3.
@@ -797,10 +825,8 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 KHÓA BỐI CẢNH ĐỜI THỰC THẤU CẢM (RELATABLE REALISM & SPATIAL INVARIANCE):
     - Chuẩn không gian: '{setting_archetype}' (nhà phố hiện đại hoặc chung cư sạch sẽ, ngăn nắp, tường men sáng, ánh sáng tự nhiên).
-    - TUYỆT ĐỐI CẤM 2 THÁI CỰC PHI THỰC TẾ:
-      1. Cấm bối cảnh nhà cấp 4 cũ kỹ, tường bẩn, bếp ẩm thấp nhếch nhác.
-      2. Cấm bối cảnh biệt thự cung điện xa hoa lộng lẫy, dát vàng giả tạo.
-    - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH (ví dụ: bồn rửa bát inox đôi sạch sẽ), chỉ thay đổi góc máy quay!
+    - TUYỆT ĐỐI CẤM 2 THÁI CỰC PHI THỰC TẾ: Cấm nhà cấp 4 cũ kỹ nhếch nhác, Cấm biệt thự xa hoa lộng lẫy dát vàng.
+    - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH, chỉ thay đổi góc máy quay!
 
     🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI (SITUATIONAL BEHAVIORAL SYNC):
     - TUYỆT ĐỐI CẤM nhân vật đứng thẳng đơ giữa nhà chào mẫu ('standing stiffly in room holding product at chest level') nếu lời thoại đang nói về một tình huống cụ thể (xem phim, đi làm, nấu ăn, đi ngủ, nghỉ ngơi, chăm con...).
@@ -831,8 +857,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - Trạng thái cạp áo (sơ vin nhét vào cạp quần HOẶC buông thõng tự nhiên) được quyết định dựa vào phân tích thời trang và hoàn cảnh thực tế, sau đó BẮT BUỘC phải đồng nhất 100% xuyên suốt cả 4 phân cảnh!
     - Tuyệt đối cấm cảnh trước sơ vin mà cảnh sau lại thả áo buông thõng.
 
-    🛑 QUY TẮC PHÁT ÂM SỐ BỐN CHUẨN THỰC TẾ:
-    - 100% các con số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm, bốn triệu...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư', CẤM 'hai tư nghìn').
+    🛑 QUY TẮC PHÁT ÂM SỐ BỐN & CHỮ SỐ 1 TRONG LỜI THOẠI:
+    - 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm, một trăm bốn mươi nghìn...).
+    - TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' hoặc 'tứ' (CẤM 'mười tư', CẤM 'mười tứ', CẤM 'tư mươi', CẤM 'tứ mươi', CẤM 'trăm tư', CẤM 'trăm tứ', CẤM '1 trăm tứ mươi nghìn').
+    - TUYỆT ĐỐI CẤM viết số '1 trăm' thành chữ số '1', BẮT BUỘC viết rõ bằng chữ là 'một trăm'.
 
     🛑 GIỚI HẠN CỨNG THỜI LƯỢNG VEO 3 (TỐI ĐA 10 GIÂY / PHÂN CẢNH):
     - MỖI PHÂN CẢNH (CẢNH 1, 2, 3, 4) CÓ THỜI LƯỢNG LINH HOẠT TỪ 4s ĐẾN TỐI ĐA 10 GIÂY (đã bao gồm đệm diễn xuất tự nhiên).
@@ -869,7 +897,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V168.0 HOÀN HẢO TOÀN DIỆN (FIX DỨT ĐIỂM XẺ TÀ)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V169.0 HOÀN HẢO TOÀN DIỆN (FIX DỨT ĐIỂM SỐ TIỀN & XẺ TÀ)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -915,13 +943,12 @@ def create_scene_details(target_id, mode, style):
         else:
             locked_tuck_en = "shirt hem strictly neatly tucked into waistband with a clean flat waistline"
 
-    # PHÂN TÍCH KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC
     asym_data = dna.get("spatial_asymmetry_analysis", {})
     asym_lock_en = ""
     asym_neg_en = ""
     if isinstance(asym_data, dict) and asym_data.get("has_asymmetry", False):
         asym_lock_en = asym_data.get("en_prompt_lock", "")
-        asym_neg_en = asym_data.get("negative_prompt_lock", "mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut")
+        asym_neg_en = asym_data.get("negative_prompt_lock", "mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut, high thigh slit")
 
     v_proof = dna.get("visual_proof_dna", {})
     has_visual_proof = isinstance(v_proof, dict) and bool(v_proof.get("catalyst_action_en"))
@@ -1029,7 +1056,7 @@ def create_scene_details(target_id, mode, style):
                 "action_en": "speaking with welcoming open-palm gestures, product neatly placed nearby",
                 "sfx": "Tiếng chuông ting trong trẻo",
                 "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal đòn bẩy giá an toàn'}",
-                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng [X] nghìn, áp voucher còn tầm [Y mấy nghìn] thôi, nhưng giá từng thời điểm có thể khác nhau, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!'}"
+                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng hơn một trăm bốn mươi nghìn, áp voucher còn tầm mấy mươi nghìn thôi, nhưng giá từng thời điểm có thể khác nhau, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!'}"
             }}
         ]
     }}
@@ -1108,7 +1135,6 @@ def create_scene_details(target_id, mode, style):
         if env_sfx and "rain" not in sfx_sound.lower() and "breeze" not in sfx_sound.lower():
             sfx_sound = f"{sfx_sound}, {env_sfx}"
         
-        # ĐỒNG NHẤT TRANG PHỤC KÈM KHÓA XẺ TÀ CỐ ĐỊNH XUYÊN SUỐT
         active_wardrobe = scn.get('scene_outfit_en') or wardrobe_str
         if asym_lock_en and asym_lock_en not in active_wardrobe:
             active_wardrobe = f"{active_wardrobe}, {asym_lock_en}"
@@ -1117,7 +1143,6 @@ def create_scene_details(target_id, mode, style):
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
 
-        # THÊM MỎ NEO TƯ THẾ HỖ TRỢ XẺ TÀ NẾU CÓ BẤT ĐỐI XỨNG
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
         if is_culinary:
@@ -1547,7 +1572,7 @@ if is_viral_mode:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: váy xẻ tà bên sườn phải người mặc, son thoa lên môi căng mọng):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: nửa đêm xem phim ăn snack, son thoa lên môi căng mọng):", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
@@ -1566,7 +1591,7 @@ else:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: váy xẻ tà bên sườn phải người mặc, son thoa lên môi căng mọng):", key=f"custom_note_prod_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: nửa đêm xem phim ăn snack, son thoa lên môi căng mọng):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2, col_opt3 = st.columns([1.2, 1.2, 1.2])
 style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
@@ -1665,7 +1690,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
 
                 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TUYỆT ĐỐI CẤM THUYẾT MINH.
                 🛑 CÂU THOẠI PHẢI XUÔI TAI, TỰ NHIÊN, CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY.
-                🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). SỐ 4 ĐỌC LÀ 'BỐN' (CẤM 'TƯ'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
+                🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). SỐ 4 ĐỌC LÀ 'BỐN' (CẤM 'TƯ', CẤM 'TỨ'). CẤM '1 TRĂM' (BẮT BUỘC VIẾT 'MỘT TRĂM'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
                 🛑 BẮT BUỘC TẠO RA 5 KỊCH BẢN Ở 5 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
                 CHỈ ĐẠO HERO SKU: {override_instruction}
                 
@@ -1734,7 +1759,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
                     "outlines": [
-                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp xưng hô chuẩn, dùng từ 'bốn'...", "actors": {num_chars} }},
+                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp xưng hô chuẩn, dùng từ 'bốn', 'một trăm'...", "actors": {num_chars} }},
                         {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": {num_chars} }},
                         {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": {num_chars} }},
                         {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": {num_chars} }},
