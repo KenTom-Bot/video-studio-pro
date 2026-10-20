@@ -395,6 +395,46 @@ def clean_and_normalize_voiceover(text: str) -> str:
         cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
+# ==============================================================================
+# BỘ XỬ LÝ ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT ĐỘNG (DYNAMIC WEATHER & ATMOSPHERIC PARSER)
+# ==============================================================================
+def extract_environmental_lighting_and_weather(vo_text: str, base_setting_en: str = "", is_indoor: bool = True):
+    if not vo_text: return "", ""
+    vo_lower = vo_text.lower()
+    weather_desc = []
+    weather_sfx = []
+    
+    # 1. Trời mưa, mưa rào, mưa phùn, giông bão, rả rích
+    if any(k in vo_lower for k in ["mưa", "mưa rào", "mưa to", "mưa phùn", "giông bão", "sấm chớp", "mưa rả rích", "đang mưa", "ngày mưa"]):
+        if is_indoor:
+            weather_desc.append("visible heavy rain pouring outside large background window, water droplets streaking down the glass pane, cozy moody overcast daylight")
+        else:
+            weather_desc.append("rainy atmospheric weather, wet reflective pavement with water puddles, gentle raindrops falling")
+        weather_sfx.append("ambient soft rain pattering against window")
+        
+    # 2. Nắng nóng, trưa hè, nắng gắt, chói chang, 40 độ
+    elif any(k in vo_lower for k in ["nắng gắt", "nắng nóng", "trưa hè", "chói chang", "40 độ", "oi bức", "nắng hè", "nắng nôi"]):
+        if is_indoor:
+            weather_desc.append("bright intense natural summer daylight streaming through windows with warm sun flare")
+        else:
+            weather_desc.append("intense hot sunny midday summer light, bright natural sun glare, warm golden tones")
+        weather_sfx.append("subtle warm breeze")
+        
+    # 3. Đêm muộn, tối trời, ban đêm, nửa đêm
+    elif any(k in vo_lower for k in ["ban đêm", "tối muộn", "đêm muộn", "nửa đêm", "tối trời", "buổi tối"]):
+        if is_indoor:
+            weather_desc.append("dark cozy nighttime ambiance, warm soft interior lamp lighting, dark evening sky outside window")
+        else:
+            weather_desc.append("nighttime urban lighting, evening streetlamps casting warm ambient glows")
+        weather_sfx.append("quiet night ambiance")
+        
+    # 4. Gió rét, mùa đông, se lạnh, sương mù
+    elif any(k in vo_lower for k in ["gió mùa", "lạnh buốt", "gió rét", "mùa đông", "se lạnh", "sương mù", "rét mướt", "giá rét"]):
+        weather_desc.append("cold chilly winter atmosphere, soft misty cool-toned lighting, subtle breath fog or window glass condensation")
+        weather_sfx.append("soft gentle chilly wind")
+        
+    return ", ".join(weather_desc), ", ".join(weather_sfx)
+
 def sanitize_veo3_prompt(prompt_text: str) -> str:
     if not prompt_text: return ""
     p = re.sub(r'\bunzipping\s+(?:front\s+)?(?:zipper\s+)?(?:halfway\s+)?(?:on\s+)?chest\b', 'smoothly demonstrating the front zipper', prompt_text, flags=re.IGNORECASE)
@@ -669,6 +709,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - TUYỆT ĐỐI CẤM các từ ngữ công nghệ/máy móc sáo rỗng: CẤM 'thuật toán gợi ý', CẤM 'máy vừa phân tích', CẤM 'hệ thống vừa báo', CẤM 'AI phát hiện'.
     - QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư').
     - NẾU LÀ ĐỒ ĂN / ẨM THỰC: Mô tả kích thích tối đa tam giác giác quan (thị giác: độ bóng/khói, xúc giác: độ giòn/bẻ đôi xốp tan, thính giác: tiếng cắn rộp rộp ASMR).
+    - 🛑 ĐỒNG BỘ THỜI TIẾT VÀ BỐI CẢNH: Nếu câu chuyện trong kịch bản diễn ra vào ngày mưa, trưa hè nắng gắt, đêm muộn... hãy ghi rõ yếu tố thời tiết đó vào bối cảnh (ví dụ: 'Gian bếp ấm cúng ngày mưa rào, cửa sổ mờ hơi nước').
     - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s.
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN').
     - CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
@@ -729,6 +770,14 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       1. Cấm bối cảnh nhà cấp 4 cũ kỹ, tường bẩn, bếp ẩm thấp nhếch nhác.
       2. Cấm bối cảnh biệt thự cung điện xa hoa lộng lẫy, dát vàng giả tạo.
     - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH (ví dụ: bồn rửa bát inox đôi sạch sẽ), chỉ thay đổi góc máy quay!
+
+    🛑 ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT VỚI LỜI THOẠI (DYNAMIC WEATHER & ATMOSPHERIC SYNC):
+    - Khi lời thoại nhắc đến thời tiết, thời điểm trong ngày (trời mưa, nắng gắt 40 độ, đêm khuya, mùa đông rét buốt, sương mù, trưa hè oi ả...):
+      • BẮT BUỘC phản chiếu trung thực vào `setting_en` và `action_en` của Cảnh đó.
+      • Nếu ở trong nhà mà thoại nói trời mưa: Tự động thêm chi tiết cửa sổ kính mờ hơi nước, vệt mưa chảy ngoài cửa kính, bầu trời xám xịt bên ngoài (`visible heavy rain pouring outside large background window, water droplets streaking down the glass pane, cozy moody overcast daylight`).
+      • Nếu ở ngoài trời: Mặt đường ướt, hạt mưa rơi, vũng nước phản chiếu (`wet pavement with rain puddles, gentle raindrops in the air`).
+      • SFX BẮT BUỘC có âm thanh tương ứng (`Foley: soft rain pattering against window pane, ...`).
+      • TUYỆT ĐỐI CẤM thoại nói trời mưa mà bối cảnh lại nắng đẹp hay không có giọt mưa nào!
 
     🛑 KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG (STRICT ANATOMICAL ASYMMETRY LOCK):
     - Khi trang phục hoặc sản phẩm có chi tiết bất đối xứng (ví dụ: xẻ tà váy, túi ngực, vạt áo chéo, khóa kéo lệch):
@@ -792,7 +841,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V162.0 HOÀN HẢO TOÀN DIỆN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V164.0 HOÀN HẢO TOÀN DIỆN
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -902,7 +951,7 @@ def create_scene_details(target_id, mode, style):
         scene4_instruction = f"""
         🛑 CHỈ THỊ CẢNH 4 CHO TIKTOK SHOP (CẢ GIÁ GỐC + GIÁ GIẢM KÍCH THÍCH + MIỄN TRỪ THỜI ĐIỂM < 30 TỪ):
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng 3 vế xuôi tai:
-          1. Neo giá thực tế & Báo giá giảm kích thích: 'Bình thường set này hơn [X] nghìn, đợt này áp mã voucher vào chỉ còn khoảng [Y] mấy nghìn thôi...' (hoặc 'giá gốc khoảng [X] nghìn, áp mã vào còn tầm [Y] mấy nghìn...')
+          1. Neo giá thực tế & Báo giá giảm kích thích: 'Bình thường set này hơn [X] nghìn, đợt này áp mã voucher vào chỉ còn khoảng [Y] mấy nghìn thôi...' (hoặc 'giá gốc khoảng [X] nghìn, hiện tại áp mã còn tầm [Y] mấy nghìn...')
           2. Miễn trừ thời điểm chống quét bot sai lệch giá: 'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...' (hoặc 'tùy thời điểm giá sẽ khác nhau...')
           3. Rào kiểm tra tài khoản + CTA: '{audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'
         - QUY TẮC SỐ BỐN: Đọc là 'bốn' (bốn mươi nghìn, một trăm bốn mươi nghìn...). CẤM TUYỆT ĐỐI 'tư'.
@@ -1103,6 +1152,18 @@ def create_scene_details(target_id, mode, style):
             scene_setting_en = default_setting
         else:
             scene_setting_en = scn.get("setting_en") or default_setting
+
+        # ĐỒNG BỘ THỜI TIẾT & MÔI TRƯỜNG ĐỘNG GIỮA LỜI THOẠI VÀ BỐI CẢNH (DYNAMIC WEATHER & ATMOSPHERIC SYNC)
+        is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "townhouse", "living", "table"])
+        weather_env, env_sfx = extract_environmental_lighting_and_weather(scn.get("voiceover", ""), scene_setting_en, is_indoor=is_indoor_scene)
+        
+        if weather_env and not any(k in scene_setting_en.lower() for k in ["rain", "sunny", "nighttime", "chilly"]):
+            scene_setting_en = f"{scene_setting_en}, {weather_env}"
+        if env_sfx:
+            cur_sfx = scn.get("sfx", "")
+            if "rain" not in cur_sfx.lower() and "breeze" not in cur_sfx.lower() and "night" not in cur_sfx.lower():
+                scn["sfx"] = f"{cur_sfx}, {env_sfx}"
+                sfx_sound = scn["sfx"]
         
         # TỐI ƯU TRANG PHỤC & KHÓA SƠ VIN ĐỒNG NHẤT
         if is_fashion_styling:
@@ -1331,7 +1392,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     return more_scripts
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN LÝ DỰ ÁN NÂNG CẤP
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN TOÀN NĂNG (MẬT KHẨU & DỰ ÁN TẤT CẢ USER)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -1350,6 +1411,9 @@ with st.sidebar:
                         st.session_state.current_email = email_c
                         st.toast("✅ Đăng nhập thành công!"); time.sleep(0.4); st.rerun()
                     else: st.error("❌ Email hoặc mật khẩu không đúng!")
+            
+            with st.expander("❓ Quên mật khẩu?"):
+                st.info("💡 Nếu quên mật khẩu, vui lòng liên hệ Hotline / Zalo Admin: **0869 628 316** để được xác thực tài khoản và cấp lại mật khẩu ngay lập tức.")
                         
         with tabs[1]:
             with st.form("register_form", border=False):
@@ -1383,7 +1447,7 @@ with st.sidebar:
                 "current_project_id": None, "saved_reference_images": [], "character_profiles": [],
                 "current_processing_id": None, "current_cloning_id": None
             })
-            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')} commodities"
+            st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", value=st.session_state.active_project_title)
@@ -1405,11 +1469,23 @@ with st.sidebar:
         
         st.markdown("---")
         st.markdown("### 📂 KHO DỰ ÁN")
+        is_admin_user = (st.session_state.current_email == ADMIN_EMAIL)
+        
         if supabase:
             try:
-                res = supabase.table("saved_projects").select("*").eq("user_email", st.session_state.current_email).order("created_at", desc=True).execute()
+                if is_admin_user:
+                    res = supabase.table("saved_projects").select("*").order("created_at", desc=True).execute()
+                else:
+                    res = supabase.table("saved_projects").select("*").eq("user_email", st.session_state.current_email).order("created_at", desc=True).execute()
                 all_projects = res.data or []
             except: all_projects = []
+
+            # BỘ LỌC DỰ ÁN THEO THÀNH VIÊN DÀNH CHO ADMIN
+            if is_admin_user and all_projects:
+                creator_emails = sorted(list(set(p.get("user_email", "") for p in all_projects if p.get("user_email"))))
+                sel_creator = st.selectbox("👤 Lọc theo thành viên:", ["Tất cả thành viên"] + creator_emails, key="admin_sel_creator")
+                if sel_creator != "Tất cả thành viên":
+                    all_projects = [p for p in all_projects if p.get("user_email") == sel_creator]
 
             search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên dự án...", key="search_proj_input")
             display_projects = [p for p in all_projects if search_proj.strip().lower() in p['project_title'].lower()] if search_proj.strip() else (all_projects if st.session_state.show_all_projects else all_projects[:3])
@@ -1417,7 +1493,12 @@ with st.sidebar:
             if not display_projects: st.info("Chưa có dự án nào.")
             else:
                 for p in display_projects:
+                    proj_creator = p.get("user_email", "N/A")
                     with st.expander(f"🎬 {p['project_title']}"):
+                        if is_admin_user:
+                            st.markdown(f"<span style='font-size:12px; color:#1e40af; background:#dbeafe; padding:2px 8px; border-radius:4px; font-weight:600;'>👤 Tạo bởi: {proj_creator}</span>", unsafe_allow_html=True)
+                            st.caption(f"📅 Ngày tạo: {p.get('created_at', '')[:10]}")
+                        
                         new_p_name = st.text_input("Đổi tên dự án:", value=p['project_title'], key=f"ren_txt_{p['id']}")
                         if st.button("✏️ Cập Nhật Tên", key=f"ren_btn_{p['id']}", use_container_width=True, disabled=is_system_busy):
                             if new_p_name.strip() and new_p_name.strip() != p['project_title']:
@@ -1461,7 +1542,10 @@ with st.sidebar:
                         if st.button(f"🔽 Xem thêm {len(all_projects)-3} dự án", use_container_width=True, disabled=is_system_busy):
                             st.session_state.show_all_projects = True; st.rerun()
 
-        if st.session_state.current_email == ADMIN_EMAIL:
+        # ======================================================================
+        # MỤC QUẢN TRỊ ADMIN: ĐỔI MẬT KHẨU, GIA HẠN & CẤP QUYỀN
+        # ======================================================================
+        if is_admin_user:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             with st.expander("➕ Cấp Quyền Mới", expanded=False):
@@ -1493,7 +1577,7 @@ with st.sidebar:
                         st.toast(f"✅ Đã cấp quyền đến {calculated_exp_str}!"); time.sleep(0.4); st.rerun()
                     else: st.error("⚠️ Vui lòng nhập đầy đủ thông tin!")
 
-            st.markdown("##### 👥 Danh Sách Tài Khoản & Gia Hạn")
+            st.markdown("##### 👥 Danh Sách Tài Khoản & Mật Khẩu")
             search_acc = st.text_input("🔍 Tìm tài khoản:", placeholder="Nhập Email hoặc SĐT...", key="search_acc_input")
             other_accs = [item for item in st.session_state.licensed_accounts.items() if item[0] != ADMIN_EMAIL]
             filt_accs = [item for item in other_accs if search_acc.strip().lower() in item[0].lower() or search_acc.strip() in item[1].get('phone', '')] if search_acc.strip() else (other_accs if st.session_state.show_all_admin_accounts else other_accs[:3])
@@ -1501,6 +1585,14 @@ with st.sidebar:
             for acc_mail, info in filt_accs:
                 with st.expander(f"👤 {acc_mail} ({info.get('plan_type')})"):
                     st.write(f"📞 SĐT: `{info.get('phone', 'N/A')}` | ⏳ Hạn: `{info.get('expires_at')}`")
+                    
+                    # TÍNH NĂNG ĐỔI & RESET MẬT KHẨU DÀNH CHO ADMIN
+                    new_user_pass = st.text_input("🔑 Đổi mật khẩu:", value=info.get("password", ""), key=f"pass_edit_{acc_mail}")
+                    if st.button("⚡ Đặt 123456", key=f"btn_quick_reset_{acc_mail}", use_container_width=True, disabled=is_system_busy, help="Reset mật khẩu tài khoản này về 123456"):
+                        st.session_state.licensed_accounts[acc_mail]["password"] = "123456"
+                        save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
+                        st.toast(f"✅ Đã reset mật khẩu của {acc_mail} về '123456'!"); time.sleep(0.3); st.rerun()
+
                     cur_roles = info.get("roles", ALL_MODULES)
                     new_roles = st.multiselect("Đổi thể loại:", ALL_MODULES, default=cur_roles, key=f"roles_sel_{acc_mail}")
                     new_plan = st.selectbox("Đổi gói:", ["Trial", "Basic", "Advanced", "VIP"], index=["Trial", "Basic", "Advanced", "VIP"].index(info.get("plan_type", "Trial")), key=f"plan_sel_{acc_mail}")
@@ -1519,11 +1611,12 @@ with st.sidebar:
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
+                        st.session_state.licensed_accounts[acc_mail]["password"] = new_user_pass.strip()
                         st.session_state.licensed_accounts[acc_mail]["roles"] = new_roles
                         st.session_state.licensed_accounts[acc_mail]["plan_type"] = new_plan
                         st.session_state.licensed_accounts[acc_mail]["expires_at"] = target_exp_str
                         save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
-                        st.toast("✅ Đã cập nhật thành công!"); time.sleep(0.4); st.rerun()
+                        st.toast("✅ Đã cập nhật tài khoản và mật khẩu thành công!"); time.sleep(0.4); st.rerun()
                     if c_act2.button("🗑 Xóa", key=f"del_acc_{acc_mail}", type="secondary", use_container_width=True, disabled=is_system_busy):
                         delete_single_account(acc_mail)
                         if acc_mail in st.session_state.licensed_accounts: del st.session_state.licensed_accounts[acc_mail]
@@ -1696,7 +1789,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TUYỆT ĐỐI CẤM THUYẾT MINH.
                 🛑 CÂU THOẠI PHẢI XUÔI TAI, TỰ NHIÊN, CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY.
                 🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN'. 100% BẮT BUỘC DÙNG TỪ 'NGHÌN'.
-                🛑 QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM 'tư'.
+                🛑 QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư').
                 🛑 CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
                 🛑 CẤM TUYỆT ĐỐI KHẨU NGỮ MIỀN NAM. 100% dùng từ ngữ Hà Nội chuẩn.
                 🛑 BẮT BUỘC TẠO RA 5 KỊCH BẢN Ở 5 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
@@ -1809,7 +1902,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
-# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5 CHỈ HIỆN KHI LÀ THỜI TRANG / ẨM THỰC / TỌA ĐỘ
+# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5, 6, 7 HIỆN KHI CÓ DỮ LIỆU CHUYÊN BIỆT
 # ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
