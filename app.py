@@ -300,7 +300,7 @@ SOUTHERN_TO_HANOI = {
     r'\bmuỗng\b': 'thìa',
     r'\bbàn\s*ủi\b': 'bàn là',
     r'\bbao\s*rác\b': 'túi rác',
-    r'\bchổi\s*lông\s*gà\b': 'chổi phất trần',
+    r'\chổi\s*lông\s*gà\b': 'chổi phất trần',
 
     # 4. CÔNG NGHỆ, ĐIỆN TỬ & PHỤ KIỆN
     r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru',
@@ -394,6 +394,60 @@ def clean_and_normalize_voiceover(text: str) -> str:
     ]:
         cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
+
+# ==============================================================================
+# BỘ XỬ LÝ ĐỒNG BỘ HOẠT CẢNH ĐỜI THỰC & HÀNH VI TÌNH HUỐNG (SITUATIONAL BEHAVIOR)
+# ==============================================================================
+def extract_situational_scenario_en(vo_text: str):
+    if not vo_text: return None
+    vo_lower = vo_text.lower()
+    
+    # 1. Nửa đêm xem phim, cày phim, xem TV
+    if any(k in vo_lower for k in ["xem phim", "cày phim", "coi phim", "xem tivi", "lướt phim", "chiếu phim"]):
+        return {
+            "setting": "cozy living room with comfortable sofa, ambient glowing reflection from TV/projector screen in darkened room",
+            "action": "sitting comfortably curled up on soft sofa, holding product naturally while enjoying TV screen",
+            "sfx": "subtle movie background audio, quiet late-night room ambiance",
+            "is_indoor": True
+        }
+        
+    # 2. Sáng sớm vội đi làm, dậy muộn, chuẩn bị ra ngoài
+    elif any(k in vo_lower for k in ["đi làm", "sáng sớm", "dậy muộn", "vội vã", "ra ngoài", "chuẩn bị đi"]):
+        return {
+            "setting": "bright modern apartment entryway beside vanity mirror with crisp morning sunlight",
+            "action": "preparing to head out, holding product with brisk realistic morning momentum",
+            "sfx": "morning birds chirping outside, key chime",
+            "is_indoor": True
+        }
+        
+    # 3. Đang nấu ăn, bữa cơm chiều, đứng bếp
+    elif any(k in vo_lower for k in ["nấu ăn", "nấu cơm", "bữa cơm", "vào bếp", "đang rán", "đang nấu", "chiều muộn"]):
+        return {
+            "setting": "tidy modern townhouse kitchen beside sleek induction cooktop with clean cookware",
+            "action": "standing naturally by stove wearing apron, interacting smoothly with cooking setup and product",
+            "sfx": "gentle sizzling cooking sounds, kitchen Foley",
+            "is_indoor": True
+        }
+        
+    # 4. Đi làm về mệt mỏi, vừa về đến nhà
+    elif any(k in vo_lower for k in ["đi làm về", "về đến nhà", "mệt mỏi sau", "sau giờ làm", "tan ca"]):
+        return {
+            "setting": "warm apartment entryway hallway or cozy living armchair with gentle homecoming ambient lighting",
+            "action": "relaxing into armchair after a long busy day, unwinding naturally with product",
+            "sfx": "door softly closing, gentle sigh of relief",
+            "is_indoor": True
+        }
+        
+    # 5. Đi ngủ, nằm lướt điện thoại, trước khi ngủ
+    elif any(k in vo_lower for k in ["đi ngủ", "lên giường", "trước khi ngủ", "nằm lướt", "dưỡng da ban đêm"]):
+        return {
+            "setting": "peaceful modern bedroom with soft bedding, warm gentle bedside lamp lighting",
+            "action": "sitting comfortably propped against bed pillows, holding product in serene bedtime routine",
+            "sfx": "peaceful nighttime room silence",
+            "is_indoor": True
+        }
+        
+    return None
 
 # ==============================================================================
 # BỘ XỬ LÝ ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT ĐỘNG (DYNAMIC WEATHER & ATMOSPHERIC PARSER)
@@ -766,6 +820,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       2. Cấm bối cảnh biệt thự cung điện xa hoa lộng lẫy, dát vàng giả tạo.
     - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH (ví dụ: bồn rửa bát inox đôi sạch sẽ), chỉ thay đổi góc máy quay!
 
+    🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI (SITUATIONAL BEHAVIORAL SYNC):
+    - TUYỆT ĐỐI CẤM nhân vật đứng thẳng đơ giữa nhà chào mẫu ('standing stiffly in room holding product at chest level') nếu lời thoại đang nói về một tình huống cụ thể (xem phim, đi làm, nấu ăn, đi ngủ, nghỉ ngơi, chăm con...).
+    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại:
+      • Nếu thoại nói 'Nửa đêm xem phim đói bụng': Bối cảnh là phòng khách sofa ban đêm ánh sáng TV hắt lên, nhân vật ngồi co chân trên sofa ăn snack, mắt nhìn màn hình TV.
+      • Nếu thoại nói 'Sáng vội đi làm': Bối cảnh là gương sảnh ra vào, vội vàng chỉnh trang phục/túi xách.
+      • Nếu thoại nói 'Đang nấu cơm chiều': Bối cảnh cạnh bếp từ nấu ăn, tay cầm muôi đảo nhẹ.
+
     🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI (VISUAL PROOF & TRANSFORMATION DIRECTIVE):
     - CẢNH 2 (Interest - Thử thách trực quan / Stress-test): Thao tác bóc tách, thử nghiệm thực tế (quẹt vệt son đậm màu, vỗ nhẹ lớp kem tan tiệp vào da, lau đúng 1 đường qua chảo dính mỡ đen, ấn giấy khô lên tã ướt, bật công tắc đèn decor...).
     - CẢNH 3 (Desire - Bằng chứng biến đổi chấn động / Transformation Proof): Lột xác 100% đối lập với Cảnh 1 (môi căng mọng quyến rũ / da căng mướt glass-skin / bề mặt inox sáng bóng soi gương / giấy khô cong không đọng nước / căn phòng bừng sáng ấm áp điện ảnh).
@@ -832,7 +893,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V165.0 HOÀN HẢO TOÀN DIỆN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V166.0 HOÀN HẢO TOÀN DIỆN
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1000,7 +1061,7 @@ def create_scene_details(target_id, mode, style):
     - Số đo thực tế: '{condensed_dna.get("dimensions")}'.
     - Tỷ lệ kích thước sản phẩm: '{condensed_dna.get("product_scale_relative")}' (bất biến qua 4 cảnh so với bàn tay và thân người).
     - CẢ 4 CẢNH BẮT ĐẦU NÓI NGAY TỪ 0.00S.
-    - HÀNH ĐỘNG THỰC TẾ SỐNG ĐỘNG (action_en): Mô tả hành động cụ thể chân thực bằng tiếng Anh gắn liền với tính năng/bằng chứng thị giác của sản phẩm mà không lặp lại từ 'Character'.
+    - HÀNH ĐỘNG THỰC TẾ SỐNG ĐỘNG (action_en): Mô tả hành động cụ thể chân thực bằng tiếng Anh gắn liền với tình huống hoạt cảnh của lời thoại mà không lặp lại từ 'Character'.
     
     ĐỊNH DẠNG JSON TRẢ VỀ:
     {{
@@ -1029,7 +1090,7 @@ def create_scene_details(target_id, mode, style):
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "expression": "Ánh mắt đồng cảm, nụ cười hào hứng mở màn nhìn thẳng camera",
                 "expression_en": "looking at camera with an empathetic warm smile",
-                "action_en": "holding product steadily at chest level with invariant real-life scale, establishing clear focus",
+                "action_en": "natural opening action matching the spoken narrative situation, holding product in steady focus",
                 "sfx": "Tiếng mở hộp hoặc âm thanh đời thực nhẹ nhàng",
                 "director": "Attention | Bám sát tiêu đề '{fixed_title}' | Câu xuôi chuẩn tiếng Hà Nội | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn cuốn hút tự nhiên bám sát tiêu đề '{fixed_title}' (từ 18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' bằng tiếng Hà Nội chuẩn xuôi tai, dùng từ 'nghìn', số 4 đọc là 'bốn'..."
@@ -1138,22 +1199,31 @@ def create_scene_details(target_id, mode, style):
         sfx_sound = scn.get("sfx", "Natural Foley sound")
         micro_expr_en = scn.get("expression_en", "looking at camera with a natural confident smile")
         scene_num = scn.get("scene", 1)
-        
-        if is_fixed_location:
-            scene_setting_en = default_setting
-        else:
-            scene_setting_en = scn.get("setting_en") or default_setting
+        vo_line = scn.get("voiceover", "")
 
-        is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "townhouse", "living", "table"])
-        weather_env, env_sfx = extract_environmental_lighting_and_weather(scn.get("voiceover", ""), scene_setting_en, is_indoor=is_indoor_scene)
-        
+        # 1. BÓC TÁCH HOẠT CẢNH TÌNH HUỐNG THỰC TẾ TỪ LỜI THOẠI (SITUATIONAL BEHAVIOR)
+        situational_override = extract_situational_scenario_en(vo_line)
+        if situational_override:
+            scene_setting_en = situational_override["setting"]
+            raw_action = situational_override["action"]
+            is_indoor_scene = situational_override["is_indoor"]
+            if situational_override.get("sfx"):
+                sfx_sound = f"{sfx_sound}, {situational_override['sfx']}"
+        else:
+            if is_fixed_location:
+                scene_setting_en = default_setting
+            else:
+                scene_setting_en = scn.get("setting_en") or default_setting
+            raw_action = scn.get("action_en") or f"demonstrating {clean_prod_en} with steady hands"
+            is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "townhouse", "living", "table", "bed", "sofa"])
+
+        # 2. ĐỒNG BỘ THỜI TIẾT & MÔI TRƯỜNG ĐỘNG (WEATHER SYNC)
+        weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, scene_setting_en, is_indoor=is_indoor_scene)
         if weather_env and not any(k in scene_setting_en.lower() for k in ["rain", "sunny", "nighttime", "chilly"]):
             scene_setting_en = f"{scene_setting_en}, {weather_env}"
         if env_sfx:
-            cur_sfx = scn.get("sfx", "")
-            if "rain" not in cur_sfx.lower() and "breeze" not in cur_sfx.lower() and "night" not in cur_sfx.lower():
-                scn["sfx"] = f"{cur_sfx}, {env_sfx}"
-                sfx_sound = scn["sfx"]
+            if "rain" not in sfx_sound.lower() and "breeze" not in sfx_sound.lower() and "night" not in sfx_sound.lower():
+                sfx_sound = f"{sfx_sound}, {env_sfx}"
         
         if is_fashion_styling:
             active_outfit = f"wearing {scn.get('scene_outfit_en') or wardrobe_str}"
@@ -1166,7 +1236,6 @@ def create_scene_details(target_id, mode, style):
             
         actor_full = f"{actor_base}, {active_outfit}"
         
-        raw_action = scn.get("action_en") or f"demonstrating {clean_prod_en} with steady hands"
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
         
@@ -1181,7 +1250,7 @@ def create_scene_details(target_id, mode, style):
                 scene_focus = f"Warm closing shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding authentic package of {clean_prod_en}."
         else:
             if scene_num == 1:
-                scene_focus = f"Establishing shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, holding {clean_prod_en} at chest level, open packaging nearby."
+                scene_focus = f"Authentic situational shot in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}."
             elif scene_num == 2:
                 scene_focus = f"Medium close-up in {scene_setting_en}. {actor_full}. {micro_expr_en}, {clean_action}, holding {clean_prod_en} with steady hands."
             elif scene_num == 3:
@@ -1197,7 +1266,6 @@ def create_scene_details(target_id, mode, style):
         )
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         
-        speaker_line = scn.get("voiceover", "")
         audio_anchor = "Audio Direction: Spoken in clear authentic native Northern Vietnamese Hanoi accent, local Hanoi urban cadence, crisp natural conversational pacing, zero Southern dialect bleed."
         
         if is_viral and scene_num == 4:
@@ -1207,7 +1275,7 @@ def create_scene_details(target_id, mode, style):
 
         raw_vid = (
             f"{camera_shot}. Commercial live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}. "
-            f"Action: Visibly speaking directly to camera with natural on-camera lip-sync from 0.00s. {audio_anchor} Spoken audio: \"{speaker_line}\", Foley: [{sfx_sound}]. "
+            f"Action: Visibly speaking directly to camera with natural on-camera lip-sync from 0.00s. {audio_anchor} Spoken audio: \"{vo_line}\", Foley: [{sfx_sound}]. "
             f"{action_phrase}. "
             f"Pure camera footage, strictly no text, no subtitles, no UI overlay. "
             f"Negative prompt: {vid_neg}."
@@ -1770,7 +1838,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN ĐÚNG ĐỘ TUỔI, TUYỆT ĐỐI CẤM THUYẾT MINH.
                 🛑 CÂU THOẠI PHẢI XUÔI TAI, TỰ NHIÊN, CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY.
                 🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN'. 100% BẮT BUỘC DÙNG TỪ 'NGHÌN'.
-                🛑 QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM 'tư'.
+                🛑 QUY TẮC SỐ BỐN: 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm...). TUYỆT ĐỐI CẤM đọc số bốn thành 'tư' (CẤM 'mười tư', CẤM 'tư mươi', CẤM 'trăm tư').
                 🛑 CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE', 'TRÊN LIVE'.
                 🛑 CẤM TUYỆT ĐỐI KHẨU NGỮ MIỀN NAM. 100% dùng từ ngữ Hà Nội chuẩn.
                 🛑 BẮT BUỘC TẠO RA 5 KỊCH BẢN Ở 5 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
@@ -1886,7 +1954,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma trận Bằng chứng Thị giác, Giác quan & Tọa độ chuẩn xác!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Ma trận Hoạt cảnh, Bằng chứng Thị giác & Tọa độ chuẩn xác!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
