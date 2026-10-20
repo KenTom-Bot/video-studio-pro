@@ -254,6 +254,8 @@ POLICY_REPLACEMENTS = {
 }
 
 SOUTHERN_TO_HANOI = {
+    r'\báp\s*mã\b': 'nay giảm',
+    r'\báp\s*voucher\b': 'nay giảm',
     r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi',
     r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi',
     r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi',
@@ -382,6 +384,8 @@ def clean_and_normalize_voiceover(text: str) -> str:
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
     for pattern, rep in [
+        (r'\báp\s*mã\b', 'nay giảm'),
+        (r'\báp\s*voucher\b', 'nay giảm'),
         (r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b', 'một trăm bốn mươi'),
         (r'\b1\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
         (r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b', 'một trăm bốn mươi'),
@@ -403,6 +407,27 @@ def clean_and_normalize_voiceover(text: str) -> str:
     ]:
         cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
+
+def format_product_name_bold(text: str) -> str:
+    if not text: return ""
+    clean = clean_analysis_text(text)
+    if ":" in clean:
+        parts = clean.split(":", 1)
+        return f"<b style='color:#0f172a; font-weight:800; font-size:15px;'>{parts[0].strip()}</b>: {parts[1].strip()}"
+    elif " - " in clean:
+        parts = clean.split(" - ", 1)
+        return f"<b style='color:#0f172a; font-weight:800; font-size:15px;'>{parts[0].strip()}</b> - {parts[1].strip()}"
+    return f"<b style='color:#0f172a; font-weight:800; font-size:15px;'>{clean}</b>"
+
+def format_ocr_prices(ca_data: dict) -> str:
+    det = ca_data.get('detected_prices', '')
+    orig = ca_data.get('original_price_spoken', '')
+    sale = ca_data.get('sale_price_spoken', '')
+    if orig and sale:
+        return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{orig}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{sale}</span>"
+    elif det:
+        return f"<span style='color:#dc2626; font-weight:800; font-size:14.5px;'>{clean_analysis_text(det)}</span>"
+    return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
 # ==============================================================================
 # BỘ XỬ LÝ ĐỒNG BỘ HOẠT CẢNH ĐỜI THỰC & HÀNH VI TÌNH HUỐNG
@@ -786,7 +811,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU KÍCH THÍCH & AN TOÀN TUYỆT ĐỐI (DƯỚI 30 TỪ):
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng 3 vế xuôi tai:
           1. Neo giá thực tế & Báo giá giảm kích thích:
-             'Bình thường set này hơn một trăm bốn mươi nghìn, đợt này áp mã voucher vào chỉ còn khoảng...' (BẮT BUỘC VIẾT 'MỘT TRĂM BỐN MƯƠI NGHÌN', CẤM '1 TRĂM TỨ MƯƠI'!)
+             'Bình thường khoảng [Giá gốc thực tế đã phiên âm], nay giảm chỉ còn tầm [Giá sale thực tế đã phiên âm] thôi...' (BẮT BUỘC DÙNG 'NAY GIẢM', TUYỆT ĐỐI CẤM DÙNG 'ÁP MÃ', CẤM 'ÁP VOUCHER'!)
           2. Miễn trừ thời điểm phòng ngừa quét chính sách:
              'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...' (hoặc 'tùy thời điểm giá sẽ chênh lệch một chút...')
           3. Rào voucher tài khoản cá nhân & CTA:
@@ -856,7 +881,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V172.0 (KHÓA TRANG PHỤC BẤT BIẾN & TỈ LỆ THỰC TẾ)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V174.0 (TINH CHỈNH HOÀN HẢO TOÀN DIỆN)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -882,15 +907,32 @@ def create_scene_details(target_id, mode, style):
     
     dna = st.session_state.get("content_analysis") or {}
     
-    raw_price_anchor = dna.get("rounded_price_anchor", "")
-    spelled_out_price_anchor = clean_and_normalize_voiceover(raw_price_anchor)
+    raw_orig_price = dna.get("original_price_spoken", "")
+    raw_sale_price = dna.get("sale_price_spoken", "")
+    
+    if not raw_orig_price or not raw_sale_price:
+        detected_p = str(dna.get("detected_prices", ""))
+        num_matches = [int(n.replace('.', '').replace(',', '')) for n in re.findall(r'\b\d{1,3}(?:[.,]\d{3})+\b', detected_p)]
+        if len(num_matches) >= 2:
+            num_matches.sort()
+            sale_num, orig_num = num_matches[0], num_matches[-1]
+            raw_orig_price = number_to_vietnamese_words(orig_num).replace(" đồng", "")
+            raw_sale_price = number_to_vietnamese_words(sale_num).replace(" đồng", "")
+        elif len(num_matches) == 1:
+            raw_orig_price = number_to_vietnamese_words(int(num_matches[0] * 1.25)).replace(" đồng", "")
+            raw_sale_price = number_to_vietnamese_words(num_matches[0]).replace(" đồng", "")
+        else:
+            raw_orig_price = "ba trăm năm mươi nghìn"
+            raw_sale_price = "hai trăm chín mươi nghìn"
+
+    orig_price_spoken = clean_and_normalize_voiceover(raw_orig_price)
+    sale_price_spoken = clean_and_normalize_voiceover(raw_sale_price)
 
     self_pronoun = dna.get("self_pronoun") or "em"
     audience_pronoun = dna.get("audience_pronoun") or ("các chị em" if not is_viral else "mọi người")
     setting_archetype = dna.get("setting_archetype") or "Nhà phố / Chung cư hiện đại sạch sẽ"
     is_fixed_location = dna.get("is_fixed_location", True)
 
-    # XÁC ĐỊNH SẢN PHẨM THỜI TRANG HAY PHI THỜI TRANG
     f_rules = dna.get("fashion_mix_and_match_rules", {})
     is_fashion_product = False
     if isinstance(f_rules, dict) and f_rules.get("is_fashion_item"):
@@ -930,7 +972,6 @@ def create_scene_details(target_id, mode, style):
         prod_kw = str(dna.get("what_and_unique", "")).lower()
         is_culinary = any(k in prod_kw for k in ["ăn", "thịt", "bánh", "tóp mỡ", "sốt", "mắm", "chả", "nem", "gà", "cá", "ẩm thực", "đồ ăn", "món"])
 
-    # THIẾT LẬP MỎ NEO TỈ LỆ THỰC TẾ & KHỐI 3D (ĐẶC BIỆT CHO MÁY XAY / THIẾT BỊ BẾP)
     prod_type_lower = str(dna.get("what_and_unique", "")).lower()
     if any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor", "osaka"]):
         volumetric_form_en = "compact 2-liter electric food processor, total assembled height approx 25cm, clear glass bowl diameter 15cm, motorized top power base that fits into two adult hands, sitting steady on kitchen counter matching adjacent cutting board scale"
@@ -948,7 +989,6 @@ def create_scene_details(target_id, mode, style):
         volumetric_form_en = "strict realistic 3D volumetric proportions, maintaining balanced length-to-width-to-height ratio against adult hand"
         dim_3d_ratio_txt = "Tỉ lệ Dài x Rộng x Cao đồng nhất chuẩn xác"
 
-    # THIẾT LẬP TRANG PHỤC CHUẨN DUY NHẤT (MASTER LOCKED WARDROBE)
     raw_rec_wardrobe = dna.get("recommended_wardrobe_en", "")
     if any(k in setting_archetype.lower() for k in ["bếp", "kitchen", "nấu", "cook"]) or any(k in prod_type_lower for k in ["xay", "chảo", "nồi", "bếp", "rửa"]):
         master_wardrobe_locked = f"cream-white casual short-sleeve tee, {locked_tuck_en}, clean beige linen kitchen apron, matching comfortable trousers"
@@ -963,7 +1003,8 @@ def create_scene_details(target_id, mode, style):
         "dimensions": dna.get("product_dimensions", "Kích thước chuẩn đời thực"),
         "dimensions_3d_ratio": dim_3d_ratio_txt,
         "product_scale_relative": volumetric_form_en,
-        "price_anchor": spelled_out_price_anchor or raw_price_anchor,
+        "original_price_spoken": orig_price_spoken,
+        "sale_price_spoken": sale_price_spoken,
         "self_pronoun": self_pronoun,
         "audience_pronoun": audience_pronoun,
         "setting_archetype": setting_archetype,
@@ -991,6 +1032,7 @@ def create_scene_details(target_id, mode, style):
     KHÓA HÌNH KHỐI 3 CHIỀU THỰC TẾ: {volumetric_form_en}
     KHÓA TRANG PHỤC MASTER DUY NHẤT 4 CẢNH: {master_wardrobe_locked}
     SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
+    GIÁ GỐC THỰC TẾ: '{orig_price_spoken}' | GIÁ SALE THỰC TẾ: '{sale_price_spoken}'
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
@@ -1052,8 +1094,8 @@ def create_scene_details(target_id, mode, style):
                 "expression_en": "smiling warmly into lens with open welcoming hands",
                 "action_en": "speaking with welcoming open-palm gestures, product neatly placed nearby",
                 "sfx": "Tiếng chuông ting trong trẻo",
-                "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal đòn bẩy giá an toàn'}",
-                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng hơn một trăm bốn mươi nghìn, áp voucher còn tầm mấy mươi nghìn thôi, nhưng giá từng thời điểm có thể khác nhau, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!'}"
+                "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá nay giảm an toàn'}",
+                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng hơn {orig_price_spoken}, nay giảm chỉ còn tầm {sale_price_spoken} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!'}"
             }}
         ]
     }}
@@ -1083,7 +1125,6 @@ def create_scene_details(target_id, mode, style):
     actor_base = f"{full_char}, neat {locked_hair}"
     asym_append = f", {asym_lock_en}" if asym_lock_en else ""
 
-    # KHÓA TRANG PHỤC TUYỆT ĐỐI THEO QUY CHUẨN MASTER WARDROBE
     if is_fashion_product:
         master_outfit_string = f"wearing {master_wardrobe_locked}{asym_append}"
     else:
@@ -1135,7 +1176,6 @@ def create_scene_details(target_id, mode, style):
         if env_sfx and "rain" not in sfx_sound.lower() and "breeze" not in sfx_sound.lower():
             sfx_sound = f"{sfx_sound}, {env_sfx}"
         
-        # CƯỠNG CHẾ KHÓA TRANG PHỤC ĐỒNG NHẤT 100% CẢ 4 CẢNH
         actor_full = f"{actor_base}, {master_outfit_string}"
         
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
@@ -1143,7 +1183,6 @@ def create_scene_details(target_id, mode, style):
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
-        # KHÓA CƯỠNG CHẾ QUANG HỌC VÀ KHỐI LƯỢNG 3 CHIỀU THỰC TẾ
         if scene_num == 1:
             depth_3d_lock = f", three-quarter isometric perspective displaying strict 3D depth and invariant [{volumetric_form_en}] proportions"
         elif scene_num in [2, 3]:
@@ -1184,8 +1223,8 @@ def create_scene_details(target_id, mode, style):
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
         f"👗 <b>Khóa trang phục Master duy nhất:</b> {master_wardrobe_locked} (Đồng nhất 100% cả 4 cảnh)",
-        f"📐 <b>Tỉ lệ khối 3D Dài x Rộng x Cao:</b> {dim_3d_ratio_txt} ({volumetric_form_en})",
-        f"🛠 <b>Đặc điểm sản phẩm:</b> {condensed_dna.get('dimensions')} - {condensed_dna.get('product', '')}"
+        f"💰 <b>Mức giá đồng bộ (Cảnh 4):</b> Bình thường ~{orig_price_spoken}, nay giảm ~{sale_price_spoken}",
+        f"📐 <b>Tỉ lệ khối 3D:</b> {dim_3d_ratio_txt} ({volumetric_form_en})"
     ]
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
         summary_lines.append(f"🎯 <b>Ghi chú riêng:</b> {user_custom_note}")
@@ -1515,7 +1554,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1624,7 +1663,7 @@ for i in range(num_chars):
     c_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"f_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
     if c_file: char_inputs.append({"id": i+1, "role": role or f"Diễn viên {i+1}", "file": c_file})
 
-if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="primary", use_container_width=True, disabled=is_system_busy):
+if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
     can_run, msg = check_usage_limit(st.session_state.current_email)
     if not can_run: st.error(msg)
     else:
@@ -1683,6 +1722,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 - Quét kỹ số đo thực tế của sản phẩm (dài, rộng, cao, đường kính cối, dung tích):
                   • Nếu là máy xay thịt / thực phẩm: aspect_ratio_3d = 'Cao 25cm x Đường kính cối 15cm (Dung tích 2L)', geometric_form_factor_en = 'compact 2-liter electric food processor, total assembled height 25cm, clear glass bowl diameter 15cm, motorized top power base that fits into two adult hands'.
 
+                🛑 QUY CHUẨN BÓC TÁCH GIÁ TIỀN CHUẨN XÁC TỪNG MỨC GIÁ:
+                - Quét OCR giá tiền trên ảnh:
+                  • original_price_spoken: Phiên âm giá gốc đầy đủ bằng chữ (ví dụ: 'ba trăm năm mươi nghìn đồng' - CẤM '1 trăm', CẤM 'tư', CẤM 'tứ').
+                  • sale_price_spoken: Phiên âm giá sale đầy đủ bằng chữ (ví dụ: 'hai trăm chín mươi nghìn đồng' - CẤM '1 trăm', CẤM 'tư', CẤM 'tứ').
+
                 🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ:
                   • Váy xẻ tà bên sườn phải người mặc:
                     en_prompt_lock = 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, with subtle modest knee-level slit depth, while the entire left side and front panel are completely solid unbroken fabric with zero slit'
@@ -1738,6 +1782,8 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                                 "auditory_foley": "loud sharp crunch snap and crispy chewing mastication"
                             }}
                         }},
+                        "original_price_spoken": "Giá gốc phiên âm bằng chữ chuẩn (ví dụ: ba trăm năm mươi nghìn)",
+                        "sale_price_spoken": "Giá sale phiên âm bằng chữ chuẩn (ví dụ: hai trăm chín mươi nghìn)",
                         "recommended_setting_en": "Realistic clean modern townhouse kitchen with clean sink under 15 words",
                         "recommended_wardrobe_en": "cream-white casual short-sleeve tee with beige linen kitchen apron",
                         "target_audience": "Tệp khách hàng mục tiêu",
@@ -1750,7 +1796,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "correct_ergonomic_grip": "Tư thế cầm nắm công thái học chuẩn đời thực của sản phẩm",
                         "hero_sku_color": "Mã màu bán chạy nhất (Hero SKU)",
                         "color_palette": "Bảng màu toàn bộ",
-                        "what_and_unique": "Định danh sản phẩm và điểm độc bản (USP)",
+                        "what_and_unique": "[Tên sản phẩm]: [Định danh sản phẩm và điểm độc bản USP vượt trội]",
                         "target_user": "Đối tượng cụ thể phù hợp nhất",
                         "why_buy": "Lý do thuyết phục không thể chối từ",
                         "where_and_convenience": "Hoàn cảnh ứng dụng thực tế và sự tiện lợi",
@@ -1761,7 +1807,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "product_assembly_structure": "Bóc tách cấu trúc đa linh kiện",
                         "flexible_connector_specs": "Dây nối hoặc không có dây nối",
                         "strict_anti_morph_targets": "Các vật thể AI dễ vẽ nhầm để cấm tiệt",
-                        "detected_prices": "Quét OCR giá tiền",
+                        "detected_prices": "Giá gốc: ... - Giá giảm: ...",
                         "rounded_price_anchor": "Giá gốc và giá sale làm tròn hợp lý",
                         "product_dimensions": "Thông số kích thước (Dài x Rộng x Cao cụ thể)",
                         "prompt_dna_lock": "Visual DNA cho video"
@@ -1805,13 +1851,14 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
-# BỐ CỤC: 2 CỘT ĐỐI XỨNG & MỤC CHI TIẾT
+# BỐ CỤC: 2 CỘT ĐỐI XỨNG & ĐÁNH SỐ ĐỘNG LIỀN MẠCH
 # ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
     st.divider()
     st.markdown("### 🔍 **Phân Tích Chi Tiết**")
     
+    # HÀNG 1: MỤC 1 & 2
     col_row1_left, col_row1_right = st.columns(2)
     with col_row1_left:
         st.markdown(f"""
@@ -1852,12 +1899,13 @@ if isinstance(ca, dict):
             </div>
             """, unsafe_allow_html=True)
 
+    # HÀNG 2: MỤC 3 & 4
     col_row2_left, col_row2_right = st.columns(2)
     with col_row2_left:
         st.markdown(f"""
         <div class="dna-card">
             <div class="dna-card-title">💎 3. Giải phẫu Sản phẩm & Nội Dung (Interest & Desire)</div>
-            <div class="dna-row"><span class="dna-label">📦 Chủ đề & Điểm đặc biệt:</span><span class="dna-text">{clean_analysis_text(ca.get('what_and_unique', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">📦 Chủ đề & Điểm đặc biệt:</span><span class="dna-text">{format_product_name_bold(ca.get('what_and_unique', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">👥 Đối tượng phù hợp:</span><span class="dna-text">{clean_analysis_text(ca.get('target_user', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🔥 Tại sao nên xem/mua:</span><span class="dna-text">{clean_analysis_text(ca.get('why_buy', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">📍 Hoàn cảnh & Tiện ích:</span><span class="dna-text">{clean_analysis_text(ca.get('where_and_convenience', ''))}</span></div>
@@ -1887,47 +1935,86 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Nhà phố/Chung cư sạch sẽ'))}</span></div>
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
                 <div class="dna-row"><span class="dna-label">📐 Tỉ lệ khối 3D (Dài x Rộng x Cao):</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
-                <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{clean_analysis_text(ca.get('detected_prices', ''))}</span></div>
-                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Đòn bẩy giá tương phản linh hoạt:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('rounded_price_anchor', ''))}</span></div>
+                <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
+                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường ~{ca.get('original_price_spoken', '')}, nay giảm ~{ca.get('sale_price_spoken', '')}</span></div>
             </div>
             """, unsafe_allow_html=True)
 
+    # THU THẬP VÀ ĐÁNH SỐ ĐỘNG CHO CÁC MỤC NÂNG CAO (5, 6, 7...) VÀ CHIA 2 CỘT CÂN ĐỐI
+    extra_blocks = []
+    
     vp_info = ca.get('visual_proof_dna', {})
     if isinstance(vp_info, dict) and vp_info.get('catalyst_action_en'):
-        st.markdown(f"""
-        <div class="dna-card" style="border-left: 4px solid #059669; margin-top: 6px;">
-            <div class="dna-card-title" style="color:#047857;">🔬 5. Bằng Chứng Thị Giác & Biến Đổi Thực Tế (Visual Proof Engine)</div>
+        extra_blocks.append({
+            "title_suffix": "Bằng Chứng Thị Giác & Biến Đổi Thực Tế (Visual Proof Engine)",
+            "icon": "🔬",
+            "border_color": "#059669",
+            "title_color": "#047857",
+            "html": f"""
             <div class="dna-row"><span class="dna-label">🏷 Phân loại thử nghiệm:</span><span class="dna-text" style="font-weight:700; color:#065f46;">{str(vp_info.get('category_type', '')).upper()}</span></div>
             <div class="dna-row"><span class="dna-label">⚡ Nỗi đau thị giác (Trước):</span><span class="dna-text">{clean_analysis_text(vp_info.get('before_visual', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🧪 Thao tác kích hoạt (Cảnh 2):</span><span class="dna-text"><code>{vp_info.get('catalyst_action_en', '')}</code></span></div>
             <div class="dna-row"><span class="dna-label">✨ Bằng chứng lột xác (Cảnh 3):</span><span class="dna-text" style="color:#047857; font-weight:600;"><code>{vp_info.get('after_transformation_en', '')}</code></span></div>
             <div class="dna-row"><span class="dna-label">🔊 Âm thanh đặc tả (Foley):</span><span class="dna-text" style="color:#15803d;">{clean_analysis_text(vp_info.get('proof_sfx', ''))}</span></div>
-        </div>
-        """, unsafe_allow_html=True)
+            """
+        })
 
     asym_info = ca.get('spatial_asymmetry_analysis', {})
     if isinstance(asym_info, dict) and asym_info.get('has_asymmetry', False):
-        st.markdown(f"""
-        <div class="dna-card" style="border-left: 4px solid #8b5cf6; margin-top: 6px;">
-            <div class="dna-card-title" style="color:#7c3aed;">📐 6. Khóa Tọa Độ Giải Phẫu & Cắt May Bất Đối Xứng (Spatial Asymmetry Lock)</div>
+        extra_blocks.append({
+            "title_suffix": "Khóa Tọa Độ Giải Phẫu & Cắt May Bất Đối Xứng (Spatial Asymmetry Lock)",
+            "icon": "📐",
+            "border_color": "#8b5cf6",
+            "title_color": "#7c3aed",
+            "html": f"""
             <div class="dna-row"><span class="dna-label">✂️ Chi tiết bất đối xứng:</span><span class="dna-text" style="font-weight:700; color:#6d28d9;">{clean_analysis_text(asym_info.get('feature_type', 'Xẻ tà'))}</span></div>
             <div class="dna-row"><span class="dna-label">📍 Tọa độ người mặc:</span><span class="dna-text" style="font-weight:600; color:#4c1d95;">{clean_analysis_text(asym_info.get('anatomical_location_vi', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🛡 Cưỡng chế Prompt EN:</span><span class="dna-text"><code>{asym_info.get('en_prompt_lock', '')}</code></span></div>
-        </div>
-        """, unsafe_allow_html=True)
+            """
+        })
 
     c_dna = ca.get('culinary_dna', {})
     if isinstance(c_dna, dict) and c_dna.get('is_culinary', False):
         sensory = c_dna.get('sensory_cues', {})
-        st.markdown(f"""
-        <div class="dna-card" style="border-left: 4px solid #f97316; margin-top: 6px;">
-            <div class="dna-card-title" style="color:#ea580c;">🍗 7. Giải Phẫu Kích Hoạt Đa Giác Quan Ẩm Thực (Food-Porn Sensory Matrix)</div>
+        extra_blocks.append({
+            "title_suffix": "Giải Phẫu Kích Hoạt Đa Giác Quan Ẩm Thực (Food-Porn Sensory Matrix)",
+            "icon": "🍗",
+            "border_color": "#f97316",
+            "title_color": "#ea580c",
+            "html": f"""
             <div class="dna-row"><span class="dna-label">✨ Cấu trúc vật lý:</span><span class="dna-text" style="font-weight:600; color:#c2410c;">{clean_analysis_text(c_dna.get('texture_profile', 'Giòn rụm xốp tan'))}</span></div>
             <div class="dna-row"><span class="dna-label">👁 Kích thích Thị giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('visual_en', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🖐 Kích thích Xúc giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('tactile_en', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">👂 Kích thích Thính giác (ASMR):</span><span class="dna-text" style="color:#15803d; font-weight:600;">{clean_analysis_text(sensory.get('auditory_foley', ''))}</span></div>
-        </div>
-        """, unsafe_allow_html=True)
+            """
+        })
+
+    # DÀN TRANG CHIA 2 CỘT ĐỐI XỨNG & ĐÁNH SỐ LIỀN MẠCH TỰ ĐỘNG
+    if extra_blocks:
+        current_card_index = 5
+        for i in range(0, len(extra_blocks), 2):
+            col_ex_left, col_ex_right = st.columns(2)
+            
+            b_left = extra_blocks[i]
+            with col_ex_left:
+                st.markdown(f"""
+                <div class="dna-card" style="border-left: 4px solid {b_left['border_color']}; margin-top: 6px;">
+                    <div class="dna-card-title" style="color:{b_left['title_color']};">{b_left['icon']} {current_card_index}. {b_left['title_suffix']}</div>
+                    {b_left['html']}
+                </div>
+                """, unsafe_allow_html=True)
+            current_card_index += 1
+            
+            if i + 1 < len(extra_blocks):
+                b_right = extra_blocks[i+1]
+                with col_ex_right:
+                    st.markdown(f"""
+                    <div class="dna-card" style="border-left: 4px solid {b_right['border_color']}; margin-top: 6px;">
+                        <div class="dna-card-title" style="color:{b_right['title_color']};">{b_right['icon']} {current_card_index}. {b_right['title_suffix']}</div>
+                        {b_right['html']}
+                    </div>
+                    """, unsafe_allow_html=True)
+                current_card_index += 1
 
     if ca.get('prompt_dna_lock'):
         st.markdown("##### 📌 **Visual DNA Lock:**")
@@ -1996,40 +2083,44 @@ if all_sc:
                 
             st.markdown("---")
 
-    st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
-    for outline in comp_sc:
-        sc_id = outline["id"]
-        with st.container(border=True):
-            c1, c2, c3 = st.columns([2.5, 1, 1])
-            c1.markdown(f"**#{sc_id}. {outline.get('title')}**")
-            c1.caption(f"⚡ *{outline.get('hook')}*")
-            if str(sc_id) != str(st.session_state.active_script_id):
-                if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
-                    st.session_state.active_script_id = int(sc_id); st.session_state.scroll_to_detail = True; st.rerun()
-            btn_clone_ph = c3.empty()
-            if str(st.session_state.current_cloning_id) == str(sc_id):
-                btn_clone_ph.markdown("<div style='background: #fffbeb; color: #dc2626; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fca5a5;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
-            else:
-                if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
-                    can_run, msg = check_usage_limit(st.session_state.current_email)
-                    if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
-                    else: st.error(msg)
+    # 1. KỊCH BẢN ĐÃ DỰNG CHI TIẾT (CHỈ HIỂN THỊ KHI ĐÃ CÓ KỊCH BẢN HOÀN THÀNH)
+    if comp_sc:
+        st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
+        for outline in comp_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2, c3 = st.columns([2.5, 1, 1])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}**")
+                c1.caption(f"⚡ *{outline.get('hook')}*")
+                if str(sc_id) != str(st.session_state.active_script_id):
+                    if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
+                        st.session_state.active_script_id = int(sc_id); st.session_state.scroll_to_detail = True; st.rerun()
+                btn_clone_ph = c3.empty()
+                if str(st.session_state.current_cloning_id) == str(sc_id):
+                    btn_clone_ph.markdown("<div style='background: #fffbeb; color: #dc2626; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fca5a5;'>⏳ Đang nhân bản...</div>", unsafe_allow_html=True)
+                else:
+                    if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email)
+                        if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
+                        else: st.error(msg)
 
-    st.markdown("<br>### ⏳ **2. Kịch Bản Chờ Dựng**", unsafe_allow_html=True)
-    for outline in pend_sc:
-        sc_id = outline["id"]
-        with st.container(border=True):
-            c1, c2 = st.columns([3, 1.2])
-            c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
-            c1.caption(f"⚡ *{outline.get('hook')}*")
-            btn_detail_ph = c2.empty()
-            if str(st.session_state.current_processing_id) == str(sc_id):
-                btn_detail_ph.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fde68a;'>⏳ Đang dựng 4 cảnh...</div>", unsafe_allow_html=True)
-            else:
-                if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
-                    can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
-                    if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
-                    else: st.error(msg)
+    # 2. KỊCH BẢN CHỜ DỰNG (ĐỒNG BỘ FONT SIZE & IN ĐẬM VỚI PHẦN 1)
+    if pend_sc:
+        st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
+        for outline in pend_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2 = st.columns([3, 1.2])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{outline.get('hook')}*")
+                btn_detail_ph = c2.empty()
+                if str(st.session_state.current_processing_id) == str(sc_id):
+                    btn_detail_ph.markdown("<div style='background: #fffbeb; color: #d97706; border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #fde68a;'>⏳ Đang dựng 4 cảnh...</div>", unsafe_allow_html=True)
+                else:
+                    if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
+                        if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
+                        else: st.error(msg)
 
     if st.session_state.current_processing_id is not None:
         target_id_to_run = st.session_state.current_processing_id
@@ -2060,9 +2151,10 @@ if all_sc:
         else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
 
     # ==========================================================================
-    # KHỞI TẠO KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
+    # 3. GỌI THÊM 5 KỊCH BẢN MỚI (ĐỒNG BỘ FONT SIZE & IN ĐẬM VỚI PHẦN 1 & 2)
     # ==========================================================================
-    st.markdown("--- \n##### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
+    st.divider()
+    st.markdown("### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
     a_opts = ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước"]
     c_ang = cg1.selectbox("🧭 Chiến lược mới:", a_opts, key=f"ea_{st.session_state.reset_key}")
