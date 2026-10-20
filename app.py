@@ -177,7 +177,8 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
 
 def convert_to_soft_price_range(price_text: str) -> str:
     if not price_text: return "mấy chục nghìn"
-    p_lower = price_text.lower().strip()
+    p_lower = str(price_text).lower().strip()
+    p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+)+', '', p_lower).strip()
     if "triệu" in p_lower:
         match = re.search(r'([a-zà-ỹ\s]+triệu)', p_lower)
         if match:
@@ -188,7 +189,7 @@ def convert_to_soft_price_range(price_text: str) -> str:
             return f"hơn {match.group(1).strip()} nghìn"
     if any(k in p_lower for k in ["mươi", "mười"]):
         return "mấy chục nghìn"
-    return f"hơn {price_text}"
+    return f"hơn {p_lower}"
 
 # ==============================================================================
 # HÀM XÁC ĐỊNH NHÂN KHẨU HỌC BẤT BIẾN
@@ -435,11 +436,12 @@ def format_product_name_bold(text: str) -> str:
     return f"<b style='color:#0f172a; font-weight:800; font-size:15px;'>{clean}</b>"
 
 def format_ocr_prices(ca_data: dict) -> str:
+    if not isinstance(ca_data, dict): return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
     det = ca_data.get('detected_prices', '')
     orig = ca_data.get('original_price_spoken', '')
     sale = ca_data.get('sale_price_spoken', '')
     if orig and sale:
-        return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{orig}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{sale}</span>"
+        return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     elif det:
         return f"<span style='color:#dc2626; font-weight:800; font-size:14.5px;'>{clean_analysis_text(det)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
@@ -950,7 +952,6 @@ def create_scene_details(target_id, mode, style):
     orig_price_spoken = clean_and_normalize_voiceover(raw_orig_price)
     sale_price_spoken = clean_and_normalize_voiceover(raw_sale_price)
 
-    # Chuyển đổi sang khoảng giá ước chừng an toàn cho Cảnh 4
     soft_orig_price = convert_to_soft_price_range(orig_price_spoken)
     soft_sale_price = convert_to_soft_price_range(sale_price_spoken)
 
@@ -1595,7 +1596,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1974,7 +1975,8 @@ if isinstance(ca, dict):
         else:
             orig_p_display = ca.get('original_price_spoken', '')
             sale_p_display = ca.get('sale_price_spoken', '')
-            price_display_text = f"Bình thường ~{orig_p_display}, nay giảm ~{sale_p_display}" if orig_p_display and sale_p_display else clean_analysis_text(ca.get('rounded_price_anchor', ''))
+            soft_orig = convert_to_soft_price_range(orig_p_display) if orig_p_display else "hơn một trăm nghìn"
+            soft_sale = convert_to_soft_price_range(sale_p_display) if sale_p_display else "mấy chục nghìn"
             st.markdown(f"""
             <div class="dna-card">
                 <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh, Động Lực Học & Mức Giá</div>
@@ -1982,7 +1984,7 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
                 <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
-                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}</span></div>
+                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường khoảng {soft_orig}, nay giảm khoảng {soft_sale}</span></div>
             </div>
             """, unsafe_allow_html=True)
 
