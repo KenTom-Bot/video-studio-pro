@@ -176,7 +176,7 @@ def extract_and_convert_prices_in_text(raw_text: str) -> str:
     return cleaned
 
 # ==============================================================================
-# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC BẤT BIẾN (HỖ TRỢ ĐƠN & ĐA NHÂN VẬT)
+# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC BẤT BIẾN
 # ==============================================================================
 def get_demographics_description(char_profiles):
     if not char_profiles:
@@ -222,7 +222,7 @@ def get_demographics_description(char_profiles):
     return primary_gender, full_demo
 
 # ==============================================================================
-# BỘ LỌC BẢN QUYỀN & NGƯỜI NỔI TIẾNG (IP & CELEBRITY SAFEGUARD)
+# BỘ LỌC BẢN QUYỀN & NGƯỜI NỔI TIẾNG
 # ==============================================================================
 def sanitize_third_party_ip(text: str) -> str:
     if not text: return ""
@@ -237,7 +237,7 @@ def sanitize_third_party_ip(text: str) -> str:
     return cleaned
 
 # ==============================================================================
-# TỪ ĐIỂN BẢN ĐỊA HÓA TIẾNG HÀ NỘI TOÀN DIỆN CHO TẤT CẢ NGÀNH NGHỀ & SỐ "BỐN"
+# TỪ ĐIỂN BẢN ĐỊA HÓA TIẾNG HÀ NỘI TOÀN DIỆN
 # ==============================================================================
 POLICY_REPLACEMENTS = {
     r'\btuyệt\s*đối\b': 'rất', r'\bhoàn\s*toàn\b': 'thực sự', r'\b100\s*%\b': 'rất nhiều',
@@ -574,7 +574,7 @@ def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prom
     components.html(html_code, height=42)
 
 # ==============================================================================
-# QUẢN LÝ DỰ ÁN NÂNG CẤP: TỰ ĐỘNG KHÔI PHỤC KHI LƯU & ĐỔI TÊN DỄ DÀNG
+# QUẢN LÝ DỰ ÁN NÂNG CẤP
 # ==============================================================================
 def save_project_to_db(email, title, payload_data, project_id=None):
     if not supabase: return False, "Chưa kết nối cơ sở dữ liệu."
@@ -746,12 +746,12 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {viral_directive}
     
     🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
-    - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU (tuyệt đối không trùng lặp bối cảnh giữa 5 kịch bản).
+    - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - Phân tích linh hoạt theo đúng thực tế sản phẩm và góc độ kịch bản.
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU, BẰNG CHỨNG THỊ GIÁC & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI: Chủ ngữ -> Vị ngữ -> Cảm xúc/Hiệu quả.
-    - TUYỆT ĐỐI CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY: Cấm mở đầu câu bằng 'Với thiết kế...', 'Được làm từ...', 'Giúp cho việc...'.
+    - TUYỆT ĐỐI CẤM CÂU BỊ ĐỘNG HOẶC ĐẢO NGỮ LỦNG CỦNG KIỂU DỊCH MÁY.
     - TUYỆT ĐỐI CẤM các từ ngữ công nghệ/máy móc sáo rỗng: CẤM 'thuật toán gợi ý', CẤM 'máy vừa phân tích', CẤM 'hệ thống vừa báo', CẤM 'AI phát hiện'.
     - 🛑 QUY TẮC PHÁT ÂM SỐ BỐN & CHỮ SỐ 1 TRONG LỜI THOẠI:
       • 100% BẮT BUỘC viết và đọc là 'bốn' (bốn mươi, mười bốn, hai mươi bốn, một trăm bốn mươi nghìn...).
@@ -777,7 +777,6 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         outro_instruction = f"""
         🛑 QUY TẮC CẢNH 4 CHO THỂ LOẠI 'VIRAL & XÂY KÊNH' (ENGAGEMENT & RETENTION - KHÔNG BÁN HÀNG):
         - Sử dụng đúng cặp nhân xưng: KOC xưng '{self_pronoun}', gọi người xem là '{audience_pronoun}'.
-        - Mục tiêu: Giữ chân người xem, tạo cảm giác gần gũi, kích thích người xem comment thảo luận, lưu video và bấm Follow kênh.
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội tự nhiên, câu văn mượt mà ấm áp dưới 28 từ.
         - Công thức: Đặt câu hỏi thảo luận hoặc kết lại bài học tâm đắc + Kêu gọi bấm follow đón xem video tiếp theo.
         - TUYỆT ĐỐI CẤM: Không nhắc đến giá tiền, không mã giảm giá, không voucher, không giỏ hàng, không mua hàng!
@@ -817,38 +816,32 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - TUYỆT ĐỐI CẤM 2 THÁI CỰC PHI THỰC TẾ: Cấm nhà cấp 4 cũ kỹ nhếch nhác, Cấm biệt thự xa hoa lộng lẫy dát vàng.
     - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH, chỉ thay đổi góc máy quay!
 
-    🛑 KHÓA TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO (3D VOLUMETRIC & ASPECT RATIO INVARIANCE):
-    - CẢNH 1 (Master Shot): Bắt buộc dùng phối cảnh 3/4 (three-quarter isometric perspective) thể hiện rõ ràng cả 3 trục: Dài, Rộng và Độ dày/Cao.
-    - CẢNH 2 & 3 (Close-Up / Macro): Bắt buộc dùng câu lệnh quang học: 'optical camera close-up on standard-sized item, maintaining invariant length-to-width-to-height volumetric proportions, camera lens physically moving closer, zero stretching across length, width or thickness'.
-    - TUYỆT ĐỐI CẤM lỗi biến dạng tỉ lệ (kéo dài, bẹp ngang, phình to khổng lồ chiếm trọn khung hình).
+    🛑 KHÓA TRANG PHỤC ĐỒNG NHẤT BẤT BIẾN (STRICT WARDROBE INVARIANCE LOCK):
+    - VỚI SẢN PHẨM KHÔNG PHẢI THỜI TRANG (is_fashion_styling = false):
+      • Nhân vật BẮT BUỘC mặc DUY NHẤT 1 BỘ TRANG PHỤC CỐ ĐỊNH (cùng màu áo, cùng kiểu áo, cùng tạp dề nếu làm bếp, cùng quần) xuyên suốt 100% cả 4 phân cảnh!
+      • TUYỆT ĐỐI CẤM mỗi cảnh một màu áo (cấm cảnh áo cam, cảnh sau áo xanh, cảnh sau áo tím)!
+    - VỚI SẢN PHẨM THỜI TRANG (is_fashion_styling = true):
+      • Áo mẫu chính giữ nguyên 100%, chỉ phối đổi quần/chân váy theo nguyên tắc thời trang.
 
-    🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI (SITUATIONAL BEHAVIORAL SYNC):
+    🛑 KHÓA TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO (3D VOLUMETRIC & SCALE INVARIANCE):
+    - CẢNH 1 (Master Shot): Bắt buộc dùng phối cảnh 3/4 thể hiện rõ ràng cả 3 trục: Dài, Rộng và Độ dày/Cao.
+    - CẢNH 2 & 3 (Close-Up / Macro): Bắt buộc dùng câu lệnh quang học: 'optical camera physically moving closer to standard-sized item, maintaining invariant volumetric proportions, zero stretching, strictly no giant enlarged object'.
+    - KHI THÁO RỜI LINH KIỆN (VÍ DỤ: MÁY XAY THÁO CỦ MÁY & CỐI): Khóa cứng kích thước cối tương xứng với bàn tay và đồ bếp xung quanh, cấm vẽ cối phình to thành bồn tắm!
+
+    🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI:
     - TUYỆT ĐỐI CẤM nhân vật đứng thẳng đơ giữa nhà chào mẫu ('standing stiffly in room holding product at chest level') nếu lời thoại đang nói về một tình huống cụ thể (xem phim, đi làm, nấu ăn, đi ngủ, nghỉ ngơi, chăm con...).
-    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại:
-      • Nếu thoại nói 'Nửa đêm xem phim đói bụng': Bối cảnh là phòng khách sofa ban đêm ánh sáng TV hắt lên, nhân vật ngồi co chân trên sofa ăn snack, mắt nhìn màn hình TV.
-      • Nếu thoại nói 'Sáng vội đi làm': Bối cảnh là gương sảnh ra vào, vội vàng chỉnh trang phục/túi xách.
-      • Nếu thoại nói 'Đang nấu cơm chiều': Bối cảnh cạnh bếp từ nấu ăn, tay cầm muôi đảo nhẹ.
+    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại.
 
-    🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI (VISUAL PROOF & TRANSFORMATION DIRECTIVE):
-    - CẢNH 2 (Interest - Thử thách trực quan / Stress-test): Thao tác bóc tách, thử nghiệm thực tế (quẹt vệt son đậm màu, vỗ nhẹ lớp kem tan tiệp vào da, lau đúng 1 đường qua chảo dính mỡ đen, ấn giấy khô lên tã ướt, bật công tắc đèn decor...).
-    - CẢNH 3 (Desire - Bằng chứng biến đổi chấn động / Transformation Proof): Lột xác 100% đối lập với Cảnh 1 (môi căng mọng quyến rũ / da căng mướt glass-skin / bề mặt inox sáng bóng soi gương / giấy khô cong không đọng nước / căn phòng bừng sáng ấm áp điện ảnh).
+    🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI:
+    - CẢNH 2 (Thử thách trực quan): Thao tác bóc tách, thử nghiệm thực tế.
+    - CẢNH 3 (Bằng chứng biến đổi): Lột xác 100% đối lập với Cảnh 1.
 
-    🛑 ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT VỚI LỜI THOẠI (DYNAMIC WEATHER & ATMOSPHERIC SYNC):
-    - Khi lời thoại nhắc đến thời tiết, thời điểm trong ngày (trời mưa, nắng gắt 40 độ, đêm khuya, mùa đông rét buốt, sương mù, trưa hè oi ả...):
-      • BẮT BUỘC phản chiếu trung thực vào `setting_en` và `action_en` của Cảnh đó.
-      • Nếu ở trong nhà mà thoại nói trời mưa: Tự động thêm chi tiết cửa sổ kính mờ hơi nước, vệt mưa chảy ngoài cửa kính, bầu trời xám xịt bên ngoài.
-      • Nếu ở ngoài trời: Mặt đường ướt, hạt mưa rơi, vũng nước phản chiếu.
-      • SFX BẮT BUỘC có âm thanh tương ứng.
+    🛑 ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT VỚI LỜI THOẠI:
+    - Thoại có mưa, nắng, đêm muộn -> phản chiếu 100% vào bối cảnh, ánh sáng và Foley SFX.
 
     🛑 KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC:
-    - Khi trang phục hoặc sản phẩm có chi tiết bất đối xứng (ví dụ: xẻ tà váy, túi ngực, vạt áo chéo, khóa kéo lệch):
-      • TUYỆT ĐỐI KHÔNG dùng từ đối lập 'camera frame left' trong câu lệnh dương tính vì sẽ làm AI bị lộn bên!
-      • NẾU XẺ BÊN PHẢI NGƯỜI MẶC: Bắt buộc dùng cú pháp khóa tuyệt đối: 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, while the entire left side and front panel are completely solid unbroken fabric with zero slit'.
-      • ĐẶC BIỆT ĐỘ SÂU XẺ: Phân tích kỹ ảnh gốc: Nếu xẻ nhẹ ngang gối thì ghi 'subtle modest knee-length slit', nếu xẻ cao thì ghi 'high thigh slit'. TUYỆT ĐỐI KHÔNG tự ý biến xẻ nhẹ thành xẻ cao bạo liệt!
-
-    🛑 KHÓA TRẠNG THÁI SƠ VIN TRANG PHỤC ĐỒNG BỘ THEO PHÂN TÍCH THỰC TẾ:
-    - Trạng thái cạp áo (sơ vin nhét vào cạp quần HOẶC buông thõng tự nhiên) được quyết định dựa vào phân tích thời trang và hoàn cảnh thực tế, sau đó BẮT BUỘC phải đồng nhất 100% xuyên suốt cả 4 phân cảnh!
-    - Tuyệt đối cấm cảnh trước sơ vin mà cảnh sau lại thả áo buông thõng.
+    - Xẻ bên sườn phải người mặc: 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, while the entire left side and front panel are completely solid unbroken fabric with zero slit'.
+    - Độ sâu vết xẻ chuẩn xác theo ảnh gốc: xẻ nhẹ ngang gối ('subtle modest knee-length slit'), cấm tự ý xẻ cao tít lên háng!
 
     🛑 QUY TẮC PHÁT ÂM SỐ BỐN & CHỮ SỐ 1 TRONG LỜI THOẠI:
     - 100% các số có số 4 BẮT BUỘC đọc và viết là 'bốn' (mười bốn, hai mươi bốn, bốn mươi, bốn trăm, một trăm bốn mươi nghìn...).
@@ -856,32 +849,14 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - TUYỆT ĐỐI CẤM viết số '1 trăm' thành chữ số '1', BẮT BUỘC viết rõ bằng chữ là 'một trăm'.
 
     🛑 GIỚI HẠN CỨNG THỜI LƯỢNG VEO 3 (TỐI ĐA 10 GIÂY / PHÂN CẢNH):
-    - MỖI PHÂN CẢNH (CẢNH 1, 2, 3, 4) CÓ THỜI LƯỢNG LINH HOẠT TỪ 4s ĐẾN TỐI ĐA 10 GIÂY (đã bao gồm đệm diễn xuất tự nhiên).
-    - CẢNH 1 HOÀN TOÀN CÓ THỂ DÀI 7s, 8s, 9s HOẶC 10s nếu mở đầu bằng một câu chuyện hay, tình huống kịch tính hoặc tâm sự chạm cảm xúc.
-    - TUYỆT ĐỐI CẤM BẤT KỲ CẢNH NÀO VƯỢT QUÁ 10 GIÂY.
-    - Số từ của mỗi phân cảnh BẮT BUỘC nằm trong khoảng từ 16 đến TỐI ĐA 35 TỪ!
+    - Tối đa 10s/cảnh. Số từ mỗi phân cảnh nằm trong khoảng từ 16 đến TỐI ĐA 35 TỪ!
 
-    🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU (SPOKEN-SYNTAX DIRECTIVE):
-    - Lời thoại phải xuôi tai, gãy gọn, đúng văn phong nói chuyện hằng ngày của người Hà Nội: Chủ ngữ -> Vị ngữ -> Hiệu quả thực tế.
-    - CẤM TUYỆT ĐỐI câu bị động, câu đảo ngữ rườm rà kiểu dịch máy.
-
-    🛑 KHÓA CHẶT GIỚI TÍNH & ĐỘ TUỔI DIỄN VIÊN BẤT BIẾN:
-    - BẮT BUỘC xác định và duy trì duy nhất 1 GIỚI TÍNH CỤ THỂ và ĐỘ TUỔI CỤ THỂ xuyên suốt cả 4 phân cảnh!
-    - TUYỆT ĐỐI CẤM dùng từ chung chung trung tính ('Character', 'Person').
-
-    🛑 KHÓA MẠCH TRUYỆN CHẶT CHẼ THEO TIÊU ĐỀ:
-    - Toàn bộ 4 phân cảnh BẮT BUỘC phát triển nội dung, hành động và lời thoại bám sát 100% tiêu đề kịch bản và câu Hook gốc!
-
-    🛑 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP NGAY TỪ 0.00s:
-    - Lời thoại bắt đầu ngay từ 0.00s, khẩu hình khớp từng từ.
-
-    🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN:
-    - 100% dùng từ 'nghìn' (CẤM 'NGÀN'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'. CẤM giọng thuyết minh ngoài.
+    🛑 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP NGAY TỪ 0.00s.
     - {char_rules}
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V171.0 (KHÓA TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V172.0 (KHÓA TRANG PHỤC BẤT BIẾN & TỈ LỆ THỰC TẾ)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -915,6 +890,16 @@ def create_scene_details(target_id, mode, style):
     setting_archetype = dna.get("setting_archetype") or "Nhà phố / Chung cư hiện đại sạch sẽ"
     is_fixed_location = dna.get("is_fixed_location", True)
 
+    # XÁC ĐỊNH SẢN PHẨM THỜI TRANG HAY PHI THỜI TRANG
+    f_rules = dna.get("fashion_mix_and_match_rules", {})
+    is_fashion_product = False
+    if isinstance(f_rules, dict) and f_rules.get("is_fashion_item"):
+        is_fashion_product = True
+    else:
+        prod_title_kw = str(dna.get("what_and_unique", "")).lower()
+        if any(k in prod_title_kw for k in ["váy", "áo", "quần", "đầm", "set đồ", "chân váy", "blazer", "khoác"]):
+            is_fashion_product = True
+
     tuck_analysis_data = dna.get("tuck_in_analysis", {})
     locked_tuck_en = ""
     if isinstance(tuck_analysis_data, dict):
@@ -945,29 +930,32 @@ def create_scene_details(target_id, mode, style):
         prod_kw = str(dna.get("what_and_unique", "")).lower()
         is_culinary = any(k in prod_kw for k in ["ăn", "thịt", "bánh", "tóp mỡ", "sốt", "mắm", "chả", "nem", "gà", "cá", "ẩm thực", "đồ ăn", "món"])
 
-    # THIẾT LẬP TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO (3D VOLUMETRIC ASPECT RATIO)
-    dim_analysis = dna.get("dimensional_ratio_analysis", {})
-    if isinstance(dim_analysis, dict) and dim_analysis.get("geometric_form_factor_en"):
-        volumetric_form_en = dim_analysis.get("geometric_form_factor_en")
-        dim_3d_ratio_txt = dim_analysis.get("aspect_ratio_3d", "Tỉ lệ khối 3D chuẩn đời thực")
+    # THIẾT LẬP MỎ NEO TỈ LỆ THỰC TẾ & KHỐI 3D (ĐẶC BIỆT CHO MÁY XAY / THIẾT BỊ BẾP)
+    prod_type_lower = str(dna.get("what_and_unique", "")).lower()
+    if any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor", "osaka"]):
+        volumetric_form_en = "compact 2-liter electric food processor, total assembled height approx 25cm, clear glass bowl diameter 15cm, motorized top power base that fits into two adult hands, sitting steady on kitchen counter matching adjacent cutting board scale"
+        dim_3d_ratio_txt = "Cao tổng thể 25cm x Đường kính cối 15cm (Dung tích 2L chuẩn gia đình)"
+    elif any(k in prod_type_lower for k in ["son", "lipstick", "mascara", "chì kẻ", "bút"]):
+        volumetric_form_en = "slender cylindrical tube form factor, length is approx 4 times its diameter (approx 8cm height, 2cm diameter), fits inside adult palm"
+        dim_3d_ratio_txt = "Dài 8cm x Rộng 2cm x Cao 2cm (Tỉ lệ 4:1:1)"
+    elif any(k in prod_type_lower for k in ["cushion", "phấn phủ", "hộp kem"]):
+        volumetric_form_en = "flat compact disc-shaped cylinder, diameter approx 3 times its thickness, held in one hand"
+        dim_3d_ratio_txt = "Đường kính 7cm x Dày 2.5cm (Tỉ lệ 3:3:1)"
+    elif any(k in prod_type_lower for k in ["chảo", "nồi"]):
+        volumetric_form_en = "wide circular cookware, diameter approx 28cm with 6cm side wall height, resting flat on stove"
+        dim_3d_ratio_txt = "Đường kính 28cm x Cao 6cm"
     else:
-        raw_dim_str = str(dna.get("product_dimensions", "Kích thước đời thực")).lower()
-        prod_type_lower = str(dna.get("what_and_unique", "")).lower()
-        if any(k in prod_type_lower for k in ["son", "lipstick", "mascara", "chì kẻ", "bút"]):
-            volumetric_form_en = "slender cylindrical tube form factor, length is approx 4 times its diameter (approx 8cm height, 2cm diameter)"
-            dim_3d_ratio_txt = "Dài 8cm x Rộng 2cm x Cao 2cm (Tỉ lệ 4:1:1)"
-        elif any(k in prod_type_lower for k in ["cushion", "phấn phủ", "hộp kem"]):
-            volumetric_form_en = "flat compact disc-shaped cylinder, diameter is approx 3 times its thickness"
-            dim_3d_ratio_txt = "Đường kính 7cm x Dày 2.5cm (Tỉ lệ 3:3:1)"
-        elif any(k in prod_type_lower for k in ["cốc", "bình", "tumbler"]):
-            volumetric_form_en = "tall cylindrical container, height is approx 2.5 times its base diameter"
-            dim_3d_ratio_txt = "Cao 18cm x Đường kính 7cm (Tỉ lệ 2.5:1:1)"
-        elif any(k in prod_type_lower for k in ["chảo", "nồi"]):
-            volumetric_form_en = "wide shallow circular cookware, diameter is approx 5 times its side wall height"
-            dim_3d_ratio_txt = "Đường kính 28cm x Cao 6cm (Tỉ lệ 5:5:1)"
-        else:
-            volumetric_form_en = "strict realistic 3D volumetric proportions, maintaining balanced length-to-width-to-height ratio"
-            dim_3d_ratio_txt = "Tỉ lệ Dài x Rộng x Cao đồng nhất chuẩn xác"
+        volumetric_form_en = "strict realistic 3D volumetric proportions, maintaining balanced length-to-width-to-height ratio against adult hand"
+        dim_3d_ratio_txt = "Tỉ lệ Dài x Rộng x Cao đồng nhất chuẩn xác"
+
+    # THIẾT LẬP TRANG PHỤC CHUẨN DUY NHẤT (MASTER LOCKED WARDROBE)
+    raw_rec_wardrobe = dna.get("recommended_wardrobe_en", "")
+    if any(k in setting_archetype.lower() for k in ["bếp", "kitchen", "nấu", "cook"]) or any(k in prod_type_lower for k in ["xay", "chảo", "nồi", "bếp", "rửa"]):
+        master_wardrobe_locked = f"cream-white casual short-sleeve tee, {locked_tuck_en}, clean beige linen kitchen apron, matching comfortable trousers"
+    elif raw_rec_wardrobe:
+        master_wardrobe_locked = f"{raw_rec_wardrobe}, {locked_tuck_en}"
+    else:
+        master_wardrobe_locked = f"cream-white casual top, {locked_tuck_en}, comfortable trousers"
 
     condensed_dna = {
         "product": dna.get("what_and_unique", ""),
@@ -980,14 +968,15 @@ def create_scene_details(target_id, mode, style):
         "audience_pronoun": audience_pronoun,
         "setting_archetype": setting_archetype,
         "is_fixed_location": is_fixed_location,
+        "is_fashion_product": is_fashion_product,
         "is_culinary": is_culinary,
         "has_visual_proof": has_visual_proof,
         "visual_proof_dna": v_proof,
         "culinary_sensory": culinary_info.get("sensory_cues", {}) if isinstance(culinary_info, dict) else {},
         "locked_tuck_en": locked_tuck_en,
         "asym_lock_en": asym_lock_en,
-        "recommended_setting_en": dna.get("recommended_setting_en", "tidy modern Vietnamese townhouse kitchen with clean sink"),
-        "recommended_wardrobe_en": dna.get("recommended_wardrobe_en", f"casual top {locked_tuck_en} with comfortable trousers")
+        "master_wardrobe_locked": master_wardrobe_locked,
+        "recommended_setting_en": dna.get("recommended_setting_en", "tidy modern townhouse kitchen with clean countertops")
     }
 
     fallback_prod_name = f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip()
@@ -999,13 +988,15 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK: '{fixed_hook}' | BỐI CẢNH: {fixed_setting_base}
     DIỄN VIÊN KHÓA CỨNG: {detected_demographic_en}.
     KHÓA CẮT MAY BẤT ĐỐI XỨNG: {asym_lock_en if asym_lock_en else 'none'}
-    KHÓA HÌNH KHỐI 3 CHIỀU DÀI X RỘNG X CAO: {volumetric_form_en}
+    KHÓA HÌNH KHỐI 3 CHIỀU THỰC TẾ: {volumetric_form_en}
+    KHÓA TRANG PHỤC MASTER DUY NHẤT 4 CẢNH: {master_wardrobe_locked}
+    SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
     {{
         "title": "{fixed_title}",
-        "is_fashion_styling": true,
+        "is_fashion_styling": {str(is_fashion_product).lower()},
         "presentation_format_used": "{presentation_format}",
         "voice": {{"tone": "{voice_guidance}"}},
         "outfit_vi": "Mô tả trang phục phù hợp với {fixed_setting_base}",
@@ -1024,7 +1015,6 @@ def create_scene_details(target_id, mode, style):
                 "scene": 1, "aida_stage": "Attention",
                 "setting": "Mô tả bối cảnh mở màn...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
-                "scene_outfit_en": "Mô tả chi tiết trang phục kết hợp chi tiết xẻ sườn nếu có",
                 "camera_shot": "Vertical 9:16 eye-level three-quarter medium shot",
                 "expression_en": "looking at camera with natural empathetic smile",
                 "action_en": "natural opening action matching spoken situation, holding product steadily",
@@ -1036,7 +1026,6 @@ def create_scene_details(target_id, mode, style):
                 "scene": 2, "aida_stage": "Interest",
                 "setting": "Mô tả bối cảnh cận cảnh...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
-                "scene_outfit_en": "Trang phục đồng nhất",
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
                 "action_en": "{v_proof.get('catalyst_action_en') if has_visual_proof else 'demonstrating functional details with steady hands'}",
@@ -1048,7 +1037,6 @@ def create_scene_details(target_id, mode, style):
                 "scene": 3, "aida_stage": "Desire",
                 "setting": "Mô tả bối cảnh thực tế...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
-                "scene_outfit_en": "Trang phục đồng nhất",
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
                 "action_en": "{v_proof.get('after_transformation_en') if has_visual_proof else 'performing practical task with immediate effective results'}",
@@ -1060,7 +1048,6 @@ def create_scene_details(target_id, mode, style):
                 "scene": 4, "aida_stage": "Action",
                 "setting": "Mô tả bối cảnh kết thúc...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
-                "scene_outfit_en": "Trang phục đồng nhất",
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
                 "action_en": "speaking with welcoming open-palm gestures, product neatly placed nearby",
@@ -1088,22 +1075,24 @@ def create_scene_details(target_id, mode, style):
     c_mat = res.get("character_matrix") or {}
     full_char = c_mat.get("full_characters_appearance") or f"{detected_demographic_en}, natural Vietnamese facial features, warm skin tone"
     locked_hair = c_mat.get("locked_hairstyles") or "neat tidy jet-black hair"
-    locked_tops = c_mat.get("locked_tops") or "casual top"
-    locked_tuck = c_mat.get("locked_tuck_style") or locked_tuck_en
-    locked_bottoms = c_mat.get("locked_bottoms") or "comfortable trousers"
     default_setting = c_mat.get("locked_setting") or condensed_dna.get("recommended_setting_en") or (outline.get("setting") or "warm realistic indoor setting")
     
-    is_fashion_styling = res.get("is_fashion_styling", True)
     clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or fallback_prod_name)
     product_scale_en = res.get("product_scale_en") or volumetric_form_en
     
     actor_base = f"{full_char}, neat {locked_hair}"
     asym_append = f", {asym_lock_en}" if asym_lock_en else ""
-    wardrobe_str = f"wearing {locked_tops}, {locked_tuck}, and {locked_bottoms}{asym_append}"
-    
+
+    # KHÓA TRANG PHỤC TUYỆT ĐỐI THEO QUY CHUẨN MASTER WARDROBE
+    if is_fashion_product:
+        master_outfit_string = f"wearing {master_wardrobe_locked}{asym_append}"
+    else:
+        master_outfit_string = f"strictly wearing identical {master_wardrobe_locked}{asym_append} across all scenes without variation"
+
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
-    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized prop, giant object"
-    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}"
+    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant machine, bathtub-sized bowl, tiny motor base"
+    wardrobe_negatives = ", changing clothes, different clothes, different outfit, wardrobe inconsistency, altered dress, changing clothing color, inconsistent outfit, changing hairstyle"
+    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}"
     
     total_sec = 0.0
     for scn in scenes:
@@ -1146,21 +1135,19 @@ def create_scene_details(target_id, mode, style):
         if env_sfx and "rain" not in sfx_sound.lower() and "breeze" not in sfx_sound.lower():
             sfx_sound = f"{sfx_sound}, {env_sfx}"
         
-        active_wardrobe = scn.get('scene_outfit_en') or wardrobe_str
-        if asym_lock_en and asym_lock_en not in active_wardrobe:
-            active_wardrobe = f"{active_wardrobe}, {asym_lock_en}"
-        actor_full = f"{actor_base}, wearing {active_wardrobe}"
+        # CƯỠNG CHẾ KHÓA TRANG PHỤC ĐỒNG NHẤT 100% CẢ 4 CẢNH
+        actor_full = f"{actor_base}, {master_outfit_string}"
         
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
-        # KHÓA CƯỠNG CHẾ QUANG HỌC VÀ TỈ LỆ 3 CHIỀU
+        # KHÓA CƯỠNG CHẾ QUANG HỌC VÀ KHỐI LƯỢNG 3 CHIỀU THỰC TẾ
         if scene_num == 1:
             depth_3d_lock = f", three-quarter isometric perspective displaying strict 3D depth and invariant [{volumetric_form_en}] proportions"
         elif scene_num in [2, 3]:
-            depth_3d_lock = f", optical camera close-up on standard-sized item, maintaining invariant length-to-width-to-height volumetric proportions ({volumetric_form_en}), camera lens physically moving closer, zero stretching across length, width or thickness"
+            depth_3d_lock = f", optical camera physically zooming closer to standard-sized item, maintaining invariant volumetric proportions ({volumetric_form_en}), camera lens physically moving closer, zero stretching, strictly no giant enlarged object, detached bowl maintaining standard 15cm width"
         else:
             depth_3d_lock = f", balanced proportions matching exact [{volumetric_form_en}] specifications"
 
@@ -1196,7 +1183,7 @@ def create_scene_details(target_id, mode, style):
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
-        f"👗 <b>Trang phục & Cạp áo:</b> {res.get('outfit_vi', 'Trang phục đời thường phù hợp bối cảnh')} (Đồng nhất 100%)",
+        f"👗 <b>Khóa trang phục Master duy nhất:</b> {master_wardrobe_locked} (Đồng nhất 100% cả 4 cảnh)",
         f"📐 <b>Tỉ lệ khối 3D Dài x Rộng x Cao:</b> {dim_3d_ratio_txt} ({volumetric_form_en})",
         f"🛠 <b>Đặc điểm sản phẩm:</b> {condensed_dna.get('dimensions')} - {condensed_dna.get('product', '')}"
     ]
@@ -1318,7 +1305,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     return more_scripts
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN TOÀN NĂNG (MẬT KHẨU & DỰ ÁN TẤT CẢ USER)
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN TOÀN NĂNG
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -1528,7 +1515,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1569,7 +1556,7 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH - XEM TRƯỚC ẢNH ẨN GỌN (0 TOKEN)
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
@@ -1641,7 +1628,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
     can_run, msg = check_usage_limit(st.session_state.current_email)
     if not can_run: st.error(msg)
     else:
-        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, phân tích Khối 3D Dài x Rộng x Cao & Khóa không gian..."):
+        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, phân tích Khối 3D Dài x Rộng x Cao & Khóa trang phục..."):
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars)]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -1678,7 +1665,7 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 DIỄN VIÊN: {num_chars} nhân vật 100% người Việt bản địa ({', '.join([p['role'] for p in st.session_state.character_profiles])}).
                 
                 🛑 QUY CHUẨN MA TRẬN NHÂN XƯNG (PRONOUN MATRIX SPECIFICATION):
-                - Hãy phân tích đúng tệp người mua để gán cặp nhân xưng chuẩn:
+                - Phân tích đúng tệp người mua để gán cặp nhân xưng chuẩn:
                   • Đồ bếp, gia dụng, tẩy rửa: self_pronoun = 'em', audience_pronoun = 'các chị em' (hoặc 'các bác', 'nhà mình'). CẤM gọi 'các mẹ'!
                   • Mẹ & Bé: self_pronoun = 'em' / 'mình', audience_pronoun = 'các mẹ' / 'ba mẹ'.
                   • Thời trang nữ / Mỹ phẩm: self_pronoun = 'em' / 'mình', audience_pronoun = 'các nàng' / 'các chị em'.
@@ -1693,9 +1680,8 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                 - Xác định rõ ngành hàng và cặp trạng thái Before -> Catalyst Action -> After.
 
                 🛑 QUY CHUẨN KHÓA TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO (DIMENSIONAL RATIO ANALYSIS):
-                - Quét kỹ số đo thực tế của sản phẩm (dài, rộng, cao, đường kính, dung tích) để tính toán tỉ lệ hình học:
-                  • Quy đổi tỉ lệ Dài : Rộng : Cao (ví dụ: 'Dài 30cm x Rộng 15cm x Cao 10cm' -> aspect_ratio_3d = '3 : 1.5 : 1').
-                  • Mô tả geometric_form_factor_en: 'elongated rectangular slab form factor, length is exactly twice the width with a slim height measuring one-third width', 'flat disc-shaped cylinder with diameter 3x thickness', 'tall slender cylinder height 4x diameter'...
+                - Quét kỹ số đo thực tế của sản phẩm (dài, rộng, cao, đường kính cối, dung tích):
+                  • Nếu là máy xay thịt / thực phẩm: aspect_ratio_3d = 'Cao 25cm x Đường kính cối 15cm (Dung tích 2L)', geometric_form_factor_en = 'compact 2-liter electric food processor, total assembled height 25cm, clear glass bowl diameter 15cm, motorized top power base that fits into two adult hands'.
 
                 🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ:
                   • Váy xẻ tà bên sườn phải người mặc:
@@ -1725,9 +1711,9 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                             "en_prompt_lock": "shirt hem strictly cleanly untucked, resting naturally at hips"
                         }},
                         "dimensional_ratio_analysis": {{
-                            "aspect_ratio_3d": "Dài : Rộng : Cao (ví dụ: 3 : 1.5 : 1)",
-                            "geometric_form_factor_en": "Mô tả hình khối 3 chiều chuẩn xác bằng tiếng Anh (ví dụ: elongated rectangular slab form factor, length is twice the width, with slim thickness)",
-                            "reference_anchor_comparison": "So sánh trực quan với bàn tay hoặc vật chuẩn (ví dụ: dài bằng 2 đốt ngón tay, vừa vặn trong một lòng bàn tay)"
+                            "aspect_ratio_3d": "Dài : Rộng : Cao cụ thể",
+                            "geometric_form_factor_en": "Mô tả hình khối 3 chiều chuẩn xác bằng tiếng Anh",
+                            "reference_anchor_comparison": "So sánh trực quan với bàn tay hoặc vật chuẩn"
                         }},
                         "spatial_asymmetry_analysis": {{
                             "has_asymmetry": true/false,
@@ -1752,13 +1738,13 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                                 "auditory_foley": "loud sharp crunch snap and crispy chewing mastication"
                             }}
                         }},
-                        "recommended_setting_en": "Realistic clean modern Vietnamese townhouse or apartment setting under 15 words",
-                        "recommended_wardrobe_en": "Appropriate contextual outfit under 12 words (e.g. casual tee with beige linen apron)",
+                        "recommended_setting_en": "Realistic clean modern townhouse kitchen with clean sink under 15 words",
+                        "recommended_wardrobe_en": "cream-white casual short-sleeve tee with beige linen kitchen apron",
                         "target_audience": "Tệp khách hàng mục tiêu",
                         "core_value": "Giá trị cốt lõi",
                         "pain_points": "Nỗi đau thực tế",
                         "hook_element": "Yếu tố giật gân 3 giây đầu",
-                        "recommended_format": "Phân tích và đề xuất hình thức phù hợp nhất (Review bóc hộp soi chi tiết / Trải nghiệm thực tế / Hybrid)",
+                        "recommended_format": "Phân tích và đề xuất hình thức phù hợp nhất",
                         "format_reason": "Lý do vì sao sản phẩm này nên làm theo hình thức trên",
                         "operational_mechanism": "Phân tích bản chất cơ chế hoạt động thực tế từng bước",
                         "correct_ergonomic_grip": "Tư thế cầm nắm công thái học chuẩn đời thực của sản phẩm",
@@ -1815,11 +1801,11 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma trận Tỉ lệ Khối 3D Dài x Rộng x Cao & Khóa không gian!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Ma trận Tỉ lệ Khối 3D & Khóa trang phục bất biến!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
-# BỐ CỤC: 2 CỘT ĐỐI XỨNG (1-2, 3-4) & MỤC 5, 6, 7 HIỆN KHI CÓ DỮ LIỆU CHUYÊN BIỆT
+# BỐ CỤC: 2 CỘT ĐỐI XỨNG & MỤC CHI TIẾT
 # ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
