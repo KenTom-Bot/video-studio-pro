@@ -305,7 +305,7 @@ SOUTHERN_TO_HANOI = {
     r'\bmuỗng\b': 'thìa',
     r'\bbàn\s*ủi\b': 'bàn là',
     r'\bbao\s*rác\b': 'túi rác',
-    r'\bchổi\s*lông\s*gà\b': 'chổi phất trần',
+    r'\chổi\s*lông\s*gà\b': 'chổi phất trần',
     r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru',
     r'\bêm\s+ái\b': 'êm ru',
     r'\bgiữa\s+tiếng\s+còi\s+xe\s+inh\s+ỏi\b': 'ngoài đường còi xe ồn ào',
@@ -848,14 +848,16 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - VỚI SẢN PHẨM THỜI TRANG (is_fashion_styling = true):
       • Áo mẫu chính giữ nguyên 100%, chỉ phối đổi quần/chân váy theo nguyên tắc thời trang.
 
-    🛑 KHÓA TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO (3D VOLUMETRIC & SCALE INVARIANCE):
-    - CẢNH 1 (Master Shot): Bắt buộc dùng phối cảnh 3/4 thể hiện rõ ràng cả 3 trục: Dài, Rộng và Độ dày/Cao.
-    - CẢNH 2 & 3 (Close-Up / Macro): Bắt buộc dùng câu lệnh quang học: 'optical camera physically moving closer to standard-sized item, maintaining invariant volumetric proportions, zero stretching, strictly no giant enlarged object'.
-    - KHI THÁO RỜI LINH KIỆN (VÍ DỤ: MÁY XAY THÁO CỦ MÁY & CỐI): Khóa cứng kích thước cối tương xứng với bàn tay và đồ bếp xung quanh, cấm vẽ cối phình to thành bồn tắm!
+    🛑 KHÓA TỈ LỆ THỰC TẾ & TƯ THẾ TƯƠNG TÁC THEO TỪNG LOẠI SẢN PHẨM (CONTEXT-DRIVEN PHYSICAL SCALE):
+    - KHÔNG ĐƯỢC GÒ BÓ SẢN PHẨM TRÊN MẶT BÀN BẾP nếu sản phẩm là đồ lớn, nội thất, cá nhân hoặc ngoài trời!
+    - ĐẶT / CẦM / KÊ PHẢI HOÀN TOÀN TỰ NHIÊN THEO TÌNH HUỐNG KỊCH BẢN:
+      • Đồ lớn / Nội thất (Tủ lạnh, tivi, sofa, đệm, giường, bàn ghế): Kê đặt vững chắc trên sàn nhà (grounded on floor / wall-mounted), nhân vật đứng cạnh, mở cửa, ngồi hoặc nằm lên cân xứng với chiều cao 1m65 của con người và căn phòng.
+      • Đồ vừa / Cầm tay (Máy xay, chảo, nồi, cốc, bình): Cầm 1-2 tay hoặc đặt trên kệ/bếp/bồn rửa tự nhiên, tỉ lệ nhỏ gọn hơn cẳng tay và vai người.
+      • Đồ nhỏ / Cá nhân (Son, phấn, trang sức): Cầm ngón tay, bỏ túi, đặt khay trang điểm.
+    - TUYỆT ĐỐI CẤM LỖI PHÓNG ĐẠI: Không bao giờ vẽ sản phẩm phình to bất thường choán hết màn hình.
 
     🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI:
-    - TUYỆT ĐỐI CẤM nhân vật đứng thẳng đơ giữa nhà chào mẫu ('standing stiffly in room holding product at chest level') nếu lời thoại đang nói về một tình huống cụ thể (xem phim, đi làm, nấu ăn, đi ngủ, nghỉ ngơi, chăm con...).
-    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại.
+    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại (ngồi sofa xem phim, vội đi làm, đứng nấu cơm...).
 
     🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI:
     - CẢNH 2 (Thử thách trực quan): Thao tác bóc tách, thử nghiệm thực tế.
@@ -881,7 +883,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V174.0 (TINH CHỈNH HOÀN HẢO TOÀN DIỆN)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V176.0 (KHÓA TỈ LỆ VẬT LÝ THEO NGỮ CẢNH LINH HOẠT)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -972,22 +974,28 @@ def create_scene_details(target_id, mode, style):
         prod_kw = str(dna.get("what_and_unique", "")).lower()
         is_culinary = any(k in prod_kw for k in ["ăn", "thịt", "bánh", "tóp mỡ", "sốt", "mắm", "chả", "nem", "gà", "cá", "ẩm thực", "đồ ăn", "món"])
 
+    # THIẾT LẬP MỎ NEO TỈ LỆ THỰC TẾ & BẢN THỂ HỌC ĐỘNG (KHÔNG GÒ BÓ MẶT BÀN)
     prod_type_lower = str(dna.get("what_and_unique", "")).lower()
-    if any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor", "osaka"]):
-        volumetric_form_en = "compact 2-liter electric food processor, total assembled height approx 25cm, clear glass bowl diameter 15cm, motorized top power base that fits into two adult hands, sitting steady on kitchen counter matching adjacent cutting board scale"
-        dim_3d_ratio_txt = "Cao tổng thể 25cm x Đường kính cối 15cm (Dung tích 2L chuẩn gia đình)"
-    elif any(k in prod_type_lower for k in ["son", "lipstick", "mascara", "chì kẻ", "bút"]):
-        volumetric_form_en = "slender cylindrical tube form factor, length is approx 4 times its diameter (approx 8cm height, 2cm diameter), fits inside adult palm"
-        dim_3d_ratio_txt = "Dài 8cm x Rộng 2cm x Cao 2cm (Tỉ lệ 4:1:1)"
-    elif any(k in prod_type_lower for k in ["cushion", "phấn phủ", "hộp kem"]):
-        volumetric_form_en = "flat compact disc-shaped cylinder, diameter approx 3 times its thickness, held in one hand"
-        dim_3d_ratio_txt = "Đường kính 7cm x Dày 2.5cm (Tỉ lệ 3:3:1)"
-    elif any(k in prod_type_lower for k in ["chảo", "nồi"]):
-        volumetric_form_en = "wide circular cookware, diameter approx 28cm with 6cm side wall height, resting flat on stove"
-        dim_3d_ratio_txt = "Đường kính 28cm x Cao 6cm"
+    
+    # 1. Đồ nội thất, điện máy lớn (Tủ lạnh, tivi, sofa, đệm, giường, máy giặt...)
+    if any(k in prod_type_lower for k in ["tủ lạnh", "refrigerator", "tivi", "tv", "sofa", "đệm", "nệm", "mattress", "giường", "bed", "máy giặt", "tủ quần áo", "bàn ăn", "ghế massage"]):
+        volumetric_form_en = "authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human (standing beside refrigerator, sitting on sofa, or resting on mattress), natural spacious room presence"
+        dim_3d_ratio_txt = "Kích thước nội thất lớn (Tỉ lệ chuẩn theo vóc dáng 1m65 & sàn phòng)"
+    # 2. Thiết bị gia dụng vừa & cầm tay (Máy xay, nồi, chảo, bình nước...)
+    elif any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor", "osaka"]):
+        volumetric_form_en = "compact 2-liter electric food processor, total height approx 25cm (noticeably shorter than adult forearm), clear glass bowl diameter 15cm, motorized top power base held or operated comfortably with female hands, positioned naturally according to situational action"
+        dim_3d_ratio_txt = "Cao 25cm x Cối 15cm (Nhỏ hơn cẳng tay, cầm/đặt tự nhiên)"
+    elif any(k in prod_type_lower for k in ["chảo", "nồi", "cookware"]):
+        volumetric_form_en = "standard cookware approx 28cm diameter, proportioned accurately against human torso and stovetop, handled naturally with one or two hands"
+        dim_3d_ratio_txt = "Đường kính 28cm x Cao 6cm (Cầm/đặt trên bếp tự nhiên)"
+    # 3. Đồ bỏ túi, mỹ phẩm nhỏ (Son, phấn, serum, trang sức...)
+    elif any(k in prod_type_lower for k in ["son", "lipstick", "mascara", "chì kẻ", "bút", "nhẫn", "serum", "cushion"]):
+        volumetric_form_en = "compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers, placed or held naturally matching situational action"
+        dim_3d_ratio_txt = "Nhỏ gọn cầm tay / bỏ túi (Cầm ngón tay hoặc đặt khay tự nhiên)"
+    # 4. Các vật thể tiêu chuẩn khác
     else:
-        volumetric_form_en = "strict realistic 3D volumetric proportions, maintaining balanced length-to-width-to-height ratio against adult hand"
-        dim_3d_ratio_txt = "Tỉ lệ Dài x Rộng x Cao đồng nhất chuẩn xác"
+        volumetric_form_en = "invariant 1:1 real-world physical scale, accurately proportioned against adult human body and setting architecture, naturally placed or held matching situational context"
+        dim_3d_ratio_txt = "Tỉ lệ đời thực chuẩn xác (Đặt/cầm linh hoạt theo tình huống)"
 
     raw_rec_wardrobe = dna.get("recommended_wardrobe_en", "")
     if any(k in setting_archetype.lower() for k in ["bếp", "kitchen", "nấu", "cook"]) or any(k in prod_type_lower for k in ["xay", "chảo", "nồi", "bếp", "rửa"]):
@@ -1017,7 +1025,7 @@ def create_scene_details(target_id, mode, style):
         "locked_tuck_en": locked_tuck_en,
         "asym_lock_en": asym_lock_en,
         "master_wardrobe_locked": master_wardrobe_locked,
-        "recommended_setting_en": dna.get("recommended_setting_en", "tidy modern townhouse kitchen with clean countertops")
+        "recommended_setting_en": dna.get("recommended_setting_en", "tidy realistic townhouse setting")
     }
 
     fallback_prod_name = f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip()
@@ -1029,7 +1037,7 @@ def create_scene_details(target_id, mode, style):
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK: '{fixed_hook}' | BỐI CẢNH: {fixed_setting_base}
     DIỄN VIÊN KHÓA CỨNG: {detected_demographic_en}.
     KHÓA CẮT MAY BẤT ĐỐI XỨNG: {asym_lock_en if asym_lock_en else 'none'}
-    KHÓA HÌNH KHỐI 3 CHIỀU THỰC TẾ: {volumetric_form_en}
+    QUY CHUẨN TỈ LỆ THỰC TẾ: {volumetric_form_en}
     KHÓA TRANG PHỤC MASTER DUY NHẤT 4 CẢNH: {master_wardrobe_locked}
     SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
     GIÁ GỐC THỰC TẾ: '{orig_price_spoken}' | GIÁ SALE THỰC TẾ: '{sale_price_spoken}'
@@ -1059,9 +1067,9 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 eye-level three-quarter medium shot",
                 "expression_en": "looking at camera with natural empathetic smile",
-                "action_en": "natural opening action matching spoken situation, holding product steadily",
+                "action_en": "natural opening action matching spoken situation, interacting authentically with product (holding, placing, leaning or operating naturally)",
                 "sfx": "Foley âm thanh nhẹ nhàng đời thực",
-                "director": "Attention | Bám sát '{fixed_title}' | Phối cảnh 3D Master | Thoại on-camera từ 0.00s",
+                "director": "Attention | Bám sát '{fixed_title}' | Tương tác tự nhiên chuẩn tỉ lệ | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn (18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' chuẩn tiếng Hà Nội..."
             }},
             {{
@@ -1070,7 +1078,7 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
-                "action_en": "{v_proof.get('catalyst_action_en') if has_visual_proof else 'demonstrating functional details with steady hands'}",
+                "action_en": "{v_proof.get('catalyst_action_en') if has_visual_proof else 'demonstrating functional details with steady hands, naturally placed or held matching situation'}",
                 "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR'}",
                 "director": "Interest | Thao tác trực quan | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
@@ -1092,7 +1100,7 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
-                "action_en": "speaking with welcoming open-palm gestures, product neatly placed nearby",
+                "action_en": "speaking with welcoming open-palm gestures, product naturally situated nearby",
                 "sfx": "Tiếng chuông ting trong trẻo",
                 "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá nay giảm an toàn'}",
                 "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng hơn {orig_price_spoken}, nay giảm chỉ còn tầm {sale_price_spoken} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình nhé!'}"
@@ -1131,7 +1139,7 @@ def create_scene_details(target_id, mode, style):
         master_outfit_string = f"strictly wearing identical {master_wardrobe_locked}{asym_append} across all scenes without variation"
 
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
-    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant machine, bathtub-sized bowl, tiny motor base"
+    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale"
     wardrobe_negatives = ", changing clothes, different clothes, different outfit, wardrobe inconsistency, altered dress, changing clothing color, inconsistent outfit, changing hairstyle"
     base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}"
     
@@ -1167,7 +1175,7 @@ def create_scene_details(target_id, mode, style):
                 sfx_sound = f"{sfx_sound}, {situational_override['sfx']}"
         else:
             scene_setting_en = default_setting if is_fixed_location else (scn.get("setting_en") or default_setting)
-            raw_action = scn.get("action_en") or f"demonstrating {clean_prod_en} with steady hands"
+            raw_action = scn.get("action_en") or f"interacting with {clean_prod_en} naturally"
             is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed"])
 
         weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, scene_setting_en, is_indoor=is_indoor_scene)
@@ -1183,19 +1191,20 @@ def create_scene_details(target_id, mode, style):
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
+        # KHÓA TỈ LỆ VẬT LÝ THEO NGỮ CẢNH (LINH HOẠT KHÔNG GÒ BÓ)
         if scene_num == 1:
-            depth_3d_lock = f", three-quarter isometric perspective displaying strict 3D depth and invariant [{volumetric_form_en}] proportions"
+            depth_3d_lock = f", three-quarter perspective capturing authentic physical scale matching situational placement ({volumetric_form_en})"
         elif scene_num in [2, 3]:
-            depth_3d_lock = f", optical camera physically zooming closer to standard-sized item, maintaining invariant volumetric proportions ({volumetric_form_en}), camera lens physically moving closer, zero stretching, strictly no giant enlarged object, detached bowl maintaining standard 15cm width"
+            depth_3d_lock = f", optical camera physically zooming closer, maintaining invariant authentic scale ({volumetric_form_en}), camera moving closer without artificial enlargement of object"
         else:
-            depth_3d_lock = f", balanced proportions matching exact [{volumetric_form_en}] specifications"
+            depth_3d_lock = f", authentic proportions matching [{volumetric_form_en}]"
 
         if is_culinary:
             img_core = f"Macro food photography, {clean_prod_en} glistening with rich glossy sauce, steam rising, {actor_full}, {clean_action}{depth_3d_lock}"
         else:
-            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, holding {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
+            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
             
-        raw_img = f"{img_core}, 8k resolution, soft natural studio lighting, sharp focus --ar 9:16 --style raw --v 6.1"
+        raw_img = f"{img_core}, 8k resolution, soft natural lighting, sharp focus --ar 9:16 --style raw --v 6.1"
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         scn["img_neg"] = base_negative_prompt
         
@@ -1224,7 +1233,7 @@ def create_scene_details(target_id, mode, style):
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
         f"👗 <b>Khóa trang phục Master duy nhất:</b> {master_wardrobe_locked} (Đồng nhất 100% cả 4 cảnh)",
         f"💰 <b>Mức giá đồng bộ (Cảnh 4):</b> Bình thường ~{orig_price_spoken}, nay giảm ~{sale_price_spoken}",
-        f"📐 <b>Tỉ lệ khối 3D:</b> {dim_3d_ratio_txt} ({volumetric_form_en})"
+        f"📐 <b>Tỉ lệ thực tế:</b> {dim_3d_ratio_txt}"
     ]
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
         summary_lines.append(f"🎯 <b>Ghi chú riêng:</b> {user_custom_note}")
@@ -1554,7 +1563,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1718,9 +1727,11 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 🛑 QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI (VISUAL PROOF & TRANSFORMATION DNA):
                 - Xác định rõ ngành hàng và cặp trạng thái Before -> Catalyst Action -> After.
 
-                🛑 QUY CHUẨN KHÓA TỈ LỆ KHỐI 3 CHIỀU DÀI X RỘNG X CAO (DIMENSIONAL RATIO ANALYSIS):
-                - Quét kỹ số đo thực tế của sản phẩm (dài, rộng, cao, đường kính cối, dung tích):
-                  • Nếu là máy xay thịt / thực phẩm: aspect_ratio_3d = 'Cao 25cm x Đường kính cối 15cm (Dung tích 2L)', geometric_form_factor_en = 'compact 2-liter electric food processor, total assembled height 25cm, clear glass bowl diameter 15cm, motorized top power base that fits into two adult hands'.
+                🛑 QUY CHUẨN KHÓA TỈ LỆ THỰC TẾ & BẢN THỂ HỌC ĐỘNG (CONTEXT-DRIVEN PRODUCT SCALE):
+                - Quét kỹ sản phẩm để phân loại hình thể và không gian:
+                  • Nếu là đồ lớn/nội thất (tủ lạnh, tivi, sofa, đệm, giường): aspect_ratio_3d = 'Kích thước lớn thực tế theo vóc dáng 1m65 & sàn phòng', geometric_form_factor_en = 'authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human'.
+                  • Nếu là máy xay, đồ bếp cầm tay: aspect_ratio_3d = 'Cao 25cm x Cối 15cm (Nhỏ hơn cẳng tay, cầm/đặt tự nhiên)', geometric_form_factor_en = 'compact 2-liter electric food processor, total height approx 25cm (shorter than adult forearm), clear glass bowl diameter 15cm, motorized top power base held or operated comfortably with female hands'.
+                  • Nếu là son, mỹ phẩm, bỏ túi: aspect_ratio_3d = 'Nhỏ gọn cầm tay / bỏ túi', geometric_form_factor_en = 'compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers'.
 
                 🛑 QUY CHUẨN BÓC TÁCH GIÁ TIỀN CHUẨN XÁC TỪNG MỨC GIÁ:
                 - Quét OCR giá tiền trên ảnh:
@@ -1756,8 +1767,8 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         }},
                         "dimensional_ratio_analysis": {{
                             "aspect_ratio_3d": "Dài : Rộng : Cao cụ thể",
-                            "geometric_form_factor_en": "Mô tả hình khối 3 chiều chuẩn xác bằng tiếng Anh",
-                            "reference_anchor_comparison": "So sánh trực quan với bàn tay hoặc vật chuẩn"
+                            "geometric_form_factor_en": "Mô tả hình khối 3 chiều và tỉ lệ đời thực chuẩn xác bằng tiếng Anh",
+                            "reference_anchor_comparison": "So sánh trực quan với cơ thể người, sàn nhà, hoặc đồ vật xung quanh"
                         }},
                         "spatial_asymmetry_analysis": {{
                             "has_asymmetry": true/false,
@@ -1784,8 +1795,8 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         }},
                         "original_price_spoken": "Giá gốc phiên âm bằng chữ chuẩn (ví dụ: ba trăm năm mươi nghìn)",
                         "sale_price_spoken": "Giá sale phiên âm bằng chữ chuẩn (ví dụ: hai trăm chín mươi nghìn)",
-                        "recommended_setting_en": "Realistic clean modern townhouse kitchen with clean sink under 15 words",
-                        "recommended_wardrobe_en": "cream-white casual short-sleeve tee with beige linen kitchen apron",
+                        "recommended_setting_en": "Realistic clean modern townhouse setting under 15 words",
+                        "recommended_wardrobe_en": "cream-white casual short-sleeve tee with comfortable trousers",
                         "target_audience": "Tệp khách hàng mục tiêu",
                         "core_value": "Giá trị cốt lõi",
                         "pain_points": "Nỗi đau thực tế",
@@ -1793,7 +1804,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "recommended_format": "Phân tích và đề xuất hình thức phù hợp nhất",
                         "format_reason": "Lý do vì sao sản phẩm này nên làm theo hình thức trên",
                         "operational_mechanism": "Phân tích bản chất cơ chế hoạt động thực tế từng bước",
-                        "correct_ergonomic_grip": "Tư thế cầm nắm công thái học chuẩn đời thực của sản phẩm",
+                        "correct_ergonomic_grip": "Tư thế cầm nắm/kê đặt công thái học chuẩn đời thực của sản phẩm",
                         "hero_sku_color": "Mã màu bán chạy nhất (Hero SKU)",
                         "color_palette": "Bảng màu toàn bộ",
                         "what_and_unique": "[Tên sản phẩm]: [Định danh sản phẩm và điểm độc bản USP vượt trội]",
@@ -1847,7 +1858,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma trận Tỉ lệ Khối 3D & Khóa trang phục bất biến!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Ma trận Tỉ lệ Thực tế & Khóa trang phục bất biến!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
@@ -1923,18 +1934,21 @@ if isinstance(ca, dict):
                 <div class="dna-card-title">💡 4. Chuẩn Bối Cảnh & Mẹo Đời Sống</div>
                 <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Nhà phố/Chung cư sạch sẽ'))}</span></div>
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
-                <div class="dna-row"><span class="dna-label">📐 Tỉ lệ khối 3D:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{dim_txt_display}</span></div>
+                <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">🎨 Khóa phối cảnh chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', 'Tự nhiên'))}</span></div>
                 <div class="dna-row"><span class="dna-label" style="color:#15803d;">📣 Kêu gọi tương tác (CTA):</span><span class="dna-text" style="color:#15803d; font-weight:700;">Thảo luận, chia sẻ mẹo hay & Follow kênh đón xem tập sau</span></div>
             </div>
             """, unsafe_allow_html=True)
         else:
+            orig_p_display = ca.get('original_price_spoken', '')
+            sale_p_display = ca.get('sale_price_spoken', '')
+            price_display_text = f"Bình thường ~{orig_p_display}, nay giảm ~{sale_p_display}" if orig_p_display and sale_p_display else clean_analysis_text(ca.get('rounded_price_anchor', ''))
             st.markdown(f"""
             <div class="dna-card">
                 <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh, Động Lực Học & Mức Giá</div>
                 <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Nhà phố/Chung cư sạch sẽ'))}</span></div>
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
-                <div class="dna-row"><span class="dna-label">📐 Tỉ lệ khối 3D (Dài x Rộng x Cao):</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
+                <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
                 <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường ~{ca.get('original_price_spoken', '')}, nay giảm ~{ca.get('sale_price_spoken', '')}</span></div>
             </div>
@@ -2067,7 +2081,7 @@ if all_sc:
             
             c_p1, c_p2 = st.columns(2)
             with c_p1:
-                st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa phối cảnh khối 3D):**")
+                st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa tỉ lệ vật lý theo ngữ cảnh):**")
                 st.code(img_p := scn.get('img_p', ''), language="text")
                 safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
                 
@@ -2083,7 +2097,7 @@ if all_sc:
                 
             st.markdown("---")
 
-    # 1. KỊCH BẢN ĐÃ DỰNG CHI TIẾT (CHỈ HIỂN THỊ KHI ĐÃ CÓ KỊCH BẢN HOÀN THÀNH)
+    # 1. KỊCH BẢN ĐÃ DỰNG CHI TIẾT (ẨN THÔNG MINH KHI CHƯA CÓ KỊCH BẢN HOÀN THÀNH)
     if comp_sc:
         st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
         for outline in comp_sc:
