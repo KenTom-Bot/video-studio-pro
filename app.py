@@ -129,13 +129,13 @@ def number_to_vietnamese_words(n: int) -> str:
         elif t == 1:
             res.append("mười")
             if u == 1: res.append("một")
-            elif u == 4: res.append("bốn")   # KHÓA CỨNG "mười bốn" (TUYỆT ĐỐI KHÔNG DÙNG "TƯ")
+            elif u == 4: res.append("bốn")
             elif u == 5: res.append("lăm")
             elif u != 0: res.append(digits[u])
         else:
             res.append(digits[t] + " mươi")
             if u == 1: res.append("mốt")
-            elif u == 4: res.append("bốn")   # KHÓA CỨNG "hai mươi bốn..." (TUYỆT ĐỐI KHÔNG DÙNG "TƯ")
+            elif u == 4: res.append("bốn")
             elif u == 5: res.append("lăm")
             elif u != 0: res.append(digits[u])
         return " ".join(res)
@@ -254,7 +254,6 @@ POLICY_REPLACEMENTS = {
 }
 
 SOUTHERN_TO_HANOI = {
-    # 1. KHÓA CỨNG TOÀN BỘ SỐ 4 PHÁT ÂM CHUẨN LÀ "BỐN" (DIỆT SẠCH "TƯ")
     r'\btư\s+mươi\b': 'bốn mươi',
     r'\bmười\s+tư\b': 'mười bốn',
     r'\btrăm\s+tư\b': 'trăm bốn mươi',
@@ -269,8 +268,6 @@ SOUTHERN_TO_HANOI = {
     r'\bhai\s+tư\b': 'hai mươi bốn',
     r'\bba\s+tư\b': 'ba mươi bốn',
     r'\bhăm\s+tư\b': 'hai mươi bốn',
-
-    # 2. F&B, ĐỒ ĂN VẶT & ẨM THỰC
     r'\bba\s*rọi\b': 'ba chỉ',
     r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn',
     r'\bchiên\b': 'rán',
@@ -285,8 +282,6 @@ SOUTHERN_TO_HANOI = {
     r'\brỗng\s*ruột\b': 'xốp tan',
     r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man',
     r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ',
-
-    # 3. GIA DỤNG, BẾP & TẨY RỬA
     r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua',
     r'\bxả\s*nước\b': 'tráng nước',
     r'\brải\s+vào\b': 'xếp vào',
@@ -301,8 +296,6 @@ SOUTHERN_TO_HANOI = {
     r'\bbàn\s*ủi\b': 'bàn là',
     r'\bbao\s*rác\b': 'túi rác',
     r'\bchổi\s*lông\s*gà\b': 'chổi phất trần',
-
-    # 4. CÔNG NGHỆ, ĐIỆN TỬ & PHỤ KIỆN
     r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru',
     r'\bêm\s+ái\b': 'êm ru',
     r'\bgiữa\s+tiếng\s+còi\s+xe\s+inh\s+ỏi\b': 'ngoài đường còi xe ồn ào',
@@ -311,15 +304,11 @@ SOUTHERN_TO_HANOI = {
     r'\bnét\s+căng\b': 'rõ mồn một',
     r'\bpin\s*trâu\b': 'pin dùng trâu bò',
     r'\bsạc\s*lẹ\b': 'sạc nhanh',
-
-    # 5. MỸ PHẨM & LÀM ĐẸP
     r'\bthấm\s*lẹ\b': 'thấm nhanh',
     r'\bbết\s*rít\b': 'nhờn dính',
     r'\bxài\s*êm\b': 'dùng êm',
     r'\bmịn\s*mướt\b': 'căng mướt',
     r'\blột\s*mụn\b': 'hút mụn',
-
-    # 6. THỜI TRANG & MAY MẶC
     r'\bbận\s+đồ\b': 'mặc đồ',
     r'\bbận\s+áo\b': 'mặc áo',
     r'\bbận\s+quần\b': 'mặc quần',
@@ -331,8 +320,6 @@ SOUTHERN_TO_HANOI = {
     r'\bmang\s*dép\b': 'đi dép',
     r'\bdây\s*nịt\b': 'thắt lưng',
     r'\bbóp\s*tiền\b': 'ví tiền',
-
-    # 7. ĐẠI TỪ & KHẨU NGỮ THÔNG DỤNG
     r'\bngàn\b': 'nghìn',
     r'\bxài\b': 'dùng',
     r'\bgiùm\b': 'hộ',
@@ -404,7 +391,7 @@ def extract_situational_scenario_en(vo_text: str):
     
     if any(k in vo_lower for k in ["xem phim", "cày phim", "coi phim", "xem tivi", "lướt phim", "chiếu phim"]):
         return {
-            "setting": "cozy living room with comfortable sofa, ambient glowing reflection from TV/projector screen in darkened room",
+            "setting": "cozy living room with comfortable sofa, ambient glowing reflection from TV screen in darkened room",
             "action": "sitting comfortably curled up on soft sofa, holding product naturally while enjoying TV screen",
             "sfx": "subtle movie background audio, quiet late-night room ambiance",
             "is_indoor": True
@@ -833,11 +820,12 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
       • Nếu ở ngoài trời: Mặt đường ướt, hạt mưa rơi, vũng nước phản chiếu (`wet pavement with rain puddles, gentle raindrops in the air`).
       • SFX BẮT BUỘC có âm thanh tương ứng (`Foley: soft rain pattering against window pane, ...`).
 
-    🛑 KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG (STRICT ANATOMICAL ASYMMETRY LOCK):
+    🛑 KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC:
     - Khi trang phục hoặc sản phẩm có chi tiết bất đối xứng (ví dụ: xẻ tà váy, túi ngực, vạt áo chéo, khóa kéo lệch):
-      • BẮT BUỘC phải mô tả vị trí từ GÓC NHÌN GIẢI PHẪU CỦA NGƯỜI MẶC: 'wearer's anatomical right leg / side seam' hoặc 'wearer's anatomical left leg / side seam'.
-      • NẾU XẺ BÊN HÔNG: Bắt buộc dùng 'side-seam slit', TUYỆT ĐỐI CẤM nhầm thành 'front slit' (xẻ trước).
-      • Trong Negative Prompt bắt buộc có: 'mirrored slit, slit on wrong leg, front slit, inverted design'.
+      • TUYỆT ĐỐI KHÔNG dùng từ đối lập 'camera frame left' trong câu lệnh dương tính vì sẽ làm AI bị lộn bên!
+      • NẾU XẺ BÊN PHẢI NGƯỜI MẶC: Bắt buộc dùng cú pháp khóa tuyệt đối: 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, while the entire left side and front panel are completely solid unbroken fabric with zero slit'.
+      • ĐẶC BIỆT ĐỘ SÂU XẺ: Phân tích kỹ ảnh gốc: Nếu xẻ nhẹ ngang gối thì ghi 'subtle modest knee-length slit', nếu xẻ cao thì ghi 'high thigh slit'. TUYỆT ĐỐI KHÔNG tự ý biến xẻ nhẹ thành xẻ cao bạo liệt!
+      • Trong Negative Prompt bắt buộc có: 'mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, high slit'.
 
     🛑 KHÓA TRẠNG THÁI SƠ VIN TRANG PHỤC ĐỒNG BỘ THEO PHÂN TÍCH THỰC TẾ:
     - Trạng thái cạp áo (sơ vin nhét vào cạp quần HOẶC buông thõng tự nhiên) được quyết định dựa vào phân tích thời trang và hoàn cảnh thực tế, sau đó BẮT BUỘC phải đồng nhất 100% xuyên suốt cả 4 phân cảnh!
@@ -875,19 +863,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - CẢNH 2: KOC xưng tôi/mình/em, nói chuyện tâm sự chỉ cho người xem xem tính năng hoặc mẹo hay. CẤM THUYẾT MINH!
     - Đồng nhất 100% chất giọng, tông giọng, độ tuổi và kiểu thoại xuyên suốt cả 4 cảnh.
 
-    🛑 NGUYÊN TẮC PHỐI ĐỒ THỜI TRANG (SMART MIX & MATCH):
-    1. THỜI TRANG PHỐI ĐỒ (is_fashion_styling = true): 
-       - Khuôn mặt, kiểu tóc, màu tóc đen tuyền giữ nguyên 100%.
-       - Trang phục ('scene_outfit_en'): Áp dụng các mẫu quần/chân váy phối đồ ăn khớp với hoàn cảnh từng cảnh.
-    2. CÁC SẢN PHẨM KHÁC (is_fashion_styling = false): Trang phục khóa cứng 1 bộ suốt 4 cảnh.
-
     🛑 CƯỠNG CHẾ 100% GIỌNG HÀ NỘI CHUẨN:
     - 100% dùng từ 'nghìn' (CẤM TUYỆT ĐỐI TỪ 'NGÀN'). CẤM TUYỆT ĐỐI TỪ 'TRỢ GIÁ', 'PHIÊN LIVE'. CẤM giọng thuyết minh ngoài.
     - {char_rules}
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V167.0 HOÀN HẢO TOÀN DIỆN (TỐI ƯU TOKEN & PROMPT)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V168.0 HOÀN HẢO TOÀN DIỆN (FIX DỨT ĐIỂM XẺ TÀ)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -933,12 +915,13 @@ def create_scene_details(target_id, mode, style):
         else:
             locked_tuck_en = "shirt hem strictly neatly tucked into waistband with a clean flat waistline"
 
+    # PHÂN TÍCH KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC
     asym_data = dna.get("spatial_asymmetry_analysis", {})
     asym_lock_en = ""
     asym_neg_en = ""
     if isinstance(asym_data, dict) and asym_data.get("has_asymmetry", False):
         asym_lock_en = asym_data.get("en_prompt_lock", "")
-        asym_neg_en = asym_data.get("negative_prompt_lock", "mirrored slit, slit on wrong leg, front slit, inverted design")
+        asym_neg_en = asym_data.get("negative_prompt_lock", "mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut")
 
     v_proof = dna.get("visual_proof_dna", {})
     has_visual_proof = isinstance(v_proof, dict) and bool(v_proof.get("catalyst_action_en"))
@@ -974,18 +957,18 @@ def create_scene_details(target_id, mode, style):
     fallback_prod_name = f"authentic {condensed_dna.get('hero_sku', '')} {condensed_dna.get('product', 'product')}".strip()
     clean_prod_en = sanitize_third_party_ip(fallback_prod_name)
 
-    # KHỬ TRÙNG LẶP TOKEN: Prompt Text truyền dữ liệu súc tích, các luật cốt lõi đã nằm trong System Prompt
     prompt_text = f"""
     DỮ LIỆU ĐẦU VÀO: {json.dumps(condensed_dna, ensure_ascii=False)}
     THỂ LOẠI: '{current_active_mode}' | HÌNH THỨC: '{presentation_format}'
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK: '{fixed_hook}' | BỐI CẢNH: {fixed_setting_base}
     DIỄN VIÊN KHÓA CỨNG: {detected_demographic_en}.
+    KHÓA CẮT MAY BẤT ĐỐI XỨNG: {asym_lock_en if asym_lock_en else 'none'}
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
     {{
         "title": "{fixed_title}",
-        "is_fashion_styling": false,
+        "is_fashion_styling": true,
         "presentation_format_used": "{presentation_format}",
         "voice": {{"tone": "{voice_guidance}"}},
         "outfit_vi": "Mô tả trang phục phù hợp với {fixed_setting_base}",
@@ -1004,6 +987,7 @@ def create_scene_details(target_id, mode, style):
                 "scene": 1, "aida_stage": "Attention",
                 "setting": "Mô tả bối cảnh mở màn...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "scene_outfit_en": "Mô tả chi tiết trang phục kết hợp chi tiết xẻ sườn nếu có",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "expression_en": "looking at camera with natural empathetic smile",
                 "action_en": "natural opening action matching spoken situation, holding product steadily",
@@ -1015,6 +999,7 @@ def create_scene_details(target_id, mode, style):
                 "scene": 2, "aida_stage": "Interest",
                 "setting": "Mô tả bối cảnh cận cảnh...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "scene_outfit_en": "Trang phục đồng nhất",
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
                 "action_en": "{v_proof.get('catalyst_action_en') if has_visual_proof else 'demonstrating functional details with steady hands'}",
@@ -1026,6 +1011,7 @@ def create_scene_details(target_id, mode, style):
                 "scene": 3, "aida_stage": "Desire",
                 "setting": "Mô tả bối cảnh thực tế...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "scene_outfit_en": "Trang phục đồng nhất",
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
                 "action_en": "{v_proof.get('after_transformation_en') if has_visual_proof else 'performing practical task with immediate effective results'}",
@@ -1037,6 +1023,7 @@ def create_scene_details(target_id, mode, style):
                 "scene": 4, "aida_stage": "Action",
                 "setting": "Mô tả bối cảnh kết thúc...",
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "scene_outfit_en": "Trang phục đồng nhất",
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
                 "action_en": "speaking with welcoming open-palm gestures, product neatly placed nearby",
@@ -1069,7 +1056,7 @@ def create_scene_details(target_id, mode, style):
     locked_bottoms = c_mat.get("locked_bottoms") or "comfortable trousers"
     default_setting = c_mat.get("locked_setting") or condensed_dna.get("recommended_setting_en") or (outline.get("setting") or "warm realistic indoor setting")
     
-    is_fashion_styling = res.get("is_fashion_styling", False)
+    is_fashion_styling = res.get("is_fashion_styling", True)
     clean_prod_en = sanitize_third_party_ip(res.get("clean_product_name_en") or fallback_prod_name)
     product_scale_en = res.get("product_scale_en") or "1:1 adult hand scale"
     
@@ -1077,7 +1064,6 @@ def create_scene_details(target_id, mode, style):
     asym_append = f", {asym_lock_en}" if asym_lock_en else ""
     wardrobe_str = f"wearing {locked_tops}, {locked_tuck}, and {locked_bottoms}{asym_append}"
     
-    # TÁCH RIÊNG NEGATIVE PROMPT (KHÔNG NHỒI VÀO CHUỖI PROMPT CHÍNH)
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
     base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}"
     
@@ -1104,7 +1090,6 @@ def create_scene_details(target_id, mode, style):
         scene_num = scn.get("scene", 1)
         vo_line = scn.get("voiceover", "")
 
-        # 1. BÓC TÁCH HOẠT CẢNH ĐỜI THỰC
         situational_override = extract_situational_scenario_en(vo_line)
         if situational_override:
             scene_setting_en = situational_override["setting"]
@@ -1117,28 +1102,33 @@ def create_scene_details(target_id, mode, style):
             raw_action = scn.get("action_en") or f"demonstrating {clean_prod_en} with steady hands"
             is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed"])
 
-        # 2. ĐỒNG BỘ THỜI TIẾT
         weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, scene_setting_en, is_indoor=is_indoor_scene)
         if weather_env and not any(k in scene_setting_en.lower() for k in ["rain", "sunny", "nighttime", "chilly"]):
             scene_setting_en = f"{scene_setting_en}, {weather_env}"
         if env_sfx and "rain" not in sfx_sound.lower() and "breeze" not in sfx_sound.lower():
             sfx_sound = f"{sfx_sound}, {env_sfx}"
         
-        actor_full = f"{actor_base}, wearing {scn.get('scene_outfit_en') or wardrobe_str}" if is_fashion_styling else f"{actor_base}, {wardrobe_str}"
+        # ĐỒNG NHẤT TRANG PHỤC KÈM KHÓA XẺ TÀ CỐ ĐỊNH XUYÊN SUỐT
+        active_wardrobe = scn.get('scene_outfit_en') or wardrobe_str
+        if asym_lock_en and asym_lock_en not in active_wardrobe:
+            active_wardrobe = f"{active_wardrobe}, {asym_lock_en}"
+        actor_full = f"{actor_base}, wearing {active_wardrobe}"
+        
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
 
-        # 3. TỐI ƯU PROMPT ẢNH (MIDJOURNEY / FLUX CHUẨN THAM SỐ)
+        # THÊM MỎ NEO TƯ THẾ HỖ TRỢ XẺ TÀ NẾU CÓ BẤT ĐỐI XỨNG
+        asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
+
         if is_culinary:
             img_core = f"Macro food photography, {clean_prod_en} glistening with rich glossy sauce, steam rising, {actor_full}, {clean_action}"
         else:
-            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}, {micro_expr_en}, {clean_action}, holding {clean_prod_en} ({product_scale_en})"
+            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, holding {clean_prod_en} ({product_scale_en})"
             
         raw_img = f"{img_core}, 8k resolution, soft natural studio lighting, sharp focus --ar 9:16 --style raw --v 6.1"
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         scn["img_neg"] = base_negative_prompt
         
-        # 4. TỐI ƯU PROMPT VEO 3 CÔ ĐỌNG (ĐIỂM NGỌT: 70-85 TỪ, SẠCH TEXT-BLEEDING)
         audio_anchor = "Audio Direction: Spoken in clear native Northern Vietnamese Hanoi accent, natural conversational pacing."
         if is_viral and scene_num == 4:
             action_phrase = "speaking with welcoming open-palm gestures directly to lens"
@@ -1146,7 +1136,7 @@ def create_scene_details(target_id, mode, style):
             action_phrase = f"Character visibly performing: {clean_action}, interacting with {clean_prod_en} ({product_scale_en})"
 
         raw_vid = (
-            f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}. "
+            f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}{asym_pose_anchor}. "
             f"Action: Visibly speaking to camera with natural on-camera lip-sync from 0.00s. "
             f"{action_phrase}. "
             f"{audio_anchor} Spoken audio: \"{vo_line}\", Foley: [{sfx_sound}]. "
@@ -1493,7 +1483,7 @@ with st.sidebar:
                     elif renew_choice == "Vĩnh viễn": target_exp_str = "2099-12-31"
                     elif renew_choice != "Giữ nguyên hạn hiện tại":
                         dur_map_v = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
-                        target_exp_str = (datetime.now() + timedelta(days=dur_days_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+                        target_exp_str = (datetime.now() + timedelta(days=dur_map_v.get(renew_choice, 30))).strftime("%Y-%m-%d")
 
                     c_act1, c_act2 = st.columns(2)
                     if c_act1.button("🔄 Cập Nhật", key=f"save_renew_{acc_mail}", use_container_width=True, disabled=is_system_busy):
@@ -1557,7 +1547,7 @@ if is_viral_mode:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: nửa đêm xem phim ăn snack, son thoa lên môi căng mọng):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: váy xẻ tà bên sườn phải người mặc, son thoa lên môi căng mọng):", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
@@ -1576,7 +1566,7 @@ else:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: nửa đêm xem phim ăn snack, son thoa lên môi căng mọng):", key=f"custom_note_prod_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: váy xẻ tà bên sườn phải người mặc, son thoa lên môi căng mọng):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2, col_opt3 = st.columns([1.2, 1.2, 1.2])
 style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
@@ -1662,8 +1652,12 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                   • Decor/Nội thất: góc tối bừa bộn -> bấm công tắc bật đèn -> bừng sáng tông ấm điện ảnh.
                   • Sức khỏe/TPCN: CỐ DỊNH KHÔNG CAM KẾT CHỮA BỆNH, định vị thói quen sống khỏe (viên sủi sùng sục trong nước trong vắt, thần thái rạng rỡ tràn đầy năng lượng).
 
-                🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG:
-                  • Váy xẻ tà sườn phải người mặc -> en_prompt_lock = 'asymmetrical high side-seam slit strictly positioned on the wearer anatomical right leg (camera frame left), strictly along side seam with zero front slit', negative_prompt_lock = 'mirrored slit, slit on wrong leg, front slit, inverted design'.
+                🛑 QUY CHUẨN KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC:
+                - Phân tích kỹ bức ảnh xem vết xẻ nằm ở đâu và độ sâu như thế nào:
+                  • Váy xẻ tà bên sườn phải người mặc (dù chụp ảnh góc nào):
+                    en_prompt_lock = 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, with subtle modest knee-level slit depth, while the entire left side and front panel are completely solid unbroken fabric with zero slit'
+                    negative_prompt_lock = 'mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut, high thigh slit'
+                  • TUYỆT ĐỐI KHÔNG dùng từ 'camera frame left' trong câu lệnh dương tính vì sẽ làm AI bị lộn bên!
 
                 🛑 QUY CHUẨN PHÂN TÍCH SƠ VIN THỜI TRANG ĐỘNG:
                   • Đồ bếp, làm sạch, nội trợ, ở nhà, ăn uống, áo phông rộng, áo len nỉ dày -> decision = 'untucked', en_prompt_lock = 'shirt hem strictly cleanly untucked, resting naturally at hips for casual comfort'.
@@ -1690,9 +1684,9 @@ if st.button("🚀 PHÂN TÍCH DNA & SINH 5 KỊCH BẢN ĐA VŨ TRỤ", type="p
                         "spatial_asymmetry_analysis": {{
                             "has_asymmetry": true/false,
                             "feature_type": "xẻ tà / vạt chéo / túi ngực lệch / nơ vai / khóa kéo sườn",
-                            "anatomical_location_vi": "Vị trí giải phẫu chuẩn xác (ví dụ: xẻ bên sườn phải người mặc, không xẻ đằng trước)",
-                            "en_prompt_lock": "asymmetrical high side-seam slit strictly positioned on the wearer anatomical right leg (camera frame left), strictly along side seam with zero front slit",
-                            "negative_prompt_lock": "mirrored slit, slit on wrong leg, front slit, inverted design"
+                            "anatomical_location_vi": "Vị trí giải phẫu chuẩn xác (ví dụ: xẻ tà nhẹ bên sườn phải người mặc, không xẻ đằng trước)",
+                            "en_prompt_lock": "asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, subtle modest knee-level slit, while the entire left side and front panel are completely solid unbroken fabric with zero slit",
+                            "negative_prompt_lock": "mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut, high thigh slit"
                         }},
                         "visual_proof_dna": {{
                             "category_type": "beauty_cosmetics / home_cleaning / mom_and_baby / kids_toy / home_decor / wellness_nutrition / general",
