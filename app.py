@@ -108,6 +108,11 @@ def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
     except Exception:
         return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
+def clean_html(raw_html: str) -> str:
+    """Loại bỏ triệt để khoảng thụt đầu dòng (leading indentation) để CommonMark không biến HTML thành thẻ code <pre><code>"""
+    if not raw_html: return ""
+    return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
+
 # ==============================================================================
 # THUẬT TOÁN PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT CHUẨN XÁC TỪNG CON SỐ (KHÓA CỨNG "BỐN")
 # ==============================================================================
@@ -456,35 +461,35 @@ def extract_situational_scenario_en(vo_text: str):
     if any(k in vo_lower for k in ["xem phim", "cày phim", "coi phim", "xem tivi", "lướt phim", "chiếu phim"]):
         return {
             "setting": "cozy living room with comfortable sofa, ambient glowing reflection from TV screen in darkened room",
-            "action": "sitting comfortably curled up on soft sofa, holding or placing product naturally while enjoying TV screen",
+            "action": "First, sitting comfortably curled up on soft sofa; then smoothly holding or interacting with product naturally while enjoying TV screen",
             "sfx": "subtle movie background audio, quiet late-night room ambiance",
             "is_indoor": True
         }
     elif any(k in vo_lower for k in ["đi làm", "sáng sớm", "dậy muộn", "vội vã", "ra ngoài", "chuẩn bị đi"]):
         return {
             "setting": "bright modern apartment entryway beside vanity mirror with crisp morning sunlight",
-            "action": "preparing to head out, holding or wearing product with brisk realistic morning momentum",
+            "action": "First, checking reflection in mirror; then smoothly holding or preparing product with brisk realistic morning momentum",
             "sfx": "morning birds chirping outside, key chime",
             "is_indoor": True
         }
     elif any(k in vo_lower for k in ["nấu ăn", "nấu cơm", "bữa cơm", "vào bếp", "đang rán", "đang nấu", "chiều muộn"]):
         return {
             "setting": "tidy modern townhouse kitchen beside sleek induction cooktop with clean cookware",
-            "action": "standing naturally by stove wearing apron, interacting smoothly with cooking setup and product",
+            "action": "First, standing naturally by cooktop wearing apron; then smoothly interacting with cooking setup and product with steady hands",
             "sfx": "gentle sizzling cooking sounds, kitchen Foley",
             "is_indoor": True
         }
     elif any(k in vo_lower for k in ["đi làm về", "về đến nhà", "mệt mỏi sau", "sau giờ làm", "tan ca"]):
         return {
             "setting": "warm apartment entryway hallway or cozy living armchair with gentle homecoming ambient lighting",
-            "action": "relaxing into armchair after a long busy day, unwinding naturally with product",
+            "action": "First, closing door softly; then smoothly relaxing into armchair while unwinding naturally with product",
             "sfx": "door softly closing, gentle sigh of relief",
             "is_indoor": True
         }
     elif any(k in vo_lower for k in ["đi ngủ", "lên giường", "trước khi ngủ", "nằm lướt", "dưỡng da ban đêm"]):
         return {
             "setting": "peaceful modern bedroom with soft bedding, warm gentle bedside lamp lighting",
-            "action": "sitting comfortably propped against bed pillows, holding product in serene bedtime routine",
+            "action": "First, propping comfortably against soft bed pillows; then smoothly holding or applying product in serene bedtime routine",
             "sfx": "peaceful nighttime room silence",
             "is_indoor": True
         }
@@ -866,20 +871,25 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - VỚI SẢN PHẨM THỜI TRANG (is_fashion_styling = true):
       • Áo mẫu chính giữ nguyên 100%, chỉ phối đổi quần/chân váy theo nguyên tắc thời trang.
 
-    🛑 KHÓA TỈ LỆ THỰC TẾ & TƯ THẾ TƯƠNG TÁC THEO TỪNG LOẠI SẢN PHẨM (CONTEXT-DRIVEN PHYSICAL SCALE):
+    🛑 CHUỖI HÀNH ĐỘNG TUẦN TỰ KHÔNG BIẾN DẠNG (SEQUENTIAL ACTION TIMELINE):
+    - Cho phép nhân vật thao tác nhiều hành động liên hoàn sinh động (mở nắp, nhấn nút, cắm sạc, kiểm tra, thoa kem, múc nguyên liệu...).
+    - BẮT BUỘC viết cấu trúc action_en theo liên từ thời gian tuần tự nối tiếp: 'First, [action 1]; then smoothly, [action 2]; while [action 3]'.
+    - KHÓA TIẾP XÚC CƠ HỌC (BOUNDARY CONTACT LOCK): Ngón tay và bàn tay nhân vật tiếp xúc ngoài dứt khoát, không bao giờ hòa tan, dính liền hay chảy vào thân vỏ sản phẩm.
+    - KHÓA VẬT THỂ RẮN 100% (RIGID SOLID INVARIANCE): Sản phẩm là khối vật lý rắn 100% giữ nguyên kích thước hình học, không morphing, không biến dạng, không tự phát sinh thêm chi tiết thừa (zero phantom parts).
+
+    🛑 KHÓA TỈ LỆ THỰC TẾ & TƯ THẾ TƯƠNG TÁC THEO TỪNG LOẠI SẢN PHẨM:
     - KHÔNG ĐƯỢC GÒ BÓ SẢN PHẨM TRÊN MẶT BÀN BẾP nếu sản phẩm là đồ lớn, nội thất, cá nhân hoặc ngoài trời!
     - ĐẶT / CẦM / KÊ PHẢI HOÀN TOÀN TỰ NHIÊN THEO TÌNH HUỐNG KỊCH BẢN:
       • Đồ lớn / Nội thất (Tủ lạnh, tivi, sofa, đệm, giường, bàn ghế): Kê đặt vững chắc trên sàn nhà (grounded on floor / wall-mounted), nhân vật đứng cạnh, mở cửa, ngồi hoặc nằm lên cân xứng với chiều cao 1m65 của con người và căn phòng.
-      • Đồ vừa / Cầm tay (Máy xay, chảo, nồi, cốc, bình): Cầm 1-2 tay hoặc đặt trên kệ/bếp/bồn rửa tự nhiên, tỉ lệ nhỏ gọn hơn cẳng tay và vai người.
+      • Đồ vừa / Cầm tay (Máy xay, chảo, nồi, cốc, củ sạc, dây cáp): Cầm 1-2 tay hoặc đặt trên kệ/bàn làm việc/bếp/bồn rửa tự nhiên.
       • Đồ nhỏ / Cá nhân (Son, phấn, trang sức): Cầm ngón tay, bỏ túi, đặt khay trang điểm.
-    - KHÓA KHUNG XƯƠNG CƠ HỌC VẬT RẮN (RIGID SOLID INVARIANCE): Sản phẩm giữ nguyên cấu trúc vật rắn 100%, cấm biến dạng méo mó, cấm sinh chi tiết thừa, tay cầm tiếp xúc ngoài sạch sẽ không bị dính tan vào vỏ máy.
 
     🛑 TỐI ƯU VEO 3 CHỐNG VẤP VÀ CHỐNG LẶP LỜI THOẠI (VEO 3 AUDIO-VISUAL TAIL ANCHOR):
     - Cấu trúc prompt Veo 3 chia rõ 2 thì: Nhân vật nói câu thoại duy nhất một lần từ 0.00s, sau khi dứt lời ngậm miệng mỉm cười tự nhiên và tiếp tục hoàn tất cử chỉ hành động đến hết thời lượng video.
     - Câu thoại viết liền mạch, cấm dấu chấm lửng '...', chỉ dùng dấu phẩy và dấu chấm rõ ràng.
 
     🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI:
-    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại (ngồi sofa xem phim, vội đi làm, đứng nấu cơm...).
+    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại (ngồi sofa xem phim, cắm sạc bàn làm việc, vội đi làm, đứng nấu cơm...).
 
     🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI:
     - CẢNH 2 (Thử thách trực quan): Thao tác bóc tách, thử nghiệm thực tế.
@@ -905,7 +915,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V177.0 (VEO 3 SAFE & SOFT RANGE PRICING)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V179.0 (MASTER COMPLETE ENGINE)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -991,26 +1001,31 @@ def create_scene_details(target_id, mode, style):
     v_proof = dna.get("visual_proof_dna", {})
     has_visual_proof = isinstance(v_proof, dict) and bool(v_proof.get("catalyst_action_en"))
 
-    culinary_info = dna.get("culinary_dna", {})
-    is_culinary = False
-    if isinstance(culinary_info, dict) and culinary_info.get("is_culinary"):
-        is_culinary = True
-    else:
-        prod_kw = str(dna.get("what_and_unique", "")).lower()
-        is_culinary = any(k in prod_kw for k in ["ăn", "thịt", "bánh", "tóp mỡ", "sốt", "mắm", "chả", "nem", "gà", "cá", "ẩm thực", "đồ ăn", "món"])
+    # ĐA GIÁC QUAN TOÀN NĂNG (UNIVERSAL SENSORY MATRIX)
+    sensory_info = dna.get("universal_sensory_matrix", {})
+    if not isinstance(sensory_info, dict) or not sensory_info.get("tactile_feel"):
+        sensory_info = {
+            "category_type_vi": "Đa giác quan đời sống thực tế",
+            "tactile_feel": "Bề mặt đầm chắc, vỏ nhám mịn chống bám vân tay, cầm nắm vừa vặn",
+            "visual_aesthetic": "Màu sắc hoàn thiện tinh xảo, đường nét sắc sảo, đèn led báo hiệu trực quan",
+            "auditory_asmr": "Tiếng click đanh gọn chắc nịch, tiếng kết nối dứt khoát êm ái",
+            "functional_delight": "Trải nghiệm tiện lợi mượt mà, thao tác an tâm tin cậy"
+        }
 
-    # THIẾT LẬP MỎ NEO TỈ LỆ THỰC TẾ & BẢN THỂ HỌC ĐỘNG (KHÔNG GÒ BÓ MẶT BÀN)
     prod_type_lower = str(dna.get("what_and_unique", "")).lower()
     
     if any(k in prod_type_lower for k in ["tủ lạnh", "refrigerator", "tivi", "tv", "sofa", "đệm", "nệm", "mattress", "giường", "bed", "máy giặt", "tủ quần áo", "bàn ăn", "ghế massage"]):
-        volumetric_form_en = "authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human (standing beside refrigerator, sitting on sofa, or resting on mattress), natural spacious room presence"
+        volumetric_form_en = "authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human, natural spacious room presence"
         dim_3d_ratio_txt = "Kích thước nội thất lớn (Tỉ lệ chuẩn theo vóc dáng 1m65 & sàn phòng)"
-    elif any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor", "osaka"]):
+    elif any(k in prod_type_lower for k in ["máy xay", "blender", "xay thịt", "food processor"]):
         volumetric_form_en = "compact 2-liter electric food processor, total height approx 25cm (noticeably shorter than adult forearm), clear glass bowl diameter 15cm, motorized top power base held or operated comfortably with female hands, positioned naturally according to situational action"
         dim_3d_ratio_txt = "Cao 25cm x Cối 15cm (Nhỏ hơn cẳng tay, cầm/đặt tự nhiên)"
     elif any(k in prod_type_lower for k in ["chảo", "nồi", "cookware"]):
         volumetric_form_en = "standard cookware approx 28cm diameter, proportioned accurately against human torso and stovetop, handled naturally with one or two hands"
         dim_3d_ratio_txt = "Đường kính 28cm x Cao 6cm (Cầm/đặt trên bếp tự nhiên)"
+    elif any(k in prod_type_lower for k in ["sạc", "charger", "củ sạc", "dây sạc", "cable", "tai nghe", "earphone", "pin dự phòng"]):
+        volumetric_form_en = "compact palm-sized electronic accessory, cased in matte anti-fingerprint shell, braided flexible cable, held or plugged effortlessly with fingers, accurate real-world scale"
+        dim_3d_ratio_txt = "Phụ kiện công nghệ bỏ túi (Cầm tay hoặc cắm ổ điện)"
     elif any(k in prod_type_lower for k in ["son", "lipstick", "mascara", "chì kẻ", "bút", "nhẫn", "serum", "cushion"]):
         volumetric_form_en = "compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers, placed or held naturally matching situational action"
         dim_3d_ratio_txt = "Nhỏ gọn cầm tay / bỏ túi (Cầm ngón tay hoặc đặt khay tự nhiên)"
@@ -1041,10 +1056,9 @@ def create_scene_details(target_id, mode, style):
         "setting_archetype": setting_archetype,
         "is_fixed_location": is_fixed_location,
         "is_fashion_product": is_fashion_product,
-        "is_culinary": is_culinary,
         "has_visual_proof": has_visual_proof,
         "visual_proof_dna": v_proof,
-        "culinary_sensory": culinary_info.get("sensory_cues", {}) if isinstance(culinary_info, dict) else {},
+        "universal_sensory_matrix": sensory_info,
         "locked_tuck_en": locked_tuck_en,
         "asym_lock_en": asym_lock_en,
         "master_wardrobe_locked": master_wardrobe_locked,
@@ -1090,9 +1104,9 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 eye-level three-quarter medium shot",
                 "expression_en": "looking at camera with natural empathetic smile",
-                "action_en": "natural opening action matching spoken situation, interacting authentically with product (holding, placing, leaning or operating naturally)",
+                "action_en": "First, holding or positioning product naturally; then smoothly greeting camera with gentle head nod while maintaining clean hand grip without finger-melting artifacts",
                 "sfx": "Foley âm thanh nhẹ nhàng đời thực",
-                "director": "Attention | Bám sát '{fixed_title}' | Tương tác tự nhiên chuẩn tỉ lệ | Thoại on-camera từ 0.00s",
+                "director": "Attention | Bám sát '{fixed_title}' | Chuỗi tuần tự tự nhiên | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn (18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' chuẩn tiếng Hà Nội..."
             }},
             {{
@@ -1101,9 +1115,9 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
-                "action_en": "{v_proof.get('catalyst_action_en') if has_visual_proof else 'demonstrating functional details with steady hands, naturally placed or held matching situation'}",
-                "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR'}",
-                "director": "Interest | Thao tác trực quan | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
+                "action_en": "{('First, performing: ' + v_proof.get('catalyst_action_en') + '; then smoothly inspecting the functional result with steady hands') if has_visual_proof else 'First, smoothly demonstrating the key feature; then inspecting the practical motion with clean hand separation'}",
+                "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR đời thực'}",
+                "director": "Interest | Thao tác trực quan tuần tự | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
             }},
             {{
@@ -1112,9 +1126,9 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
-                "action_en": "{v_proof.get('after_transformation_en') if has_visual_proof else 'performing practical task with immediate effective results'}",
+                "action_en": "{('First, revealing transformation: ' + v_proof.get('after_transformation_en') + '; then presenting the satisfying outcome to camera') if has_visual_proof else 'First, smoothly completing the practical usage; then smiling approvingly at the high-efficiency result'}",
                 "sfx": "Tiếng giác quan đời sống thực tế",
-                "director": "Desire | Bằng chứng biến đổi | Thoại on-camera từ 0.00s",
+                "director": "Desire | Bằng chứng biến đổi tuần tự | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
             }},
             {{
@@ -1123,7 +1137,7 @@ def create_scene_details(target_id, mode, style):
                 "setting_en": "{condensed_dna.get('recommended_setting_en')}",
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
-                "action_en": "speaking with welcoming open-palm gestures, product naturally situated nearby",
+                "action_en": "First, speaking with welcoming open-palm gestures; then smoothly gesturing toward bottom-left cart while smiling warmly to finish",
                 "sfx": "Tiếng chuông ting trong trẻo",
                 "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá khoảng và nay giảm an toàn'}",
                 "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'}"
@@ -1162,9 +1176,9 @@ def create_scene_details(target_id, mode, style):
         master_outfit_string = f"strictly wearing identical {master_wardrobe_locked}{asym_append} across all scenes without variation"
 
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
-    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale, morphing, melting, liquid distortion, deformed object, changing parts, extra limbs, rubbery movement, unstable geometry"
+    scale_negatives = ", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale, morphing, melting, liquid distortion, deformed object, changing parts, detachable artifacts, phantom parts, rubbery movement, unstable geometry"
     wardrobe_negatives = ", changing clothes, different clothes, different outfit, wardrobe inconsistency, altered dress, changing clothing color, inconsistent outfit, changing hairstyle"
-    speech_negatives = ", repeating speech, stuttering audio, looping voice, echoing words"
+    speech_negatives = ", stutter, stammer, repeated speech, looped audio, echo dialogue, repeating speech, stuttering audio, looping voice, echoing words"
     base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}{speech_negatives}"
     
     total_sec = 0.0
@@ -1199,7 +1213,7 @@ def create_scene_details(target_id, mode, style):
                 sfx_sound = f"{sfx_sound}, {situational_override['sfx']}"
         else:
             scene_setting_en = default_setting if is_fixed_location else (scn.get("setting_en") or default_setting)
-            raw_action = scn.get("action_en") or f"interacting with {clean_prod_en} naturally"
+            raw_action = scn.get("action_en") or f"First, interacting with {clean_prod_en} naturally; then smoothly demonstrating features with steady hands"
             is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed"])
 
         weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, scene_setting_en, is_indoor=is_indoor_scene)
@@ -1215,7 +1229,6 @@ def create_scene_details(target_id, mode, style):
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
 
-        # KHÓA TỈ LỆ VẬT LÝ THEO NGỮ CẢNH (LINH HOẠT KHÔNG GÒ BÓ)
         if scene_num == 1:
             depth_3d_lock = f", three-quarter perspective capturing authentic physical scale matching situational placement ({volumetric_form_en})"
         elif scene_num in [2, 3]:
@@ -1223,19 +1236,14 @@ def create_scene_details(target_id, mode, style):
         else:
             depth_3d_lock = f", authentic proportions matching [{volumetric_form_en}]"
 
-        # Khóa chống biến dạng vật lý và chống dính tay vào sản phẩm
-        rigid_boundary_lock = "Hands maintain clean external contact with surfaces without fingers melting into product casing. Product remains a rigid solid physical object maintaining fixed geometry throughout all motions."
+        rigid_boundary_lock = "Hands maintain clean external contact with surfaces without finger-melting artifacts. Product remains a 100% rigid solid physical object with invariant geometry, strictly zero morphing, zero phantom parts throughout all motions."
 
-        if is_culinary:
-            img_core = f"Macro food photography, {clean_prod_en} glistening with rich glossy sauce, steam rising, {actor_full}, {clean_action}{depth_3d_lock}"
-        else:
-            img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
+        img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
             
         raw_img = f"{img_core}, 8k resolution, soft natural lighting, sharp focus --ar 9:16 --style raw --v 6.1"
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         scn["img_neg"] = base_negative_prompt
         
-        # Làm sạch câu thoại để Veo 3 đọc không bị vấp dấu câu
         clean_vo_for_audio = re.sub(r'\.{2,}', '.', vo_line).strip()
         clean_vo_for_audio = re.sub(r'\s*-\s*', ', ', clean_vo_for_audio).strip()
 
@@ -1245,7 +1253,6 @@ def create_scene_details(target_id, mode, style):
         else:
             action_phrase = f"Character visibly performing: {clean_action}, interacting with {clean_prod_en} ({product_scale_en}){depth_3d_lock}"
 
-        # Cấu trúc Veo 3 chia rõ 2 thì: Nói 1 lần duy nhất từ 0.00s -> sau đó ngậm miệng mỉm cười hoàn tất cử chỉ
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}{asym_pose_anchor}. "
             f"Action: Visibly speaks dialogue to camera with natural lip-sync from 0.00s, speaks the sentence smoothly once, "
@@ -1660,7 +1667,7 @@ if is_viral_mode:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: nửa đêm xem phim ăn snack, son thoa lên môi căng mọng):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: củ sạc nhỏ gọn cắm bàn làm việc, son thoa lên môi căng mọng):", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
@@ -1670,7 +1677,7 @@ else:
     
     col_f1, col_f2 = st.columns([2, 1])
     up_files = col_f1.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
-    hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Đỏ, Be, Size L...", key=f"hero_override_{st.session_state.reset_key}")
+    hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Đỏ, Be, Size L, Hồng Pastel...", key=f"hero_override_{st.session_state.reset_key}")
     
     if up_files:
         with st.expander(f"👁 Xem lại {len(up_files)} ảnh sản phẩm đã tải lên", expanded=False):
@@ -1679,7 +1686,7 @@ else:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: nửa đêm xem phim ăn snack, son thoa lên môi căng mọng):", key=f"custom_note_prod_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: củ sạc nhỏ gọn cắm bàn làm việc, son thoa lên môi căng mọng):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2, col_opt3 = st.columns([1.2, 1.2, 1.2])
 style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
@@ -1709,7 +1716,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
     can_run, msg = check_usage_limit(st.session_state.current_email)
     if not can_run: st.error(msg)
     else:
-        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, phân tích Khối 3D Dài x Rộng x Cao & Khóa trang phục..."):
+        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, thiết lập Ma Trận Đa Giác Quan & Tỉ lệ thực tế..."):
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars)]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -1760,11 +1767,20 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 🛑 QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI (VISUAL PROOF & TRANSFORMATION DNA):
                 - Xác định rõ ngành hàng và cặp trạng thái Before -> Catalyst Action -> After.
 
+                🛑 QUY CHUẨN MA TRẬN ĐA GIÁC QUAN ĐỜI SỐNG CHO MỌI NGÀNH HÀNG (UNIVERSAL SENSORY MATRIX):
+                - BẮT BUỘC phân tích đầy đủ 4 giác quan đời thực cho sản phẩm này:
+                  • category_type_vi: Phân loại giác quan (Công nghệ & Phụ kiện / Mỹ phẩm & Skincare / Gia dụng & Tiện ích / Ẩm thực & Thức uống / Mẹ & Bé).
+                  • tactile_feel: Cảm giác xúc giác (chất son nhung lì, củ sạc nhám mờ chống vân tay, inox sáng bóng kin kít, vải mềm mịn, độ đầm tay...).
+                  • visual_aesthetic: Kích thích thị giác (đèn led sạc xanh băng, màu son tiệp da, cối thịt xay hồng tươi sền sệt, màu pastel tinh xảo...).
+                  • auditory_asmr: Kích thích thính giác (tiếng tách cắm sạc Type-C đanh chắc, tiếng rít sạch kin kít, tiếng click nắp êm tai, tiếng nhai giòn rụm...).
+                  • functional_delight: Cảm xúc hài lòng (sạc nhanh không nóng, đầm tay chắc chắn, an tâm tuyệt đối, một chạm tiện lợi...).
+
                 🛑 QUY CHUẨN KHÓA TỈ LỆ THỰC TẾ & BẢN THỂ HỌC ĐỘNG (CONTEXT-DRIVEN PRODUCT SCALE):
                 - Quét kỹ sản phẩm để phân loại hình thể và không gian:
-                  • Nếu là đồ lớn/nội thất (tủ lạnh, tivi, sofa, đệm, giường): aspect_ratio_3d = 'Kích thước lớn thực tế theo vóc dáng 1m65 & sàn phòng', geometric_form_factor_en = 'authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human'.
-                  • Nếu là máy xay, đồ bếp cầm tay: aspect_ratio_3d = 'Cao 25cm x Cối 15cm (Nhỏ hơn cẳng tay, cầm/đặt tự nhiên)', geometric_form_factor_en = 'compact 2-liter electric food processor, total height approx 25cm (shorter than adult forearm), clear glass bowl diameter 15cm, motorized top power base held or operated comfortably with female hands'.
-                  • Nếu là son, mỹ phẩm, bỏ túi: aspect_ratio_3d = 'Nhỏ gọn cầm tay / bỏ túi', geometric_form_factor_en = 'compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers'.
+                  • Đồ lớn/nội thất (tủ lạnh, tivi, sofa, đệm, giường): aspect_ratio_3d = 'Kích thước lớn thực tế theo vóc dáng 1m65 & sàn phòng', geometric_form_factor_en = 'authentic architectural large-scale item, realistically grounded on floor or wall-mounted, proportioned accurately against a 1.65m adult human'.
+                  • Máy xay, đồ bếp cầm tay: aspect_ratio_3d = 'Cao 25cm x Cối 15cm (Nhỏ hơn cẳng tay, cầm/đặt tự nhiên)', geometric_form_factor_en = 'compact 2-liter electric food processor, total height approx 25cm (shorter than adult forearm), clear glass bowl diameter 15cm, motorized top power base held or operated comfortably with female hands'.
+                  • Củ sạc, phụ kiện công nghệ: aspect_ratio_3d = 'Phụ kiện công nghệ bỏ túi (Cầm tay hoặc cắm ổ điện)', geometric_form_factor_en = 'compact palm-sized electronic accessory, cased in matte anti-fingerprint shell, braided flexible cable, held or plugged effortlessly with fingers'.
+                  • Son, mỹ phẩm, bỏ túi: aspect_ratio_3d = 'Nhỏ gọn cầm tay / bỏ túi', geometric_form_factor_en = 'compact pocket-sized personal item, fitting effortlessly inside adult palm or between fingers'.
 
                 🛑 QUY CHUẨN BÓC TÁCH GIÁ TIỀN CHUẨN XÁC TỪNG MỨC GIÁ:
                 - Quét OCR giá tiền trên ảnh:
@@ -1811,20 +1827,18 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                             "negative_prompt_lock": "mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut, high thigh slit"
                         }},
                         "visual_proof_dna": {{
-                            "category_type": "beauty_cosmetics / home_cleaning / mom_and_baby / kids_toy / home_decor / wellness_nutrition / general",
+                            "category_type": "beauty_cosmetics / home_cleaning / electronics_gadget / mom_and_baby / kids_toy / home_decor / wellness_nutrition / general",
                             "before_visual": "Mô tả trạng thái trước khi dùng (nỗi đau thị giác)",
                             "catalyst_action_en": "Mô tả hành động thử nghiệm trực quan trong Cảnh 2 bằng tiếng Anh",
                             "after_transformation_en": "Mô tả kết quả lột xác trong Cảnh 3 bằng tiếng Anh",
                             "proof_sfx": "Âm thanh ASMR thực tế"
                         }},
-                        "culinary_dna": {{
-                            "is_culinary": true/false,
-                            "texture_profile": "Cấu trúc giòn tan/sền sệt/xốp mềm của món ăn",
-                            "sensory_cues": {{
-                                "visual_en": "golden crispy crackling glistening with amber sauce, rising steam",
-                                "tactile_en": "slowly breaking piece in half with fingers showing airy hollow interior",
-                                "auditory_foley": "loud sharp crunch snap and crispy chewing mastication"
-                            }}
+                        "universal_sensory_matrix": {{
+                            "category_type_vi": "Phân loại giác quan (Công nghệ & Phụ kiện / Mỹ phẩm & Skincare / Gia dụng & Tiện ích / Ẩm thực)",
+                            "tactile_feel": "Cảm giác xúc giác chân thực (chất liệu nhám mờ, đầm tay, nhung mịn, chống vân tay...)",
+                            "visual_aesthetic": "Kích thích thị giác trực quan (màu sắc pastel, đèn led báo hiệu, đường nét sắc sảo...)",
+                            "auditory_asmr": "Kích thích thính giác ASMR (tiếng tách cắm sạc Type-C, tiếng click nắp, tiếng rít sạch...)",
+                            "functional_delight": "Cảm xúc hài lòng (sạc nhanh không nóng, đầm tay chắc chắn, an tâm tuyệt đối...)"
                         }},
                         "original_price_spoken": "Giá gốc phiên âm bằng chữ chuẩn (ví dụ: ba trăm năm mươi nghìn)",
                         "sale_price_spoken": "Giá sale phiên âm bằng chữ chuẩn (ví dụ: hai trăm chín mươi nghìn)",
@@ -1891,7 +1905,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma trận Tỉ lệ Thực tế & Khóa trang phục bất biến!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Ma Trận Đa Giác Quan & Tỉ lệ thực tế hoàn hảo!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
@@ -1905,7 +1919,7 @@ if isinstance(ca, dict):
     # HÀNG 1: MỤC 1 & 2
     col_row1_left, col_row1_right = st.columns(2)
     with col_row1_left:
-        st.markdown(f"""
+        c1_html = clean_html(f"""
         <div class="dna-card">
             <div class="dna-card-title">🎯 1. Chân dung Khách hàng & Hook 3s (Attention)</div>
             <div class="dna-row"><span class="dna-label">👥 Tệp khách hàng:</span><span class="dna-text">{clean_analysis_text(ca.get('target_audience', ''))}</span></div>
@@ -1914,7 +1928,8 @@ if isinstance(ca, dict):
             <div class="dna-row"><span class="dna-label" style="color:#2563eb;">🎬 Hình thức tối ưu:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('recommended_format', 'Review / Trải nghiệm'))}</span></div>
             <div class="dna-row"><span class="dna-label">💡 Lý do đề xuất:</span><span class="dna-text">{clean_analysis_text(ca.get('format_reason', ''))}</span></div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
+        st.markdown(c1_html, unsafe_allow_html=True)
 
     with col_row1_right:
         pronoun_badge = f"🗣 <b>Nhân xưng:</b> KOC xưng <b>'{ca.get('self_pronoun', 'em')}'</b> - Gọi người xem là <b>'{ca.get('audience_pronoun', 'các chị em')}'</b>"
@@ -1923,7 +1938,7 @@ if isinstance(ca, dict):
         tuck_reason_str = tuck_info.get('fashion_reason', 'Phù hợp hoàn cảnh') if isinstance(tuck_info, dict) else 'Phù hợp hoàn cảnh'
         tuck_badge = f"👗 <b>Cạp áo:</b> {tuck_decision_str} ({tuck_reason_str})"
         if is_viral_mode:
-            st.markdown(f"""
+            c2_html = clean_html(f"""
             <div class="dna-card">
                 <div class="dna-card-title">🌟 2. Định Vị Kênh & Ma Trận Nhân Xưng</div>
                 <div class="dna-row"><span class="dna-label">👤 Định vị kênh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('target_user', viral_persona or 'KOC Chuyên gia đời sống'))}</span></div>
@@ -1931,9 +1946,9 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">👗 Khóa cạp áo:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{tuck_badge}</span></div>
                 <div class="dna-row"><span class="dna-label">💎 Giá trị cốt lõi:</span><span class="dna-text">{clean_analysis_text(ca.get('core_value', ''))}</span></div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
         else:
-            st.markdown(f"""
+            c2_html = clean_html(f"""
             <div class="dna-card">
                 <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy & Ma Trận Nhân Xưng</div>
                 <div class="dna-row"><span class="dna-label">⭐ Mẫu ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))}</span></div>
@@ -1941,12 +1956,13 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">👗 Khóa cạp áo:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{tuck_badge}</span></div>
                 <div class="dna-row"><span class="dna-label">🎨 Toàn bộ bảng màu:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
+        st.markdown(c2_html, unsafe_allow_html=True)
 
     # HÀNG 2: MỤC 3 & 4
     col_row2_left, col_row2_right = st.columns(2)
     with col_row2_left:
-        st.markdown(f"""
+        c3_html = clean_html(f"""
         <div class="dna-card">
             <div class="dna-card-title">💎 3. Giải phẫu Sản phẩm & Nội Dung (Interest & Desire)</div>
             <div class="dna-row"><span class="dna-label">📦 Chủ đề & Điểm đặc biệt:</span><span class="dna-text">{format_product_name_bold(ca.get('what_and_unique', ''))}</span></div>
@@ -1955,14 +1971,15 @@ if isinstance(ca, dict):
             <div class="dna-row"><span class="dna-label">📍 Hoàn cảnh & Tiện ích:</span><span class="dna-text">{clean_analysis_text(ca.get('where_and_convenience', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🛠 Thao tác & Cách dùng chuẩn thực tế:</span><span class="dna-text">{clean_analysis_text(ca.get('how_to_use', ''))}</span></div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
+        st.markdown(c3_html, unsafe_allow_html=True)
 
     with col_row2_right:
         dim_3d = ca.get('dimensional_ratio_analysis', {})
         dim_txt_display = dim_3d.get('aspect_ratio_3d', ca.get('product_dimensions', 'Chuẩn đời thực')) if isinstance(dim_3d, dict) else ca.get('product_dimensions', 'Chuẩn đời thực')
         loc_type_str = "Khóa 1 vị trí cố định (Single-Location)" if ca.get('is_fixed_location', True) else "Chuyển cảnh theo mạch truyện (Dynamic)"
         if is_viral_mode:
-            st.markdown(f"""
+            c4_html = clean_html(f"""
             <div class="dna-card">
                 <div class="dna-card-title">💡 4. Chuẩn Bối Cảnh & Mẹo Đời Sống</div>
                 <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Nhà phố/Chung cư sạch sẽ'))}</span></div>
@@ -1971,13 +1988,13 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">🎨 Khóa phối cảnh chi tiết:</span><span class="dna-text">{clean_analysis_text(ca.get('product_color_lock', 'Tự nhiên'))}</span></div>
                 <div class="dna-row"><span class="dna-label" style="color:#15803d;">📣 Kêu gọi tương tác (CTA):</span><span class="dna-text" style="color:#15803d; font-weight:700;">Thảo luận, chia sẻ mẹo hay & Follow kênh đón xem tập sau</span></div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
         else:
             orig_p_display = ca.get('original_price_spoken', '')
             sale_p_display = ca.get('sale_price_spoken', '')
             soft_orig = convert_to_soft_price_range(orig_p_display) if orig_p_display else "hơn một trăm nghìn"
             soft_sale = convert_to_soft_price_range(sale_p_display) if sale_p_display else "mấy chục nghìn"
-            st.markdown(f"""
+            c4_html = clean_html(f"""
             <div class="dna-card">
                 <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh, Động Lực Học & Mức Giá</div>
                 <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Nhà phố/Chung cư sạch sẽ'))}</span></div>
@@ -1986,11 +2003,13 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
                 <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường khoảng {soft_orig}, nay giảm khoảng {soft_sale}</span></div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
+        st.markdown(c4_html, unsafe_allow_html=True)
 
     # THU THẬP VÀ ĐÁNH SỐ ĐỘNG CHO CÁC MỤC NÂNG CAO (5, 6, 7...) VÀ CHIA 2 CỘT CÂN ĐỐI
     extra_blocks = []
     
+    # MỤC 5: BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI THỰC TẾ
     vp_info = ca.get('visual_proof_dna', {})
     if isinstance(vp_info, dict) and vp_info.get('catalyst_action_en'):
         extra_blocks.append({
@@ -1998,15 +2017,42 @@ if isinstance(ca, dict):
             "icon": "🔬",
             "border_color": "#059669",
             "title_color": "#047857",
-            "html": f"""
+            "html": clean_html(f"""
             <div class="dna-row"><span class="dna-label">🏷 Phân loại thử nghiệm:</span><span class="dna-text" style="font-weight:700; color:#065f46;">{str(vp_info.get('category_type', '')).upper()}</span></div>
             <div class="dna-row"><span class="dna-label">⚡ Nỗi đau thị giác (Trước):</span><span class="dna-text">{clean_analysis_text(vp_info.get('before_visual', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🧪 Thao tác kích hoạt (Cảnh 2):</span><span class="dna-text"><code>{vp_info.get('catalyst_action_en', '')}</code></span></div>
             <div class="dna-row"><span class="dna-label">✨ Bằng chứng lột xác (Cảnh 3):</span><span class="dna-text" style="color:#047857; font-weight:600;"><code>{vp_info.get('after_transformation_en', '')}</code></span></div>
             <div class="dna-row"><span class="dna-label">🔊 Âm thanh đặc tả (Foley):</span><span class="dna-text" style="color:#15803d;">{clean_analysis_text(vp_info.get('proof_sfx', ''))}</span></div>
-            """
+            """)
         })
 
+    # MỤC 6: GIẢI PHẪU KÍCH HOẠT ĐA GIÁC QUAN ĐỜI SỐNG (UNIVERSAL MULTI-SENSORY ASMR)
+    # Áp dụng tự động cho MỌI ngành hàng (Công nghệ, Mỹ phẩm, Gia dụng, Ẩm thực, Mẹ & Bé)
+    s_info = ca.get('universal_sensory_matrix', {})
+    if not isinstance(s_info, dict) or not s_info.get('tactile_feel'):
+        s_info = {
+            "category_type_vi": "Đa giác quan đời sống thực tế",
+            "tactile_feel": "Bề mặt đầm chắc, vỏ nhám mịn chống bám vân tay, cầm nắm vừa vặn",
+            "visual_aesthetic": "Màu sắc hoàn thiện tinh xảo, đường nét sắc sảo, đèn led báo hiệu trực quan",
+            "auditory_asmr": "Tiếng click đanh gọn chắc nịch, tiếng kết nối dứt khoát êm ái",
+            "functional_delight": "Trải nghiệm tiện lợi mượt mà, thao tác an tâm tin cậy"
+        }
+
+    extra_blocks.append({
+        "title_suffix": "Giải Phẫu Kích Hoạt Đa Giác Quan Đời Sống (Multi-Sensory ASMR Matrix)",
+        "icon": "✨",
+        "border_color": "#f97316",
+        "title_color": "#ea580c",
+        "html": clean_html(f"""
+        <div class="dna-row"><span class="dna-label">🏷 Phân loại cảm giác:</span><span class="dna-text" style="font-weight:700; color:#c2410c;">{clean_analysis_text(s_info.get('category_type_vi', 'Đa giác quan'))}</span></div>
+        <div class="dna-row"><span class="dna-label">🖐 Kích thích Xúc giác:</span><span class="dna-text">{clean_analysis_text(s_info.get('tactile_feel', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">👁 Kích thích Thị giác:</span><span class="dna-text">{clean_analysis_text(s_info.get('visual_aesthetic', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">👂 Kích thích Thính giác (ASMR):</span><span class="dna-text" style="color:#15803d; font-weight:600;">{clean_analysis_text(s_info.get('auditory_asmr', ''))}</span></div>
+        <div class="dna-row"><span class="dna-label">💖 Cảm xúc thỏa mãn:</span><span class="dna-text">{clean_analysis_text(s_info.get('functional_delight', ''))}</span></div>
+        """)
+    })
+
+    # MỤC 7 (NẾU CÓ): KHÓA TỌA ĐỘ CẮT MAY BẤT ĐỐI XỨNG
     asym_info = ca.get('spatial_asymmetry_analysis', {})
     if isinstance(asym_info, dict) and asym_info.get('has_asymmetry', False):
         extra_blocks.append({
@@ -2014,27 +2060,11 @@ if isinstance(ca, dict):
             "icon": "📐",
             "border_color": "#8b5cf6",
             "title_color": "#7c3aed",
-            "html": f"""
+            "html": clean_html(f"""
             <div class="dna-row"><span class="dna-label">✂️ Chi tiết bất đối xứng:</span><span class="dna-text" style="font-weight:700; color:#6d28d9;">{clean_analysis_text(asym_info.get('feature_type', 'Xẻ tà'))}</span></div>
             <div class="dna-row"><span class="dna-label">📍 Tọa độ người mặc:</span><span class="dna-text" style="font-weight:600; color:#4c1d95;">{clean_analysis_text(asym_info.get('anatomical_location_vi', ''))}</span></div>
             <div class="dna-row"><span class="dna-label">🛡 Cưỡng chế Prompt EN:</span><span class="dna-text"><code>{asym_info.get('en_prompt_lock', '')}</code></span></div>
-            """
-        })
-
-    c_dna = ca.get('culinary_dna', {})
-    if isinstance(c_dna, dict) and c_dna.get('is_culinary', False):
-        sensory = c_dna.get('sensory_cues', {})
-        extra_blocks.append({
-            "title_suffix": "Giải Phẫu Kích Hoạt Đa Giác Quan Ẩm Thực (Food-Porn Sensory Matrix)",
-            "icon": "🍗",
-            "border_color": "#f97316",
-            "title_color": "#ea580c",
-            "html": f"""
-            <div class="dna-row"><span class="dna-label">✨ Cấu trúc vật lý:</span><span class="dna-text" style="font-weight:600; color:#c2410c;">{clean_analysis_text(c_dna.get('texture_profile', 'Giòn rụm xốp tan'))}</span></div>
-            <div class="dna-row"><span class="dna-label">👁 Kích thích Thị giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('visual_en', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">🖐 Kích thích Xúc giác:</span><span class="dna-text">{clean_analysis_text(sensory.get('tactile_en', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">👂 Kích thích Thính giác (ASMR):</span><span class="dna-text" style="color:#15803d; font-weight:600;">{clean_analysis_text(sensory.get('auditory_foley', ''))}</span></div>
-            """
+            """)
         })
 
     # DÀN TRANG CHIA 2 CỘT ĐỐI XỨNG & ĐÁNH SỐ LIỀN MẠCH TỰ ĐỘNG
@@ -2045,23 +2075,25 @@ if isinstance(ca, dict):
             
             b_left = extra_blocks[i]
             with col_ex_left:
-                st.markdown(f"""
+                card_html_left = clean_html(f"""
                 <div class="dna-card" style="border-left: 4px solid {b_left['border_color']}; margin-top: 6px;">
                     <div class="dna-card-title" style="color:{b_left['title_color']};">{b_left['icon']} {current_card_index}. {b_left['title_suffix']}</div>
                     {b_left['html']}
                 </div>
-                """, unsafe_allow_html=True)
+                """)
+                st.markdown(card_html_left, unsafe_allow_html=True)
             current_card_index += 1
             
             if i + 1 < len(extra_blocks):
                 b_right = extra_blocks[i+1]
                 with col_ex_right:
-                    st.markdown(f"""
+                    card_html_right = clean_html(f"""
                     <div class="dna-card" style="border-left: 4px solid {b_right['border_color']}; margin-top: 6px;">
                         <div class="dna-card-title" style="color:{b_right['title_color']};">{b_right['icon']} {current_card_index}. {b_right['title_suffix']}</div>
                         {b_right['html']}
                     </div>
-                    """, unsafe_allow_html=True)
+                    """)
+                    st.markdown(card_html_right, unsafe_allow_html=True)
                 current_card_index += 1
 
     if ca.get('prompt_dna_lock'):
