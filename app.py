@@ -88,7 +88,6 @@ def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas = text.count(',') + text.count(';')
     periods = text.count('.') + text.count('!') + text.count('?')
-    # Nhịp đọc nhanh dồn dập (4.8 - 5.2 từ/s cho TikTok Shop; 4.2 từ/s cho Viral)
     rate = 5.0 if is_tiktok_shop else 4.2
     comma_pause = 0.08 if is_tiktok_shop else 0.10
     period_pause = 0.12 if is_tiktok_shop else 0.16
@@ -387,17 +386,17 @@ def repair_and_parse_json(text_content: str):
         except: pass
     raise Exception("Lỗi cấu trúc phản hồi từ AI. Vui lòng bấm tạo lại.")
 
-# HỆ THỐNG GỌI MODEL THẾ HỆ MỚI AN TOÀN
+# ==============================================================================
+# HÀM GỌI MODEL CHUẨN XÁC VỚI GOOGLE GEMINI 3.8
+# ==============================================================================
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    models_to_try = ["gemini-3.5-flash-lite", "gemini-3.5-flash"]
+    models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
     last_err = None
     for model_name in models_to_try:
         for attempt in range(3):
             try:
                 res = client.models.generate_content(
-                    model=model_name,
-                    contents=contents,
+                    model=model_name, contents=contents,
                     config=types.GenerateContentConfig(
                         system_instruction=sys_inst,
                         response_mime_type="application/json",
@@ -868,7 +867,6 @@ presentation_format_opts = [
 ]
 selected_format = st.selectbox("🎬 Hình thức video:", presentation_format_opts, key=f"pres_{st.session_state.reset_key}")
 
-# Module chọn số lượng diễn viên & nhập vai trò (Để trống = AI tự chọn)
 num_chars_input = st.number_input("👤 Số lượng diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", min_value=1, max_value=4, value=1, key=f"chars_num_{st.session_state.reset_key}")
 char_inputs = []
 for i in range(num_chars_input):
@@ -975,7 +973,6 @@ if isinstance(ca, dict) and ca.get("target_audience"):
     user_specified_actors = [p['role'] for p in st.session_state.get('character_profiles', []) if p.get('role')]
     koc_final_display = f"👤 <b>KOC:</b> {', '.join(user_specified_actors)} (Người dùng chỉ định)" if user_specified_actors else f"🤖 <b>KOC tự động:</b> {koc_auto_desc}"
 
-    # Hàng 1: Thẻ 1 & 2
     c_r1_l, c_r1_r = st.columns(2)
     with c_r1_l:
         st.markdown(clean_html(f"""
@@ -998,7 +995,6 @@ if isinstance(ca, dict) and ca.get("target_audience"):
         </div>
         """), unsafe_allow_html=True)
 
-    # Hàng 2: Thẻ 3 & 4
     c_r2_l, c_r2_r = st.columns(2)
     with c_r2_l:
         st.markdown(clean_html(f"""
@@ -1019,7 +1015,6 @@ if isinstance(ca, dict) and ca.get("target_audience"):
         </div>
         """), unsafe_allow_html=True)
 
-    # Hàng 3: Thẻ 5 & 6
     v_demo = ca.get('visceral_demonstration_dna', {})
     s_mat = ca.get('universal_sensory_matrix', {})
     c_r3_l, c_r3_r = st.columns(2)
@@ -1067,7 +1062,6 @@ if all_sc:
             safe_cushion = round(max(0.0, dur_int - speech_sec), 1)
 
             st.markdown(f"#### 📍 Phân cảnh {idx}/{num_scenes} - Giai đoạn {scn.get('aida_stage')}")
-            # Hiển thị số giây phân cảnh to rõ ràng cho người dùng tạo video
             st.markdown(f"""
             <div class='timing-badge'>
                 ⏱ THỜI LƯỢNG CLIP CẦN TẠO: <span class='scene-sec-highlight'>{scn.get('dur')}</span> &nbsp;|&nbsp; 
@@ -1123,7 +1117,7 @@ if all_sc:
                 c1.markdown(f"**#{sc_id}. {sc.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
                 c1.caption(f"⚡ *{sc.get('hook')}*")
                 if c2.button("✨ Tạo chi tiết ngay", key=f"g_{sc_id}", type="secondary", use_container_width=True):
-                    with st.spinner(f"Đang phân tích và dựng kịch bản #{sc_id}..."):
+                    with st.spinner(f"Đang dựng kịch bản #{sc_id}..."):
                         create_scene_details(sc_id, mode, "Điện Ảnh Chân Thực")
                         st.session_state.active_script_id = int(sc_id); st.rerun()
 
