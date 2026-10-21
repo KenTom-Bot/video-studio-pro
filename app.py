@@ -112,7 +112,7 @@ def clean_html(raw_html: str) -> str:
     return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
 
 # ==============================================================================
-# PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT & TÂM LÝ HỌC NEO GIÁ
+# THUẬT TOÁN PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT & TÂM LÝ HỌC NEO GIÁ
 # ==============================================================================
 def number_to_vietnamese_words(n: int) -> str:
     if n == 0: return "không đồng"
@@ -269,11 +269,6 @@ def clean_analysis_text(text) -> str:
     pattern = r'^(?:SẢN PHẨM LÀ GÌ|MỤC ĐÍCH|ĐỐI TƯỢNG|LÝ DO MUA)\s*:\s*'
     return clean_and_normalize_voiceover(re.sub(pattern, '', str(text or '').strip(), flags=re.IGNORECASE).strip())
 
-def format_analysis_field(field_val) -> str:
-    if isinstance(field_val, list):
-        return "".join([f"<div class='dna-bullet'>• <span class='dna-text'>{clean_analysis_text(i)}</span></div>" for i in field_val])
-    return "".join([f"<div class='dna-bullet'>• <span class='dna-text'>{line.strip()}</span></div>" for line in clean_analysis_text(str(field_val)).split('<br>') if line.strip()])
-
 # ==============================================================================
 # QUẢN TRỊ TÀI KHOẢN & DỰ ÁN
 # ==============================================================================
@@ -305,8 +300,8 @@ def delete_single_account(email):
 def check_usage_limit(email, is_detailing=False):
     if email == ADMIN_EMAIL: return True, ""
     acc = st.session_state.licensed_accounts.get(email)
-    if not acc: return False, "Lỗi xác thực."
-    if datetime.now() > datetime.strptime(acc.get("expires_at", "2099-12-31"), "%Y-%m-%d"): return False, "Tài khoản đã hết hạn."
+    if not acc: return False, "Lỗi xác thực tài khoản."
+    if datetime.now() > datetime.strptime(acc.get("expires_at", "2099-12-31"), "%Y-%m-%d"): return False, "Tài khoản của bạn đã hết hạn sử dụng."
     plan = acc.get("plan_type", "Trial")
     if plan == "VIP": return True, ""
     limit = {"Advanced": 20, "Basic": 10, "Trial": 3}.get(plan, 3)
@@ -315,7 +310,7 @@ def check_usage_limit(email, is_detailing=False):
         acc["daily_usage_count"] = 0
         acc["last_generation_date"] = today
     if is_detailing:
-        if acc.get("daily_usage_count", 0) >= limit: return False, f"Hết lượt tạo ({limit}/{limit}) hôm nay!"
+        if acc.get("daily_usage_count", 0) >= limit: return False, f"Hết lượt tạo ({limit}/{limit}) hôm nay! Vui lòng nâng cấp gói."
         acc["daily_usage_count"] += 1
         save_single_account(email, acc)
     return True, ""
@@ -383,16 +378,20 @@ def repair_and_parse_json(text_content: str):
     raise Exception("Lỗi cấu trúc phản hồi từ AI. Vui lòng bấm tạo lại.")
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    for model_name in ["gemini-2.5-flash", "gemini-2.5-flash-lite"]:
-        for attempt in range(2):
+    models_to_try = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    last_err = None
+    for model_name in models_to_try:
+        for attempt in range(3):
             try:
                 res = client.models.generate_content(
                     model=model_name, contents=contents,
                     config=types.GenerateContentConfig(system_instruction=sys_inst, response_mime_type="application/json", temperature=0.7, max_output_tokens=max_tokens)
                 )
                 return repair_and_parse_json(res.text)
-            except Exception: time.sleep(1.5)
-    raise Exception("Google API tạm thời gián đoạn. Vui lòng thử lại sau vài giây.")
+            except Exception as e:
+                last_err = e
+                time.sleep((attempt + 1) * 2.0)
+    raise Exception(f"Google API tạm thời gián đoạn. Vui lòng thử lại sau vài giây! (Chi tiết: {last_err})")
 
 def build_voice_direction(mode, num_chars, character_profiles):
     is_tiktok_shop = ("Viral" not in mode)
@@ -430,9 +429,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     Ghi chú riêng: {custom_note}
 
     🛑 5 NGUYÊN TẮC BẮT BUỘC ĐỂ ĐẠT 100% NHƯ VIDEO MẪU:
-    1. PHÂN CẢNH ĐỘNG (DYNAMIC 4-6 SCENES): Tự động chọn 4, 5 hoặc 6 phân cảnh phù hợp với sản phẩm để mạch truyện tự nhiên, đủ các nấc: Hook -> Soi ngàm -> Hành động vật lý -> Thành quả mãn nhãn -> Ứng dụng đời sống -> Cầm sản phẩm khuyên dùng.
+    1. PHÂN CẢNH ĐỘNG (DYNAMIC 4-6 SCENES): Tự động quyết định 4, 5 hoặc 6 phân cảnh phù hợp với sản phẩm để mạch truyện tự nhiên, đủ các nấc: Hook -> Soi ngàm -> Hành động vật lý -> Thành quả mãn nhãn -> Ứng dụng đời sống -> Cầm sản phẩm khuyên dùng.
     2. KHÓA 1 NGUYÊN LIỆU THỬ NGHIỆM DUY NHẤT: Cả kịch bản chỉ theo sát 1 nguyên liệu (ví dụ thịt heo làm nem thì chỉ thịt heo, cấm đổi màu cối sang xoài hay đá).
-    3. 1 SHOT = 1 VI HÀNH ĐỘNG (MICRO-ACTION): Mỗi cảnh chỉ làm đúng 1 hành động dứt khoát (Cảnh 2: gõ ngàm khóa; Cảnh 3: lưỡi dao xoáy thịt; Cảnh 4: thìa múc thịt dẻo).
+    3. 1 SHOT = 1 VI HÀNH ĐỘNG (MICRO-ACTION): Mỗi cảnh chỉ làm đúng 1 hành động dứt khoát (Cảnh 2: gõ ngàm khóa; Cảnh 3: dao cuộn; Cảnh 4: thìa múc thịt dẻo).
     4. KHÓA MẶT BÀN & BỐI CẢNH CỐ ĐỊNH: Bàn bếp đá cẩm thạch trắng, cấm tự ý đổi sang bàn gỗ; đồ ngoài trời đặt trên sàn bê tông, cấm kê bàn ăn giữa sân.
     5. KHỬ NHẠC NỀN & KHÓI GIẢ: 100% âm thanh Foley tự nhiên + Voiceover từ 0.00s. Luồng khí thổi phải trong suốt vô hình, không khói trắng.
     """
@@ -485,21 +484,7 @@ def create_scene_details(target_id, mode, style):
     YÊU CẦU ĐẶC BIỆT: {user_custom_note}
 
     TỰ ĐỘNG XÁC ĐỊNH SỐ PHÂN CẢNH TỐI ƯU (4, 5 HOẶC 6 CẢNH) ĐỂ NỘI DUNG MƯỢT MÀ VÀ ĐỦ NẤC CHUYỂN BIẾN.
-    TRẢ VỀ JSON:
-    {{
-        "title": "{fixed_title}",
-        "scenes": [
-            {{
-                "scene": 1, "aida_stage": "Attention",
-                "setting": "Mô tả bối cảnh mở màn...", "setting_en": "{locked_setting}",
-                "camera_shot": "Vertical 9:16 eye-level medium-full shot, static tripod",
-                "action_en": "First, standing upright beside product; then applying downward hand pressure to demonstrate stability while speaking",
-                "sfx": "Tiếng đập tay đanh chắc lên cối",
-                "director": "Attention | Đo tỉ lệ 1:1 | Thoại on-camera từ 0.00s",
-                "voiceover": "Câu mở màn ngắn gọn tự nhiên..."
-            }}
-        ]
-    }}
+    TRẢ VỀ JSON HỢP LỆ VỚI KHÓA "scenes" CHỨA DANH SÁCH CÁC PHÂN CẢNH, MỖI CẢNH CÓ: scene (số), aida_stage, setting, setting_en, camera_shot, action_en, sfx, director, voiceover.
     """
     sys_inst = get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "10s", num_chars, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_flash_sale)
     res = call_gemini([prompt_text], sys_inst)
@@ -545,7 +530,7 @@ def clone_script(script_id):
     target = next((sc for sc in all_combined if str(sc.get("id")) == str(script_id)), None)
     if not target: return []
     cur_len = len(all_combined)
-    prompt = f"Nhân bản 5 biến thể kịch bản thoại bám sát kịch bản #{script_id}: '{target.get('title')}', giữ nguyên đòn bẩy tâm lý."
+    prompt = f"Nhân bản 5 biến thể kịch bản thoại bám sát kịch bản #{script_id}: '{target.get('title')}', giữ nguyên đòn bẩy tâm lý. Trả về JSON có khóa 'outlines' danh sách gồm title, setting, hook."
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", 1, "Nhân bản"))
     return [{
         "id": cur_len + idx + 1, "title": cl.get("title", f"Biến thể #{cur_len + idx + 1}"),
@@ -558,7 +543,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     style = st.session_state.get("last_style", "Điện Ảnh Chân Thực")
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
-    prompt = f"Tạo 5 kịch bản góc độ '{angle}', ghi chú: '{extra_note}'."
+    prompt = f"Tạo 5 kịch bản góc độ '{angle}', ghi chú: '{extra_note}'. Trả về JSON có khóa 'outlines' gồm title, setting, hook."
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", num_chars, angle, extra_note, presentation_format))
     return [{
         "id": cur_len + idx + 1, "title": sc.get("title", f"Kịch bản #{cur_len + idx + 1}"),
@@ -567,7 +552,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     } for idx, sc in enumerate(res.get("outlines", []))]
 
 # ==============================================================================
-# THANH BÊN (SIDEBAR) & QUẢN LÝ TÀI KHOẢN, DỰ ÁN
+# THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN TOÀN NĂNG
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -584,9 +569,9 @@ with st.sidebar:
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_c
                         st.rerun()
-                    else: st.error("Email hoặc mật khẩu không đúng.")
+                    else: st.error("❌ Email hoặc mật khẩu không đúng!")
             with st.expander("❓ Quên mật khẩu?"):
-                st.info("💡 Liên hệ Hotline / Zalo Admin: **0869 628 316** để được cấp lại mật khẩu.")
+                st.info("💡 Liên hệ Hotline / Zalo Admin: **0869 628 316** để được cấp lại mật khẩu ngay lập tức.")
         with tabs[1]:
             with st.form("register_form", border=False):
                 r_email = st.text_input("Email đăng ký:")
@@ -604,7 +589,7 @@ with st.sidebar:
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = r_email.strip()
                         st.rerun()
-                    else: st.error("Thông tin đăng ký không hợp lệ.")
+                    else: st.error("⚠️ Thông tin đăng ký không hợp lệ hoặc số điện thoại sai định dạng.")
     else:
         st.markdown("### 🗂 DỰ ÁN")
         if st.button("➕ TẠO DỰ ÁN MỚI", type="primary", use_container_width=True, disabled=is_system_busy):
@@ -618,19 +603,20 @@ with st.sidebar:
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.rerun()
 
-        st.session_state.active_project_title = st.text_input("Tên dự án:", value=st.session_state.active_project_title)
+        st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", value=st.session_state.active_project_title)
         c_s1, c_s2 = st.columns(2)
         if c_s1.button("💾 Lưu Dự Án", use_container_width=True, disabled=is_system_busy):
             payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context"]}
             succ, msg = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
             if succ: st.toast(f"✅ {msg}")
             else: st.error(msg)
-        if c_s2.button("📑 Lưu Bản Mới", use_container_width=True, disabled=is_system_busy):
+        if c_s2.button("📑 Lưu Bản Mới", use_container_width=True, disabled=is_system_busy, help="Lưu dữ liệu hiện tại thành một dự án mới độc lập hoàn toàn"):
             payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context"]}
             succ, msg = save_project_to_db(st.session_state.current_email, f"{st.session_state.active_project_title} (Bản sao)", payload, project_id=None)
             if succ:
                 st.session_state.active_project_title = f"{st.session_state.active_project_title} (Bản sao)"
-                st.rerun()
+                st.toast("✅ Đã lưu thành dự án bản sao mới!"); time.sleep(0.3); st.rerun()
+            else: st.error(msg)
 
         st.markdown("---")
         st.markdown("### 📂 KHO DỰ ÁN")
@@ -642,13 +628,30 @@ with st.sidebar:
                 all_projects = res.data or []
             except: pass
 
+        if is_admin_user and all_projects:
+            creator_emails = sorted(list(set(p.get("user_email", "") for p in all_projects if p.get("user_email"))))
+            sel_creator = st.selectbox("👤 Lọc theo thành viên:", ["Tất cả thành viên"] + creator_emails)
+            if sel_creator != "Tất cả thành viên":
+                all_projects = [p for p in all_projects if p.get("user_email") == sel_creator]
+
         search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên dự án...", key="search_proj_inp")
         display_projects = [p for p in all_projects if search_proj.strip().lower() in p['project_title'].lower()] if search_proj.strip() else (all_projects if st.session_state.show_all_projects else all_projects[:3])
 
         for p in display_projects:
             with st.expander(f"🎬 {p['project_title']}"):
+                if is_admin_user:
+                    st.caption(f"👤 Tạo bởi: `{p.get('user_email', 'N/A')}` | 📅 Ngày tạo: {p.get('created_at', '')[:10]}")
+                
+                new_p_name = st.text_input("Đổi tên dự án:", value=p['project_title'], key=f"ren_txt_{p['id']}")
+                if st.button("✏️ Cập Nhật Tên", key=f"ren_btn_{p['id']}", use_container_width=True, disabled=is_system_busy):
+                    if new_p_name.strip() and new_p_name.strip() != p['project_title']:
+                        supabase.table("saved_projects").update({"project_title": new_p_name.strip()}).eq("id", p['id']).execute()
+                        if str(st.session_state.get("current_project_id")) == str(p['id']):
+                            st.session_state.active_project_title = new_p_name.strip()
+                        st.toast("✅ Đã đổi tên dự án thành công!"); time.sleep(0.3); st.rerun()
+
                 col_o, col_d = st.columns(2)
-                if col_o.button("📂 Mở", key=f"o_{p['id']}", use_container_width=True):
+                if col_o.button("📂 Mở", key=f"o_{p['id']}", use_container_width=True, disabled=is_system_busy):
                     sd = p.get("script_content", {})
                     st.session_state.update({
                         "content_analysis": sd.get("content_analysis"), "all_scripts": sd.get("all_scripts", []),
@@ -658,48 +661,114 @@ with st.sidebar:
                         "active_project_title": p['project_title'], "scroll_to_detail": True
                     })
                     st.rerun()
-                if col_d.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True):
+                if col_d.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True, disabled=is_system_busy):
                     supabase.table("saved_projects").delete().eq("id", p['id']).execute()
-                    st.rerun()
+                    if str(st.session_state.get("current_project_id")) == str(p['id']):
+                        st.session_state.current_project_id = None
+                    st.toast("✅ Đã xóa dự án thành công!"); time.sleep(0.3); st.rerun()
 
         if len(all_projects) > 3 and not search_proj.strip():
-            if st.button("🔼 Thu gọn" if st.session_state.show_all_projects else f"🔽 Xem thêm {len(all_projects)-3} dự án"):
-                st.session_state.show_all_projects = not st.session_state.show_all_projects
-                st.rerun()
+            if st.session_state.show_all_projects:
+                if st.button("🔼 Thu gọn kho dự án", use_container_width=True, disabled=is_system_busy):
+                    st.session_state.show_all_projects = False; st.rerun()
+            else:
+                if st.button(f"🔽 Xem thêm {len(all_projects)-3} dự án", use_container_width=True, disabled=is_system_busy):
+                    st.session_state.show_all_projects = True; st.rerun()
 
         if is_admin_user:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             with st.expander("➕ Cấp Quyền Mới"):
-                adm_acc = st.text_input("Email:", key="adm_acc")
-                adm_phone = st.text_input("SĐT:", key="adm_phone")
-                adm_pass = st.text_input("Mật khẩu:", value="123456", key="adm_pass")
-                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True)
-                if st.button("💾 Cấp Quyền", type="primary", use_container_width=True):
-                    st.session_state.licensed_accounts[adm_acc.strip()] = {
-                        "roles": ALL_MODULES, "phone": adm_phone.strip(), "password": adm_pass.strip(),
-                        "expires_at": "2099-12-31", "plan_type": adm_plan, "daily_usage_count": 0,
-                        "last_generation_date": "", "active_session_id": ""
-                    }
-                    save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
-                    st.rerun()
+                adm_acc = st.text_input("Email tài khoản:", key="adm_acc")
+                adm_phone = st.text_input("SĐT tài khoản:", key="adm_phone")
+                adm_pass = st.text_input("Mật khẩu ban đầu:", value="123456", key="adm_pass")
+                adm_roles_choice = st.multiselect("Thể loại cho phép:", ALL_MODULES, default=ALL_MODULES, key="adm_roles")
+                adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_plan")
+                adm_dur = st.selectbox("Thời hạn cấp quyền:", ["3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Chọn ngày)"], key="adm_dur")
+                
+                calc_exp = "2099-12-31"
+                if adm_dur == "Tùy chỉnh (Chọn ngày)":
+                    cust_d = st.date_input("Chọn ngày hết hạn:", value=date.today() + timedelta(days=30), min_value=date.today(), key="adm_custom_d")
+                    calc_exp = cust_d.strftime("%Y-%m-%d")
+                elif adm_dur != "Vĩnh viễn":
+                    dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
+                    calc_exp = (datetime.now() + timedelta(days=dur_map.get(adm_dur, 30))).strftime("%Y-%m-%d")
 
-            for acc_mail, info in [i for i in st.session_state.licensed_accounts.items() if i[0] != ADMIN_EMAIL][:3]:
-                with st.expander(f"👤 {acc_mail}"):
-                    if st.button("⚡ Đặt mật khẩu 123456", key=f"rst_{acc_mail}"):
+                if st.button("💾 Cấp Quyền Tài Khoản", type="primary", use_container_width=True, key="btn_save_grant"):
+                    if adm_acc.strip() and adm_phone.strip() and adm_pass.strip():
+                        st.session_state.licensed_accounts[adm_acc.strip()] = {
+                            "roles": adm_roles_choice, "phone": adm_phone.strip(), "password": adm_pass.strip(),
+                            "expires_at": calc_exp, "plan_type": adm_plan, "daily_usage_count": 0,
+                            "last_generation_date": "", "active_session_id": ""
+                        }
+                        save_single_account(adm_acc.strip(), st.session_state.licensed_accounts[adm_acc.strip()])
+                        st.toast(f"✅ Đã cấp quyền tài khoản đến ngày {calc_exp}!"); time.sleep(0.4); st.rerun()
+                    else: st.error("Vui lòng điền đủ thông tin.")
+
+            search_acc = st.text_input("🔍 Tìm tài khoản:", placeholder="Nhập Email hoặc SĐT...", key="search_acc_input")
+            other_accs = [item for item in st.session_state.licensed_accounts.items() if item[0] != ADMIN_EMAIL]
+            filt_accs = [item for item in other_accs if search_acc.strip().lower() in item[0].lower() or search_acc.strip() in item[1].get('phone', '')] if search_acc.strip() else (other_accs if st.session_state.show_all_admin_accounts else other_accs[:3])
+
+            for acc_mail, info in filt_accs:
+                with st.expander(f"👤 {acc_mail} ({info.get('plan_type')})"):
+                    st.write(f"📞 SĐT: `{info.get('phone', 'N/A')}` | ⏳ Hạn: `{info.get('expires_at')}`")
+                    new_u_pass = st.text_input("🔑 Đổi mật khẩu:", value=info.get("password", ""), key=f"pass_e_{acc_mail}")
+                    if st.button("⚡ Đặt 123456", key=f"rst_{acc_mail}", use_container_width=True):
                         st.session_state.licensed_accounts[acc_mail]["password"] = "123456"
                         save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
-                        st.toast("✅ Đã đặt mật khẩu về 123456!")
+                        st.toast("✅ Đã reset mật khẩu về '123456'!"); time.sleep(0.3); st.rerun()
+
+                    new_roles = st.multiselect("Đổi thể loại:", ALL_MODULES, default=info.get("roles", ALL_MODULES), key=f"r_e_{acc_mail}")
+                    new_plan = st.selectbox("Đổi gói cước:", ["Trial", "Basic", "Advanced", "VIP"], index=["Trial", "Basic", "Advanced", "VIP"].index(info.get("plan_type", "Trial")), key=f"p_e_{acc_mail}")
+                    renew_choice = st.selectbox("Gia hạn thời gian:", ["Giữ nguyên hạn hiện tại", "3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Chọn ngày)"], key=f"rn_e_{acc_mail}")
+                    
+                    target_exp = info.get("expires_at", "2099-12-31")
+                    if renew_choice == "Tùy chỉnh (Chọn ngày)":
+                        try: cur_d = datetime.strptime(info.get("expires_at", ""), "%Y-%m-%d").date()
+                        except: cur_d = date.today() + timedelta(days=30)
+                        cust_rd = st.date_input("Chọn ngày hết hạn mới:", value=cur_d, min_value=date.today(), key=f"rd_e_{acc_mail}")
+                        target_exp = cust_rd.strftime("%Y-%m-%d")
+                    elif renew_choice == "Vĩnh viễn": target_exp = "2099-12-31"
+                    elif renew_choice != "Giữ nguyên hạn hiện tại":
+                        dur_map = {"3 Ngày": 3, "7 Ngày": 7, "1 Tháng": 30, "3 Tháng": 90, "6 Tháng": 180, "1 Năm": 365, "2 Năm": 730}
+                        target_exp = (datetime.now() + timedelta(days=dur_map.get(renew_choice, 30))).strftime("%Y-%m-%d")
+
+                    col_u1, col_u2 = st.columns(2)
+                    if col_u1.button("🔄 Cập Nhật", key=f"save_u_{acc_mail}", use_container_width=True):
+                        st.session_state.licensed_accounts[acc_mail]["password"] = new_u_pass.strip()
+                        st.session_state.licensed_accounts[acc_mail]["roles"] = new_roles
+                        st.session_state.licensed_accounts[acc_mail]["plan_type"] = new_plan
+                        st.session_state.licensed_accounts[acc_mail]["expires_at"] = target_exp
+                        save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
+                        st.toast("✅ Đã cập nhật tài khoản thành công!"); time.sleep(0.3); st.rerun()
+                    if col_u2.button("🗑 Xóa", key=f"del_u_{acc_mail}", type="secondary", use_container_width=True):
+                        delete_single_account(acc_mail)
+                        if acc_mail in st.session_state.licensed_accounts: del st.session_state.licensed_accounts[acc_mail]
+                        st.toast("✅ Đã xóa tài khoản!"); time.sleep(0.3); st.rerun()
+
+            if len(other_accs) > 3 and not search_acc.strip():
+                if st.session_state.show_all_admin_accounts:
+                    if st.button("🔼 Thu gọn danh sách tài khoản", use_container_width=True):
+                        st.session_state.show_all_admin_accounts = False; st.rerun()
+                else:
+                    if st.button(f"🔽 Xem thêm {len(other_accs)-3} tài khoản", use_container_width=True):
+                        st.session_state.show_all_admin_accounts = True; st.rerun()
 
         st.markdown("---")
-        components.html("""
-        <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1.5px solid #86efac; border-radius:12px; padding:10px; text-align:center; font-family:sans-serif;">
-            <div style="color:#15803d; font-weight:bold; font-size:13px; margin-bottom:5px;">📞 HỖ TRỢ TRỰC TIẾP</div>
-            <div style="background:#991b1b; color:#fff; border-radius:8px; padding:6px; font-weight:900; font-size:17px; letter-spacing:1px;">0869 628 316</div>
-        </div>
-        """, height=85)
+        support_iframe_code = """
+        <!DOCTYPE html><html><head><meta charset="utf-8">
+        <style>* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; } .support-container { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 14px; padding: 12px 10px; text-align: center; } .support-title { font-size: 14px; font-weight: 800; color: #15803d; margin-bottom: 7px; display: flex; align-items: center; justify-content: center; gap: 6px; } .hotline-card { background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%); border-radius: 10px; padding: 8px 6px; text-align: center; } .hotline-label { color: #fecdd3 !important; font-size: 12.5px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; justify-content: center; gap: 5px; } .hotline-number { color: #ffffff !important; font-size: 20px; font-weight: 900; letter-spacing: 1.2px; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }</style></head>
+        <body><div class="support-container"><div class="support-title"><svg style="width: 17px; height: 17px; fill: #15803d;" viewBox="0 0 24 24"><path d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3c.55 0 1-.45 1-1v-4.18A3 3 0 0 0 21 14V10a9 9 0 0 0-9-9z"/></svg><span>HỖ TRỢ TRỰC TIẾP</span></div><div class="hotline-card"><div class="hotline-label"><span>Hotline / Zalo:</span></div><div class="hotline-number">0869 628 316</div></div></div></body></html>
+        """
+        components.html(support_iframe_code, height=115)
+        
+        u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
+        u_plan = u_info.get("plan_type", "Trial")
+        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
+        u_lim = "Không giới hạn" if u_plan == "VIP" else (20 if u_plan == "Advanced" else (10 if u_plan == "Basic" else 3))
+        st.info(f"**GÓI {u_plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Đã tạo: **{u_used}/{u_lim}**\n• Hạn dùng: {u_info.get('expires_at')}")
 
-        if st.button("🚪 Đăng Xuất"):
+        if st.button("🚪 Đăng Xuất", disabled=is_system_busy):
             st.session_state.is_logged_in = False
             st.rerun()
 
@@ -712,10 +781,36 @@ st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo
 mode = st.selectbox("🎯 Thể loại:", ALL_MODULES, key=f"mode_{st.session_state.reset_key}")
 is_viral_mode = ("Viral" in mode)
 
-col_f1, col_f2 = st.columns([2, 1])
-up_files = col_f1.file_uploader("📦 Upload Ảnh Sản Phẩm (Bắt buộc):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_{st.session_state.reset_key}")
-hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Nâu, Cối thủy tinh...", key=f"sku_{st.session_state.reset_key}")
-custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: chuyên đề xay thịt ba chỉ làm nem dẻo quánh):", key=f"note_{st.session_state.reset_key}")
+up_files, custom_note = [], ""
+viral_persona, viral_topic = "", ""
+if is_viral_mode:
+    col_v1, col_v2 = st.columns(2)
+    viral_persona = col_v1.text_input("👤 Định vị Kênh:", placeholder="Ví dụ: Mẹ bỉm sữa thông thái, KOC chuyên gia đời sống...", key=f"viral_persona_{st.session_state.reset_key}")
+    viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, placeholder="Ví dụ: Mẹo dọn sạch lá khô sân vườn trong 2 phút, bí quyết giữ giàn cây xanh tốt...", key=f"viral_topic_{st.session_state.reset_key}")
+    up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
+    
+    if up_files:
+        with st.expander(f"👁 Xem lại {len(up_files)} ảnh đã tải lên", expanded=False):
+            n_cols = min(len(up_files), 4)
+            cols = st.columns(n_cols)
+            for idx, f in enumerate(up_files):
+                cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: giàn mướp trĩu quả, thịt xay dẻo quánh):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    hero_sku_override = ""
+else:
+    col_f1, col_f2 = st.columns([2, 1])
+    up_files = col_f1.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
+    hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Nâu, Cối thủy tinh, Hồng Pastel...", key=f"sku_{st.session_state.reset_key}")
+    
+    if up_files:
+        with st.expander(f"👁 Xem lại {len(up_files)} ảnh đã tải lên", expanded=False):
+            n_cols = min(len(up_files), 4)
+            cols = st.columns(n_cols)
+            for idx, f in enumerate(up_files):
+                cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: chuyên đề xay thịt ba chỉ làm nem dẻo quánh):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 presentation_format_opts = [
     "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)",
@@ -725,7 +820,6 @@ presentation_format_opts = [
 ]
 selected_format = st.selectbox("🎬 Hình thức video:", presentation_format_opts, key=f"pres_{st.session_state.reset_key}")
 
-# Module chọn số lượng diễn viên & upload ảnh nhân vật
 num_chars_input = st.number_input("👤 Số lượng diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", min_value=1, max_value=4, value=1, key=f"chars_num_{st.session_state.reset_key}")
 char_inputs = []
 for i in range(num_chars_input):
@@ -736,14 +830,14 @@ for i in range(num_chars_input):
     if c_img: char_inputs.append({"id": i+1, "role": c_role, "file": c_img})
 
 if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
-    with st.spinner("⏳ Đang quét dữ liệu hình ảnh, trích xuất đặc trưng sinh trắc học và tạo 5 kịch bản..."):
+    with st.spinner("⏳ Đang phân tích dữ liệu sản phẩm, trích xuất đặc trưng sinh trắc học và tạo 5 kịch bản..."):
         try:
             st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars_input)]
             st.session_state["saved_reference_images"] = [compress_image_bytes(f, 768, 75) for f in up_files] if up_files else []
             
             prompt = f"""
             PHÂN TÍCH SẢN PHẨM & TẠO 5 KỊCH BẢN CHUẨN THƯƠNG MẠI:
-            - Ghi chú ưu tiên: '{custom_note}' | SKU ưu tiên: '{hero_sku_override}'.
+            - Ghi chú riêng: '{custom_note}' | SKU ưu tiên: '{hero_sku_override}'.
             - BẮT BUỘC 5 KỊCH BẢN ĐẠI DIỆN CHO 5 GÓC ĐỘ: Nỗi đau, Bán ước mơ, Đập tan định kiến, Lifestyle POV, Flash Sale.
             TRẢ VỀ JSON:
             {{
