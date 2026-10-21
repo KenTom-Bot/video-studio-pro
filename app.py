@@ -689,7 +689,7 @@ for key, default_val in [
     ("reset_key", 0), ("scroll_to_top", False), ("scroll_to_detail", False),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", "🛒 TikTok Shop & Bán Hàng"), ("last_style", "Điện Ảnh Chân Thực"), ("last_narrator", "On-camera"),
-    ("last_presentation_format", "🌟 AI Tự Động Phân Tích & Đề Xuất"),
+    ("last_presentation_format", "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)"),
     ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
     ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
     ("current_processing_id", None), ("current_cloning_id", None)
@@ -801,9 +801,8 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     is_multi = (num_chars >= 2)
     is_viral = ("Viral" in mode)
     format_direction = f"ĐỊNH DẠNG: TIỂU PHẨM ĐỐI THOẠI {num_chars} NHÂN VẬT THUẦN VIỆT NÓI TRỰC TIẾP." if is_multi else "ĐỊNH DẠNG: ĐỘC THOẠI KOC THUẦN VIỆT NÓI TRỰC TIẾP."
-    strat_cmd = "BẠN PHẢI MIX ĐA DẠNG 5 GÓC ĐỘ NỘI DUNG." if "Tự động mix" in angle else f"VIẾT CẢ 5 KỊCH BẢN THEO: '{angle}'."
     override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG: '{custom_note}'. Bạn BẮT BUỘC phải thực hiện đúng chỉ thị này trong toàn bộ 5 kịch bản!" if custom_note else ""
-    pres_rule = f"🛑 HÌNH THỨC VIDEO CHỈ ĐỊNH: '{presentation_format}'. Hãy định hướng kịch bản bám sát hình thức này." if presentation_format else ""
+    pres_rule = f"🛑 HÌNH THỨC VIDEO CHỈ ĐỊNH: '{presentation_format}'." if presentation_format else ""
 
     viral_directive = """
     🛑 PHÂN NHÁNH THỂ LOẠI: ĐÂY LÀ VIDEO 'VIRAL & XÂY KÊNH':
@@ -811,13 +810,17 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - CẢ 5 KỊCH BẢN PHẢI TẬP TRUNG: Chia sẻ kiến thức, mẹo vặt hữu ích, sự thật bất ngờ, giải quyết hiểu lầm, hoặc câu chuyện đời thường chân thật chạm cảm xúc.
     - TUYỆT ĐỐI KHÔNG BÁN HÀNG, KHÔNG GIỚI THIỆU GIÁ TIỀN, KHÔNG GIỎ HÀNG, KHÔNG KHUYẾN MÃI, KHÔNG DEAL HỜI.
     """ if is_viral else """
-    🛑 PHÂN NHÁNH THỂ LOẠI: ĐÂY LÀ VIDEO 'TIKTOK SHOP & BÁN HÀNG':
-    - Mục tiêu: Chuyển đổi bán hàng trực tiếp, giải quyết nỗi đau khách hàng, phô diễn công năng sản phẩm, đòn bẩy neo giá và chốt deal giỏ hàng an toàn.
+    🛑 BẮT BUỘC PHÂN BỔ 5 KỊCH BẢN ĐẦU TIÊN THEO ĐÚNG MA TRẬN 5 GÓC TIẾP CẬN TÂM LÝ:
+    - Kịch bản 1: NỖI ĐAU & RÀO CẢN THỰC TẾ (Bám sát video 1: 'Các bác ơi, nhà chật/ngại bừa mà vẫn muốn... thì tham khảo ngay...').
+    - Kịch bản 2: BÁN ƯỚC MƠ & CHỨNG THỰC XÃ HỘI (Bám sát video 2: 'Mấy bữa nay ai qua nhà/nhìn vào cũng hỏi... Đây là... nở hoa/lên món đẹp mê luôn').
+    - Kịch bản 3: ĐẬP TAN ĐỊNH KIẾN (Cứ ngỡ phức tạp/tốn kém ai ngờ giải pháp mới thông minh).
+    - Kịch bản 4: TRẢI NGHIỆM ĐỜI SỐNG (Lifestyle POV chữa lành, không gian sống tiện nghi).
+    - Kịch bản 5: FLASH SALE & KÍCH CẦU GIÁ (DUY NHẤT kịch bản này là dạng kích cầu báo khoảng giá hời, 4 kịch bản trên là soft-sell tự nhiên không nhắc giá).
     """
 
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK & REELS TRIỆU VIEW. PHONG CÁCH: {style}
-    {strat_cmd} | {format_direction}
+    {format_direction}
     {override_rule}
     {pres_rule}
     {viral_directive}
@@ -844,7 +847,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     🛑 {char_rules}
     """
 
-def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="Nhà phố / Chung cư hiện đại sạch sẽ", is_fixed_location=True):
+def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="Nhà phố / Chung cư hiện đại sạch sẽ", is_fixed_location=True, is_flash_sale=False):
     is_multi = (num_chars >= 2)
     is_viral = ("Viral" in mode)
     voice_guidance = build_voice_direction(mode, num_chars, character_profiles)
@@ -858,24 +861,46 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         - Công thức: Đặt câu hỏi thảo luận hoặc kết lại bài học tâm đắc + Kêu gọi bấm follow đón xem video tiếp theo.
         - TUYỆT ĐỐI CẤM: Không nhắc đến giá tiền, không mã giảm giá, không voucher, không giỏ hàng, không mua hàng!
         """
-    else:
+    elif is_flash_sale:
         outro_instruction = f"""
-        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP SIÊU AN TOÀN VÀ KÍCH THÍCH (KHÓA KÉP 'KHOẢNG' & 'NAY GIẢM'):
+        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 CHO KỊCH BẢN FLASH SALE / DEAL HỜI (DUY NHẤT DẠNG NÀY MỚI NÓI KHOẢNG GIÁ):
         - Lời thoại Cảnh 4 chuẩn giọng Hà Nội, tuân thủ đúng 3 vế xuôi tai:
-          1. Neo khoảng giá tâm lý học (TUYỆT ĐỐI KHÔNG BÁO GIÁ CỨNG TRỰC TIẾP):
-             'Bình thường khoảng [giá gốc làm tròn LÊN], nay giảm chỉ còn khoảng [giá sale làm tròn XUỐNG] thôi...'
-             (BẮT BUỘC DÙNG 'KHOẢNG' CHO CẢ GIÁ GỐC LẪN GIÁ SALE, BẮT BUỘC DÙNG TỪ 'NAY GIẢM', CẤM NÓI GIÁ CỨNG TỪNG CON SỐ ĐỂ TRÁNH VI PHẠM KHI SHOP ĐỔI GIÁ, CẤM 'ÁP MÃ', CẤM 'ÁP VOUCHER').
+          1. Neo khoảng giá tâm lý học mềm mại (TUYỆT ĐỐI KHÔNG BÁO GIÁ CỨNG TRỰC TIẾP):
+             'Bình thường khoảng [giá gốc làm tròn LÊN], nay giảm sâu chỉ còn khoảng [giá sale làm tròn XUỐNG] thôi...'
+             (BẮT BUỘC DÙNG 'KHOẢNG' CHO CẢ GIÁ GỐC LẪN GIÁ SALE, BẮT BUỘC DÙNG TỪ 'NAY GIẢM SÂU', CẤM 'ÁP MÃ', CẤM 'ÁP VOUCHER').
           2. Mệnh đề miễn trừ thời điểm phòng ngừa quét chính sách:
              'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...' (hoặc 'tùy thời điểm giá sẽ chênh lệch một chút...')
           3. Rào voucher tài khoản cá nhân & CTA:
              '{audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'
-        - QUY TẮC SỐ BỐN: Đọc là 'bốn' (bốn mươi nghìn, một trăm bốn mươi nghìn...). CẤM TUYỆT ĐỐI 'tư', CẤM 'tứ'.
-        - CẤM TUYỆT ĐỐI các từ: 'phiên live', 'trên live', 'trợ giá'.
-        - CẤM gọi 'các mẹ' nếu đại từ khán giả quy định là '{audience_pronoun}'.
-        - TUYỆT ĐỐI KHÔNG yêu cầu hiện text/chữ/subtitles trên video để tránh lỗi font/chính tả của AI Veo 3.
+        """
+    else:
+        outro_instruction = f"""
+        🛑 CÔNG THỨC KẾT BÀI SOFT-SELL TỰ NHIÊN CHO CÁC KỊCH BẢN THÔNG THƯỜNG (TRIỆT TIÊU CẢM GIÁC BÁN HÀNG):
+        - TUYỆT ĐỐI CẤM: KHÔNG BÁO GIÁ TIỀN, KHÔNG NÓI VOUCHER, KHÔNG NÓI MÃ GIẢM GIÁ, KHÔNG BÁO 'MẤY CHỤC NGHÌN', KHÔNG CHÈO KÉO MUA HÀNG XÔ BỒ!
+        - Lời thoại Cảnh 4 chuẩn giọng tự nhiên như người chia sẻ đời sống, gieo ước mơ và khuyên dùng tự nhiên:
+          • Mẫu 1 (Chuẩn video 1): '{audience_pronoun.capitalize()} nào thích [kết quả đẹp/tiện lợi] tại nhà thì đừng bỏ qua em này nhé!'
+          • Mẫu 2 (Chuẩn video 2): 'Muốn [trước nhà/gian bếp/góc bàn] có [kết quả đẹp/thơm tho/gọn gàng] như thế này thì [trồng/dùng/sắm] em này nghen / nhé!'
+          • Mẫu 3: '{audience_pronoun.capitalize()} nào đang cần [giải quyết nỗi đau] thì bấm góc trái tham khảo thử xem sao nhé!'
+        - Độ dài ngắn gọn dưới 28 từ, ấm áp, chân thành, thân thiện.
         """
 
     override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG (DIRECTOR'S SPECIAL OVERRIDE): '{custom_note}'. BẮT BUỘC tuân thủ 100% trong toàn bộ các phân cảnh, lời thoại, và cấu trúc prompt ảnh/video!" if custom_note else ""
+
+    dual_space_director_block = """
+    🛑 QUY CHUẨN ĐẠO DIỄN GÓC QUAY, CHUYỂN CẢNH & DIỄN XUẤT CHUẨN 2 VIDEO TRIỆU VIEW MẪU:
+    1. KỸ THUẬT CHUYỂN CẢNH 2 KHÔNG GIAN ĐAN XEN (DUAL-SPACE TRANSITIONS):
+       - Cảnh 1 & Cảnh 2: Quay tại KHÔNG GIAN CƠ HỌC / SHOWROOM / KHO / SÂN MỘC (thấy sản phẩm mới tinh chưa qua sử dụng, cọc khung, bao đất, kệ dụng cụ, tỷ lệ chuẩn với người thật).
+       - Cảnh 3 & Cảnh 4: Chuyển sang KHÔNG GIAN THÀNH QUẢ VIÊN MÃN (sân thượng ngập nắng, giàn lá xanh mướt trĩu quả, bàn ăn bốc khói, góc làm việc tinh tế gọn gàng).
+    2. MA TRẬN 4 GÓC MÁY ĐIỆN ẢNH CHUẨN MỰC:
+       - Cảnh 1 (0-5s | Establishing): 'Vertical 9:16 eye-level medium-full establishing shot, tripod locked'. Máy cố định ngang tầm mắt, lấy trọn chiều cao 1m8-2m của sản phẩm so với KOC 1m65.
+       - Cảnh 2 (5-11s | Mechanical Detail): 'Vertical 9:16 low-angle macro shot with subtle tilt-up motion'. Máy hạ thấp hất nhẹ lên, bắt cận khớp nối, ngàm lắp ráp, cọc chịu lực.
+       - Cảnh 3 (11-19s | Outcome Under-Canopy): 'Vertical 9:16 under-canopy medium close-up, subtle slow pan'. Đặt máy dưới tán giàn hoặc cận bề mặt thành quả đón ánh nắng tự nhiên.
+       - Cảnh 4 (19-25s | Warm Push-in): 'Vertical 9:16 warm eye-level shot with slow push-in'. Máy tiến tới chậm 10%, KOC mỉm cười nhìn thẳng ống kính tạo độ tin cậy.
+    3. HÀNH VI TIẾP XÚC & DIỄN XUẤT CỦA KOC:
+       - Cảnh 2: Bàn tay chạm hoặc gõ nhẹ vào khớp nối/cọc thép để chứng minh độ cứng vững.
+       - Cảnh 3: Bàn tay luồn xuống dưới nâng đỡ nhẹ nhàng chùm quả/thành quả, mắt ngắm say mê rồi mới mỉm cười quay sang camera.
+       - Cảnh 4: KOC cầm chắc sản phẩm bán lẻ (bầu ươm, hộp sản phẩm) trên tay trước phông nền thành quả, tuyệt đối không thả xuống sàn.
+    """
 
     return f"""
     BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP & VIRAL ĐA GIÁC QUAN (AUDIO-VISUAL MASTER). PHONG CÁCH: {style}
@@ -883,6 +908,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     {override_rule}
+    {dual_space_director_block}
     
     🛑 MA TRẬN NHÂN XƯNG ĐỒNG NHẤT (PRONOUN INVARIANCE LOCK):
     - Toàn bộ 4 phân cảnh BẮT BUỘC sử dụng đúng cặp đại từ nhân xưng: KOC tự xưng là '{self_pronoun}' và gọi khán giả là '{audience_pronoun}'.
@@ -890,15 +916,11 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - Giữ nguyên duy nhất một cách xưng hô này từ Cảnh 1 đến Cảnh 4, cấm thay đổi giữa chừng.
 
     🛑 THỊ GIÁC HÓA BỐI CẢNH & ĐẠO CỤ KHỚP 100% LỜI THOẠI (NARRATIVE SETTING & PROPS SYNC):
-    - BẮT BUỘC mỗi phân cảnh phải tự động suy luận 'setting_en' và 'supporting_props_en' ăn khớp hoàn toàn với câu chuyện của lời thoại:
-      • Thoại nói về làm việc/sạc đêm -> setting là bàn làm việc với laptop mở, đèn bàn, sổ tay, cốc nước.
-      • Thoại nói về nấu ăn/bữa cơm -> setting là gian bếp sạch sẽ, bếp từ, chảo/nồi, đĩa thức ăn.
-      • Thoại nói về dưỡng da/trang điểm -> setting là bàn trang điểm, gương soi, khay mỹ phẩm.
-      • Thoại nói về dạo phố/đi làm vội -> setting là hành lang/cửa ra vào hoặc góc phố sáng sủa.
+    - BẮT BUỘC mỗi phân cảnh phải tự động suy luận 'setting_en' và 'supporting_props_en' ăn khớp hoàn toàn với câu chuyện của lời thoại.
     - Đạo cụ phụ trợ ('supporting_props_en'): Ngắn gọn dưới 8 từ, phản chiếu trực quan bối cảnh nhân vật đang nói.
 
     🛑 KHÓA ÂM THANH THUẦN HIỆU ỨNG THỰC TẾ & KHỬ HOÀN TOÀN NHẠC NỀN (ZERO BACKGROUND MUSIC / SFX ONLY):
-    - Toàn bộ video chỉ bao gồm tiếng nhân vật nói trực tiếp (Spoken Voiceover) và tiếng động hiệu ứng môi trường thực tế đời thường (Foley / Sound Effects - SFX: tiếng click đanh gọn, tiếng cắm sạc, tiếng dao thớt, tiếng xèo xèo...).
+    - Toàn bộ video chỉ bao gồm tiếng nhân vật nói trực tiếp (Spoken Voiceover) và tiếng động hiệu ứng môi trường thực tế đời thường (Foley / Sound Effects - SFX: tiếng click đanh gọn, tiếng cắm sạc, tiếng dao thớt, tiếng gió lá cây...).
     - TUYỆT ĐỐI CẤM MỌI DẠNG NHẠC NỀN (Background Music / BGM / Soundtrack / Melody / Instrumental Beat): Không chèn nhạc nền để triệt tiêu 100% nguy cơ vi phạm bản quyền âm thanh trên TikTok, Reels, YouTube Shorts!
     - Trong prompt video bắt buộc ghi rõ: 'Strictly natural Foley sound effects and clean spoken voiceover only, zero background music, zero musical score, no BGM.'
 
@@ -950,7 +972,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V188.0 (PURE FOLEY & ANTI-COPYRIGHT AUDIO SHIELD)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V190.0 (DUAL-SPACE & CINEMATIC ACTING ENGINE)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -972,7 +994,17 @@ def create_scene_details(target_id, mode, style):
     fixed_hook = clean_and_normalize_voiceover(outline.get('hook', ''))
     fixed_setting_base = outline.get('setting', 'Không gian thực tế phù hợp')
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
-    presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích & Đề Xuất")
+    presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)")
+
+    # PHÂN BIỆT RẠCH RÒI: CHỈ KỊCH BẢN FLASH SALE MỚI BÁO KHOẢNG GIÁ, CÒN LẠI DÙNG SOFT-SELL
+    title_lower = str(fixed_title).lower()
+    custom_lower = str(user_custom_note).lower()
+    pres_lower = str(presentation_format).lower()
+    is_flash_sale = (
+        any(k in title_lower for k in ["flash sale", "deal", "giá hời", "sale", "tiết kiệm", "giảm sốc", "kịch bản 5"]) or
+        any(k in custom_lower for k in ["flash sale", "deal", "giá hời", "giảm giá"]) or
+        ("flash sale" in pres_lower)
+    )
     
     dna = st.session_state.get("content_analysis") or {}
     
@@ -1148,6 +1180,17 @@ def create_scene_details(target_id, mode, style):
         "recommended_setting_en": dna.get("recommended_setting_en", "tidy realistic townhouse setting")
     }
 
+    # HƯỚNG DẪN THOẠI CẢNH 4 TỰ ĐỘNG
+    if is_viral:
+        voiceover_c4_guide = "Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow"
+        director_c4_guide = "Action | Kêu gọi tương tác follow"
+    elif is_flash_sale:
+        voiceover_c4_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm sâu chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!"
+        director_c4_guide = "Action | Kích cầu flash sale khoảng giá an toàn"
+    else:
+        voiceover_c4_guide = f"{audience_pronoun.capitalize()} nào thích [kết quả đẹp/tiện lợi] hoặc muốn [viễn cảnh mơ ước] thì đừng bỏ qua em [tên sản phẩm] này nhé, cứ bấm góc trái tham khảo thử nha!"
+        director_c4_guide = "Action | Lời khuyên tự nhiên soft-sell, triệt tiêu cảm giác bán hàng, cấm nhắc giá"
+
     prompt_text = f"""
     DỮ LIỆU ĐẦU VÀO TOÀN DIỆN (BẮT BUỘC THAM CHIẾU QUY CÁCH THỰC TẾ & MÀU HERO SKU KHÓA CỨNG):
     {json.dumps(condensed_dna, ensure_ascii=False)}
@@ -1162,18 +1205,12 @@ def create_scene_details(target_id, mode, style):
     KHÓA DUY NHẤT MÀU HERO SKU XUYÊN SUỐT 4 CẢNH: '{hero_color_str}' (CẤM ĐỔI SANG MÀU KHÁC CỦA BẢNG MÀU).
     KHÓA GIỮ SẢN PHẨM: Cầm trên tay hoặc để lên bàn/kệ/dock sạc, TUYỆT ĐỐI CẤM thả xuống đất, cấm biến mất.
     KHÓA ÂM THANH: CHỈ DÙNG FOLEY HIỆU ỨNG THỰC TẾ ĐỜI SỐNG, TUYỆT ĐỐI CẤM NHẠC NỀN (ZERO BACKGROUND MUSIC / BGM).
+    ĐỊNH HƯỚNG CHỐT CẢNH 4: {'NÓI KHOẢNG GIÁ FLASH SALE' if is_flash_sale else 'SOFT-SELL TỰ NHIÊN, CẤM NHẮC GIÁ TIỀN'}.
     SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
-    KHOẢNG GIÁ GỐC LÀM TRÒN LÊN (CẢNH 4): '{soft_orig_price}' | KHOẢNG GIÁ SALE LÀM TRÒN XUỐNG (CẢNH 4): '{soft_sale_price}'
     QUY CÁCH TIẾP XÚC VẬT LÝ & DÂY DẪN ĐỜI THỰC: '{physical_docking_rule}'
     CÁCH SỬ DỤNG CHUẨN THỰC TẾ: '{condensed_dna.get("how_to_use_real_world")}'
     TƯ THẾ CẦM NẮM/TIẾP XÚC: '{condensed_dna.get("correct_ergonomic_grip")}'
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
-    
-    🛑 CHỈ ĐẠO ĐẶC BIỆT VỀ BỐI CẢNH VÀ ĐẠO CỤ (NARRATIVE SETTING & PROPS SYNC):
-    - Tự động thiết kế 'setting_en' và 'supporting_props_en' trong từng phân cảnh sao cho ĂN KHỚP 100% với câu chuyện KOC đang kể trong 'voiceover':
-      • Nếu thoại nói về làm việc/sạc đêm: setting là góc bàn làm việc gỗ với laptop mở sáng, đèn bàn làm việc ấm, sổ tay, cốc nước.
-      • Nếu thoại nói về nấu ăn/bếp núc: setting là gian bếp sạch sẽ với bếp từ hiện đại, chảo nồi, đĩa đồ ăn chuẩn bị.
-      • Nếu thoại nói về chăm sóc da: setting là bàn trang điểm/bồn rửa mặt với gương soi, khay đựng mỹ phẩm.
     
     TRẢ VỀ JSON CHÍNH XÁC:
     {{
@@ -1196,51 +1233,51 @@ def create_scene_details(target_id, mode, style):
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
-                "setting": "Mô tả bối cảnh mở màn tiếng Việt ăn khớp 100% với thoại...",
-                "setting_en": "Setting description in English perfectly matching the voiceover situation",
-                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
-                "camera_shot": "Vertical 9:16 eye-level three-quarter medium shot",
+                "setting": "Mô tả bối cảnh mở màn (Kho hàng/Showroom/sân mộc thấy sản phẩm thô)...",
+                "setting_en": "Tidy mechanical warehouse, showroom or raw patio establishing space",
+                "supporting_props_en": "as-is raw unplanted structure, soil bags or tool shelves",
+                "camera_shot": "Vertical 9:16 eye-level medium-full establishing shot, tripod locked",
                 "expression_en": "looking at camera with natural empathetic smile",
-                "action_en": "First, holding or positioning product naturally matching real-world specs; then smoothly greeting camera with gentle head nod while maintaining clean hand grip without finger-melting artifacts",
+                "action_en": "First, standing upright beside product to establish 1:1 human scale; then gesturing clearly toward structure while speaking enthusiastically",
                 "sfx": "Foley âm thanh thao tác hoặc môi trường thực tế (tuyệt đối không nhạc nền)",
-                "director": "Attention | Bám sát '{fixed_title}' | Chuỗi tuần tự tự nhiên | Thoại on-camera từ 0.00s",
+                "director": "Attention | Bám sát '{fixed_title}' | Toàn cảnh đo tỉ lệ | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn (18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' chuẩn tiếng Hà Nội..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
-                "setting": "Mô tả bối cảnh cận cảnh ăn khớp 100% với thoại...",
-                "setting_en": "Setting description in English perfectly matching the voiceover situation",
-                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
-                "camera_shot": "Vertical 9:16 eye-level medium close-up",
+                "setting": "Mô tả bối cảnh cận cảnh soi chi tiết cơ học...",
+                "setting_en": "Close engineering setup space",
+                "supporting_props_en": "tightly locked joints, steel-core poles, modular clips",
+                "camera_shot": "Vertical 9:16 low-angle macro shot with subtle tilt-up motion",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
-                "action_en": "{('First, performing: ' + v_proof.get('catalyst_action_en') + '; then smoothly inspecting the functional result with steady hands') if has_visual_proof else 'First, smoothly demonstrating the key feature strictly according to real-world how_to_use; then inspecting the practical motion with clean hand separation'}",
+                "action_en": "First, touching and tapping firmly on connection joint to prove mechanical rigidity; then inspecting structural fit with steady hands",
                 "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR đời thực (tuyệt đối không nhạc nền)'}",
-                "director": "Interest | Thao tác trực quan tuần tự bám sát how_to_use | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
+                "director": "Interest | Thao tác chạm gõ kiểm tra ngàm lắp ghép | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
-                "setting": "Mô tả bối cảnh trải nghiệm ăn khớp 100% với thoại...",
-                "setting_en": "Setting description in English perfectly matching the voiceover situation",
-                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
-                "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
+                "setting": "Mô tả bối cảnh chuyển sang sân thượng/phòng ngập nắng thành quả viên mãn...",
+                "setting_en": "Bright sunny rooftop garden under lush thriving green canopy or elegant finished space",
+                "supporting_props_en": "hanging fresh bountiful harvest, vibrant leaves, natural sun flare",
+                "camera_shot": "Vertical 9:16 under-canopy medium close-up, subtle slow pan",
                 "expression_en": "smiling contentedly with an approving head nod",
-                "action_en": "{('First, revealing transformation: ' + v_proof.get('after_transformation_en') + '; then presenting the satisfying outcome to camera') if has_visual_proof else 'First, smoothly completing the practical usage; then smiling approvingly at the high-efficiency result'}",
-                "sfx": "Tiếng giác quan đời sống thực tế (tuyệt đối không nhạc nền)",
-                "director": "Desire | Bằng chứng biến đổi tuần tự | Thoại on-camera từ 0.00s",
+                "action_en": "First, gently cupping and lifting hanging harvest or refined result from beneath; then admiring outcome before smiling proudly at camera",
+                "sfx": "Tiếng gió lá cây hoặc giác quan đời sống thực tế (tuyệt đối không nhạc nền)",
+                "director": "Desire | Dưới tán giàn thành quả viên mãn | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
-                "setting": "Mô tả bối cảnh kết thúc...",
-                "setting_en": "Warm closing setting description in English",
-                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
-                "camera_shot": "Vertical 9:16 warm eye-level closing shot",
+                "setting": "Mô tả bối cảnh kết thúc trước phông nền thành quả...",
+                "setting_en": "Sunny outdoor rooftop garden or finished home space",
+                "supporting_props_en": "retail boxed unit or seedling pot in hands",
+                "camera_shot": "Vertical 9:16 warm eye-level shot with slow push-in",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
-                "action_en": "First, speaking with welcoming open-palm gestures; then smoothly gesturing toward bottom-left cart while smiling warmly to finish",
+                "action_en": "First, holding retail product firmly in both hands facing lens; then sharing recommendation with warm welcoming smile",
                 "sfx": "Tiếng chuông ting nhẹ nhàng (tuyệt đối không nhạc nền)",
-                "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá khoảng và nay giảm an toàn'}",
-                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'}"
+                "director": "{director_c4_guide}",
+                "voiceover": "{voiceover_c4_guide}"
             }}
         ]
     }}
@@ -1251,7 +1288,8 @@ def create_scene_details(target_id, mode, style):
         num_chars=num_chars, character_profiles=char_profiles,
         custom_note=user_custom_note, presentation_format=presentation_format,
         self_pronoun=self_pronoun, audience_pronoun=audience_pronoun,
-        setting_archetype=setting_archetype, is_fixed_location=is_fixed_location
+        setting_archetype=setting_archetype, is_fixed_location=is_fixed_location,
+        is_flash_sale=is_flash_sale
     )
     res = call_gemini([prompt_text], sys_inst, max_tokens=6500)
     if not res: raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
@@ -1278,7 +1316,7 @@ def create_scene_details(target_id, mode, style):
     dynamic_anti_morph = f", {dna.get('strict_anti_morph_targets')}" if dna.get('strict_anti_morph_targets') else ""
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
     
-    # BỘ CHẶN TIÊU CỰC TOÀN DIỆN: CHẶN NHẠC NỀN BẢN QUYỀN, RƠI ĐỒ, CHI TIẾT THỪA, LẶP TỪ & LỆCH MÀU
+    # BỘ CHẶN TIÊU CỰC TOÀN DIỆN: CHẶN NHẠC NỀN, RƠI ĐỒ, CHI TIẾT THỪA, LẶP TỪ & LỆCH MÀU
     music_negatives = ", background music, musical score, instrumental music, bgm, soundtrack, singing, melody, jingle, synthesizer music, acoustic guitar, piano track, beats, rhythm track, ambient music"
     drop_negatives = ", dropping product, throwing product, tossing item, falling product, product on floor, disappearing product, product vanishing, out of frame product, item falling downwards"
     extra_part_negatives = ", extra parts, phantom objects, morphing artifacts, floating debris, detached components"
@@ -1305,20 +1343,20 @@ def create_scene_details(target_id, mode, style):
         scn["actual_speech_sec"] = actual_speech_time
         total_sec += float(dynamic_scene_sec)
         
+        scene_num = scn.get("scene", 1)
         camera_shot = scn.get("camera_shot", "Vertical 9:16 eye-level medium shot")
         sfx_sound = scn.get("sfx", "Natural Foley sound")
         sfx_sound = re.sub(r'\b(?:movie\s+)?background\s+audio\b', 'ambient room Foley', sfx_sound, flags=re.IGNORECASE)
         sfx_sound = re.sub(r'\b(?:music|soundtrack|melody|song)\b', 'Foley effect', sfx_sound, flags=re.IGNORECASE)
         
         micro_expr_en = scn.get("expression_en", "looking at camera with natural smile")
-        scene_num = scn.get("scene", 1)
         vo_line = scn.get("voiceover", "")
 
         # ĐỒNG BỘ BỐI CẢNH & ĐẠO CỤ THỰC TẾ THEO LỜI THOẠI
         scene_setting_en = scn.get("setting_en") or default_setting
         supporting_props_en = scn.get("supporting_props_en", "").strip()
         raw_action = scn.get("action_en") or f"First, interacting with {clean_prod_en} naturally; then smoothly demonstrating features with steady hands"
-        is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed", "desk", "office"])
+        is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed", "desk", "office", "warehouse", "showroom"])
 
         # THỜI TIẾT TỰ ĐỘNG
         weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, is_indoor=is_indoor_scene)
@@ -1331,6 +1369,10 @@ def create_scene_details(target_id, mode, style):
         
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
+
+        # NẾU LÀ CẢNH 4 DẠNG BÁN ƯỚC MƠ / THỰC TẾ: KOC CẦM TRÊN TAY SẢN PHẨM BÁN THẬT
+        if scene_num == 4 and ("bán ước mơ" in pres_lower or "thành quả" in pres_lower or not is_flash_sale):
+            clean_action = f"First, holding {clean_prod_en} firmly and proudly in both hands facing camera; then sharing natural recommendation with a welcoming warm smile"
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
         docking_phrase = f", {docking_lock_en}" if docking_lock_en else ""
@@ -1347,7 +1389,7 @@ def create_scene_details(target_id, mode, style):
 
         audio_anchor = "Spoken in clear native Northern Vietnamese Hanoi accent."
 
-        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): KHỬ TOÀN BỘ NHẠC NỀN, CHỈ GIỮ FOLEY VÀ THOẠI
+        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): KHỬ TOÀN BỘ NHẠC NỀN, KHÓA GÓC MÁY ĐIỆN ẢNH
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}{props_phrase}. Subject: {actor_full}{asym_pose_anchor}. "
             f"Action: {clean_action}, interacting with solid {clean_prod_en} ({product_scale_en}){docking_phrase}. {retention_lock} "
@@ -1360,14 +1402,16 @@ def create_scene_details(target_id, mode, style):
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     
-    goal_badge = "🌟 <b>Định hướng:</b> Xây Kênh & Kéo Tương Tác / Follow" if is_viral else "🛒 <b>Định hướng:</b> Chốt đơn TikTok Shop an toàn"
+    goal_badge = "🌟 <b>Định hướng:</b> Xây Kênh & Kéo Tương Tác / Follow" if is_viral else ("⚡ <b>Định hướng:</b> Kích cầu Flash Sale (Báo khoảng giá)" if is_flash_sale else "🌿 <b>Định hướng:</b> Chia sẻ tự nhiên Soft-sell (Triệt tiêu cảm giác bán hàng)")
+    price_badge = f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}" if is_flash_sale else "🌿 <b>Định hướng chốt Cảnh 4:</b> Lời khuyên tự nhiên Soft-sell ('thích thì đừng bỏ qua...'), hoàn toàn không nhắc giá tiền"
+    
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
-        f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
+        f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh đan xen 2 không gian'}) | {goal_badge}",
         f"👗 <b>Khóa trang phục Toàn Diện:</b> {master_wardrobe_locked} (Đồng nhất 100% cả 4 cảnh)",
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Đồng nhất 100% cả 4 cảnh, đã chặn màu đối thủ)",
         f"🔇 <b>Âm thanh bản quyền:</b> Thuần Foley SFX thực tế đời sống & Voiceover, triệt tiêu 100% nhạc nền (Zero BGM)",
-        f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}",
+        price_badge,
         f"📐 <b>Tỉ lệ thực tế:</b> {dim_3d_ratio_txt}"
     ]
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
@@ -1388,7 +1432,7 @@ def clone_script(script_id):
     cur_len = len(all_combined)
     target_detail = st.session_state.generated_details.get(int(script_id), st.session_state.generated_details.get(str(script_id), {}))
     user_custom_note = target.get("custom_note") or st.session_state.get("current_input_context", "").strip()
-    presentation_format = target.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích & Đề Xuất")
+    presentation_format = target.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)")
     
     original_voices = []
     if target_detail and "scenes" in target_detail:
@@ -1415,7 +1459,7 @@ def clone_script(script_id):
     prompt = f"""
     SẢN PHẨM: {json.dumps(condensed_dna, ensure_ascii=False)} | GỐC #{script_id}: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
-    NHIỆM VỤ: Giữ nguyên 90% cốt truyện, thông điệp, đòn bẩy giá. Chỉ đổi bối cảnh sinh hoạt và diễn đạt tự nhiên (CẤM các từ 'thuật toán', 'máy phân tích').
+    NHIỆM VỤ: Giữ nguyên 90% cốt truyện, thông điệp, đòn bẩy chốt hạ. Chỉ đổi bối cảnh sinh hoạt và diễn đạt tự nhiên (CẤM các từ 'thuật toán', 'máy phân tích').
     ĐẠI TỪ: Xưng '{self_pronoun}' - Gọi '{audience_pronoun}'.
     TRẢ VỀ JSON:
     {{
@@ -1449,7 +1493,7 @@ def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_mor
     char_rules = generate_char_rules_string(char_profiles)
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
     active_note = extra_note.strip() if extra_note.strip() else st.session_state.get("current_input_context", "").strip()
-    active_format = presentation_format if presentation_format else st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích & Đề Xuất")
+    active_format = presentation_format if presentation_format else st.session_state.get("last_presentation_format", "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)")
     dna = st.session_state.get("content_analysis") or {}
     self_pronoun = dna.get("self_pronoun", "em")
     audience_pronoun = dna.get("audience_pronoun", "các chị em" if "Viral" not in mode else "mọi người")
@@ -1765,7 +1809,7 @@ if is_viral_mode:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: cầm chắc máy xay trên kệ bếp, thoa son trước gương):", key=f"custom_note_viral_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: giàn mướp trĩu quả, thành quả cơm gia đình ấm cúng):", key=f"custom_note_viral_{st.session_state.reset_key}")
     hero_sku_override = ""
 else:
     products_data = supabase.table("products").select("*").execute().data if supabase else []
@@ -1784,18 +1828,20 @@ else:
             for idx, f in enumerate(up_files):
                 cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
                 
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: cầm chắc máy xay trên kệ bếp, thoa son trước gương):", key=f"custom_note_prod_{st.session_state.reset_key}")
+    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: giàn mướp trĩu quả, thành quả cơm gia đình ấm cúng):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
 col_opt1, col_opt2, col_opt3 = st.columns([1.2, 1.2, 1.2])
 style = col_opt1.selectbox("🎨 Phong cách:", ["Điện Ảnh Chân Thực", "Hoạt Hình 3D", "Studio Tối Giản"], key=f"style_sel_{st.session_state.reset_key}")
-angle_options = ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước"]
+angle_options = ["🌟 Tự động mix (1 Flash Sale + 4 Tự Nhiên)", "🌿 Chia sẻ & Bán Ước Mơ", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "⚡ Flash Sale & Deal hời"]
 initial_angle = col_opt1.selectbox("🧭 Chiến lược:", angle_options, key=f"angle_sel_{st.session_state.reset_key}")
 
 presentation_format_opts = [
-    "🌟 AI Tự Động Phân Tích & Đề Xuất", 
-    "📦 Review & Bóc Hộp Soi Chi Tiết (Freshly Unboxed)", 
-    "👶 Trải Nghiệm Thực Tế Đời Sống (Lifestyle POV)", 
-    "⚡ Kết Hợp Cả Hai (Bóc Hộp + Trải Nghiệm Thực Tế)"
+    "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)",
+    "🔥 2. Nỗi Đau & Giải Pháp Thực Tế (Problem-Solving & Setup Proof)",
+    "⚡ 3. Đòn Bẩy Flash Sale & Kích Cầu Giá (Price-Anchor CTA)",
+    "📦 4. Review & Bóc Hộp Soi Chi Tiết (Freshly Unboxed)", 
+    "👶 5. Trải Nghiệm Thực Tế Đời Sống (Lifestyle POV)", 
+    "✨ 6. AI Tự Động Phân Tích & Đề Xuất"
 ]
 selected_presentation_format = col_opt2.selectbox("🎬 Hình thức video:", presentation_format_opts, key=f"pres_format_{st.session_state.reset_key}")
 narrator_mode = col_opt2.selectbox("🎙 Thuyết minh:", ["Nhân vật xuất hiện (On-camera)"], key=f"narrator_sel_{st.session_state.reset_key}")
@@ -1842,7 +1888,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
 
                 override_instruction = f"BẮT BUỘC KHÓA HERO SKU LÀ: '{hero_sku_override.strip()}' theo yêu cầu trực tiếp của người dùng." if hero_sku_override.strip() else "QUÉT OCR ƯU TIÊN TUYỆT ĐỐI Ô PHÂN LOẠI CÓ GẮN ICON NGỌN LỬA '🔥', 'Hot', 'Bán chạy', 'Top 1'. Nếu ô có tag này, BẮT BUỘC 100% chọn ô đó là Hero SKU! Không chọn màu khác khi đã có tag Hot/Bán chạy."
 
-                special_prompt_mode = "MỤC TIÊU VIRAL & XÂY KÊNH: Kích thích tương tác thảo luận, tạo bài học hữu ích hoặc sự thật bất ngờ, kéo Follower. TUYỆT ĐỐI KHÔNG BÁN HÀNG." if is_viral_mode else "MỤC TIÊU BÁN HÀNG TIKTOK SHOP: Tập trung vào giải quyết vấn đề, công năng và chốt đơn an toàn."
+                special_prompt_mode = "MỤC TIÊU VIRAL & XÂY KÊNH: Kích thích tương tác thảo luận, tạo bài học hữu ích hoặc sự thật bất ngờ, kéo Follower. TUYỆT ĐỐI KHÔNG BÁN HÀNG." if is_viral_mode else "MỤC TIÊU BÁN HÀNG TIKTOK SHOP: 4 kịch bản chốt hạ tự nhiên soft-sell (không nhắc giá), 1 kịch bản flash sale kích cầu khoảng giá."
 
                 prompt = f"""
                 INPUT: {input_context_str}
@@ -2004,11 +2050,11 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "prompt_dna_lock": "Visual DNA cho video"
                     }},
                     "outlines": [
-                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp xưng hô chuẩn, dùng từ 'bốn', 'một trăm'...", "actors": {num_chars} }},
-                        {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": {num_chars} }},
-                        {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": {num_chars} }},
-                        {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": {num_chars} }},
-                        {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh đời thực 5...", "hook": "...", "actors": {num_chars} }}
+                        {{ "id": 1, "title": "Nỗi Đau & Rào Cản Thực Tế", "setting": "Kho hàng / Góc mộc vật tư...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp bám sát video 1...", "actors": {num_chars} }},
+                        {{ "id": 2, "title": "Bán Ước Mơ & Chứng Thực Xã Hội", "setting": "Vườn sân thượng hoa lá ngập nắng...", "hook": "Câu hook tò mò xã hội bám sát video 2...", "actors": {num_chars} }},
+                        {{ "id": 3, "title": "Đập Tan Định Kiến Cũ", "setting": "Góc sinh hoạt đời sống hiện đại...", "hook": "...", "actors": {num_chars} }},
+                        {{ "id": 4, "title": "Trải Nghiệm Đời Sống (Lifestyle POV)", "setting": "Không gian sống gia đình tiện nghi...", "hook": "...", "actors": {num_chars} }},
+                        {{ "id": 5, "title": "Đòn Bẩy Flash Sale & Kích Cầu", "setting": "Góc trải nghiệm thực tế trực diện...", "hook": "...", "actors": {num_chars} }}
                     ]
                 }}
                 """
@@ -2110,7 +2156,7 @@ if isinstance(ca, dict):
     with col_row2_right:
         dim_3d = ca.get('dimensional_ratio_analysis', {})
         dim_txt_display = dim_3d.get('aspect_ratio_3d', ca.get('product_dimensions', 'Chuẩn đời thực')) if isinstance(dim_3d, dict) else ca.get('product_dimensions', 'Chuẩn đời thực')
-        loc_type_str = "Khóa 1 vị trí cố định (Single-Location)" if ca.get('is_fixed_location', True) else "Chuyển cảnh theo mạch truyện (Dynamic)"
+        loc_type_str = "Khóa 1 vị trí cố định (Single-Location)" if ca.get('is_fixed_location', True) else "Chuyển cảnh đan xen 2 không gian (Showroom -> Sân thượng trĩu quả)"
         if is_viral_mode:
             c4_html = clean_html(f"""
             <div class="dna-card">
@@ -2138,7 +2184,7 @@ if isinstance(ca, dict):
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
                 <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
-                <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường khoảng {soft_orig}, nay giảm khoảng {soft_sale}</span></div>
+                <div class="dna-row"><span class="dna-label" style="color:#15803d;">🎯 Định hướng chốt deal:</span><span class="dna-text" style="color:#15803d; font-weight:700;">4 kịch bản soft-sell tự nhiên (không nhắc giá) + 1 kịch bản flash sale kích cầu</span></div>
             </div>
             """)
         st.markdown(c4_html, unsafe_allow_html=True)
@@ -2283,13 +2329,13 @@ if all_sc:
             
             c_p1, c_p2 = st.columns(2)
             with c_p1:
-                st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa toàn diện Bối cảnh, Đạo cụ & Giày dép):**")
+                st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa toàn diện Góc máy điện ảnh, Bối cảnh & Đạo cụ):**")
                 st.code(img_p := scn.get('img_p', ''), language="text")
                 safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
                 st.caption("💡 *Mẹo giữ nhân vật & đồ nhiều lớp:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Điểm ngọt 75-85 từ, Khử hoàn toàn nhạc nền):**")
+                st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Điểm ngọt 75-85 từ, Góc máy chuyển động & Khử BGM):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
@@ -2373,7 +2419,7 @@ if all_sc:
     st.divider()
     st.markdown("### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2, cg3, cg4 = st.columns([1.5, 0.8, 1.2, 1.5])
-    a_opts = ["🌟 Tự động mix", "⚡ Flash Sale & Deal hời", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "💡 Chia sẻ", "😂 Hài hước"]
+    a_opts = ["🌟 Tự động mix (1 Flash Sale + 4 Tự Nhiên)", "🌿 Chia sẻ & Bán Ước Mơ", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "⚡ Flash Sale & Deal hời"]
     c_ang = cg1.selectbox("🧭 Chiến lược mới:", a_opts, key=f"ea_{st.session_state.reset_key}")
     c_num = cg2.number_input("Số diễn viên:", 1, 8, num_chars, key=f"en_{st.session_state.reset_key}")
     c_dur_choice = cg3.selectbox("⏳ Thời lượng:", ["Thời lượng động sinh học", "Tùy chỉnh (s)"], key=f"ed_{st.session_state.reset_key}")
