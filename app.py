@@ -810,7 +810,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - CẢ 5 KỊCH BẢN PHẢI TẬP TRUNG: Chia sẻ kiến thức, mẹo vặt hữu ích, sự thật bất ngờ, giải quyết hiểu lầm, hoặc câu chuyện đời thường chân thật chạm cảm xúc.
     - TUYỆT ĐỐI KHÔNG BÁN HÀNG, KHÔNG GIỚI THIỆU GIÁ TIỀN, KHÔNG GIỎ HÀNG, KHÔNG KHUYẾN MÃI, KHÔNG DEAL HỜI.
     """ if is_viral else """
-    🛑 BẮT BUỘC PHÂN BỔ 5 KỊCH BẢN ĐẦU TIÊN THEO ĐÚNG MA TRẬN 5 GÓC TIẾP CẬN TÂM LÝ:
+    🛑 BẮT BUỘC PHÂN BỔ 5 KỊCH BẢN ĐẦU TIÊN THEO ĐÚNG MA TRẬN 5 GÓC TIẾP CẬN TÂM LÝ & THỊ GIÁC:
     - Kịch bản 1: NỖI ĐAU & RÀO CẢN THỰC TẾ (Bám sát video 1: 'Các bác ơi, nhà chật/ngại bừa mà vẫn muốn... thì tham khảo ngay...').
     - Kịch bản 2: BÁN ƯỚC MƠ & CHỨNG THỰC XÃ HỘI (Bám sát video 2: 'Mấy bữa nay ai qua nhà/nhìn vào cũng hỏi... Đây là... nở hoa/lên món đẹp mê luôn').
     - Kịch bản 3: ĐẬP TAN ĐỊNH KIẾN (Cứ ngỡ phức tạp/tốn kém ai ngờ giải pháp mới thông minh).
@@ -886,20 +886,19 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG (DIRECTOR'S SPECIAL OVERRIDE): '{custom_note}'. BẮT BUỘC tuân thủ 100% trong toàn bộ các phân cảnh, lời thoại, và cấu trúc prompt ảnh/video!" if custom_note else ""
 
-    dual_space_director_block = """
-    🛑 QUY CHUẨN ĐẠO DIỄN GÓC QUAY, CHUYỂN CẢNH & DIỄN XUẤT CHUẨN 2 VIDEO TRIỆU VIEW MẪU:
-    1. KỸ THUẬT CHUYỂN CẢNH 2 KHÔNG GIAN ĐAN XEN (DUAL-SPACE TRANSITIONS):
-       - Cảnh 1 & Cảnh 2: Quay tại KHÔNG GIAN CƠ HỌC / SHOWROOM / KHO / SÂN MỘC (thấy sản phẩm mới tinh chưa qua sử dụng, cọc khung, bao đất, kệ dụng cụ, tỷ lệ chuẩn với người thật).
-       - Cảnh 3 & Cảnh 4: Chuyển sang KHÔNG GIAN THÀNH QUẢ VIÊN MÃN (sân thượng ngập nắng, giàn lá xanh mướt trĩu quả, bàn ăn bốc khói, góc làm việc tinh tế gọn gàng).
-    2. MA TRẬN 4 GÓC MÁY ĐIỆN ẢNH CHUẨN MỰC:
-       - Cảnh 1 (0-5s | Establishing): 'Vertical 9:16 eye-level medium-full establishing shot, tripod locked'. Máy cố định ngang tầm mắt, lấy trọn chiều cao 1m8-2m của sản phẩm so với KOC 1m65.
-       - Cảnh 2 (5-11s | Mechanical Detail): 'Vertical 9:16 low-angle macro shot with subtle tilt-up motion'. Máy hạ thấp hất nhẹ lên, bắt cận khớp nối, ngàm lắp ráp, cọc chịu lực.
-       - Cảnh 3 (11-19s | Outcome Under-Canopy): 'Vertical 9:16 under-canopy medium close-up, subtle slow pan'. Đặt máy dưới tán giàn hoặc cận bề mặt thành quả đón ánh nắng tự nhiên.
-       - Cảnh 4 (19-25s | Warm Push-in): 'Vertical 9:16 warm eye-level shot with slow push-in'. Máy tiến tới chậm 10%, KOC mỉm cười nhìn thẳng ống kính tạo độ tin cậy.
-    3. HÀNH VI TIẾP XÚC & DIỄN XUẤT CỦA KOC:
-       - Cảnh 2: Bàn tay chạm hoặc gõ nhẹ vào khớp nối/cọc thép để chứng minh độ cứng vững.
-       - Cảnh 3: Bàn tay luồn xuống dưới nâng đỡ nhẹ nhàng chùm quả/thành quả, mắt ngắm say mê rồi mới mỉm cười quay sang camera.
-       - Cảnh 4: KOC cầm chắc sản phẩm bán lẻ (bầu ươm, hộp sản phẩm) trên tay trước phông nền thành quả, tuyệt đối không thả xuống sàn.
+    visceral_action_director = """
+    🛑 BỘ QUY CHUẨN ĐỘNG LỰC HỌC THỊ GIÁC & HÀNH ĐỘNG CỰC KỲ CUỐN HÚT (VISCERAL ACTION & STRESS TEST ENGINE):
+    1. TRIỆT TIÊU TOÀN BỘ CÁC HÀNH ĐỘNG MƠ HỒ (ZERO VAGUE GESTURES):
+       - TUYỆT ĐỐI CẤM các cụm từ sáo rỗng vô cảm như: 'interacting naturally', 'demonstrating features', 'showing product to camera'.
+       - 100% CÁC PHÂN CẢNH PHẢI ĐƯỢC CHỈ ĐỊNH ĐỘNG TỪ VẬT LÝ SIÊU CỤ THỂ, MẠNH MẼ VÀ TÁC ĐỘNG TRỰC TIẾP LÊN ĐỒ VẬT.
+    2. MA TRẬN 3 NẤC HÀNH ĐỘNG THỊ GIÁC BẮT BUỘC:
+       - CẢNH 1 (Visual Punch Hook): Hành động giật thị giác ngay giây 0.00 (ví dụ: dùng 2 tay ấn mạnh thử lực, búng ngón tay côm cốp vào quả, kéo căng dây, xịt thử 1 tia nước dứt khoát, chỉ thẳng vào điểm độc bản).
+       - CẢNH 2 (Extreme Stress Test / Mechanical Proof): Thử thách cực hạn hoặc bóc tách cơ học siêu cận (ví dụ: gõ mạnh cọc sắt lõi thép vang tiếng đanh chắc, cắm ngập chấu sạc phát ra tiếng click giòn giã, thả vật liệu thử nghiệm bóc tách, quẹt khăn chia đôi mảng sáng tối đối lập).
+       - CẢNH 3 (Satisfying Climax Payoff): Bằng chứng thị giác mãn nhãn (ví dụ: 2 tay nâng đỡ chùm quả trĩu mọng dưới vòm lá đón tia nắng xuyên qua, bẻ đôi quả mọng nước, xé đôi miếng thịt mọng nước bốc khói, bề mặt sáng bóng kin kít soi gương).
+       - CẢNH 4 (Steady Hero Grip): 2 tay nâng giữ chắc chắn sản phẩm thật ngang ngực trước phông nền thành quả, mỉm cười giao tiếp tin cậy với người xem.
+    3. NỐI CẢNH ĐAN XEN 2 KHÔNG GIAN ĐIỆN ẢNH:
+       - Cảnh 1 & Cảnh 2: Không gian showroom/kho mộc/cơ học (thấy sản phẩm mới ráp, cấu trúc vật lý, chưa có thành quả).
+       - Cảnh 3 & Cảnh 4: Nhảy sang Không gian thành quả rực rỡ ngập nắng (sân thượng xanh mướt, bàn ăn thịnh soạn, góc làm việc tinh tế).
     """
 
     return f"""
@@ -908,7 +907,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {dialogue_type_rule}
     {outro_instruction}
     {override_rule}
-    {dual_space_director_block}
+    {visceral_action_director}
     
     🛑 MA TRẬN NHÂN XƯNG ĐỒNG NHẤT (PRONOUN INVARIANCE LOCK):
     - Toàn bộ 4 phân cảnh BẮT BUỘC sử dụng đúng cặp đại từ nhân xưng: KOC tự xưng là '{self_pronoun}' và gọi khán giả là '{audience_pronoun}'.
@@ -972,7 +971,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V190.0 (DUAL-SPACE & CINEMATIC ACTING ENGINE)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V191.0 (VISCERAL DEMONSTRATION & PROOF ENGINE)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1087,6 +1086,12 @@ def create_scene_details(target_id, mode, style):
             "functional_delight": "Trải nghiệm tiện lợi mượt mà, thao tác an tâm tin cậy"
         }
 
+    # BÓC TÁCH MA TRẬN ĐỘNG LỰC HỌC THỊ GIÁC (VISCERAL DEMONSTRATIONS)
+    visceral_dna = dna.get("visceral_demonstration_dna", {})
+    hook_punch_action = visceral_dna.get("hook_punch_action_en") if isinstance(visceral_dna, dict) else ""
+    stress_test_action = visceral_dna.get("stress_test_action_en") if isinstance(visceral_dna, dict) else ""
+    satisfying_payoff_action = visceral_dna.get("satisfying_payoff_action_en") if isinstance(visceral_dna, dict) else ""
+
     # KHÓA GIÀY/DÉP (FOOTWEAR INVARIANCE LOCK)
     footwear_analyzed = dna.get("locked_footwear_en", "")
     if not footwear_analyzed:
@@ -1173,6 +1178,7 @@ def create_scene_details(target_id, mode, style):
         "strict_anti_morph_targets": dna.get("strict_anti_morph_targets", ""),
         "has_visual_proof": has_visual_proof,
         "visual_proof_dna": v_proof,
+        "visceral_demonstration_dna": visceral_dna,
         "universal_sensory_matrix": sensory_info,
         "locked_tuck_en": locked_tuck_en,
         "asym_lock_en": asym_lock_en,
@@ -1210,6 +1216,9 @@ def create_scene_details(target_id, mode, style):
     QUY CÁCH TIẾP XÚC VẬT LÝ & DÂY DẪN ĐỜI THỰC: '{physical_docking_rule}'
     CÁCH SỬ DỤNG CHUẨN THỰC TẾ: '{condensed_dna.get("how_to_use_real_world")}'
     TƯ THẾ CẦM NẮM/TIẾP XÚC: '{condensed_dna.get("correct_ergonomic_grip")}'
+    HÀNH ĐỘNG GIẬT THỊ GIÁC CẢNH 1: {hook_punch_action if hook_punch_action else 'First, firmly gripping or pressing downward on structure with both hands to establish rugged 1:1 scale; then pointing out key feature'}
+    THỬ THÁCH CỰC HẠN CẢNH 2: {stress_test_action if stress_test_action else 'First, tapping knuckle firmly against joints or testing mechanical resilience; then examining snug fit with steady fingers'}
+    BIẾN ĐỔI THỎA MÃN CẢNH 3: {satisfying_payoff_action if satisfying_payoff_action else 'First, gently cupping and lifting finished harvest or flawless outcome from beneath; then admiring result before smiling at camera'}
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
     
     TRẢ VỀ JSON CHÍNH XÁC:
@@ -1238,8 +1247,8 @@ def create_scene_details(target_id, mode, style):
                 "supporting_props_en": "as-is raw unplanted structure, soil bags or tool shelves",
                 "camera_shot": "Vertical 9:16 eye-level medium-full establishing shot, tripod locked",
                 "expression_en": "looking at camera with natural empathetic smile",
-                "action_en": "First, standing upright beside product to establish 1:1 human scale; then gesturing clearly toward structure while speaking enthusiastically",
-                "sfx": "Foley âm thanh thao tác hoặc môi trường thực tế (tuyệt đối không nhạc nền)",
+                "action_en": "{hook_punch_action if hook_punch_action else 'First, standing upright beside product and applying downward palm pressure to prove rugged stability; then gesturing clearly toward key mechanism while speaking enthusiastically'}",
+                "sfx": "Foley âm thanh gõ đanh chắc hoặc thao tác đời thực (tuyệt đối không nhạc nền)",
                 "director": "Attention | Bám sát '{fixed_title}' | Toàn cảnh đo tỉ lệ | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn (18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' chuẩn tiếng Hà Nội..."
             }},
@@ -1250,9 +1259,9 @@ def create_scene_details(target_id, mode, style):
                 "supporting_props_en": "tightly locked joints, steel-core poles, modular clips",
                 "camera_shot": "Vertical 9:16 low-angle macro shot with subtle tilt-up motion",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
-                "action_en": "First, touching and tapping firmly on connection joint to prove mechanical rigidity; then inspecting structural fit with steady hands",
+                "action_en": "{stress_test_action if stress_test_action else 'First, firmly tapping knuckle against core joint to demonstrate absolute mechanical rigidity; then inspecting structural fit with steady steady fingers'}",
                 "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR đời thực (tuyệt đối không nhạc nền)'}",
-                "director": "Interest | Thao tác chạm gõ kiểm tra ngàm lắp ghép | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
+                "director": "Interest | Thao tác chạm gõ thử thách ngàm lắp ghép | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
             }},
             {{
@@ -1262,7 +1271,7 @@ def create_scene_details(target_id, mode, style):
                 "supporting_props_en": "hanging fresh bountiful harvest, vibrant leaves, natural sun flare",
                 "camera_shot": "Vertical 9:16 under-canopy medium close-up, subtle slow pan",
                 "expression_en": "smiling contentedly with an approving head nod",
-                "action_en": "First, gently cupping and lifting hanging harvest or refined result from beneath; then admiring outcome before smiling proudly at camera",
+                "action_en": "{satisfying_payoff_action if satisfying_payoff_action else 'First, gently cupping and lifting hanging harvest or refined result from beneath; then admiring outcome before smiling proudly at camera'}",
                 "sfx": "Tiếng gió lá cây hoặc giác quan đời sống thực tế (tuyệt đối không nhạc nền)",
                 "director": "Desire | Dưới tán giàn thành quả viên mãn | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
@@ -1274,7 +1283,7 @@ def create_scene_details(target_id, mode, style):
                 "supporting_props_en": "retail boxed unit or seedling pot in hands",
                 "camera_shot": "Vertical 9:16 warm eye-level shot with slow push-in",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
-                "action_en": "First, holding retail product firmly in both hands facing lens; then sharing recommendation with warm welcoming smile",
+                "action_en": "First, holding retail product firmly in both hands facing camera; then sharing recommendation with warm welcoming smile",
                 "sfx": "Tiếng chuông ting nhẹ nhàng (tuyệt đối không nhạc nền)",
                 "director": "{director_c4_guide}",
                 "voiceover": "{voiceover_c4_guide}"
@@ -1370,7 +1379,7 @@ def create_scene_details(target_id, mode, style):
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
         clean_action = re.sub(r'\[.*?\]', '', clean_action).strip()
 
-        # NẾU LÀ CẢNH 4 DẠNG BÁN ƯỚC MƠ / THỰC TẾ: KOC CẦM TRÊN TAY SẢN PHẨM BÁN THẬT
+        # NẾU LÀ CẢNH 4: KOC CẦM TRÊN TAY SẢN PHẨM BÁN THẬT
         if scene_num == 4 and ("bán ước mơ" in pres_lower or "thành quả" in pres_lower or not is_flash_sale):
             clean_action = f"First, holding {clean_prod_en} firmly and proudly in both hands facing camera; then sharing natural recommendation with a welcoming warm smile"
 
@@ -1389,7 +1398,7 @@ def create_scene_details(target_id, mode, style):
 
         audio_anchor = "Spoken in clear native Northern Vietnamese Hanoi accent."
 
-        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): KHỬ TOÀN BỘ NHẠC NỀN, KHÓA GÓC MÁY ĐIỆN ẢNH
+        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): KHỬ TOÀN BỘ NHẠC NỀN, KHÓA GÓC MÁY ĐIỆN ẢNH VÀ HÀNH ĐỘNG THỰC TẾ
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}{props_phrase}. Subject: {actor_full}{asym_pose_anchor}. "
             f"Action: {clean_action}, interacting with solid {clean_prod_en} ({product_scale_en}){docking_phrase}. {retention_lock} "
@@ -1860,7 +1869,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
     can_run, msg = check_usage_limit(st.session_state.current_email)
     if not can_run: st.error(msg)
     else:
-        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, thiết lập Ma Trận Đa Giác Quan & Tỉ lệ thực tế..."):
+        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, thiết lập Động Lực Học Thị Giác & Tỉ lệ thực tế..."):
             try:
                 st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars)]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -1913,16 +1922,11 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 - Phân loại setting_archetype: 'Gian bếp nhà phố/chung cư sạch sẽ', 'Phòng tắm gia đình ốp gạch men', 'Góc bàn làm việc gọn gàng', 'Phòng khách ấm cúng'...
                 - Cắm cờ is_fixed_location = true/false.
 
-                🛑 QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI (VISUAL PROOF & TRANSFORMATION DNA):
-                - Xác định rõ ngành hàng và cặp trạng thái Before -> Catalyst Action -> After.
-
-                🛑 QUY CHUẨN MA TRẬN ĐA GIÁC QUAN ĐỜI SỐNG CHO MỌI NGÀNH HÀNG (UNIVERSAL SENSORY MATRIX):
-                - BẮT BUỘC phân tích đầy đủ 4 giác quan đời thực cho sản phẩm này:
-                  • category_type_vi: Phân loại giác quan (Công nghệ & Phụ kiện / Mỹ phẩm & Skincare / Gia dụng & Tiện ích / Ẩm thực & Thức uống / Mẹ & Bé).
-                  • tactile_feel: Cảm giác xúc giác (chất son nhung lì, vỏ máy nhám mờ chống vân tay, inox sáng bóng kin kít, vải mềm mịn, độ đầm tay...).
-                  • visual_aesthetic: Kích thích thị giác (đèn led báo hiệu, màu sắc tiệp da, độ hoàn thiện tinh xảo, màu pastel...).
-                  • auditory_asmr: Kích thích thính giác (tiếng tách cắm cáp đanh chắc, tiếng rít sạch kin kít, tiếng click nắp êm tai, tiếng nhai giòn rụm...).
-                  • functional_delight: Cảm xúc hài lòng (vận hành êm ru, đầm tay chắc chắn, an tâm tuyệt đối, một chạm tiện lợi...).
+                🛑 QUY CHUẨN MA TRẬN ĐỘNG LỰC HỌC THỊ GIÁC & HÀNH ĐỘNG CỰC KỲ CUỐN HÚT (VISCERAL DEMONSTRATION DNA):
+                - BẮT BUỘC phân tích riêng 3 hành động vật lý bùng nổ cho sản phẩm cụ thể này:
+                  • hook_punch_action_en: Hành động giật thị giác ngay Cảnh 1 (ấn mạnh hai tay thử tải trọng, búng ngón tay côm cốp vào quả, kéo căng dây, xịt một tia bọt dứt khoát...).
+                  • stress_test_action_en: Thao tác thử thách cực hạn / soi cơ học chi tiết Cảnh 2 (gõ mạnh cọc thép chứng minh không rung lắc, cắm ngập chấu sạc nghe tiếng tách, chà quẹt chia đôi mảng sạch bẩn...).
+                  • satisfying_payoff_action_en: Kết quả biến đổi cực kỳ đã mắt Cảnh 3 (hai tay nâng đỡ chùm quả chín vàng óng dưới vòm lá, bẻ đôi mọng nước, xé đôi miếng thịt mọng nước bốc khói, mặt kính sáng bóng kin kít soi gương...).
 
                 🛑 QUY CHUẨN PHÂN TÍCH SƠ VIN ĐỘNG THEO BỐI CẢNH (CONTEXT-DRIVEN TUCK-IN ANALYSIS):
                 - BẮT BUỘC phân tích bối cảnh và kiểu dáng để quyết định sơ vin hay không:
@@ -1999,12 +2003,13 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                             "en_prompt_lock": "asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, subtle modest knee-level slit, while the entire left side and front panel are completely solid unbroken fabric with zero slit",
                             "negative_prompt_lock": "mirrored slit, slit on wrong leg, slit on left side, front slit, center slit, inverted cut, high thigh slit"
                         }},
-                        "visual_proof_dna": {{
-                            "category_type": "beauty_cosmetics / home_cleaning / electronics_gadget / mom_and_baby / kids_toy / home_decor / wellness_nutrition / general",
-                            "before_visual": "Mô tả trạng thái trước khi dùng (nỗi đau thị giác)",
-                            "catalyst_action_en": "Mô tả hành động thử nghiệm trực quan trong Cảnh 2 bằng tiếng Anh",
-                            "after_transformation_en": "Mô tả kết quả lột xác trong Cảnh 3 bằng tiếng Anh",
-                            "proof_sfx": "Âm thanh ASMR thực tế (không nhạc nền)"
+                        "visceral_demonstration_dna": {{
+                            "hook_punch_action_en": "Động tác thị giác giật nảy 3 giây đầu (Visual Punch) bằng tiếng Anh",
+                            "stress_test_action_en": "Hành động thử nghiệm thực tế / thử thách cực hạn Cảnh 2 bằng tiếng Anh",
+                            "satisfying_payoff_action_en": "Bằng chứng thị giác đã mắt (Satisfying Payoff) Cảnh 3 bằng tiếng Anh",
+                            "visual_punch_vi": "Mô tả động tác giật mắt bằng tiếng Việt",
+                            "stress_test_vi": "Mô tả thử nghiệm thực tế bằng tiếng Việt",
+                            "satisfying_payoff_vi": "Mô tả kết quả đã mắt bằng tiếng Việt"
                         }},
                         "universal_sensory_matrix": {{
                             "category_type_vi": "Phân loại giác quan (Công nghệ & Phụ kiện / Mỹ phẩm & Skincare / Gia dụng & Tiện ích / Ẩm thực)",
@@ -2084,7 +2089,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma Trận Đa Giác Quan & Tỉ lệ thực tế hoàn hảo!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã thiết lập Động Lực Học Thị Giác & Tỉ lệ thực tế hoàn hảo!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
@@ -2192,20 +2197,18 @@ if isinstance(ca, dict):
     # THU THẬP VÀ ĐÁNH SỐ ĐỘNG CHO CÁC MỤC NÂNG CAO (5, 6, 7...) VÀ CHIA 2 CỘT CÂN ĐỐI
     extra_blocks = []
     
-    # MỤC 5: BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI THỰC TẾ
-    vp_info = ca.get('visual_proof_dna', {})
-    if isinstance(vp_info, dict) and vp_info.get('catalyst_action_en'):
+    # MỤC 5: ĐỘNG LỰC HỌC THỊ GIÁC & THỬ THÁCH THỰC TẾ
+    v_demo = ca.get('visceral_demonstration_dna', {})
+    if isinstance(v_demo, dict) and v_demo.get('hook_punch_action_en'):
         extra_blocks.append({
-            "title_suffix": "Bằng Chứng Thị Giác & Biến Đổi Thực Tế (Visual Proof Engine)",
-            "icon": "🔬",
+            "title_suffix": "Động Lực Học Thị Giác & Thử Thách Cực Hạn (Visceral Demo Engine)",
+            "icon": "⚡",
             "border_color": "#059669",
             "title_color": "#047857",
             "html": clean_html(f"""
-            <div class="dna-row"><span class="dna-label">🏷 Phân loại thử nghiệm:</span><span class="dna-text" style="font-weight:700; color:#065f46;">{str(vp_info.get('category_type', '')).upper()}</span></div>
-            <div class="dna-row"><span class="dna-label">⚡ Nỗi đau thị giác (Trước):</span><span class="dna-text">{clean_analysis_text(vp_info.get('before_visual', ''))}</span></div>
-            <div class="dna-row"><span class="dna-label">🧪 Thao tác kích hoạt (Cảnh 2):</span><span class="dna-text"><code>{vp_info.get('catalyst_action_en', '')}</code></span></div>
-            <div class="dna-row"><span class="dna-label">✨ Bằng chứng lột xác (Cảnh 3):</span><span class="dna-text" style="color:#047857; font-weight:600;"><code>{vp_info.get('after_transformation_en', '')}</code></span></div>
-            <div class="dna-row"><span class="dna-label">🔊 Âm thanh đặc tả (Foley):</span><span class="dna-text" style="color:#15803d;">{clean_analysis_text(vp_info.get('proof_sfx', ''))}</span></div>
+            <div class="dna-row"><span class="dna-label">🥊 Cú sốc thị giác Cảnh 1 (Visual Punch):</span><span class="dna-text" style="font-weight:700; color:#065f46;">{clean_analysis_text(v_demo.get('visual_punch_vi', 'Ấn mạnh hai tay chứng minh độ đầm chắc'))}</span></div>
+            <div class="dna-row"><span class="dna-label">🔬 Thử thách thực tế Cảnh 2 (Stress Test):</span><span class="dna-text" style="font-weight:600; color:#1e40af;">{clean_analysis_text(v_demo.get('stress_test_vi', 'Gõ thử khớp nối và cọc chịu lực'))}</span></div>
+            <div class="dna-row"><span class="dna-label">✨ Biến đổi đã mắt Cảnh 3 (Satisfying Payoff):</span><span class="dna-text" style="font-weight:600; color:#b45309;">{clean_analysis_text(v_demo.get('satisfying_payoff_vi', 'Nâng chùm quả mọng trĩu trịt dưới nắng'))}</span></div>
             """)
         })
 
@@ -2335,7 +2338,7 @@ if all_sc:
                 st.caption("💡 *Mẹo giữ nhân vật & đồ nhiều lớp:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Điểm ngọt 75-85 từ, Góc máy chuyển động & Khử BGM):**")
+                st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Điểm ngọt 75-85 từ, Động lực học thị giác & Khử BGM):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
