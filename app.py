@@ -187,31 +187,43 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 # ==============================================================================
-# BỘ LỌC BẢN QUYỀN & CHUẨN TIẾNG HÀ NỘI
+# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC KOC: ƯU TIÊN USER > AI TỰ ĐỘNG
 # ==============================================================================
-def get_demographics_description(char_profiles):
-    if not char_profiles: return "female", "A 26-year-old native Vietnamese woman"
+def get_demographics_description(char_profiles, ai_koc_persona_en=""):
+    # Kiểm tra xem người dùng có nhập vai trò cụ thể không
+    user_roles = [p.get("role", "").strip() for p in (char_profiles or []) if p.get("role", "").strip()]
+    
+    # TRƯỜNG HỢP 1: NGƯỜI DÙNG KHÔNG NHẬP GÌ -> SỬ DỤNG PHÂN TÍCH TỰ ĐỘNG CỦA AI
+    if not user_roles:
+        if ai_koc_persona_en and len(ai_koc_persona_en.strip()) > 8:
+            gender = "male" if any(k in ai_koc_persona_en.lower() for k in ["man", "father", "male", "boy", "gentleman"]) else "female"
+            return gender, ai_koc_persona_en.strip().capitalize()
+        return "female", "A 28-year-old native Vietnamese woman"
+    
+    # TRƯỜNG HỢP 2: NGƯỜI DÙNG ĐÃ NHẬP VAI TRÒ -> LẤY NGƯỜI DÙNG LÀM ƯU TIÊN TUYỆT ĐỐI
     parts = []
     primary_gender = "female"
     for idx, p in enumerate(char_profiles):
-        role_lower = str(p.get("role", "")).lower()
-        if any(k in role_lower for k in ["bố", "ba", "chồng", "bác trai", "nam", "anh"]):
-            desc = "a 26-year-old native Vietnamese young man"
+        role_lower = str(p.get("role", "")).lower().strip()
+        if not role_lower:
+            desc = "a native Vietnamese person"
+        elif any(k in role_lower for k in ["bố", "ba", "chồng", "bác trai", "nam", "anh", "thanh niên"]):
+            desc = f"a native Vietnamese young man ({p['role']})"
             if idx == 0: primary_gender = "male"
-        elif any(k in role_lower for k in ["ông", "già"]):
-            desc = "a 65-year-old native Vietnamese elderly man"
+        elif any(k in role_lower for k in ["ông", "già", "bác già", "nông dân", "làm vườn"]):
+            desc = f"a native Vietnamese mature gentleman ({p['role']})"
             if idx == 0: primary_gender = "male"
-        elif any(k in role_lower for k in ["bà"]):
-            desc = "a 65-year-old native Vietnamese elderly woman"
+        elif any(k in role_lower for k in ["bà", "bà nội", "bà ngoại"]):
+            desc = f"a native Vietnamese elderly woman ({p['role']})"
             if idx == 0: primary_gender = "female"
         elif any(k in role_lower for k in ["bé trai", "con trai"]):
-            desc = "a cute 4-year-old native Vietnamese boy"
+            desc = f"a cute native Vietnamese boy ({p['role']})"
             if idx == 0: primary_gender = "male"
         elif any(k in role_lower for k in ["bé gái", "con gái", "bé"]):
-            desc = "a cute 4-year-old native Vietnamese girl"
+            desc = f"a cute native Vietnamese girl ({p['role']})"
             if idx == 0: primary_gender = "female"
         else:
-            desc = "a 26-year-old native Vietnamese woman"
+            desc = f"a native Vietnamese woman ({p['role']})"
             if idx == 0: primary_gender = "female"
         parts.append(desc)
     return primary_gender, (parts[0].capitalize() if len(parts) == 1 else " and ".join(parts).capitalize())
@@ -377,8 +389,9 @@ def repair_and_parse_json(text_content: str):
         except: pass
     raise Exception("Lỗi cấu trúc phản hồi từ AI. Vui lòng bấm tạo lại.")
 
+# SỬ DỤNG DANH SÁCH MODEL ỔN ĐỊNH ĐỂ TRIỆT TIÊU 404
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    models_to_try = ["gemini-3.5-flash", "gemini-3.5-flash-lite"]
+    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     last_err = None
     for model_name in models_to_try:
         for attempt in range(3):
@@ -409,6 +422,8 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {viral_dir}
     Ghi chú ưu tiên: {custom_note}
     QUY TẮC CỐT LÕI:
+    - BẮT BUỘC TỰ ĐỘNG PHÂN TÍCH CHÂN DUNG KOC PHÙ HỢP NHẤT VỚI SẢN PHẨM (Ví dụ: giàn cây/thổi lá -> nam/bác 35-50t; đồ bếp -> mẹ trẻ/nội trợ 28-35t; mỹ phẩm -> nữ 22-26t; công nghệ -> nam 24-28t).
+    - Nếu người dùng đã tự nhập vai trò diễn viên thì lấy thông tin người dùng làm ưu tiên cao nhất!
     - Mỗi kịch bản chọn 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - CÂU THOẠI: 100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn', viết rõ 'một trăm'. CẤM 'ngàn', 'trợ giá'.
     - Lời thoại bắt đầu ngay từ 0.00s.
@@ -429,7 +444,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     Ghi chú riêng: {custom_note}
 
     🛑 5 NGUYÊN TẮC BẮT BUỘC ĐỂ ĐẠT 100% NHƯ VIDEO MẪU:
-    1. PHÂN CẢNH ĐỘNG (DYNAMIC 4-6 SCENES): Tự động quyết định 4, 5 hoặc 6 phân cảnh phù hợp với sản phẩm để mạch truyện tự nhiên, đủ các nấc: Hook -> Soi ngàm -> Hành động vật lý -> Thành quả mãn nhãn -> Ứng dụng đời sống -> Cầm sản phẩm khuyên dùng.
+    1. PHÂN CẢNH ĐỘNG (DYNAMIC 4-6 SCENES): Tự động chọn 4, 5 hoặc 6 phân cảnh phù hợp với sản phẩm để mạch truyện tự nhiên, đủ các nấc: Hook -> Soi ngàm -> Hành động vật lý -> Thành quả mãn nhãn -> Ứng dụng đời sống -> Cầm sản phẩm khuyên dùng.
     2. KHÓA 1 NGUYÊN LIỆU THỬ NGHIỆM DUY NHẤT: Cả kịch bản chỉ theo sát 1 nguyên liệu (ví dụ thịt heo làm nem thì chỉ thịt heo, cấm đổi màu cối sang xoài hay đá).
     3. 1 SHOT = 1 VI HÀNH ĐỘNG (MICRO-ACTION): Mỗi cảnh chỉ làm đúng 1 hành động dứt khoát (Cảnh 2: gõ ngàm khóa; Cảnh 3: dao cuộn; Cảnh 4: thìa múc thịt dẻo).
     4. KHÓA MẶT BÀN & BỐI CẢNH CỐ ĐỊNH: Bàn bếp đá cẩm thạch trắng, cấm tự ý đổi sang bàn gỗ; đồ ngoài trời đặt trên sàn bê tông, cấm kê bàn ăn giữa sân.
@@ -446,16 +461,20 @@ def create_scene_details(target_id, mode, style):
     num_chars = outline.get("actors", 1)
     current_active_mode = mode or st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     is_tiktok_shop = ("Viral" not in current_active_mode)
-    detected_gender, detected_demographic_en = get_demographics_description(char_profiles)
 
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_hook = clean_and_normalize_voiceover(outline.get('hook', ''))
-    fixed_setting_base = outline.get('setting', 'Góc bếp gia đình sạch sẽ')
+    fixed_setting_base = outline.get('setting', 'Không gian thực tế phù hợp')
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
     presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "")
 
     is_flash_sale = any(k in f"{fixed_title} {user_custom_note} {presentation_format}".lower() for k in ["flash sale", "deal", "giá hời", "kịch bản 5"])
     dna = st.session_state.get("content_analysis") or {}
+
+    # LẤY CHÂN DUNG KOC PHÙ HỢP TỪ AI PHÂN TÍCH (NẾU USER KHÔNG NHẬP)
+    ai_koc_data = dna.get("koc_demographic_analysis", {})
+    ai_persona_en = ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else ""
+    detected_gender, detected_demographic_en = get_demographics_description(char_profiles, ai_persona_en)
 
     raw_orig = dna.get("original_price_spoken", "ba trăm năm mươi nghìn")
     raw_sale = dna.get("sale_price_spoken", "hai trăm chín mươi nghìn")
@@ -468,17 +487,20 @@ def create_scene_details(target_id, mode, style):
     raw_prod = sanitize_third_party_ip(dna.get("what_and_unique", "sản phẩm"))
     clean_prod = f"{hero_color} {raw_prod}".strip()
 
-    if any(k in fixed_setting_base.lower() for k in ["sân", "vườn", "ngoài trời", "thổi lá"]):
+    if any(k in fixed_setting_base.lower() for k in ["sân", "vườn", "ngoài trời", "thổi lá", "cây"]):
         locked_setting = "clean concrete patio yard with tidy garden background"
         wardrobe = "rugged olive-green polo shirt, durable dark cargo work trousers, outdoor sneakers"
-    else:
+    elif any(k in fixed_setting_base.lower() for k in ["bếp", "kitchen", "nấu", "xay", "thịt", "nồi"]):
         locked_setting = "bright modern kitchen behind a clean white marble countertop"
         wardrobe = "cream-white casual t-shirt, beige linen apron, comfortable trousers, indoor slippers"
+    else:
+        locked_setting = "tidy modern living space"
+        wardrobe = "clean casual lifestyle attire with comfortable footwear"
 
     prompt_text = f"""
     SẢN PHẨM: {clean_prod} | TIÊU ĐỀ: '{fixed_title}' | BỐI CẢNH: {locked_setting}
     TRANG PHỤC KHÓA: {wardrobe}
-    DIỄN VIÊN: {detected_demographic_en}
+    DIỄN VIÊN / KOC: {detected_demographic_en}
     ĐẠI TỪ: '{self_pronoun}' - '{audience_pronoun}'
     ĐỊNH HƯỚNG CHỐT: {'BÁO KHOẢNG GIÁ FLASH SALE' if is_flash_sale else 'SOFT-SELL TỰ NHIÊN, CẤM NHẮC GIÁ'}
     YÊU CẦU ĐẶC BIỆT: {user_custom_note}
@@ -507,7 +529,7 @@ def create_scene_details(target_id, mode, style):
         shot = scn.get("camera_shot", "Vertical 9:16 eye-level medium shot")
         act = scn.get("action_en", "operating product with steady hands")
         sfx = scn.get("sfx", "Natural Foley sound")
-        chaining_txt = f"Continuing seamlessly from previous scene angle on the same white marble countertop: " if idx > 1 else ""
+        chaining_txt = f"Continuing seamlessly from previous scene angle on the same surface: " if idx > 1 else ""
 
         if idx == num_scenes and not is_flash_sale:
             act = f"First, holding {clean_prod} firmly in both hands facing camera; then smiling warmly to share natural recommendation"
@@ -518,7 +540,7 @@ def create_scene_details(target_id, mode, style):
 
     res["total_dur"] = f"Khoảng {int(total_sec)} giây ({num_scenes} phân cảnh)"
     price_badge = f"💰 Khoảng giá: Bình thường khoảng {soft_orig}, nay giảm khoảng {soft_sale}" if is_flash_sale else "🌿 Lời khuyên Soft-sell tự nhiên (Không nhắc giá tiền)"
-    res["director_summary"] = f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s ({num_scenes} phân cảnh tự động) | 🎬 <b>Hình thức:</b> {presentation_format}<br>👗 <b>Trang phục & Bối cảnh khóa cứng:</b> {wardrobe} tại {locked_setting}<br>🔇 <b>Âm thanh:</b> Thuần Foley & Thoại trực tiếp (Zero BGM) | {price_badge}"
+    res["director_summary"] = f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s ({num_scenes} phân cảnh tự động) | 🎬 <b>Hình thức:</b> {presentation_format}<br>👤 <b>Chân dung KOC:</b> {detected_demographic_en}<br>👗 <b>Trang phục & Bối cảnh:</b> {wardrobe} tại {locked_setting}<br>🔇 <b>Âm thanh:</b> Thuần Foley & Thoại trực tiếp (Zero BGM) | {price_badge}"
 
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -820,24 +842,34 @@ presentation_format_opts = [
 ]
 selected_format = st.selectbox("🎬 Hình thức video:", presentation_format_opts, key=f"pres_{st.session_state.reset_key}")
 
+# Module chọn số lượng diễn viên & nhập vai trò (Để trống = AI tự chọn)
 num_chars_input = st.number_input("👤 Số lượng diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", min_value=1, max_value=4, value=1, key=f"chars_num_{st.session_state.reset_key}")
 char_inputs = []
 for i in range(num_chars_input):
     col_c1, col_c2 = st.columns([2, 1])
-    role_def = "Nữ KOC 26 tuổi người Việt" if i == 0 else f"Diễn viên {i+1} người Việt"
-    c_role = col_c1.text_input(f"Vai trò Diễn viên {i+1}:", value=role_def, key=f"role_{i}_{st.session_state.reset_key}")
-    c_img = col_c2.file_uploader(f"Ảnh Diễn viên {i+1} (Chỉ lấy khuôn mặt):", type=["jpg", "png"], key=f"cimg_{i}_{st.session_state.reset_key}")
-    if c_img: char_inputs.append({"id": i+1, "role": c_role, "file": c_img})
+    c_role = col_c1.text_input(
+        f"Vai trò Diễn viên {i+1} (Để trống để AI tự phân tích phù hợp):",
+        value="",
+        placeholder="Để trống = AI tự phân tích (hoặc nhập: Bác làm vườn 45t, Mẹ bỉm 28t...)",
+        key=f"role_{i}_{st.session_state.reset_key}"
+    )
+    c_img = col_c2.file_uploader(f"Ảnh Diễn viên {i+1} (Tùy chọn):", type=["jpg", "png"], key=f"cimg_{i}_{st.session_state.reset_key}")
+    char_inputs.append({"id": i+1, "role": c_role.strip(), "file": c_img})
 
 if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
-    with st.spinner("⏳ Đang phân tích dữ liệu sản phẩm, trích xuất đặc trưng sinh trắc học và tạo 5 kịch bản..."):
+    with st.spinner("⏳ Đang phân tích dữ liệu sản phẩm, lựa chọn KOC phù hợp và xây dựng 5 kịch bản..."):
         try:
-            st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars_input)]
+            st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
             st.session_state["saved_reference_images"] = [compress_image_bytes(f, 768, 75) for f in up_files] if up_files else []
             
+            # Gợi ý cho AI nếu người dùng để trống
+            user_roles_specified = [c["role"] for c in char_inputs if c["role"]]
+            koc_directive = f"Người dùng đã chỉ định diễn viên: {', '.join(user_roles_specified)}. Bắt buộc tuân thủ 100%!" if user_roles_specified else "Người dùng để trống vai trò diễn viên: BẮT BUỘC bạn phải tự động phân tích sản phẩm và bối cảnh để chọn ra chân dung KOC phù hợp nhất (Ví dụ: giàn cây/thổi lá -> nam/bác 35-50t; đồ bếp -> mẹ trẻ/nội trợ 28-35t; mỹ phẩm -> nữ 22-26t; công nghệ -> nam 24-28t). Trả về trong 'koc_demographic_analysis'!"
+
             prompt = f"""
             PHÂN TÍCH SẢN PHẨM & TẠO 5 KỊCH BẢN CHUẨN THƯƠNG MẠI:
             - Ghi chú riêng: '{custom_note}' | SKU ưu tiên: '{hero_sku_override}'.
+            - {koc_directive}
             - BẮT BUỘC 5 KỊCH BẢN ĐẠI DIỆN CHO 5 GÓC ĐỘ: Nỗi đau, Bán ước mơ, Đập tan định kiến, Lifestyle POV, Flash Sale.
             TRẢ VỀ JSON:
             {{
@@ -854,6 +886,11 @@ if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_contai
                     "recommended_format": "{selected_format}",
                     "how_to_use": "Thao tác chuẩn đời thực",
                     "product_dimensions": "Kích thước 3 chiều đời thực",
+                    "koc_demographic_analysis": {{
+                        "gender": "male hoặc female",
+                        "persona_vi": "Mô tả chân dung KOC phù hợp bằng tiếng Việt (ví dụ: Người đàn ông 35 tuổi thích chăm sóc sân vườn)",
+                        "persona_en": "a 35-year-old native Vietnamese man with a friendly practical look"
+                    }},
                     "visceral_demonstration_dna": {{
                         "visual_punch_vi": "Cú sốc thị giác giật nảy 3 giây đầu",
                         "stress_test_vi": "Thử thách cực hạn / soi ngàm cơ học",
@@ -883,8 +920,9 @@ if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_contai
             """
             payload = ["IMAGES:"] + [types.Part.from_bytes(data=cb, mime_type=cm) for cb, cm in st.session_state["saved_reference_images"]]
             for c in char_inputs:
-                cb, cm = compress_image_bytes(c['file'], 768, 75)
-                payload.extend([f"ACTOR {c['id']} FACE ONLY:", types.Part.from_bytes(data=cb, mime_type=cm)])
+                if c.get("file"):
+                    cb, cm = compress_image_bytes(c['file'], 768, 75)
+                    payload.extend([f"ACTOR {c['id']} FACE ONLY:", types.Part.from_bytes(data=cb, mime_type=cm)])
             payload.append(prompt)
 
             res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", num_chars_input, "Tự động mix", custom_note, selected_format))
@@ -903,6 +941,10 @@ if isinstance(ca, dict) and ca.get("target_audience"):
     st.divider()
     st.markdown("### 🔍 **Phân Tích Chi Tiết Sản Phẩm & Kịch Bản**")
     
+    koc_auto_desc = ca.get('koc_demographic_analysis', {}).get('persona_vi', 'Tự động chọn KOC phù hợp') if isinstance(ca.get('koc_demographic_analysis'), dict) else 'Tự động chọn KOC'
+    user_specified_actors = [p['role'] for p in st.session_state.get('character_profiles', []) if p.get('role')]
+    koc_final_display = f"👤 <b>KOC:</b> {', '.join(user_specified_actors)} (Người dùng chỉ định)" if user_specified_actors else f"🤖 <b>KOC tự động:</b> {koc_auto_desc}"
+
     # Hàng 1: Thẻ 1 & 2
     c_r1_l, c_r1_r = st.columns(2)
     with c_r1_l:
@@ -918,7 +960,8 @@ if isinstance(ca, dict) and ca.get("target_audience"):
     with c_r1_r:
         st.markdown(clean_html(f"""
         <div class="dna-card">
-            <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy & Ma Trận Nhân Xưng</div>
+            <div class="dna-card-title">🔥 2. Diễn Viên KOC & Mã Màu Bán Chạy</div>
+            <div class="dna-row"><span class="dna-label">🎭 Chân dung KOC:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{koc_final_display}</span></div>
             <div class="dna-row"><span class="dna-label">⭐ SKU ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{ca.get('hero_sku_color')}</span></div>
             <div class="dna-row"><span class="dna-label">🗣 Nhân xưng chuẩn:</span><span class="dna-text" style="color:#15803d; font-weight:700;">Xưng '{ca.get('self_pronoun')}' - Gọi '{ca.get('audience_pronoun')}'</span></div>
             <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text">{ca.get('setting_archetype')}</span></div>
