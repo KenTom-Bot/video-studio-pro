@@ -389,14 +389,21 @@ def repair_and_parse_json(text_content: str):
 
 # HỆ THỐNG GỌI MODEL THẾ HỆ MỚI AN TOÀN
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    models_to_try = ["gemini-2.5-flash", "gemini-2.0-flash"]
+    def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
+    models_to_try = ["gemini-3.5-flash-lite", "gemini-3.5-flash"]
     last_err = None
     for model_name in models_to_try:
         for attempt in range(3):
             try:
                 res = client.models.generate_content(
-                    model=model_name, contents=contents,
-                    config=types.GenerateContentConfig(system_instruction=sys_inst, response_mime_type="application/json", temperature=0.7, max_output_tokens=max_tokens)
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=sys_inst,
+                        response_mime_type="application/json",
+                        temperature=0.7,
+                        max_output_tokens=max_tokens
+                    )
                 )
                 return repair_and_parse_json(res.text)
             except Exception as e:
