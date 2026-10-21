@@ -112,18 +112,16 @@ def clean_html(raw_html: str) -> str:
     return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
 
 # ==============================================================================
-# THUẬT TOÁN PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT CHUẨN XÁC TỪNG CON SỐ
+# PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT & TÂM LÝ HỌC NEO GIÁ
 # ==============================================================================
 def number_to_vietnamese_words(n: int) -> str:
     if n == 0: return "không đồng"
     digits = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"]
-    
     def read_block_3(num_str, is_highest=False):
         num_str = num_str.zfill(3)
         h, t, u = int(num_str[0]), int(num_str[1]), int(num_str[2])
         res = []
-        if not is_highest or h > 0:
-            res.append(digits[h] + " trăm")
+        if not is_highest or h > 0: res.append(digits[h] + " trăm")
         if t == 0 and u == 0: pass
         elif t == 0 and u != 0:
             if not is_highest or h > 0: res.append("linh " + digits[u])
@@ -161,10 +159,8 @@ def number_to_vietnamese_words(n: int) -> str:
 def extract_and_convert_prices_in_text(raw_text: str) -> str:
     if not raw_text: return ""
     def replace_k(match):
-        val = int(match.group(1)) * 1000
-        return number_to_vietnamese_words(val).replace(" đồng", "")
+        return number_to_vietnamese_words(int(match.group(1)) * 1000).replace(" đồng", "")
     text = re.sub(r'\b(\d{1,4})\s*[kK]\b', replace_k, raw_text)
-
     def replace_num(match):
         num_str = match.group(1).replace('.', '').replace(',', '')
         try:
@@ -473,7 +469,6 @@ def create_scene_details(target_id, mode, style):
     raw_prod = sanitize_third_party_ip(dna.get("what_and_unique", "sản phẩm"))
     clean_prod = f"{hero_color} {raw_prod}".strip()
 
-    # Bối cảnh & Trang phục theo kịch bản
     if any(k in fixed_setting_base.lower() for k in ["sân", "vườn", "ngoài trời", "thổi lá"]):
         locked_setting = "clean concrete patio yard with tidy garden background"
         wardrobe = "rugged olive-green polo shirt, durable dark cargo work trousers, outdoor sneakers"
@@ -730,56 +725,75 @@ presentation_format_opts = [
 ]
 selected_format = st.selectbox("🎬 Hình thức video:", presentation_format_opts, key=f"pres_{st.session_state.reset_key}")
 
+# Module chọn số lượng diễn viên & upload ảnh nhân vật
+num_chars_input = st.number_input("👤 Số lượng diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", min_value=1, max_value=4, value=1, key=f"chars_num_{st.session_state.reset_key}")
+char_inputs = []
+for i in range(num_chars_input):
+    col_c1, col_c2 = st.columns([2, 1])
+    role_def = "Nữ KOC 26 tuổi người Việt" if i == 0 else f"Diễn viên {i+1} người Việt"
+    c_role = col_c1.text_input(f"Vai trò Diễn viên {i+1}:", value=role_def, key=f"role_{i}_{st.session_state.reset_key}")
+    c_img = col_c2.file_uploader(f"Ảnh Diễn viên {i+1} (Chỉ lấy khuôn mặt):", type=["jpg", "png"], key=f"cimg_{i}_{st.session_state.reset_key}")
+    if c_img: char_inputs.append({"id": i+1, "role": c_role, "file": c_img})
+
 if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
-    with st.spinner("⏳ Đang quét dữ liệu, thiết lập DNA Đa Giác Quan và xây dựng kịch bản..."):
+    with st.spinner("⏳ Đang quét dữ liệu hình ảnh, trích xuất đặc trưng sinh trắc học và tạo 5 kịch bản..."):
         try:
+            st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars_input)]
             st.session_state["saved_reference_images"] = [compress_image_bytes(f, 768, 75) for f in up_files] if up_files else []
+            
             prompt = f"""
-            PHÂN TÍCH SẢN PHẨM & TẠO 5 KỊCH BẢN TỰ NHIÊN:
-            - Ghi chú riêng: '{custom_note}' | SKU ưu tiên: '{hero_sku_override}'.
+            PHÂN TÍCH SẢN PHẨM & TẠO 5 KỊCH BẢN CHUẨN THƯƠNG MẠI:
+            - Ghi chú ưu tiên: '{custom_note}' | SKU ưu tiên: '{hero_sku_override}'.
             - BẮT BUỘC 5 KỊCH BẢN ĐẠI DIỆN CHO 5 GÓC ĐỘ: Nỗi đau, Bán ước mơ, Đập tan định kiến, Lifestyle POV, Flash Sale.
             TRẢ VỀ JSON:
             {{
                 "content_analysis": {{
                     "self_pronoun": "em", "audience_pronoun": "các chị em",
-                    "setting_archetype": "Góc bếp hiện đại sạch sẽ với mặt bàn đá cẩm thạch trắng",
-                    "hero_sku_color": "{hero_sku_override or 'nâu chuẩn ảnh'}",
-                    "what_and_unique": "Máy xay mini đa năng: Cối thủy tinh chịu lực, lưỡi dao thép 4 cánh sắc bén",
-                    "target_audience": "Nội trợ, mẹ bỉm sữa, người thích nấu ăn tại nhà",
-                    "pain_points": "Ngại băm thịt mỏi tay, máy xay cồng kềnh khó rửa",
-                    "why_buy": "Xay thịt dẻo quánh làm giò nem nhanh chóng, cối thủy tinh không ám mùi",
-                    "where_and_convenience": "Đặt trên bàn bếp gọn gàng, bấm nhả tiện lợi",
-                    "hook_element": "Đập tan nỗi sợ băm thịt mỏi tay",
+                    "setting_archetype": "Bối cảnh chuẩn mực đời thực phù hợp sản phẩm",
+                    "hero_sku_color": "{hero_sku_override or 'chuẩn ảnh'}",
+                    "what_and_unique": "[Tên sản phẩm]: [USP độc bản]",
+                    "target_audience": "Tệp khách hàng mục tiêu",
+                    "pain_points": "Nỗi đau thực tế lớn nhất",
+                    "why_buy": "Lý do thuyết phục không thể từ chối",
+                    "where_and_convenience": "Hoàn cảnh ứng dụng và sự tiện lợi",
+                    "hook_element": "Yếu tố giật gân 3 giây đầu",
                     "recommended_format": "{selected_format}",
-                    "format_reason": "Dẫn dắt trực quan qua bằng chứng thành quả",
-                    "how_to_use": "Bỏ thịt vào cối, đậy nắp, nhấn nhẹ nút trên đỉnh cối",
-                    "product_dimensions": "Cao 22cm x Đường kính 12cm",
+                    "how_to_use": "Thao tác chuẩn đời thực",
+                    "product_dimensions": "Kích thước 3 chiều đời thực",
                     "visceral_demonstration_dna": {{
-                        "visual_punch_vi": "Hai tay ấn mạnh lên cối chứng minh độ vững chãi",
-                        "stress_test_vi": "Bỏ miếng thịt dày vào nhấn nút lưỡi dao xoáy tít nhuyễn mịn",
-                        "satisfying_payoff_vi": "Dùng thìa múc thịt xay dẻo quánh, không còn một sợi gân"
+                        "visual_punch_vi": "Cú sốc thị giác giật nảy 3 giây đầu",
+                        "stress_test_vi": "Thử thách cực hạn / soi ngàm cơ học",
+                        "satisfying_payoff_vi": "Kết quả biến đổi cực kỳ đã mắt"
                     }},
                     "universal_sensory_matrix": {{
-                        "category_type_vi": "Gia dụng nhà bếp",
-                        "tactile_feel": "Cối thủy tinh đầm tay, nắp bấm êm ái",
-                        "visual_aesthetic": "Màu nâu sang trọng, cối trong suốt nhìn rõ thịt xay",
-                        "auditory_asmr": "Tiếng dao chém thịt đanh gọn, tiếng motor chạy êm ru",
-                        "functional_delight": "Thịt xay mịn tưng chỉ sau vài giây"
+                        "category_type_vi": "Ngành hàng thực tế",
+                        "tactile_feel": "Xúc giác chân thực",
+                        "visual_aesthetic": "Thị giác ấn tượng",
+                        "auditory_asmr": "Âm thanh ASMR thực tế đời sống",
+                        "functional_delight": "Cảm xúc thỏa mãn tiện lợi"
+                    }},
+                    "spatial_asymmetry_analysis": {{
+                        "has_asymmetry": false, "feature_type": "none", "anatomical_location_vi": "none"
                     }},
                     "exact_original_price_ocr": "350.000đ", "exact_sale_price_ocr": "290.000đ",
                     "original_price_spoken": "ba trăm năm mươi nghìn đồng", "sale_price_spoken": "hai trăm chín mươi nghìn đồng"
                 }},
                 "outlines": [
-                    {{"id": 1, "title": "Nỗi Đau & Rào Cản Thực Tế", "setting": "Góc bếp gia đình bàn đá trắng", "hook": "Các bác ơi, thích ăn nem rán giò chả mà ngại băm thịt thì xem ngay em này nhé!"}},
-                    {{"id": 2, "title": "Bán Ước Mơ & Chứng Thực Xã Hội", "setting": "Bàn ăn gia đình thơm phức", "hook": "Mấy bữa nay ai ăn nem nhà em cũng hỏi sao thịt xay dẻo quánh ngon thế!"}},
-                    {{"id": 3, "title": "Đập Tan Định Kiến Cũ", "setting": "Góc bếp hiện đại", "hook": "Trước cứ nghĩ máy xay mini là yếu, ai ngờ xay nửa cân thịt dẻo quánh trong 5 giây!"}},
-                    {{"id": 4, "title": "Trải Nghiệm Đời Sống (Lifestyle POV)", "setting": "Gian bếp gia đình ấm cúng", "hook": "Đi làm về muộn mà vẫn làm được đĩa nem nóng hổi cho cả nhà nhàn tênh!"}},
-                    {{"id": 5, "title": "Đòn Bẩy Flash Sale & Kích Cầu", "setting": "Góc bếp trải nghiệm", "hook": "Bác nào đang tìm máy xay cối thủy tinh thì tranh thủ đợt giảm sâu này nhé!"}}
+                    {{"id": 1, "title": "Nỗi Đau & Rào Cản Thực Tế", "setting": "Bối cảnh đời thực 1", "hook": "Câu hook ngắn gọn KOC nói trực tiếp..."}},
+                    {{"id": 2, "title": "Bán Ước Mơ & Chứng Thực Xã Hội", "setting": "Bối cảnh đời thực 2", "hook": "Câu hook tò mò xã hội..."}},
+                    {{"id": 3, "title": "Đập Tan Định Kiến Cũ", "setting": "Bối cảnh đời thực 3", "hook": "..."}},
+                    {{"id": 4, "title": "Trải Nghiệm Đời Sống (Lifestyle POV)", "setting": "Bối cảnh đời thực 4", "hook": "..."}},
+                    {{"id": 5, "title": "Đòn Bẩy Flash Sale & Kích Cầu", "setting": "Bối cảnh đời thực 5", "hook": "..."}}
                 ]
             }}
             """
-            payload = ["IMAGES:"] + [types.Part.from_bytes(data=cb, mime_type=cm) for cb, cm in st.session_state["saved_reference_images"]] + [prompt]
-            res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", 1, "Tự động mix", custom_note, selected_format))
+            payload = ["IMAGES:"] + [types.Part.from_bytes(data=cb, mime_type=cm) for cb, cm in st.session_state["saved_reference_images"]]
+            for c in char_inputs:
+                cb, cm = compress_image_bytes(c['file'], 768, 75)
+                payload.extend([f"ACTOR {c['id']} FACE ONLY:", types.Part.from_bytes(data=cb, mime_type=cm)])
+            payload.append(prompt)
+
+            res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", num_chars_input, "Tự động mix", custom_note, selected_format))
             st.session_state.content_analysis = res.get("content_analysis", {})
             outlines = res.get("outlines", [])
             for o in outlines: o["presentation_format"] = selected_format
@@ -788,12 +802,14 @@ if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_contai
         except Exception as e: st.error(f"Lỗi: {e}")
 
 # ==============================================================================
-# BẢNG PHÂN TÍCH DNA 2 CỘT ĐỐI XỨNG
+# BẢNG PHÂN TÍCH DNA 2 CỘT ĐỐI XỨNG (HIỂN THỊ ĐỦ 7 THẺ)
 # ==============================================================================
 ca = st.session_state.content_analysis
 if isinstance(ca, dict) and ca.get("target_audience"):
     st.divider()
     st.markdown("### 🔍 **Phân Tích Chi Tiết Sản Phẩm & Kịch Bản**")
+    
+    # Hàng 1: Thẻ 1 & 2
     c_r1_l, c_r1_r = st.columns(2)
     with c_r1_l:
         st.markdown(clean_html(f"""
@@ -815,6 +831,7 @@ if isinstance(ca, dict) and ca.get("target_audience"):
         </div>
         """), unsafe_allow_html=True)
 
+    # Hàng 2: Thẻ 3 & 4
     c_r2_l, c_r2_r = st.columns(2)
     with c_r2_l:
         st.markdown(clean_html(f"""
@@ -832,6 +849,29 @@ if isinstance(ca, dict) and ca.get("target_audience"):
             <div class="dna-row"><span class="dna-label">📐 Kích thước thực tế:</span><span class="dna-text">{ca.get('product_dimensions')}</span></div>
             <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
             <div class="dna-row"><span class="dna-label" style="color:#15803d;">🎯 Định hướng chốt:</span><span class="dna-text" style="color:#15803d; font-weight:700;">Soft-sell tự nhiên (Không nhắc giá ở 4 kịch bản thường)</span></div>
+        </div>
+        """), unsafe_allow_html=True)
+
+    # Hàng 3: Thẻ 5 & 6
+    v_demo = ca.get('visceral_demonstration_dna', {})
+    s_mat = ca.get('universal_sensory_matrix', {})
+    c_r3_l, c_r3_r = st.columns(2)
+    with c_r3_l:
+        st.markdown(clean_html(f"""
+        <div class="dna-card" style="border-left: 4px solid #059669;">
+            <div class="dna-card-title" style="color:#047857;">⚡ 5. Động Lực Học Thị Giác & Thử Thách Cực Hạn</div>
+            <div class="dna-row"><span class="dna-label">🥊 Cú sốc thị giác Cảnh 1:</span><span class="dna-text">{v_demo.get('visual_punch_vi')}</span></div>
+            <div class="dna-row"><span class="dna-label">🔬 Thử thách thực tế Cảnh 2:</span><span class="dna-text">{v_demo.get('stress_test_vi')}</span></div>
+            <div class="dna-row"><span class="dna-label">✨ Biến đổi đã mắt Cảnh 3:</span><span class="dna-text" style="color:#b45309; font-weight:700;">{v_demo.get('satisfying_payoff_vi')}</span></div>
+        </div>
+        """), unsafe_allow_html=True)
+    with c_r3_r:
+        st.markdown(clean_html(f"""
+        <div class="dna-card" style="border-left: 4px solid #f97316;">
+            <div class="dna-card-title" style="color:#ea580c;">✨ 6. Kích Hoạt Đa Giác Quan Đời Sống (ASMR)</div>
+            <div class="dna-row"><span class="dna-label">🖐 Xúc giác:</span><span class="dna-text">{s_mat.get('tactile_feel')}</span></div>
+            <div class="dna-row"><span class="dna-label">👁 Thị giác:</span><span class="dna-text">{s_mat.get('visual_aesthetic')}</span></div>
+            <div class="dna-row"><span class="dna-label">👂 Thính giác ASMR:</span><span class="dna-text" style="color:#15803d; font-weight:700;">{s_mat.get('auditory_asmr')}</span></div>
         </div>
         """), unsafe_allow_html=True)
 
