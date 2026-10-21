@@ -66,6 +66,7 @@ st.markdown("""
     .dna-label { font-weight: 700; color: #0f172a; font-size: 14px; display: inline-block; margin-right: 5px; }
     .dna-text { font-weight: 400 !important; color: #334155 !important; font-size: 14px !important; line-height: 1.65 !important; }
     .dna-bullet { margin-left: 10px; margin-top: 3px; color: #334155; font-weight: 400; font-size: 14px; line-height: 1.65; }
+    .script-summary-box { background: #f8fafc; border-left: 3.5px solid #3b82f6; padding: 9px 12px; border-radius: 4px; margin-top: 6px; margin-bottom: 6px; font-size: 13.5px; line-height: 1.65; color: #1e293b; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -366,7 +367,7 @@ for key, default_val in [
     ("reset_key", 0), ("scroll_to_top", False), ("scroll_to_detail", False),
     ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
     ("last_mode", "🛒 TikTok Shop & Bán Hàng"), ("last_style", "Điện Ảnh Chân Thực"), ("last_narrator", "On-camera"),
-    ("last_presentation_format", "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)"),
+    ("last_presentation_format", "🌟 Tự Động Phối Hợp Đa Dạng Hình Thức (Khuyên dùng)"),
     ("character_profiles", []), ("current_project_id", None), ("saved_reference_images", []),
     ("show_all_projects", False), ("show_all_admin_accounts", False),
     ("current_processing_id", None), ("current_cloning_id", None)
@@ -416,21 +417,26 @@ def build_voice_direction(mode, num_chars, character_profiles):
     return f"100% Giọng Hà Nội chuẩn bản địa, phát âm tròn vành rõ chữ, số 4 đọc là 'bốn', {speed_txt}. Khẩu ngữ đời thường, tự nhiên."
 
 def generate_char_rules_string(profiles):
-    return "100% người Việt Nam bản địa, nhân vật hư cấu đời thường, tóc đen tuyền tự nhiên, giữ nguyên duy nhất 1 khuôn mặt và 1 kiểu tóc suốt các cảnh."
+    return "100% người Việt Nam bản địa, nhân vật KOC hư cấu đời thường, tóc đen tuyền tự nhiên, giữ nguyên duy nhất 1 khuôn mặt và 1 kiểu tóc suốt các cảnh."
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
     is_viral = ("Viral" in mode)
-    viral_dir = "VIRAL & XÂY KÊNH: Kéo Follow, chia sẻ mẹo thật, không bán hàng, không báo giá." if is_viral else "TIKTOK SHOP: Kịch bản 1 Nỗi đau, Kịch bản 2 Bán ước mơ, Kịch bản 3 Đập tan định kiến, Kịch bản 4 Trải nghiệm đời sống, Kịch bản 5 Flash Sale kích cầu khoảng giá."
+    viral_dir = "VIRAL & XÂY KÊNH: Kéo Follow, chia sẻ mẹo thật, không bán hàng, không báo giá." if is_viral else "TIKTOK SHOP: Kịch bản 1 Nỗi đau thực tế, Kịch bản 2 Trải nghiệm & Thành quả, Kịch bản 3 Đập tan hoài nghi, Kịch bản 4 Phong cách sống thực tế, Kịch bản 5 Ưu đãi & Kích cầu giá."
     return f"""
     TỔNG ĐẠO DIỄN VIDEO TRIỆU VIEW. PHONG CÁCH: {style}.
     {viral_dir}
     Ghi chú ưu tiên: {custom_note}
-    QUY TẮC CỐT LÕI:
-    - BẮT BUỘC TỰ ĐỘNG PHÂN TÍCH CHÂN DUNG KOC PHÙ HỢP NHẤT VỚI SẢN PHẨM (Ví dụ: giàn cây/thổi lá -> nam/bác 35-50t; đồ bếp -> mẹ trẻ/nội trợ 28-35t; mỹ phẩm -> nữ 22-26t; công nghệ -> nam 24-28t).
-    - Nếu người dùng đã tự nhập vai trò diễn viên thì lấy thông tin người dùng làm ưu tiên cao nhất!
-    - Mỗi kịch bản chọn 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
-    - CÂU THOẠI: 100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn', viết rõ 'một trăm'. CẤM 'ngàn', 'trợ giá'.
-    - Lời thoại bắt đầu ngay từ 0.00s. Nhịp điệu dồn dập, cuốn hút, câu ngắn 5-8 từ ngắt nhịp tự nhiên.
+
+    🛑 QUY TẮC CỐT LÕI BẮT BUỘC:
+    1. BÁM SÁT 100% CHUYÊN ĐỀ VÀ GHI CHÚ ƯU TIÊN ('{custom_note}'):
+       - Nếu ghi chú yêu cầu chuyên đề cụ thể (Ví dụ: xay thịt ba chỉ làm nem rán, giàn mướp trĩu quả...), 100% CẢ 5 KỊCH BẢN ĐỀU PHẢI BÁM CHẶT VÀO NỘI DUNG ĐÓ!
+       - TUYỆT ĐỐI CẤM tự ý đưa vào các tính năng lan man khác (CẤM xay đá bào, CẤM làm sinh tố, CẤM đồ ăn dặm nếu sản phẩm và ghi chú đang là xay thịt làm nem!).
+    2. CHỈ CÓ DUY NHẤT 1 NHÂN VẬT KOC NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH:
+       - Nếu người dùng để trống vai trò: tự động phân tích 1 KOC thích hợp nhất trong 'koc_demographic_analysis' (Ví dụ: giàn cây/thổi lá -> nam/bác 35-50t; đồ bếp -> mẹ trẻ/nội trợ 28-35t; mỹ phẩm -> nữ 22-26t; công nghệ -> nam 24-28t).
+       - Nếu người dùng đã tự nhập: ưu tiên tuyệt đối người dùng.
+    3. TÓM TẮT MẠCH KỊCH BẢN RÕ RÀNG ('summary'):
+       - BẮT BUỘC viết tóm tắt mạch nội dung phân cảnh chi tiết (50-80 từ): KOC xuất hiện ở đâu, nói gì, đưa ra thử thách cơ học nào, máy vận hành ra sao, thành quả thực tế mãn nhãn thế nào và chốt tự nhiên ra sao.
+    4. CÂU THOẠI & PHÁT ÂM: 100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn', viết rõ 'một trăm'. CẤM 'ngàn', 'trợ giá'.
     """
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_flash_sale=False):
@@ -447,13 +453,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {outro_rule}
     Ghi chú riêng: {custom_note}
 
-    🛑 5 NGUYÊN TẮC BẮT BUỘC ĐỂ ĐẠT 100% NHƯ VIDEO MẪU:
-    1. PHÂN CẢNH ĐỘNG (DYNAMIC 4-6 SCENES): Tự động quyết định 4, 5 hoặc 6 phân cảnh phù hợp với sản phẩm để mạch truyện tự nhiên, đủ các nấc: Hook -> Soi ngàm -> Hành động vật lý -> Thành quả mãn nhãn -> Ứng dụng đời sống -> Cầm sản phẩm khuyên dùng.
-    2. KHÓA 1 NGUYÊN LIỆU THỬ NGHIỆM DUY NHẤT: Cả kịch bản chỉ theo sát 1 nguyên liệu (ví dụ thịt heo làm nem thì chỉ thịt heo, cấm đổi màu cối sang xoài hay đá).
-    3. 1 SHOT = 1 VI HÀNH ĐỘNG (MICRO-ACTION): Mỗi cảnh chỉ làm đúng 1 hành động dứt khoát (Cảnh 2: gõ ngàm khóa; Cảnh 3: dao cuộn; Cảnh 4: thìa múc thịt dẻo).
-    4. KHÓA MẶT BÀN & BỐI CẢNH CỐ ĐỊNH: Bàn bếp đá cẩm thạch trắng, cấm tự ý đổi sang bàn gỗ; đồ ngoài trời đặt trên sàn bê tông, cấm kê bàn ăn giữa sân.
-    5. KHỬ NHẠC NỀN & KHÓI GIẢ: 100% âm thanh Foley tự nhiên + Voiceover từ 0.00s. Luồng khí thổi phải trong suốt vô hình, không khói trắng.
-    6. NHỊP ĐỘ ĐỌC DỒN DẬP (4.8 - 5.2 TỪ/GIÂY): Lời thoại ngắt câu sắc gọn, dứt khoát, không dùng từ sáo rỗng (cấm 'động cơ 350w', cấm 'thiết kế sang trọng', cấm 'nhiều chị em than thở').
+    🛑 6 NGUYÊN TẮC BẮT BUỘC ĐỂ ĐẠT 100% NHƯ VIDEO MẪU:
+    1. DUY NHẤT 1 KOC XUẤT HIỆN & NÓI TRỰC TIẾP TỪ 0.00S.
+    2. PHÂN CẢNH ĐỘNG (DYNAMIC 4-6 SCENES): Tự động quyết định 4, 5 hoặc 6 phân cảnh phù hợp với sản phẩm để mạch truyện tự nhiên: Hook -> Soi ngàm -> Hành động vật lý -> Thành quả mãn nhãn -> Ứng dụng đời sống -> Cầm sản phẩm khuyên dùng.
+    3. KHÓA 1 NGUYÊN LIỆU THỬ NGHIỆM DUY NHẤT: Cả kịch bản chỉ theo sát 1 nguyên liệu (ví dụ thịt heo làm nem thì chỉ thịt heo, cấm đổi màu cối sang xoài hay đá).
+    4. 1 SHOT = 1 VI HÀNH ĐỘNG (MICRO-ACTION): Mỗi cảnh chỉ làm đúng 1 hành động dứt khoát (Cảnh 2: gõ ngàm khóa; Cảnh 3: dao cuộn; Cảnh 4: thìa múc thịt dẻo).
+    5. KHÓA MẶT BÀN & BỐI CẢNH CỐ ĐỊNH: Bàn bếp đá cẩm thạch trắng, cấm tự ý đổi sang bàn gỗ; đồ ngoài trời đặt trên sàn bê tông, cấm kê bàn ăn giữa sân.
+    6. NHỊP ĐỘ ĐỌC DỒN DẬP (4.8 - 5.2 TỪ/GIÂY): Lời thoại ngắt câu sắc gọn, dứt khoát, không dùng từ sáo rỗng (cấm 'động cơ 350w', cấm 'thiết kế sang trọng', cấm 'nhiều chị em than thở'). Khử sạch BGM.
     """
 
 def create_scene_details(target_id, mode, style):
@@ -463,7 +469,7 @@ def create_scene_details(target_id, mode, style):
 
     char_profiles = outline.get("character_profiles", st.session_state.get("character_profiles", []))
     char_rules = generate_char_rules_string(char_profiles)
-    num_chars = outline.get("actors", 1)
+    num_chars = 1
     current_active_mode = mode or st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     is_tiktok_shop = ("Viral" not in current_active_mode)
 
@@ -473,7 +479,7 @@ def create_scene_details(target_id, mode, style):
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
     presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "")
 
-    is_flash_sale = any(k in f"{fixed_title} {user_custom_note} {presentation_format}".lower() for k in ["flash sale", "deal", "giá hời", "kịch bản 5"])
+    is_flash_sale = any(k in f"{fixed_title} {user_custom_note} {presentation_format}".lower() for k in ["flash sale", "deal", "giá hời", "ưu đãi", "kịch bản 5"])
     dna = st.session_state.get("content_analysis") or {}
 
     ai_koc_data = dna.get("koc_demographic_analysis", {})
@@ -504,15 +510,16 @@ def create_scene_details(target_id, mode, style):
     prompt_text = f"""
     SẢN PHẨM: {clean_prod} | TIÊU ĐỀ: '{fixed_title}' | BỐI CẢNH: {locked_setting}
     TRANG PHỤC KHÓA: {wardrobe}
-    DIỄN VIÊN / KOC: {detected_demographic_en}
+    DIỄN VIÊN / KOC (DUY NHẤT 1 NGƯỜI): {detected_demographic_en}
     ĐẠI TỪ: '{self_pronoun}' - '{audience_pronoun}'
     ĐỊNH HƯỚNG CHỐT: {'BÁO KHOẢNG GIÁ FLASH SALE' if is_flash_sale else 'SOFT-SELL TỰ NHIÊN, CẤM NHẮC GIÁ'}
     YÊU CẦU ĐẶC BIỆT: {user_custom_note}
 
     YÊU CẦU LỜI THOẠI:
+    - Bám sát 100% chuyên đề: '{user_custom_note}'. Khóa 1 nguyên liệu thử nghiệm duy nhất xuyên suốt tất cả các phân cảnh.
     - Nhịp đọc dồn dập (4.8 - 5.2 từ/giây), ngắt nhịp nhanh, câu ngắn 5-8 từ, giàu năng lượng cuốn hút.
     - Bắt đầu nói ngay từ 0.00s. Giọng Hà Nội chuẩn.
-    - CẢM GIÁC THỰC TẾ: Mỗi cảnh làm đúng 1 hành động dứt khoát. Khóa 1 nguyên liệu duy nhất xuyên suốt các cảnh.
+    - CẢM GIÁC THỰC TẾ: Mỗi cảnh làm đúng 1 hành động dứt khoát.
 
     TỰ ĐỘNG XÁC ĐỊNH SỐ PHÂN CẢNH TỐI ƯU (4, 5 HOẶC 6 CẢNH) ĐỂ NỘI DUNG MƯỢT MÀ VÀ ĐỦ NẤC CHUYỂN BIẾN.
     TRẢ VỀ JSON HỢP LỆ VỚI KHÓA "scenes" CHỨA DANH SÁCH CÁC PHÂN CẢNH, MỖI CẢNH CÓ: scene (số), aida_stage, setting, setting_en, camera_shot, action_en, sfx, director, voiceover.
@@ -563,7 +570,7 @@ def create_scene_details(target_id, mode, style):
 
     res["total_dur"] = f"Khoảng {int(total_sec)} giây ({num_scenes} phân cảnh)"
     price_badge = f"💰 Khoảng giá: Bình thường khoảng {soft_orig}, nay giảm khoảng {soft_sale}" if is_flash_sale else "🌿 Lời khuyên Soft-sell tự nhiên (Không nhắc giá tiền)"
-    res["director_summary"] = f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s ({num_scenes} phân cảnh tự động) | 🎬 <b>Hình thức:</b> {presentation_format}<br>👤 <b>Chân dung KOC:</b> {detected_demographic_en}<br>👗 <b>Trang phục & Bối cảnh:</b> {wardrobe} tại {locked_setting}<br>🔇 <b>Âm thanh:</b> Thuần Foley & Thoại trực tiếp (Zero BGM) | {price_badge}"
+    res["director_summary"] = f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s ({num_scenes} phân cảnh tự động) | 🎬 <b>Hình thức:</b> {presentation_format}<br>👤 <b>Chân dung KOC (1 người):</b> {detected_demographic_en}<br>👗 <b>Trang phục & Bối cảnh:</b> {wardrobe} tại {locked_setting}<br>🔇 <b>Âm thanh:</b> Thuần Foley & Thoại trực tiếp (Zero BGM) | {price_badge}"
 
     st.session_state.generated_details[int(target_id)] = res
     st.session_state.generated_details[str(target_id)] = res
@@ -575,27 +582,29 @@ def clone_script(script_id):
     target = next((sc for sc in all_combined if str(sc.get("id")) == str(script_id)), None)
     if not target: return []
     cur_len = len(all_combined)
-    prompt = f"Nhân bản 5 biến thể kịch bản thoại bám sát kịch bản #{script_id}: '{target.get('title')}', giữ nguyên đòn bẩy tâm lý. Trả về JSON có khóa 'outlines' danh sách gồm title, setting, hook."
+    prompt = f"Nhân bản 5 biến thể kịch bản thoại bám sát kịch bản #{script_id}: '{target.get('title')}', giữ nguyên đòn bẩy tâm lý. Trả về JSON có khóa 'outlines' danh sách gồm title, setting, hook, summary."
     res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", 1, "Nhân bản"))
     outlines = res.get("outlines", []) if isinstance(res, dict) else (res if isinstance(res, list) else [])
     return [{
         "id": cur_len + idx + 1, "title": cl.get("title", f"Biến thể #{cur_len + idx + 1}"),
         "setting": cl.get("setting", "Bối cảnh sinh hoạt"), "hook": clean_and_normalize_voiceover(cl.get("hook", "")),
-        "actors": target.get("actors", 1), "character_profiles": target.get("character_profiles", []),
+        "summary": cl.get("summary", ""),
+        "actors": 1, "character_profiles": target.get("character_profiles", []),
         "presentation_format": target.get("presentation_format", "")
     } for idx, cl in enumerate(outlines)]
 
-def generate_more_scripts(angle, num_chars, extra_char_inputs, narrator_mode_more, duration_inst, char_profiles, extra_note="", presentation_format=""):
+def generate_more_scripts(angle, extra_note="", presentation_format=""):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     style = st.session_state.get("last_style", "Điện Ảnh Chân Thực")
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
-    prompt = f"Tạo 5 kịch bản góc độ '{angle}', ghi chú: '{extra_note}'. Trả về JSON có khóa 'outlines' gồm title, setting, hook."
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", num_chars, angle, extra_note, presentation_format))
+    prompt = f"Tạo 5 kịch bản góc độ '{angle}', ghi chú: '{extra_note}'. Bắt buộc trả về JSON có khóa 'outlines' gồm title, setting, hook, summary (mô tả mạch truyện 50-80 từ). Duy nhất 1 KOC nói."
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", 1, angle, extra_note, presentation_format))
     outlines = res.get("outlines", []) if isinstance(res, dict) else (res if isinstance(res, list) else [])
     return [{
         "id": cur_len + idx + 1, "title": sc.get("title", f"Kịch bản #{cur_len + idx + 1}"),
         "setting": sc.get("setting", "Bối cảnh đời thực"), "hook": clean_and_normalize_voiceover(sc.get("hook", "")),
-        "actors": num_chars, "character_profiles": char_profiles, "presentation_format": presentation_format
+        "summary": sc.get("summary", ""),
+        "actors": 1, "character_profiles": st.session_state.character_profiles, "presentation_format": presentation_format
     } for idx, sc in enumerate(outlines)]
 
 # ==============================================================================
@@ -859,41 +868,50 @@ else:
                 
     custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: chuyên đề xay thịt ba chỉ làm nem dẻo quánh):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
+# DANH SÁCH HÌNH THỨC VIDEO CHUẨN THƯƠNG MẠI
 presentation_format_opts = [
-    "🌟 1. Bán Ước Mơ & Thành Quả Xã Hội (Outcome-First & Social Proof)",
-    "🔥 2. Nỗi Đau & Giải Pháp Thực Tế (Problem-Solving & Setup Proof)",
-    "⚡ 3. Đòn Bẩy Flash Sale & Kích Cầu Giá (Price-Anchor CTA)",
-    "📦 4. Review & Bóc Hộp Soi Chi Tiết (Freshly Unboxed)"
+    "🌟 Tự Động Phối Hợp Đa Dạng Hình Thức (Khuyên dùng)",
+    "🌿 Trải Nghiệm & Thành Quả Đời Thường (Outcome & Social Proof)",
+    "🔥 Đánh Vào Nỗi Đau & Giải Pháp Triệt Để (Problem - Agitation - Solution)",
+    "⚡ Đòn Bẩy Ưu Đãi & Kích Cầu Cận Cảnh (Value Deal & Limited Offer)",
+    "📦 Khui Hộp & Soi Chi Tiết Công Năng (Unboxing & Deep Feature Review)"
 ]
 selected_format = st.selectbox("🎬 Hình thức video:", presentation_format_opts, key=f"pres_{st.session_state.reset_key}")
 
-num_chars_input = st.number_input("👤 Số lượng diễn viên (1 = Độc thoại KOC, ≥2 = Tiểu phẩm đối thoại):", min_value=1, max_value=4, value=1, key=f"chars_num_{st.session_state.reset_key}")
-char_inputs = []
-for i in range(num_chars_input):
-    col_c1, col_c2 = st.columns([2, 1])
-    c_role = col_c1.text_input(
-        f"Vai trò Diễn viên {i+1} (Để trống để AI tự phân tích phù hợp):",
-        value="",
-        placeholder="Để trống = AI tự phân tích (hoặc nhập: Bác làm vườn 45t, Mẹ bỉm 28t...)",
-        key=f"role_{i}_{st.session_state.reset_key}"
-    )
-    c_img = col_c2.file_uploader(f"Ảnh Diễn viên {i+1} (Tùy chọn):", type=["jpg", "png"], key=f"cimg_{i}_{st.session_state.reset_key}")
-    char_inputs.append({"id": i+1, "role": c_role.strip(), "file": c_img})
+# MODULE THIẾT LẬP KOC DUY NHẤT (1 NGƯỜI NÓI ON-CAMERA)
+col_koc1, col_koc2 = st.columns([2, 1])
+koc_role_input = col_koc1.text_input(
+    "👤 Vai trò / Chân dung KOC (Để trống để AI tự phân tích phù hợp nhất):",
+    value="",
+    placeholder="Để trống = AI tự phân tích (hoặc nhập: Bác làm vườn 45t, Mẹ bỉm 28t, Nam am hiểu đồ gia dụng...)",
+    key=f"koc_role_{st.session_state.reset_key}"
+)
+koc_img_upload = col_koc2.file_uploader(
+    "📸 Ảnh khuôn mặt KOC (Tùy chọn):",
+    type=["jpg", "png"],
+    key=f"koc_img_{st.session_state.reset_key}"
+)
+char_inputs = [{"id": 1, "role": koc_role_input.strip(), "file": koc_img_upload}]
 
 if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
     with st.spinner("⏳ Đang phân tích dữ liệu sản phẩm, lựa chọn KOC phù hợp và xây dựng 5 kịch bản..."):
         try:
-            st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs]
+            st.session_state.character_profiles = [{"id": 1, "role": koc_role_input.strip()}]
             st.session_state["saved_reference_images"] = [compress_image_bytes(f, 768, 75) for f in up_files] if up_files else []
             
-            user_roles_specified = [c["role"] for c in char_inputs if c["role"]]
-            koc_directive = f"Người dùng đã chỉ định diễn viên: {', '.join(user_roles_specified)}. Bắt buộc tuân thủ 100%!" if user_roles_specified else "Người dùng để trống vai trò diễn viên: BẮT BUỘC bạn phải tự động phân tích sản phẩm và bối cảnh để chọn ra chân dung KOC phù hợp nhất (Ví dụ: giàn cây/thổi lá -> nam/bác 35-50t; đồ bếp -> mẹ trẻ/nội trợ 28-35t; mỹ phẩm -> nữ 22-26t; công nghệ -> nam 24-28t). Trả về trong 'koc_demographic_analysis'!"
+            koc_directive = f"Người dùng đã chỉ định KOC: '{koc_role_input.strip()}'. Bắt buộc tuân thủ 100%!" if koc_role_input.strip() else "Người dùng để trống vai trò KOC: BẮT BUỘC bạn phải tự động phân tích sản phẩm và bối cảnh để chọn ra chân dung 1 KOC duy nhất phù hợp nhất (Ví dụ: giàn cây/thổi lá -> nam/bác 35-50t; đồ bếp -> mẹ trẻ/nội trợ 28-35t; mỹ phẩm -> nữ 22-26t; công nghệ -> nam 24-28t). Trả về trong 'koc_demographic_analysis'!"
 
             prompt = f"""
             PHÂN TÍCH SẢN PHẨM & TẠO 5 KỊCH BẢN CHUẨN THƯƠNG MẠI:
-            - Ghi chú riêng: '{custom_note}' | SKU ưu tiên: '{hero_sku_override}'.
+            - GHI CHÚ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG: '{custom_note}'.
+            - BẮT BUỘC 100% 5 KỊCH BẢN ĐỀU PHẢI BÁM SÁT SẢN PHẨM VÀ GHI CHÚ NÀY! NẾU CÓ CHUYÊN ĐỀ RIÊNG (ví dụ xay thịt ba chỉ làm nem), CẤM TUYỆT ĐỐI đưa các tính năng lan man khác vào (như xay đá bào, làm sinh tố, đồ ăn dặm).
+            - HÌNH THỨC VIDEO CHỈ ĐỊNH: '{selected_format}'.
+              • Nếu là '🌟 Tự Động Phối Hợp Đa Dạng Hình Thức (Khuyên dùng)': Bắt buộc 5 kịch bản phải lần lượt theo 5 góc độ: Nỗi đau (PAS), Trải nghiệm & Thành quả đời thường, Đập tan hoài nghi/định kiến, Phong cách sống thực tế (POV), Đòn bẩy ưu đãi & kích cầu giá.
+            - SKU ưu tiên: '{hero_sku_override}'.
             - {koc_directive}
-            - BẮT BUỘC 5 KỊCH BẢN ĐẠI DIỆN CHO 5 GÓC ĐỘ: Nỗi đau, Bán ước mơ, Đập tan định kiến, Lifestyle POV, Flash Sale.
+            - DUY NHẤT 1 KOC NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH.
+            - BẮT BUỘC mỗi kịch bản trong 'outlines' phải có trường 'summary' dài 50-80 từ tóm tắt rõ toàn bộ mạch video (KOC làm gì từ mở màn -> thử thách gì -> thành quả ra sao -> chốt hạ thế nào) để người dùng đọc là hiểu rõ toàn bộ nội dung.
+            
             TRẢ VỀ JSON:
             {{
                 "content_analysis": {{
@@ -911,8 +929,8 @@ if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_contai
                     "product_dimensions": "Kích thước 3 chiều đời thực",
                     "koc_demographic_analysis": {{
                         "gender": "male hoặc female",
-                        "persona_vi": "Mô tả chân dung KOC phù hợp bằng tiếng Việt (ví dụ: Người đàn ông 35 tuổi thích chăm sóc sân vườn)",
-                        "persona_en": "a 35-year-old native Vietnamese man with a friendly practical look"
+                        "persona_vi": "Mô tả chân dung KOC phù hợp bằng tiếng Việt",
+                        "persona_en": "a 35-year-old native Vietnamese person with a friendly look"
                     }},
                     "visceral_demonstration_dna": {{
                         "visual_punch_vi": "Cú sốc thị giác giật nảy 3 giây đầu",
@@ -933,22 +951,51 @@ if st.button("🚀 Phân Tích & Tạo Kịch Bản", type="primary", use_contai
                     "original_price_spoken": "ba trăm năm mươi nghìn đồng", "sale_price_spoken": "hai trăm chín mươi nghìn đồng"
                 }},
                 "outlines": [
-                    {{"id": 1, "title": "Nỗi Đau & Rào Cản Thực Tế", "setting": "Bối cảnh đời thực 1", "hook": "Câu hook ngắn gọn KOC nói trực tiếp bám sát đời sống..."}},
-                    {{"id": 2, "title": "Bán Ước Mơ & Chứng Thực Xã Hội", "setting": "Bối cảnh đời thực 2", "hook": "Câu hook tò mò xã hội..."}},
-                    {{"id": 3, "title": "Đập Tan Định Kiến Cũ", "setting": "Bối cảnh đời thực 3", "hook": "..."}},
-                    {{"id": 4, "title": "Trải Nghiệm Đời Sống (Lifestyle POV)", "setting": "Bối cảnh đời thực 4", "hook": "..."}},
-                    {{"id": 5, "title": "Đòn Bẩy Flash Sale & Kích Cầu", "setting": "Bối cảnh đời thực 5", "hook": "..."}}
+                    {{
+                        "id": 1,
+                        "title": "Nỗi Đau & Rào Cản Thực Tế",
+                        "setting": "Bối cảnh đời thực 1...",
+                        "hook": "Câu hook ngắn gọn KOC nói trực tiếp bám sát đời sống...",
+                        "summary": "Tóm tắt mạch kịch bản hoàn chỉnh (50-80 từ): KOC chỉ ra nỗi cực thực tế khi làm thủ công. Tiếp nối đưa ngay sản phẩm vào thử thách thực tế với đúng nguyên liệu chủ đạo. Thao tác dứt khoát chứng minh máy vận hành êm ái, phô diễn thành quả dẻo mịn mãn nhãn và kết nối với đĩa món ăn hoàn chỉnh trên bàn ăn gia đình, kèm lời khuyên tự nhiên."
+                    }},
+                    {{
+                        "id": 2,
+                        "title": "Trải Nghiệm & Thành Quả Đời Thường",
+                        "setting": "Bối cảnh đời thực 2...",
+                        "hook": "Câu hook tò mò xã hội...",
+                        "summary": "Tóm tắt mạch kịch bản hoàn chỉnh (50-80 từ)..."
+                    }},
+                    {{
+                        "id": 3,
+                        "title": "Đập Tan Hoài Nghi & Định Kiến",
+                        "setting": "Bối cảnh đời thực 3...",
+                        "hook": "...",
+                        "summary": "Tóm tắt mạch kịch bản hoàn chỉnh (50-80 từ)..."
+                    }},
+                    {{
+                        "id": 4,
+                        "title": "Phong Cách Sống Thực Tế (POV)",
+                        "setting": "Bối cảnh đời thực 4...",
+                        "hook": "...",
+                        "summary": "Tóm tắt mạch kịch bản hoàn chỉnh (50-80 từ)..."
+                    }},
+                    {{
+                        "id": 5,
+                        "title": "Đòn Bẩy Ưu Đãi & Kích Cầu Cận Cảnh",
+                        "setting": "Bối cảnh đời thực 5...",
+                        "hook": "...",
+                        "summary": "Tóm tắt mạch kịch bản hoàn chỉnh (50-80 từ)..."
+                    }}
                 ]
             }}
             """
             payload = ["IMAGES:"] + [types.Part.from_bytes(data=cb, mime_type=cm) for cb, cm in st.session_state["saved_reference_images"]]
-            for c in char_inputs:
-                if c.get("file"):
-                    cb, cm = compress_image_bytes(c['file'], 768, 75)
-                    payload.extend([f"ACTOR {c['id']} FACE ONLY:", types.Part.from_bytes(data=cb, mime_type=cm)])
+            if koc_img_upload:
+                cb, cm = compress_image_bytes(koc_img_upload, 768, 75)
+                payload.extend(["KOC FACE ONLY:", types.Part.from_bytes(data=cb, mime_type=cm)])
             payload.append(prompt)
 
-            res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", num_chars_input, "Tự động mix", custom_note, selected_format))
+            res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", 1, "Tự động mix", custom_note, selected_format))
             
             if isinstance(res, dict):
                 st.session_state.content_analysis = res.get("content_analysis", {})
@@ -1038,7 +1085,7 @@ if isinstance(ca, dict) and ca.get("target_audience"):
         """), unsafe_allow_html=True)
 
 # ==============================================================================
-# DANH SÁCH KỊCH BẢN & CHI TIẾT PHÂN CẢNH (HIỂN THỊ RÕ RÀNG SỐ GIÂY)
+# DANH SÁCH KỊCH BẢN & CHI TIẾT PHÂN CẢNH (HIỂN THỊ RÕ RÀNG TÓM TẮT & SỐ GIÂY)
 # ==============================================================================
 all_sc = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
 if all_sc:
@@ -1100,7 +1147,12 @@ if all_sc:
             with st.container(border=True):
                 c1, c2, c3 = st.columns([2.5, 1, 1])
                 c1.markdown(f"**#{sc_id}. {sc.get('title')}**")
-                c1.caption(f"⚡ *{sc.get('hook')}*")
+                c1.markdown(f"⚡ **Hook mở màn:** *\"{sc.get('hook')}\"*")
+                if sc.get('summary'):
+                    c1.markdown(f"<div class='script-summary-box'>📖 <b>Mạch kịch bản:</b> {sc.get('summary')}</div>", unsafe_allow_html=True)
+                if sc.get('setting'):
+                    c1.caption(f"🏛 **Bối cảnh:** {sc.get('setting')}")
+
                 if c2.button("👁 Xem lại", key=f"v_{sc_id}", use_container_width=True):
                     st.session_state.active_script_id = int(sc_id); st.rerun()
                 if c3.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True):
@@ -1115,7 +1167,12 @@ if all_sc:
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
                 c1.markdown(f"**#{sc_id}. {sc.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{sc.get('hook')}*")
+                c1.markdown(f"⚡ **Hook mở màn:** *\"{sc.get('hook')}\"*")
+                if sc.get('summary'):
+                    c1.markdown(f"<div class='script-summary-box'>📖 <b>Mạch kịch bản:</b> {sc.get('summary')}</div>", unsafe_allow_html=True)
+                if sc.get('setting'):
+                    c1.caption(f"🏛 **Bối cảnh:** {sc.get('setting')}")
+
                 if c2.button("✨ Tạo chi tiết ngay", key=f"g_{sc_id}", type="secondary", use_container_width=True):
                     with st.spinner(f"Đang dựng kịch bản #{sc_id}..."):
                         create_scene_details(sc_id, mode, "Điện Ảnh Chân Thực")
@@ -1127,9 +1184,9 @@ if all_sc:
     st.divider()
     st.markdown("### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     cg1, cg2 = st.columns([2, 1])
-    c_ang = cg1.selectbox("🧭 Chiến lược mới:", ["🌟 Tự động mix (1 Flash Sale + 4 Tự Nhiên)", "🌿 Chia sẻ & Bán Ước Mơ", "🎭 Nỗi đau (PAS)", "🔍 Review thực chiến", "⚡ Flash Sale & Deal hời"])
+    c_ang = cg1.selectbox("🧭 Chiến lược mới:", ["🌟 Tự động mix 5 góc độ", "🌿 Trải nghiệm & Thành quả", "🔥 Đánh vào nỗi đau (PAS)", "🔍 Soi chi tiết công năng", "⚡ Đòn bẩy ưu đãi & kích cầu giá"])
     extra_custom_note = cg2.text_input("Ghi chú bổ sung:")
     if st.button("🚀 Tạo Thêm 5 Kịch Bản", type="primary", use_container_width=True):
-        new_sc = generate_more_scripts(c_ang, 1, [], "On-camera", "10s", [], extra_custom_note, selected_format)
+        new_sc = generate_more_scripts(c_ang, extra_custom_note, selected_format)
         st.session_state.expanded_scripts.extend(new_sc)
         st.toast("✅ Đã sinh thêm 5 kịch bản mới!"); st.rerun()
