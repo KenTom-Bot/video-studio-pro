@@ -516,7 +516,20 @@ def create_scene_details(target_id, mode, style):
     """
     sys_inst = get_sys_inst_details(current_active_mode, style, "On-camera", char_rules, "10s", num_chars, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_flash_sale)
     res = call_gemini([prompt_text], sys_inst)
-    scenes = res.get("scenes", [])
+    if not res:
+        raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
+    
+    # Tự động chuẩn hóa nếu AI trả về trực tiếp danh sách [...]
+    if isinstance(res, list):
+        scenes = res
+        res = {"title": fixed_title, "scenes": scenes}
+    elif isinstance(res, dict):
+        scenes = res.get("scenes") or res.get("script") or []
+    else:
+        scenes = []
+
+    if not scenes:
+        raise Exception("Không trích xuất được danh sách phân cảnh từ AI. Vui lòng thử lại.")
     num_scenes = len(scenes)
     total_sec = 0.0
 
