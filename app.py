@@ -526,53 +526,9 @@ def format_ocr_prices(ca_data: dict) -> str:
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
 # ==============================================================================
-# BỘ XỬ LÝ ĐỒNG BỘ HOẠT CẢNH ĐỜI THỰC & HÀNH VI TÌNH HUỐNG
+# BỘ XỬ LÝ ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT ĐỘNG (KHÔNG CHÈN NHẠC)
 # ==============================================================================
-def extract_situational_scenario_en(vo_text: str):
-    if not vo_text: return None
-    vo_lower = vo_text.lower()
-    
-    if any(k in vo_lower for k in ["xem phim", "cày phim", "coi phim", "xem tivi", "lướt phim", "chiếu phim"]):
-        return {
-            "setting": "cozy living room with comfortable sofa, ambient glowing reflection from TV screen in darkened room",
-            "action": "First, sitting comfortably curled up on soft sofa; then smoothly holding or interacting with product naturally while enjoying TV screen",
-            "sfx": "subtle movie background audio, quiet late-night room ambiance",
-            "is_indoor": True
-        }
-    elif any(k in vo_lower for k in ["đi làm", "sáng sớm", "dậy muộn", "vội vã", "ra ngoài", "chuẩn bị đi"]):
-        return {
-            "setting": "bright modern apartment entryway beside vanity mirror with crisp morning sunlight",
-            "action": "First, checking reflection in mirror; then smoothly holding or preparing product with brisk realistic morning momentum",
-            "sfx": "morning birds chirping outside, key chime",
-            "is_indoor": True
-        }
-    elif any(k in vo_lower for k in ["nấu ăn", "nấu cơm", "bữa cơm", "vào bếp", "đang rán", "đang nấu", "chiều muộn"]):
-        return {
-            "setting": "tidy modern townhouse kitchen beside sleek induction cooktop with clean cookware",
-            "action": "First, standing naturally by cooktop wearing apron; then smoothly interacting with cooking setup and product with steady hands",
-            "sfx": "gentle sizzling cooking sounds, kitchen Foley",
-            "is_indoor": True
-        }
-    elif any(k in vo_lower for k in ["đi làm về", "về đến nhà", "mệt mỏi sau", "sau giờ làm", "tan ca"]):
-        return {
-            "setting": "warm apartment entryway hallway or cozy living armchair with gentle homecoming ambient lighting",
-            "action": "First, closing door softly; then smoothly relaxing into armchair while unwinding naturally with product",
-            "sfx": "door softly closing, gentle sigh of relief",
-            "is_indoor": True
-        }
-    elif any(k in vo_lower for k in ["đi ngủ", "lên giường", "trước khi ngủ", "nằm lướt", "dưỡng da ban đêm"]):
-        return {
-            "setting": "peaceful modern bedroom with soft bedding, warm gentle bedside lamp lighting",
-            "action": "First, propping comfortably against soft bed pillows; then smoothly holding or applying product in serene bedtime routine",
-            "sfx": "peaceful nighttime room silence",
-            "is_indoor": True
-        }
-    return None
-
-# ==============================================================================
-# BỘ XỬ LÝ ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT ĐỘNG
-# ==============================================================================
-def extract_environmental_lighting_and_weather(vo_text: str, base_setting_en: str = "", is_indoor: bool = True):
+def extract_environmental_lighting_and_weather(vo_text: str, is_indoor: bool = True):
     if not vo_text: return "", ""
     vo_lower = vo_text.lower()
     weather_desc = []
@@ -580,25 +536,25 @@ def extract_environmental_lighting_and_weather(vo_text: str, base_setting_en: st
     
     if any(k in vo_lower for k in ["mưa", "mưa rào", "mưa to", "mưa phùn", "giông bão", "sấm chớp", "mưa rả rích", "đang mưa", "ngày mưa"]):
         if is_indoor:
-            weather_desc.append("visible heavy rain pouring outside background window, water droplets streaking on glass, cozy moody overcast daylight")
+            weather_desc.append("visible heavy rain pouring outside window, droplets streaking glass, cozy overcast daylight")
         else:
-            weather_desc.append("rainy atmospheric weather, wet reflective pavement with water puddles, gentle raindrops falling")
+            weather_desc.append("rainy atmospheric weather, wet reflective pavement with water puddles, gentle raindrops")
         weather_sfx.append("ambient soft rain pattering against window")
     elif any(k in vo_lower for k in ["nắng gắt", "nắng nóng", "trưa hè", "chói chang", "40 độ", "oi bức", "nắng hè", "nắng nôi"]):
         if is_indoor:
             weather_desc.append("bright intense natural summer daylight streaming through windows with warm sun flare")
         else:
             weather_desc.append("intense hot sunny midday summer light, bright natural sun glare, warm golden tones")
-        weather_sfx.append("subtle warm breeze")
+        weather_sfx.append("subtle warm breeze Foley")
     elif any(k in vo_lower for k in ["ban đêm", "tối muộn", "đêm muộn", "nửa đêm", "tối trời", "buổi tối"]):
         if is_indoor:
             weather_desc.append("dark cozy nighttime ambiance, warm soft interior lamp lighting, dark evening sky outside window")
         else:
             weather_desc.append("nighttime urban lighting, evening streetlamps casting warm ambient glows")
-        weather_sfx.append("quiet night ambiance")
+        weather_sfx.append("quiet night room ambiance Foley")
     elif any(k in vo_lower for k in ["gió mùa", "lạnh buốt", "gió rét", "mùa đông", "se lạnh", "sương mù", "rét mướt", "giá rét"]):
         weather_desc.append("cold chilly winter atmosphere, soft misty cool-toned lighting, subtle breath fog on glass")
-        weather_sfx.append("soft gentle chilly wind")
+        weather_sfx.append("soft gentle chilly wind Foley")
         
     return ", ".join(weather_desc), ", ".join(weather_sfx)
 
@@ -933,10 +889,18 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - TUYỆT ĐỐI CẤM dùng từ 'các mẹ' nếu sản phẩm không phải đồ Mẹ & Bé!
     - Giữ nguyên duy nhất một cách xưng hô này từ Cảnh 1 đến Cảnh 4, cấm thay đổi giữa chừng.
 
-    🛑 KHÓA BỐI CẢNH ĐỜI THỰC THẤU CẢM (RELATABLE REALISM & SPATIAL INVARIANCE):
-    - Chuẩn không gian: '{setting_archetype}' (nhà phố hiện đại hoặc chung cư sạch sẽ, ngăn nắp, tường men sáng, ánh sáng tự nhiên).
-    - TUYỆT ĐỐI CẤM 2 THÁI CỰC PHI THỰC TẾ: Cấm nhà cấp 4 cũ kỹ nhếch nhác, Cấm biệt thự xa hoa lộng lẫy dát vàng.
-    - NẾU SẢN PHẨM CỐ ĐỊNH (is_fixed_location = {is_fixed_location}): BẮT BUỘC cả 4 cảnh diễn ra tại DUY NHẤT 1 TỌA ĐỘ VẬT LÝ CỐ ĐỊNH, chỉ thay đổi góc máy quay!
+    🛑 THỊ GIÁC HÓA BỐI CẢNH & ĐẠO CỤ KHỚP 100% LỜI THOẠI (NARRATIVE SETTING & PROPS SYNC):
+    - BẮT BUỘC mỗi phân cảnh phải tự động suy luận 'setting_en' và 'supporting_props_en' ăn khớp hoàn toàn với câu chuyện của lời thoại:
+      • Thoại nói về làm việc/sạc đêm -> setting là bàn làm việc với laptop mở, đèn bàn, sổ tay, cốc nước.
+      • Thoại nói về nấu ăn/bữa cơm -> setting là gian bếp sạch sẽ, bếp từ, chảo/nồi, đĩa thức ăn.
+      • Thoại nói về dưỡng da/trang điểm -> setting là bàn trang điểm, gương soi, khay mỹ phẩm.
+      • Thoại nói về dạo phố/đi làm vội -> setting là hành lang/cửa ra vào hoặc góc phố sáng sủa.
+    - Đạo cụ phụ trợ ('supporting_props_en'): Ngắn gọn dưới 8 từ, phản chiếu trực quan bối cảnh nhân vật đang nói.
+
+    🛑 KHÓA ÂM THANH THUẦN HIỆU ỨNG THỰC TẾ & KHỬ HOÀN TOÀN NHẠC NỀN (ZERO BACKGROUND MUSIC / SFX ONLY):
+    - Toàn bộ video chỉ bao gồm tiếng nhân vật nói trực tiếp (Spoken Voiceover) và tiếng động hiệu ứng môi trường thực tế đời thường (Foley / Sound Effects - SFX: tiếng click đanh gọn, tiếng cắm sạc, tiếng dao thớt, tiếng xèo xèo...).
+    - TUYỆT ĐỐI CẤM MỌI DẠNG NHẠC NỀN (Background Music / BGM / Soundtrack / Melody / Instrumental Beat): Không chèn nhạc nền để triệt tiêu 100% nguy cơ vi phạm bản quyền âm thanh trên TikTok, Reels, YouTube Shorts!
+    - Trong prompt video bắt buộc ghi rõ: 'Strictly natural Foley sound effects and clean spoken voiceover only, zero background music, zero musical score, no BGM.'
 
     🛑 THAM CHIẾU QUY CÁCH VẬT LÝ & TIẾP XÚC ĐỜI THỰC TỰ ĐỘNG CHO MỌI SẢN PHẨM:
     - BẮT BUỘC toàn bộ hành động 'action_en' trong Cảnh 1, 2, 3, 4 phải tuân thủ 100% theo các trường kỹ thuật đã phân tích:
@@ -964,27 +928,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     - KHÓA TIẾP XÚC CƠ HỌC (BOUNDARY CONTACT LOCK): Ngón tay và bàn tay nhân vật tiếp xúc ngoài dứt khoát, không bao giờ hòa tan, dính liền hay chảy vào thân vỏ sản phẩm.
     - KHÓA VẬT THỂ RẮN 100% (RIGID SOLID INVARIANCE): Sản phẩm là khối vật lý rắn 100% giữ nguyên kích thước hình học, không morphing, không biến dạng, không tự phát sinh thêm chi tiết thừa (zero phantom parts).
 
-    🛑 KHÓA TỈ LỆ THỰC TẾ & TƯ THẾ TƯƠNG TÁC THEO TỪNG LOẠI SẢN PHẨM:
-    - KHÔNG ĐƯỢC GÒ BÓ SẢN PHẨM TRÊN MẶT BÀN BẾP nếu sản phẩm là đồ lớn, nội thất, cá nhân hoặc ngoài trời!
-    - ĐẶT / CẦM / KÊ PHẢI HOÀN TOÀN TỰ NHIÊN THEO TÌNH HUỐNG KỊCH BẢN:
-      • Đồ lớn / Nội thất: Kê đặt vững chắc trên sàn nhà (grounded on floor / wall-mounted), nhân vật đứng cạnh, mở cửa, ngồi hoặc nằm lên cân xứng với chiều cao 1m65 của con người và căn phòng.
-      • Đồ vừa / Cầm tay: Cầm 1-2 tay hoặc đặt trên kệ/bàn làm việc/bếp/bồn rửa tự nhiên.
-      • Đồ nhỏ / Cá nhân: Cầm ngón tay, bỏ túi, đặt khay trang điểm.
-
     🛑 TỐI ƯU VEO 3 TRIỆT TIÊU LẶP TỪ & VẤP THOẠI (AUDIO-VISUAL TAIL ANCHOR 2.0):
     - Cấu trúc prompt Veo 3 chia rõ 2 thì dứt khoát: Nhân vật nói câu thoại duy nhất một lần từ 0.00s, sau khi dứt lời ngậm miệng mỉm cười tự nhiên và tiếp tục hoàn tất cử chỉ hành động đến hết thời lượng video.
     - TUYỆT ĐỐI CẤM nhân vật lặp lại câu thoại hoặc nói lắp để lấp đầy khung hình.
     - Câu thoại viết liền mạch, cấm dấu chấm lửng '...', chỉ dùng dấu phẩy và dấu chấm rõ ràng.
-
-    🛑 NGUYÊN TẮC HOẠT CẢNH & TƯ THẾ ĐỒNG BỘ 100% VỚI LỜI THOẠI:
-    - Tư thế (Posture), bối cảnh (Setting) và hành vi (Action) BẮT BUỘC phải ăn khớp tuyệt đối với câu chuyện của lời thoại.
-
-    🛑 BỘ QUY CHUẨN BẰNG CHỨNG THỊ GIÁC & BIẾN ĐỔI:
-    - CẢNH 2 (Thử thách trực quan): Thao tác bóc tách, thử nghiệm thực tế.
-    - CẢNH 3 (Bằng chứng biến đổi): Lột xác 100% đối lập với Cảnh 1.
-
-    🛑 ĐỒNG BỘ KHÍ HẬU & THỜI TIẾT VỚI LỜI THOẠI:
-    - Thoại có mưa, nắng, đêm muộn -> phản chiếu 100% vào bối cảnh, ánh sáng và Foley SFX.
 
     🛑 KHÓA TỌA ĐỘ GIẢI PHẪU KHÔNG GIAN BẤT ĐỐI XỨNG & ĐỘ SÂU VẾT XẺ CHÍNH XÁC:
     - Xẻ bên sườn phải người mặc: 'asymmetrical side-seam slit exclusively located on the wearer right side seam, right leg only, while the entire left side and front panel are completely solid unbroken fabric with zero slit'.
@@ -1003,7 +950,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - V186.0 (ANTI-DROP PHYSICS & DYNAMIC TUCK LOCK)
+# HÀM TẠO CHI TIẾT KỊCH BẢN - V188.0 (PURE FOLEY & ANTI-COPYRIGHT AUDIO SHIELD)
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1206,7 +1153,7 @@ def create_scene_details(target_id, mode, style):
     {json.dumps(condensed_dna, ensure_ascii=False)}
 
     THỂ LOẠI: '{current_active_mode}' | HÌNH THỨC: '{presentation_format}'
-    KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK: '{fixed_hook}' | BỐI CẢNH: {fixed_setting_base}
+    KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK: '{fixed_hook}' | BỐI CẢNH GỐC: {fixed_setting_base}
     DIỄN VIÊN KHÓA CỨNG: {detected_demographic_en}.
     KHÓA CẮT MAY BẤT ĐỐI XỨNG: {asym_lock_en if asym_lock_en else 'none'}
     QUY CHUẨN TỈ LỆ THỰC TẾ: {volumetric_form_en}
@@ -1214,12 +1161,19 @@ def create_scene_details(target_id, mode, style):
     KHÓA TRẠNG THÁI SƠ VIN: '{locked_tuck_en}' (ĐỒNG NHẤT 100% CẢ 4 CẢNH THEO ĐÚNG BỐI CẢNH NÀY).
     KHÓA DUY NHẤT MÀU HERO SKU XUYÊN SUỐT 4 CẢNH: '{hero_color_str}' (CẤM ĐỔI SANG MÀU KHÁC CỦA BẢNG MÀU).
     KHÓA GIỮ SẢN PHẨM: Cầm trên tay hoặc để lên bàn/kệ/dock sạc, TUYỆT ĐỐI CẤM thả xuống đất, cấm biến mất.
+    KHÓA ÂM THANH: CHỈ DÙNG FOLEY HIỆU ỨNG THỰC TẾ ĐỜI SỐNG, TUYỆT ĐỐI CẤM NHẠC NỀN (ZERO BACKGROUND MUSIC / BGM).
     SẢN PHẨM LÀ THỜI TRANG: {is_fashion_product}
     KHOẢNG GIÁ GỐC LÀM TRÒN LÊN (CẢNH 4): '{soft_orig_price}' | KHOẢNG GIÁ SALE LÀM TRÒN XUỐNG (CẢNH 4): '{soft_sale_price}'
     QUY CÁCH TIẾP XÚC VẬT LÝ & DÂY DẪN ĐỜI THỰC: '{physical_docking_rule}'
     CÁCH SỬ DỤNG CHUẨN THỰC TẾ: '{condensed_dna.get("how_to_use_real_world")}'
     TƯ THẾ CẦM NẮM/TIẾP XÚC: '{condensed_dna.get("correct_ergonomic_grip")}'
     YÊU CẦU ĐẶC BIỆT: {user_custom_note if user_custom_note else 'none'}
+    
+    🛑 CHỈ ĐẠO ĐẶC BIỆT VỀ BỐI CẢNH VÀ ĐẠO CỤ (NARRATIVE SETTING & PROPS SYNC):
+    - Tự động thiết kế 'setting_en' và 'supporting_props_en' trong từng phân cảnh sao cho ĂN KHỚP 100% với câu chuyện KOC đang kể trong 'voiceover':
+      • Nếu thoại nói về làm việc/sạc đêm: setting là góc bàn làm việc gỗ với laptop mở sáng, đèn bàn làm việc ấm, sổ tay, cốc nước.
+      • Nếu thoại nói về nấu ăn/bếp núc: setting là gian bếp sạch sẽ với bếp từ hiện đại, chảo nồi, đĩa đồ ăn chuẩn bị.
+      • Nếu thoại nói về chăm sóc da: setting là bàn trang điểm/bồn rửa mặt với gương soi, khay đựng mỹ phẩm.
     
     TRẢ VỀ JSON CHÍNH XÁC:
     {{
@@ -1242,45 +1196,49 @@ def create_scene_details(target_id, mode, style):
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
-                "setting": "Mô tả bối cảnh mở màn...",
-                "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "setting": "Mô tả bối cảnh mở màn tiếng Việt ăn khớp 100% với thoại...",
+                "setting_en": "Setting description in English perfectly matching the voiceover situation",
+                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
                 "camera_shot": "Vertical 9:16 eye-level three-quarter medium shot",
                 "expression_en": "looking at camera with natural empathetic smile",
                 "action_en": "First, holding or positioning product naturally matching real-world specs; then smoothly greeting camera with gentle head nod while maintaining clean hand grip without finger-melting artifacts",
-                "sfx": "Foley âm thanh nhẹ nhàng đời thực",
+                "sfx": "Foley âm thanh thao tác hoặc môi trường thực tế (tuyệt đối không nhạc nền)",
                 "director": "Attention | Bám sát '{fixed_title}' | Chuỗi tuần tự tự nhiên | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại mở màn (18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' chuẩn tiếng Hà Nội..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
-                "setting": "Mô tả bối cảnh cận cảnh...",
-                "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "setting": "Mô tả bối cảnh cận cảnh ăn khớp 100% với thoại...",
+                "setting_en": "Setting description in English perfectly matching the voiceover situation",
+                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "speaking enthusiastically with bright attentive eyes",
                 "action_en": "{('First, performing: ' + v_proof.get('catalyst_action_en') + '; then smoothly inspecting the functional result with steady hands') if has_visual_proof else 'First, smoothly demonstrating the key feature strictly according to real-world how_to_use; then inspecting the practical motion with clean hand separation'}",
-                "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR đời thực'}",
+                "sfx": "{v_proof.get('proof_sfx') if has_visual_proof else 'Tiếng cơ học đanh chắc hoặc ASMR đời thực (tuyệt đối không nhạc nền)'}",
                 "director": "Interest | Thao tác trực quan tuần tự bám sát how_to_use | Khóa trục quang học Macro | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
-                "setting": "Mô tả bối cảnh thực tế...",
-                "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "setting": "Mô tả bối cảnh trải nghiệm ăn khớp 100% với thoại...",
+                "setting_en": "Setting description in English perfectly matching the voiceover situation",
+                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
                 "action_en": "{('First, revealing transformation: ' + v_proof.get('after_transformation_en') + '; then presenting the satisfying outcome to camera') if has_visual_proof else 'First, smoothly completing the practical usage; then smiling approvingly at the high-efficiency result'}",
-                "sfx": "Tiếng giác quan đời sống thực tế",
+                "sfx": "Tiếng giác quan đời sống thực tế (tuyệt đối không nhạc nền)",
                 "director": "Desire | Bằng chứng biến đổi tuần tự | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
                 "setting": "Mô tả bối cảnh kết thúc...",
-                "setting_en": "{condensed_dna.get('recommended_setting_en')}",
+                "setting_en": "Warm closing setting description in English",
+                "supporting_props_en": "Key props visible in scene matching the story (under 8 words)",
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with open welcoming hands",
                 "action_en": "First, speaking with welcoming open-palm gestures; then smoothly gesturing toward bottom-left cart while smiling warmly to finish",
-                "sfx": "Tiếng chuông ting trong trẻo",
+                "sfx": "Tiếng chuông ting nhẹ nhàng (tuyệt đối không nhạc nền)",
                 "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal giá khoảng và nay giảm an toàn'}",
                 "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi tương tác follow' if is_viral else f'Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'}"
             }}
@@ -1320,14 +1278,15 @@ def create_scene_details(target_id, mode, style):
     dynamic_anti_morph = f", {dna.get('strict_anti_morph_targets')}" if dna.get('strict_anti_morph_targets') else ""
     spatial_neg = f", {asym_neg_en}" if asym_neg_en else ""
     
-    # BỘ CHẶN TIÊU CỰC TOÀN DIỆN: CHẶN RƠI SẢN PHẨM, CHI TIẾT THỪA, LẶP TỪ, LỆCH MÀU & ĐỔI GIÀY DÉP
+    # BỘ CHẶN TIÊU CỰC TOÀN DIỆN: CHẶN NHẠC NỀN BẢN QUYỀN, RƠI ĐỒ, CHI TIẾT THỪA, LẶP TỪ & LỆCH MÀU
+    music_negatives = ", background music, musical score, instrumental music, bgm, soundtrack, singing, melody, jingle, synthesizer music, acoustic guitar, piano track, beats, rhythm track, ambient music"
     drop_negatives = ", dropping product, throwing product, tossing item, falling product, product on floor, disappearing product, product vanishing, out of frame product, item falling downwards"
     extra_part_negatives = ", extra parts, phantom objects, morphing artifacts, floating debris, detached components"
     scale_negatives = f", distorted aspect ratio, stretched proportions, squished geometry, warped height, flattened width, inconsistent dimensional ratio, elongated object, fat distortion, oversized appliance, giant prop, disproportionate scale, morphing, melting, liquid distortion, deformed object, changing parts, detachable artifacts, phantom parts, rubbery movement, unstable geometry, finger melting, finger clipping{dynamic_anti_morph}{drop_negatives}{extra_part_negatives}"
     wardrobe_negatives = ", changing clothes, different outfit, color swapping between layers, merged inner and outer shirt, missing jacket, missing inner layer, altered dress color, changing clothing color, inconsistent outfit, changing hairstyle, different facial identity, outfit mutation, changing shoes, different footwear, barefoot, mismatched shoes, inconsistent tuck, untucked shirt when tucked, changing waistband"
     color_negatives = f", changing product color, wrong SKU color, altered model color{competing_colors_block}"
     speech_negatives = ", stutter, stammer, repeated speech, looped audio, echo dialogue, repeating speech, repeating words, stuttering audio, looping voice, echoing words, phrase repetition, double speaking"
-    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}{color_negatives}{speech_negatives}"
+    base_negative_prompt = f"opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated{spatial_neg}{scale_negatives}{wardrobe_negatives}{color_negatives}{speech_negatives}{music_negatives}"
     
     total_sec = 0.0
     for scn in scenes:
@@ -1348,23 +1307,21 @@ def create_scene_details(target_id, mode, style):
         
         camera_shot = scn.get("camera_shot", "Vertical 9:16 eye-level medium shot")
         sfx_sound = scn.get("sfx", "Natural Foley sound")
+        sfx_sound = re.sub(r'\b(?:movie\s+)?background\s+audio\b', 'ambient room Foley', sfx_sound, flags=re.IGNORECASE)
+        sfx_sound = re.sub(r'\b(?:music|soundtrack|melody|song)\b', 'Foley effect', sfx_sound, flags=re.IGNORECASE)
+        
         micro_expr_en = scn.get("expression_en", "looking at camera with natural smile")
         scene_num = scn.get("scene", 1)
         vo_line = scn.get("voiceover", "")
 
-        situational_override = extract_situational_scenario_en(vo_line)
-        if situational_override:
-            scene_setting_en = situational_override["setting"]
-            raw_action = situational_override["action"]
-            is_indoor_scene = situational_override["is_indoor"]
-            if situational_override.get("sfx"):
-                sfx_sound = f"{sfx_sound}, {situational_override['sfx']}"
-        else:
-            scene_setting_en = default_setting if is_fixed_location else (scn.get("setting_en") or default_setting)
-            raw_action = scn.get("action_en") or f"First, interacting with {clean_prod_en} naturally; then smoothly demonstrating features with steady hands"
-            is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed"])
+        # ĐỒNG BỘ BỐI CẢNH & ĐẠO CỤ THỰC TẾ THEO LỜI THOẠI
+        scene_setting_en = scn.get("setting_en") or default_setting
+        supporting_props_en = scn.get("supporting_props_en", "").strip()
+        raw_action = scn.get("action_en") or f"First, interacting with {clean_prod_en} naturally; then smoothly demonstrating features with steady hands"
+        is_indoor_scene = any(k in scene_setting_en.lower() for k in ["bếp", "kitchen", "room", "indoor", "sink", "apartment", "living", "sofa", "bed", "desk", "office"])
 
-        weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, scene_setting_en, is_indoor=is_indoor_scene)
+        # THỜI TIẾT TỰ ĐỘNG
+        weather_env, env_sfx = extract_environmental_lighting_and_weather(vo_line, is_indoor=is_indoor_scene)
         if weather_env and not any(k in scene_setting_en.lower() for k in ["rain", "sunny", "nighttime", "chilly"]):
             scene_setting_en = f"{scene_setting_en}, {weather_env}"
         if env_sfx and "rain" not in sfx_sound.lower() and "breeze" not in sfx_sound.lower():
@@ -1377,9 +1334,10 @@ def create_scene_details(target_id, mode, style):
 
         asym_pose_anchor = ", subtle three-quarter stance presenting right leg profile" if asym_lock_en else ""
         docking_phrase = f", {docking_lock_en}" if docking_lock_en else ""
+        props_phrase = f" with {supporting_props_en}" if supporting_props_en else ""
 
-        # Prompt Ảnh Midjourney tinh gọn, khóa lớp trang phục, giày dép, sơ vin và ngàm cơ học
-        img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en}){docking_phrase}"
+        # Prompt Ảnh Midjourney tinh gọn, bối cảnh & đạo cụ khớp thoại 100%
+        img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}{props_phrase}, {actor_full}{asym_pose_anchor}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en} ({product_scale_en}){docking_phrase}"
         raw_img = f"{img_core}, 8k resolution, soft natural lighting, sharp focus --ar 9:16 --style raw --v 6.1"
         scn["img_p"] = sanitize_third_party_ip(raw_img)
         scn["img_neg"] = base_negative_prompt
@@ -1389,12 +1347,12 @@ def create_scene_details(target_id, mode, style):
 
         audio_anchor = "Spoken in clear native Northern Vietnamese Hanoi accent."
 
-        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): Khóa giữ sản phẩm (chống thả đất), khóa không lặp từ, khóa màu Hero SKU
+        # CẤU TRÚC VEO 3 SWEET-SPOT (75 - 85 TỪ): KHỬ TOÀN BỘ NHẠC NỀN, CHỈ GIỮ FOLEY VÀ THOẠI
         raw_vid = (
-            f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {actor_full}{asym_pose_anchor}. "
+            f"{camera_shot}, live-action footage. Setting: {scene_setting_en}{props_phrase}. Subject: {actor_full}{asym_pose_anchor}. "
             f"Action: {clean_action}, interacting with solid {clean_prod_en} ({product_scale_en}){docking_phrase}. {retention_lock} "
             f"Visibly speaks dialogue once with natural lip-sync from 0.00s, then closes mouth into a warm smile while continuing motion. "
-            f"{audio_anchor} Spoken audio: \"{clean_vo_for_audio}\". Zero repetition, zero looped speech. Foley: [{sfx_sound}]. Pure camera footage, no text."
+            f"{audio_anchor} Spoken audio: \"{clean_vo_for_audio}\". Strictly natural Foley sound effects and voiceover only, zero background music, zero musical score, no BGM. Foley: [{sfx_sound}]. Pure camera footage, no text."
         )
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         scn["vid_neg"] = base_negative_prompt
@@ -1408,6 +1366,7 @@ def create_scene_details(target_id, mode, style):
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh chuẩn:</b> {setting_archetype} ({'Khóa 1 vị trí cố định' if is_fixed_location else 'Chuyển cảnh linh hoạt'}) | {goal_badge}",
         f"👗 <b>Khóa trang phục Toàn Diện:</b> {master_wardrobe_locked} (Đồng nhất 100% cả 4 cảnh)",
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Đồng nhất 100% cả 4 cảnh, đã chặn màu đối thủ)",
+        f"🔇 <b>Âm thanh bản quyền:</b> Thuần Foley SFX thực tế đời sống & Voiceover, triệt tiêu 100% nhạc nền (Zero BGM)",
         f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}",
         f"📐 <b>Tỉ lệ thực tế:</b> {dim_3d_ratio_txt}"
     ]
@@ -1999,13 +1958,13 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                             "before_visual": "Mô tả trạng thái trước khi dùng (nỗi đau thị giác)",
                             "catalyst_action_en": "Mô tả hành động thử nghiệm trực quan trong Cảnh 2 bằng tiếng Anh",
                             "after_transformation_en": "Mô tả kết quả lột xác trong Cảnh 3 bằng tiếng Anh",
-                            "proof_sfx": "Âm thanh ASMR thực tế"
+                            "proof_sfx": "Âm thanh ASMR thực tế (không nhạc nền)"
                         }},
                         "universal_sensory_matrix": {{
                             "category_type_vi": "Phân loại giác quan (Công nghệ & Phụ kiện / Mỹ phẩm & Skincare / Gia dụng & Tiện ích / Ẩm thực)",
                             "tactile_feel": "Cảm giác xúc giác chân thực (chất liệu nhám mờ, đầm tay, nhung mịn, chống vân tay...)",
                             "visual_aesthetic": "Kích thích thị giác trực quan (màu sắc pastel, đèn led báo hiệu, đường nét sắc sảo...)",
-                            "auditory_asmr": "Kích thích thính giác ASMR (tiếng tách cắm sạc Type-C, tiếng click nắp, tiếng rít sạch...)",
+                            "auditory_asmr": "Kích thích thính giác ASMR (tiếng tách cắm sạc Type-C, tiếng click nắp, tiếng rít sạch - không nhạc nền...)",
                             "functional_delight": "Cảm xúc hài lòng (vận hành êm ru, đầm tay chắc chắn, an tâm tuyệt đối...)"
                         }},
                         "how_to_use": "Mô tả thao tác đời thực chuẩn xác",
@@ -2170,7 +2129,7 @@ if isinstance(ca, dict):
             exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
             
             soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
-            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
             
             c4_html = clean_html(f"""
             <div class="dna-card">
@@ -2216,7 +2175,7 @@ if isinstance(ca, dict):
         }
 
     extra_blocks.append({
-        "title_suffix": "Giải Phẫu Kích Hoạt Đa Giác Quan Đời SỐng (Multi-Sensory ASMR Matrix)",
+        "title_suffix": "Giải Phẫu Kích Hoạt Đa Giác Quan Đời Sống (Multi-Sensory ASMR Matrix)",
         "icon": "✨",
         "border_color": "#f97316",
         "title_color": "#ea580c",
@@ -2320,21 +2279,21 @@ if all_sc:
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
             st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
-            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression_en', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp on-camera từ 0.00s (100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
+            st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression_en', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley thuần - Không nhạc nền):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân vật nói trực tiếp on-camera từ 0.00s (100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             
             c_p1, c_p2 = st.columns(2)
             with c_p1:
-                st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa toàn diện Giày dép, Sơ vin theo bối cảnh & Màu SKU):**")
+                st.markdown("**🖼 Prompt Ảnh (Midjourney / Flux - Khóa toàn diện Bối cảnh, Đạo cụ & Giày dép):**")
                 st.code(img_p := scn.get('img_p', ''), language="text")
                 safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
                 st.caption("💡 *Mẹo giữ nhân vật & đồ nhiều lớp:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Điểm ngọt 75-85 từ, Khóa giữ sản phẩm & Chống lặp từ):**")
+                st.markdown("**🎥 Prompt Video (Veo 3 Safe / Kling AI - Điểm ngọt 75-85 từ, Khử hoàn toàn nhạc nền):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
-            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx} (Chặn rơi sản phẩm, chi tiết thừa, lặp từ & đổi màu)", expanded=False):
+            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx} (Chặn nhạc nền, rơi đồ, lặp từ & đổi màu)", expanded=False):
                 neg_val = scn.get('vid_neg', 'opposite gender, celebrity likeness, extra fingers, text, watermark')
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
