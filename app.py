@@ -378,7 +378,7 @@ def repair_and_parse_json(text_content: str):
     raise Exception("Lỗi cấu trúc phản hồi từ AI. Vui lòng bấm tạo lại.")
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
-    models_to_try = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    models_to_try = ["gemini-3.5-flash", "gemini-3.5-flash-lite"]
     last_err = None
     for model_name in models_to_try:
         for attempt in range(3):
