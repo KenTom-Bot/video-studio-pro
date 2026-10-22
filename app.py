@@ -817,12 +817,15 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {outro_instruction}
     {override_rule}
 
-    🛑 QUY TẮC BẮT BUỘC VỀ TRANG PHỤC & ĐỒNG NHẤT NHÂN VẬT (CHARACTER & WARDROBE CONSISTENCY):
-    1. TRANG PHỤC PHẢI CHÍNH XÁC VỚI SẢN PHẨM VÀ BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN:
-       - Nếu sản phẩm công nghệ (chuột gaming, bàn phím, tai nghe, đồ setup PC): BẮT BUỘC KOC mặc trang phục tech-lifestyle, áo phông gamer trẻ trung, áo polo hiện đại hoặc áo hoodie/cardigan thoải mái, quần jogger/chinos/trousers, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ, CẤM ĐỒ BẾP!
-       - Nếu sản phẩm nấu ăn, gia dụng nhà bếp: Mặc áo thun/polo gọn gàng, tạp dề sạch sẽ (chỉ khi có nấu nướng).
-       - Nếu bối cảnh công sở, văn phòng: Áo sơ mi/blouse thanh lịch sơ vin gọn gàng, quần âu chỉn chu.
-       - Nếu bối cảnh ngoài trời / dã ngoại: Áo thun/polo thể thao, quần dài năng động, giày sneaker.
+    🛑 QUY TẮC BẮT BUỘC VỀ TRANG PHỤC & ĐỒNG NHẤT NHÂN VẬT CHO MỌI SẢN PHẨM:
+    1. TRANG PHỤC PHẢI THÍCH ỨNG CHÍNH XÁC VỚI SẢN PHẨM VÀ BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN ĐÓ:
+       - Phân tích ngành hàng và bối cảnh cụ thể của kịch bản để thiết kế 1 bộ trang phục chuẩn xác:
+         • Đồ công nghệ / Gaming / PC / Thiết bị thông minh: Áo phông/polo công nghệ trẻ trung hoặc hoodie/cardigan thoải mái, quần jogger/chinos/quần dài tối màu, giày sneaker hiện đại. TUYỆT ĐỐI CẤM TẠP DỀ!
+         • Đồ nấu ăn, đồ bếp: Áo thun/polo gọn gàng, tạp dề sạch sẽ (chỉ khi có nấu nướng).
+         • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
+         • Đồ ngoài trời, dã ngoại: Áo thun/polo thể thao năng động, quần dài, giày sneaker.
+         • Đồ phòng ngủ, chăm sóc da: Đồ mặc nhà homewear lịch sự, thoải mái.
+       - Áp dụng linh hoạt cho MỌI SẢN PHẨM, không giới hạn ngành hàng.
     2. KHÓA ĐỒNG NHẤT 100% XUYÊN SUỐT 4 PHÂN CẢNH TRONG CÙNG 1 KỊCH BẢN:
        - Từ Cảnh 1 đến Cảnh 4, nhân vật BẮT BUỘC giữ nguyên 100% duy nhất: một khuôn mặt thuần Việt, một màu tóc đen tuyền, một kiểu tóc, một chiếc áo (kể cả màu sắc và trạng thái sơ vin), một chiếc quần/váy, và một đôi giày/dép.
        - Tuyệt đối không thay đổi hay tráo đổi trang phục giữa các cảnh.
@@ -834,7 +837,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - CHUẨN XÁC THEO SẢN PHẨM & BỐI CẢNH
+# HÀM TẠO CHI TIẾT KỊCH BẢN - CHUẨN XÁC CHO MỌI SẢN PHẨM & BỐI CẢNH
 # ==============================================================================
 def create_scene_details(target_id, mode, style):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -889,10 +892,6 @@ def create_scene_details(target_id, mode, style):
     self_pronoun = dna.get("self_pronoun") or "em"
     audience_pronoun = dna.get("audience_pronoun") or ("các chị em" if not is_viral else "mọi người")
 
-    # XÁC ĐỊNH LOẠI SẢN PHẨM ĐỂ BẢO ĐẢM KHÔNG LẪN TRANG PHỤC
-    prod_full_desc = (str(dna.get("what_and_unique", "")) + " " + str(user_custom_note)).lower()
-    is_tech_product = any(k in prod_full_desc for k in ["chuột", "mouse", "bàn phím", "keyboard", "tai nghe", "headset", "sạc", "pin", "cáp", "laptop", "máy tính", "gaming", "pc", "loa", "điện thoại"])
-    
     hero_color_str = dna.get("hero_sku_color", "").strip()
     raw_prod_name = str(dna.get("what_and_unique", "product")).strip()
     if ":" in raw_prod_name: raw_prod_name = raw_prod_name.split(":", 1)[0].strip()
@@ -901,7 +900,6 @@ def create_scene_details(target_id, mode, style):
 
     condensed_dna = {
         "product": clean_prod_en,
-        "is_tech_product": is_tech_product,
         "hero_sku_color_locked": hero_color_str,
         "dimensions": dna.get("product_dimensions", "Kích thước chuẩn đời thực"),
         "self_pronoun": self_pronoun,
@@ -918,16 +916,17 @@ def create_scene_details(target_id, mode, style):
     THỂ LOẠI: '{current_active_mode}' | HÌNH THỨC: '{presentation_format}'
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK ĐÃ DUYỆT: '{fixed_hook}' | BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN NÀY: '{fixed_setting_base}'
     DIỄN VIÊN / KOC: {detected_demographic_en}.
-    SẢN PHẨM LÀ ĐỒ CÔNG NGHỆ / GAMING: {is_tech_product}
+    SẢN PHẨM: {clean_prod_en}
     GHI CHÚ ƯU TIÊN: {user_custom_note if user_custom_note else 'none'}
 
-    🛑 YÊU CẦU ĐẶC BIỆT VỀ THIẾT KẾ TRANG PHỤC 'wardrobe_lock':
-    - Bạn hãy phân tích kỹ SẢN PHẨM ('{clean_prod_en}') và BỐI CẢNH ('{fixed_setting_base}') để thiết kế 1 BỘ TRANG PHỤC DUY NHẤT phù hợp:
-      • Nếu là sản phẩm công nghệ / Gaming / PC ('{clean_prod_en}'): BẮT BUỘC KOC mặc áo phông graphic gamer, áo polo tech hiện đại hoặc áo hoodie/cardigan trẻ trung, quần jogger hoặc quần âu tối màu, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ NẤU BẾP, CẤM ĐỒ NGỦ!
-      • Nếu là sản phẩm nấu ăn / nhà bếp: Mặc áo thun/polo sạch sẽ, tạp dề nấu ăn.
-      • Nếu là bối cảnh văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
-      • Nếu là ngoài trời: Áo thun/polo thể thao, quần dài, sneaker.
-    - BỘ TRANG PHỤC NÀY ĐƯỢC DÙNG ĐỒNG NHẤT 100% TỪ CẢNH 1 ĐẾN CẢNH 4, KHÔNG THAY ĐỔI.
+    🛑 YÊU CẦU THIẾT KẾ TRANG PHỤC 'wardrobe_lock' CHO MỌI SẢN PHẨM:
+    - Hãy phân tích SẢN PHẨM ('{clean_prod_en}') và BỐI CẢNH ('{fixed_setting_base}') để thiết kế 1 BỘ TRANG PHỤC DUY NHẤT phù hợp nhất cho KOC:
+      • Đồ công nghệ / Gaming / PC: Áo phông/polo năng động, áo hoodie/cardigan trẻ trung, quần jogger/chinos/trousers, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ!
+      • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
+      • Đồ văn phòng, công sở: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
+      • Bối cảnh ngoài trời: Áo thun/polo thể thao, quần dài năng động, giày sneaker.
+      • Bối cảnh phòng ngủ/skincare: Đồ mặc nhà homewear lịch sự, thoải mái.
+    - BỘ TRANG PHỤC NÀY ĐƯỢC DÙNG ĐỒNG NHẤT 100% TỪ CẢNH 1 ĐẾN CẢNH 4 TRONG KỊCH BẢN NÀY (KHÔNG ĐỔI TRANG PHỤC).
 
     TRẢ VỀ JSON:
     {{
@@ -999,14 +998,10 @@ def create_scene_details(target_id, mode, style):
     scenes = res.get("scenes") or res.get("script") or []
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    # TRÍCH XUẤT BỘ TRANG PHỤC VÀ DIỆN MẠO ĐÃ ĐƯỢC AI THIẾT KẾ RIÊNG CHO SẢN PHẨM & BỐI CẢNH NÀY
+    # TRÍCH XUẤT BỘ TRANG PHỤC VÀ DIỆN MẠO ĐÃ ĐƯỢC AI THIẾT KẾ RIÊNG
     w_lock = res.get("wardrobe_lock", {})
-    if is_tech_product:
-        fallback_outfit_en = "modern tech-casual streetwear: minimalist charcoal-black graphic tee, relaxed-fit dark cargo joggers, crisp white-and-black low-top sneakers"
-        fallback_outfit_vi = "Áo phông đen phong cách gaming/công nghệ trẻ trung, quần jogger tối màu và giày sneaker hiện đại"
-    else:
-        fallback_outfit_en = "cream-white casual short-sleeve top with comfortable relaxed trousers and lifestyle footwear"
-        fallback_outfit_vi = "Áo cộc tay màu kem trắng thoải mái và quần vải mềm chỉn chu"
+    fallback_outfit_en = "modern clean casual top with comfortable trousers and lifestyle footwear"
+    fallback_outfit_vi = "Trang phục đời thường hiện đại, gọn gàng và lịch sự"
 
     final_outfit_en = w_lock.get("master_outfit_en") or fallback_outfit_en
     final_outfit_vi = w_lock.get("outfit_vi") or fallback_outfit_vi
@@ -1019,7 +1014,7 @@ def create_scene_details(target_id, mode, style):
         "opposite gender, celebrity likeness, public figure, deepfake, inconsistent scale, oversized, "
         "deformed hands, extra fingers, text, watermark, subtitles, blurry, oversaturated, "
         "changing clothes, changing outfit, changing hairstyle, different facial identity, "
-        "changing shoes, barefoot, apron on gaming/tech product, dropping product, falling product, "
+        "changing shoes, barefoot, apron when not cooking, dropping product, falling product, "
         "background music, musical score, instrumental music, bgm, soundtrack, melody, singing"
     )
     
@@ -1511,8 +1506,9 @@ num_chars = col_opt3.number_input("👤 Số Diễn viên (1 = Độc thoại KO
 char_inputs = []
 for i in range(num_chars):
     c_r, c_i = st.columns([2, 1])
-    role_default = "Nam KOC 26 tuổi am hiểu công nghệ" if (num_chars == 1 and is_tech_product) else ("Mẹ trẻ 26 tuổi người Việt" if (num_chars >= 2 and i == 0) else "")
-    role = c_r.text_input(f"Vai trò NV {i+1}:", value=role_default, key=f"r_{i}_{st.session_state.reset_key}")
+    # Tự động hóa vai trò cho mọi sản phẩm, không ép cứng và không gây NameError
+    role_default = "" if num_chars == 1 else ("Mẹ trẻ 26 tuổi người Việt" if i == 0 else ("Bé 4 tuổi người Việt" if i == 1 else f"Diễn viên {i+1} người Việt"))
+    role = c_r.text_input(f"Vai trò NV {i+1} (Để trống = AI tự phân tích):", value=role_default, key=f"r_{i}_{st.session_state.reset_key}")
     c_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"f_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
     if c_file: char_inputs.append({"id": i+1, "role": role or f"Diễn viên {i+1}", "file": c_file})
 
@@ -1560,14 +1556,17 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
                 - TUYỆT ĐỐI BỎ QUA 100% TRANG PHỤC CŨ TRONG ẢNH! Trang phục sẽ do AI đạo diễn thiết kế riêng ăn khớp hoàn toàn với sản phẩm và bối cảnh!
 
-                🛑 QUY CHUẨN MA TRẬN NHÂN XƯNG:
-                - Tự động nhận diện ngành hàng: Nếu là Chuột Gaming / Công Nghệ / Phụ kiện PC -> self_pronoun = 'em', audience_pronoun = 'anh em' (hoặc 'các bác'). CẤM gọi 'các mẹ', CẤM 'các chị em'!
-                - Nếu là Đồ gia dụng bếp -> self_pronoun = 'em', audience_pronoun = 'các chị em' (hoặc 'các bác').
-                - Nếu là Mẹ & Bé -> self_pronoun = 'em', audience_pronoun = 'các mẹ'.
+                🛑 QUY CHUẨN MA TRẬN NHÂN XƯNG CHO MỌI NGÀNH HÀNG:
+                - Tự động nhận diện ngành hàng từ dữ liệu đầu vào:
+                  • Đồ công nghệ / PC / Gaming / Thiết bị điện tử: self_pronoun = 'em', audience_pronoun = 'anh em' (hoặc 'các bác'). CẤM gọi 'các mẹ', CẤM 'các chị em'!
+                  • Đồ gia dụng bếp, tẩy rửa: self_pronoun = 'em', audience_pronoun = 'các chị em' (hoặc 'các bác').
+                  • Thời trang nữ / Mỹ phẩm: self_pronoun = 'em', audience_pronoun = 'các nàng' / 'các chị em'.
+                  • Mẹ & Bé: self_pronoun = 'em', audience_pronoun = 'các mẹ'.
+                  • Đời sống / Ăn vặt: self_pronoun = 'em', audience_pronoun = 'mọi người' / 'cả nhà'.
 
-                🛑 QUY CHUẨN BỐI CẢNH ĐỜI THỰC PHÙ HỢP SẢN PHẨM:
-                - BẮT BUỘC 5 kịch bản diễn ra ở 5 bối cảnh đời thực khác nhau ăn khớp với sản phẩm:
-                  • Nếu là chuột gaming / đồ PC: Góc máy tính gaming đèn LED ấm, bàn làm việc công nghệ tối giản, góc học tập sinh viên, studio sáng tạo nội dung... TUYỆT ĐỐI KHÔNG để bối cảnh nhà bếp hay nấu nướng!
+                🛑 QUY CHUẨN BỐI CẢNH ĐỜI THỰC PHÙ HỢP VỚI TỪNG SẢN PHẨM:
+                - BẮT BUỘC 5 kịch bản diễn ra ở 5 bối cảnh đời thực khác nhau ăn khớp tuyệt đối với tính chất của sản phẩm:
+                  • Nếu là chuột gaming / đồ PC: Bàn làm việc công nghệ tối giản, góc máy tính gaming đèn LED ấm, bàn học sinh viên, studio sáng tạo... TUYỆT ĐỐI KHÔNG để bối cảnh nhà bếp hay nấu nướng!
 
                 100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN.
                 🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). SỐ 4 ĐỌC LÀ 'BỐN' (CẤM 'TƯ', CẤM 'TỨ'). CẤM '1 TRĂM' (BẮT BUỘC VIẾT 'MỘT TRĂM'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
@@ -1795,7 +1794,7 @@ if all_sc:
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
-            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx}", expanded=False):
+            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx} (Chặn nhạc nền, rơi đồ, lặp từ & đổi màu)", expanded=False):
                 neg_val = scn.get('vid_neg', 'opposite gender, celebrity likeness, extra fingers, text, watermark')
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
