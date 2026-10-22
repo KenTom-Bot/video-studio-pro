@@ -973,7 +973,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
     🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CTA):
     - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
-    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kết hợp nhắc lại nỗi đau của khách): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
+    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kèm nhắc lại nỗi đau): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
 
     🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
     - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải.
@@ -1003,7 +1003,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         """
     else:
         outro_instruction = f"""
-        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL KÈM NỖI ĐAU):
+        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL):
         - NẾU KỊCH BẢN THUỘC FLASH SALE / DEAL HỜI: Dùng công thức neo giá ('Bình thường khoảng [giá gốc], nay giảm còn khoảng [giá sale]...').
         - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá trước đó): TUYỆT ĐỐI KHÔNG đọc giá ở cảnh 4. Dùng câu chốt mượt mà xoáy sâu nỗi đau: 'Nay có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp vấn đề tương tự thì rinh ngay sản phẩm ở giỏ hàng góc trái nhé!'.
         - Số 4 đọc là 'bốn'. CẤM 'tư', CẤM 'tứ'. CẤM 'phiên live', CẤM 'trợ giá'.
@@ -1150,7 +1150,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"holding or interacting with {clean_prod_en} naturally in hands"
     )
 
-    pain_point_keyword = dna.get("pain_points", "vấn đề đang gặp phải")
     scene_4_voiceover = (
         f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!"
         if is_flashsale_script else 
@@ -1712,7 +1711,7 @@ with st.sidebar:
         components.html(support_iframe_code, height=115)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
-        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date"] == datetime.now().strftime("%Y-%m-%d") else 0
+        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
         u_lim = "Không giới hạn" if u_plan == "VIP" else (20 if u_plan == "Advanced" else (10 if u_plan == "Basic" else 3))
         st.info(f"**GÓI {u_plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Đã tạo: **{u_used}/{u_lim}**\n• Hạn dùng: {u_info.get('expires_at')}")
         if st.button("🚪 Đăng Xuất", disabled=is_system_busy): 
@@ -2029,7 +2028,7 @@ if isinstance(ca, dict):
             exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
             
             soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
-            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
             
             c4_html = clean_html(f"""
             <div class="dna-card">
