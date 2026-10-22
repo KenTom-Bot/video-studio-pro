@@ -282,7 +282,7 @@ def get_demographics_description(char_profiles, ai_persona_en=""):
     return primary_gender, (", ".join(parts[:-1]).capitalize() + " and " + parts[-1])
 
 # ==============================================================================
-# HỆ THỐNG BẢO VỆ TỰ ĐỘNG, CHỐNG ẢO GIÁC & BỘ MÁY STYLIST ĐA NGÀNH
+# HỆ THỐNG BẢO VỆ TỰ ĐỘNG, CHỐNG ẢO GIÁC & BỘ LUẬT VẬT LÝ VẠN VẬT
 # ==============================================================================
 def detect_intimate_apparel(text_to_check: str) -> str:
     if not text_to_check: return "normal"
@@ -306,6 +306,34 @@ def detect_wearable_fashion(text_to_check: str) -> bool:
         "sneakers", "boots", "shirt", "pants", "jeans", "shorts", "hat", "cap", "t-shirt"
     ]
     return any(k in t for k in fashion_keywords)
+
+def get_universal_physics_rules(product_name: str) -> str:
+    p = product_name.lower()
+    if any(k in p for k in ["mỹ phẩm", "kem", "serum", "son", "phấn", "skincare", "cream", "lipstick", "lotion", "foundation"]):
+        return (
+            "[COSMETICS & SKIN PHYSICS]: Realistic application physics. "
+            "Creams/lotions spread smoothly onto skin or back of hand with natural absorption; "
+            "lipsticks glide smoothly onto lips in a single precise stroke; "
+            "liquids have correct viscosity, zero floating droplets or magical blending."
+        )
+    elif any(k in p for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "mì", "nước", "trà", "cà phê", "food", "cake", "snack", "drink", "coffee", "tea", "soup", "noodles"]):
+        return (
+            "[FOOD & LIQUID PHYSICS]: Highly appetizing and realistic food dynamics. "
+            "Hot dishes emit natural subtle steam rising upwards; liquids pour with realistic viscosity, "
+            "surface tension, and splash dynamics; cutting or biting reveals realistic internal textures (juiciness, crispness, melting layers), "
+            "zero floating food particles or magical morphing."
+        )
+    elif any(k in p for k in ["nồi", "máy xay", "máy sấy", "quạt", "hút bụi", "cooker", "blender", "dryer", "vacuum", "machine"]):
+        return (
+            "[APPLIANCE MECHANICS]: Strict mechanical operation physics. "
+            "Lids open correctly along hinges with escaping steam; blenders show high-speed blades cutting ingredients inside transparent jars; "
+            "vacuums cleanly suck surface debris into the nozzle; moving parts follow exact mechanical engineering, zero floating parts."
+        )
+    else:
+        return (
+            "[UNIVERSAL REAL-WORLD PHYSICS]: Strict adherence to real-world gravity, solid material permanence, "
+            "and correct ergonomic interaction. Zero floating objects, zero magical teleportation."
+        )
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool) -> str:
     s_lower = f"{product_en} {setting_vi}".lower()
@@ -463,7 +491,7 @@ SOUTHERN_TO_HANOI = {
     r'\bcay\s*the\b': 'cay tê',
     r'\bthe\s*the\b': 'tê tê',
     r'\bsánh\s*dẻo\b': 'sền sệt',
-    r'\bk%\s*lại\b': 'sệt lại',
+    r'\bkẹo\s*lại\b': 'sệt lại',
     r'\bđậu\s*phộng\b': 'hạt lạc',
     r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm',
     r'\btrái\s*cây\b': 'hoa quả',
@@ -939,8 +967,8 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
     🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
-    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải.
-    - Nếu sản phẩm là thời trang / quần áo / giày dép / mũ nón mặc trên người: Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s). Sản phẩm phải ở trạng thái cố định ổn định trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay, cấm tự nhấc sản phẩm rời khỏi cơ thể gây ảo giác.
+    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom', 'nâng đỡ tự nhiên'), CẤM dùng từ nhạy cảm ('khe ngực', 'vú', 'vùng kín', 'sexy').
+    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay, cấm tự nhấc sản phẩm rời khỏi cơ thể gây ảo giác.
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
@@ -1086,6 +1114,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     clean_prod_en = sanitize_third_party_ip(fallback_prod_name)
 
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable)
+    physics_rules_text = get_universal_physics_rules(clean_prod_en)
 
     condensed_dna = {
         "product": clean_prod_en,
@@ -1115,6 +1144,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     GHI CHÚ ƯU TIÊN: {user_custom_note if user_custom_note else 'none'}
     {intimate_safety_rule}
     {stylist_rules_text}
+    {physics_rules_text}
 
     TRẢ VỀ JSON:
     {{
@@ -1143,7 +1173,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "focused and confident",
                 "action_en": "First, demonstrating the key feature of {clean_prod_en}; then inspecting with clean hand separation",
-                "sfx": "Foley âm thanh thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
+                "sfx": "Tiếng thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
                 "director": "Interest | Thao tác trực quan | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
             }},
