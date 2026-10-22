@@ -973,7 +973,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
     🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CTA):
     - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
-    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên: "Nay có ưu đãi cực sâu, mọi người cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!".
+    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kết hợp nhắc lại nỗi đau của khách): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
 
     🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
     - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải.
@@ -984,7 +984,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - TUYỆT ĐỐI CẤM các từ ngữ công nghệ/máy móc sáo rỗng: CẤM 'thuật toán gợi ý', CẤM 'máy vừa phân tích', CẤM 'hệ thống vừa báo', CẤM 'AI phát hiện'.
     - 🛑 QUY TẮC PHÁT ÂM: 100% viết và đọc là 'bốn' (bốn mươi, mười bốn...). CẤM 'tư', CẤM 'tứ'. Viết rõ 'một trăm'.
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (DÙNG 'NGHÌN'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
-    - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s.
+    - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00S.
     🛑 100% NGƯỜI VIỆT HƯ CẤU: {char_rules}
     """
 
@@ -1003,9 +1003,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         """
     else:
         outro_instruction = f"""
-        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL):
+        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL KÈM NỖI ĐAU):
         - NẾU KỊCH BẢN THUỘC FLASH SALE / DEAL HỜI: Dùng công thức neo giá ('Bình thường khoảng [giá gốc], nay giảm còn khoảng [giá sale]...').
-        - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá trước đó): TUYỆT ĐỐI KHÔNG đọc giá ở cảnh 4. Dùng câu chốt mượt mà: 'Nay có ưu đãi cực sâu, {audience_pronoun} cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!'.
+        - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá trước đó): TUYỆT ĐỐI KHÔNG đọc giá ở cảnh 4. Dùng câu chốt mượt mà xoáy sâu nỗi đau: 'Nay có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp vấn đề tương tự thì rinh ngay sản phẩm ở giỏ hàng góc trái nhé!'.
         - Số 4 đọc là 'bốn'. CẤM 'tư', CẤM 'tứ'. CẤM 'phiên live', CẤM 'trợ giá'.
         """
 
@@ -1025,13 +1025,13 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
          • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
          • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
          • Đồ lót / Nội y: Áo sơ mi pastel hoặc cardigan thanh lịch kín đáo kết hợp quần dài (tuyệt đối không mặc đồ lót lên người, chỉ cầm trên tay).
-         • Sản phẩm thời trang mặc trên người (quần áo, giày dép, mũ nón): Nhân vật MẶC TRỰC TIẾP sản phẩm lên người từ giây 0.0s, cố định vị trí trên cơ thể, tuyệt đối không cầm trên tay hay để sản phẩm tự bay lượn.
+         • Sản phẩm thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP sản phẩm lên người từ giây 0.0s, cố định vị trí trên cơ thể, tuyệt đối không cầm trên tay hay để sản phẩm tự bay lượn.
        - Áp dụng linh hoạt cho MỌI SẢN PHẨM, không giới hạn ngành hàng.
     2. KHÓA ĐỒNG NHẤT 100% XUYÊN SUỐT 4 PHÂN CẢNH TRONG CÙNG 1 KỊCH BẢN:
        - Từ Cảnh 1 đến Cảnh 4, nhân vật BẮT BUỘC giữ nguyên 100% duy nhất: khuôn mặt thuần Việt, màu tóc đen tuyền, kiểu tóc, trang phục và giày dép.
 
     🛑 KHÓA ÂM THANH: CHỈ DÙNG FOLEY HIỆU ỨNG THỰC TẾ & VOICE, KHỬ 100% NHẠC NỀN (ZERO BGM).
-    🛑 KHÓA TIẾP XÚC VẬT LÝ & CHỐNG ẢO GIÁC: Tương tác tự nhiên, sản phẩm mặc trên người hoặc cầm chắc trên tay, cố định hình khối, cấm tự bay lượn, cấm biến mất.
+    🛑 KHÓA TIẾP XÚC VẬT LÝ & CHỐNG ẢO GIÁC ĐÔI TAY: Tương tác tự nhiên, sản phẩm mặc trên người hoặc cầm chắc trên tay, tay thả lỏng/chống hông tự nhiên, cấm tự với lấy đồ, cấm tự bay lượn.
     🛑 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP NGAY TỪ 0.00S.
     {char_rules}
     """
@@ -1150,10 +1150,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"holding or interacting with {clean_prod_en} naturally in hands"
     )
 
+    pain_point_keyword = dna.get("pain_points", "vấn đề đang gặp phải")
     scene_4_voiceover = (
         f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!"
         if is_flashsale_script else 
-        f"Nay có ưu đãi cực sâu, {audience_pronoun} cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!"
+        f"Nay có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp phải vấn đề tương tự thì rinh ngay sản phẩm ở giỏ hàng góc trái nhé!"
     )
 
     prompt_text = f"""
@@ -1219,7 +1220,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "smiling warmly into lens with welcoming hands",
                 "action_en": "First, interacting with {clean_prod_en} steadily; then smoothly sharing recommendations with an open-palm hand gesture while smiling warmly to finish",
                 "sfx": "Tiếng chuông ting nhẹ nhàng (không nhạc nền)",
-                "director": "{'Action | Chốt deal flashsale neo giá' if is_flashsale_script else 'Action | Chốt deal soft CTA ưu đãi chung'}",
+                "director": "{'Action | Chốt deal flashsale neo giá' if is_flashsale_script else 'Action | Chốt deal soft CTA kèm nỗi đau'}",
                 "voiceover": "{scene_4_voiceover}"
             }}
         ]
@@ -1346,7 +1347,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Đồng nhất 100% cả 4 cảnh)",
         f"🌤 <b>Cảm biến môi trường & Veo 3 5-Layer:</b> Tự động đồng bộ Ánh sáng thời tiết, Khóa vật lý 3D & Định thời gian Lip-Sync chuẩn từng giây",
         f"🔇 <b>Âm thanh bản quyền (Zero Text / BGM):</b> Thuần Foley SFX thực tế đời sống & Voiceover, triệt tiêu 100% chữ, sub, icon và nhạc nền",
-        f"💰 <b>Cảnh 4 (Chốt deal):</b> {'Neo giá Flash Sale đối lập' if is_flashsale_script else 'Soft CTA ưu đãi chung chung (An toàn TikTok Shop)'}"
+        f"💰 <b>Cảnh 4 (Chốt deal):</b> {'Neo giá Flash Sale đối lập' if is_flashsale_script else 'Soft CTA xoáy sâu nỗi đau (An toàn TikTok Shop)'}"
     ]
     if is_fashion_wearable:
         summary_lines.append("👗 <b>Chế độ Thời trang Wearable (Khóa tay & Chống ảo giác):</b> Nhân vật mặc trực tiếp sản phẩm lên người từ 0.0s, tay thả lỏng/chống hông tự nhiên, cố định vị trí, chống tự bay lượn.")
@@ -1711,7 +1712,7 @@ with st.sidebar:
         components.html(support_iframe_code, height=115)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
-        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
+        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date"] == datetime.now().strftime("%Y-%m-%d") else 0
         u_lim = "Không giới hạn" if u_plan == "VIP" else (20 if u_plan == "Advanced" else (10 if u_plan == "Basic" else 3))
         st.info(f"**GÓI {u_plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Đã tạo: **{u_used}/{u_lim}**\n• Hạn dùng: {u_info.get('expires_at')}")
         if st.button("🚪 Đăng Xuất", disabled=is_system_busy): 
@@ -1848,7 +1849,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
 
                 🛑 QUY CHUẨN PHÂN HÓA CẢNH 4 (ACTION & CTA):
                 - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
-                - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên: "Nay có ưu đãi cực sâu, mọi người cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!".
+                - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kèm nhắc lại nỗi đau): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
 
                 🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
                 - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
@@ -2028,7 +2029,7 @@ if isinstance(ca, dict):
             exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
             
             soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
-            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
             
             c4_html = clean_html(f"""
             <div class="dna-card">
