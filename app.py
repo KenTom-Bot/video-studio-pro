@@ -282,7 +282,7 @@ def get_demographics_description(char_profiles, ai_persona_en=""):
     return primary_gender, (", ".join(parts[:-1]).capitalize() + " and " + parts[-1])
 
 # ==============================================================================
-# HỆ THỐNG BẢO VỆ TỰ ĐỘNG & BỘ MÁY STYLIST ĐA NGÀNH
+# HỆ THỐNG BẢO VỆ TỰ ĐỘNG, CHỐNG ẢO GIÁC & BỘ MÁY STYLIST ĐA NGÀNH
 # ==============================================================================
 def detect_intimate_apparel(text_to_check: str) -> str:
     if not text_to_check: return "normal"
@@ -327,7 +327,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     if intimate_type == "underwear_bra":
         industry_outfit = "Áo sơ mi lụa/linen dài tay cài cúc lịch sự hoặc áo thun cổ tròn phối khoác ngoài bằng cardigan dệt kim mỏng + Quần âu ống suông dài cạp cao thanh lịch."
     elif is_fashion:
-        industry_outfit = "Nhân vật mặc trực tiếp sản phẩm thời trang này lên người. Phối cùng phụ kiện và trang phục phụ trợ tinh tế, gọn gàng, tôn phom dáng (silhouette) thực tế."
+        industry_outfit = "Nhân vật MẶC TRỰC TIẾP sản phẩm thời trang này lên người. Cố định hoàn toàn form dáng trên cơ thể từ giây 0.0s, tuyệt đối không cầm trên tay hay để sản phẩm tự dịch chuyển."
     else:
         industry_outfit = (
             "Phối đồ chuyên gia chuẩn KOC: "
@@ -463,7 +463,7 @@ SOUTHERN_TO_HANOI = {
     r'\bcay\s*the\b': 'cay tê',
     r'\bthe\s*the\b': 'tê tê',
     r'\bsánh\s*dẻo\b': 'sền sệt',
-    r'\bkẹo\s*lại\b': 'sệt lại',
+    r'\bk%\s*lại\b': 'sệt lại',
     r'\bđậu\s*phộng\b': 'hạt lạc',
     r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm',
     r'\btrái\s*cây\b': 'hoa quả',
@@ -938,9 +938,9 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
-    🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG:
-    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom', 'nâng đỡ tự nhiên'), CẤM dùng từ nhạy cảm ('khe ngực', 'vú', 'vùng kín', 'sexy').
-    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI, tạo dáng tự nhiên, xoay người khoe phom dáng và chỉ tay vào điểm nhấn (chất liệu, cúc áo, đường may) đang mặc trên người.
+    🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
+    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải.
+    - Nếu sản phẩm là thời trang / quần áo / giày dép / mũ nón mặc trên người: Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s). Sản phẩm phải ở trạng thái cố định ổn định trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay, cấm tự nhấc sản phẩm rời khỏi cơ thể gây ảo giác.
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
@@ -989,19 +989,19 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
          • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
          • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
          • Đồ lót / Nội y: Áo sơ mi pastel hoặc cardigan thanh lịch kín đáo kết hợp quần dài (tuyệt đối không mặc đồ lót lên người, chỉ cầm trên tay).
-         • Sản phẩm thời trang (quần áo, váy, áo khoác): Nhân vật MẶC TRỰC TIẾP sản phẩm thời trang đó lên người để review phom dáng.
+         • Sản phẩm thời trang mặc trên người (quần áo, giày dép, mũ nón): Nhân vật MẶC TRỰC TIẾP sản phẩm lên người từ giây 0.0s, cố định vị trí trên cơ thể, tuyệt đối không cầm trên tay hay để sản phẩm tự bay lượn.
        - Áp dụng linh hoạt cho MỌI SẢN PHẨM, không giới hạn ngành hàng.
     2. KHÓA ĐỒNG NHẤT 100% XUYÊN SUỐT 4 PHÂN CẢNH TRONG CÙNG 1 KỊCH BẢN:
        - Từ Cảnh 1 đến Cảnh 4, nhân vật BẮT BUỘC giữ nguyên 100% duy nhất: khuôn mặt thuần Việt, màu tóc đen tuyền, kiểu tóc, trang phục và giày dép.
 
     🛑 KHÓA ÂM THANH: CHỈ DÙNG FOLEY HIỆU ỨNG THỰC TẾ & VOICE, KHỬ 100% NHẠC NỀN (ZERO BGM).
-    🛑 KHÓA TIẾP XÚC VẬT LÝ: Tương tác tự nhiên với sản phẩm (mặc trên người hoặc cầm chắc trên tay), cấm thả rơi, cấm biến mất.
+    🛑 KHÓA TIẾP XÚC VẬT LÝ & CHỐNG ẢO GIÁC: Tương tác tự nhiên, sản phẩm mặc trên người hoặc cầm chắc trên tay, cố định hình khối, cấm tự bay lượn, cấm biến mất.
     🛑 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP NGAY TỪ 0.00S.
     {char_rules}
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP BỘ MÁY STYLIST ĐA NGÀNH & VEO 3 5-LAYER
+# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP CHỐNG ẢO GIÁC, STYLIST & VEO 3 5-LAYER
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1075,9 +1075,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif is_fashion_wearable:
         fallback_prod_name = f"authentic {hero_color_str} {raw_prod_name}".strip() if hero_color_str else f"authentic {raw_prod_name}"
         intimate_safety_rule = """
-        🛑 QUY CHUẢN TRÌNH BÀY SẢN PHẨM THỜI TRANG (WEARABLE ON-BODY TRY-ON):
-        1. Nhân vật MẶC TRỰC TIẾP sản phẩm thời trang này lên người để khoe phom dáng (silhouette) thực tế.
-        2. HÀNH ĐỘNG: Nhân vật tạo dáng tự nhiên, xoay người nhẹ nhàng và đưa tay chạm/chỉ vào điểm nhấn (chất liệu vải, cúc áo, đường may) đang mặc trên người.
+        🛑 QUY CHUẢN TRÌNH BÀY SẢN PHẨM THỜI TRANG (WEARABLE ON-BODY TRY-ON - CHỐNG ẢO GIÁC):
+        1. Nhân vật MẶC TRỰC TIẾP sản phẩm thời trang này lên người từ giây 0.0s. 
+        2. CỐ ĐỊNH TRẠNG THÁI: Sản phẩm nằm cố định trên cơ thể suốt video. KHÔNG ĐƯỢC PHÉP tự động bay vào tay, không cầm sản phẩm rời khỏi cơ thể, không nhấc sản phẩm lên.
+        3. HÀNH ĐỘNG: Nhân vật tạo dáng tự nhiên, xoay người nhẹ nhàng và đưa tay chạm nhẹ vào điểm nhấn đang mặc trên người mà không làm dịch chuyển trang phục.
         """
     else:
         fallback_prod_name = f"authentic {hero_color_str} {raw_prod_name}".strip() if hero_color_str else f"authentic {raw_prod_name}"
@@ -1098,7 +1099,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     }
 
     action_phrases = (
-        f"wearing {clean_prod_en} naturally on body, gracefully turning to show silhouette and gesturing toward the garment details" 
+        f"wearing {clean_prod_en} naturally on body, already worn from 0.0s, fixed position on body with zero object movement, gracefully turning to show silhouette and gesturing toward the garment" 
         if is_fashion_wearable else 
         f"holding or interacting with {clean_prod_en} naturally in hands"
     )
@@ -1142,7 +1143,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
                 "expression_en": "focused and confident",
                 "action_en": "First, demonstrating the key feature of {clean_prod_en}; then inspecting with clean hand separation",
-                "sfx": "Tiếng thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
+                "sfx": "Foley âm thanh thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
                 "director": "Interest | Thao tác trực quan | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
             }},
@@ -1153,7 +1154,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
                 "action_en": "First, completing the usage smoothly; then presenting the satisfying outcome to camera",
-                "sfx": "Tiếng trải nghiệm thực tế đời sống (không nhạc nền)",
+                "sfx": "Foley âm thanh trải nghiệm thực tế đời sống (không nhạc nền)",
                 "director": "Desire | Bằng chứng thực tế | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
             }},
@@ -1164,7 +1165,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with welcoming hands",
                 "action_en": "First, interacting with {clean_prod_en} steadily; then smoothly sharing recommendations with an open-palm hand gesture while smiling warmly to finish",
-                "sfx": "Tiếng chuông ting nhẹ nhàng (không nhạc nền)",
+                "sfx": "Foley âm thanh chuông ting nhẹ nhàng (không nhạc nền)",
                 "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal an toàn'}",
                 "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi follow' if is_viral else f'Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'}"
             }}
@@ -1196,6 +1197,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     locked_character_prompt_segment = f"{final_actor_head}, strictly wearing identical {final_outfit_en} across all scenes without variation"
 
     base_negative_prompt = (
+        "product flying, object moving into hands, picking up clothes, hands holding garment, changing position of clothes, "
         "nsfw, nude, nudity, cleavage, exposed skin, wearing underwear, wearing bra, lingerie model, "
         "suggestive pose, revealing clothes, sheer see-through fabric, opposite gender, celebrity likeness, "
         "public figure, deepfake, inconsistent scale, oversized, deformed hands, extra fingers, text, watermark, "
@@ -1248,11 +1250,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
         clean_vo_for_audio = re.sub(r'\.{2,}', '.', vo_text_current).strip()
 
+        wearable_vid_lock = "already worn on body from 0.0s, fixed position on body with zero object movement, no hand-held interaction" if is_fashion_wearable else ""
+
         raw_vid = (
             f"[CAMERA & LIGHTING]: {camera_shot}, smooth Steadicam gimbal live-action footage, {env_lighting_en}. "
             f"[SETTING]: {scene_setting_en}. "
             f"[SUBJECT LOCK]: {locked_character_prompt_segment}, {micro_expr_en}. "
-            f"[ACTION & RIGID PHYSICS]: {clean_action}. Subject interacts with solid {clean_prod_en} maintaining consistent 3D geometry, "
+            f"[ACTION & RIGID PHYSICS]: {clean_action}. {wearable_vid_lock}. Subject interacts with solid {clean_prod_en} maintaining consistent 3D geometry, "
             f"rigid-body physics, and firm anatomical finger grip (or resting stably on surface, never floating, morphing, or dropping). "
             f"[LIP-SYNC & TIMING ({dynamic_scene_sec}s total)]: From 0.0s to {actual_speech_time}s, subject speaks directly to camera with accurate "
             f"Vietnamese lip-sync and natural facial micro-expressions; for the final {cushion_sec}s, subject smoothly closes mouth into a natural "
@@ -1277,7 +1281,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}"
     ]
     if is_fashion_wearable:
-        summary_lines.append("👗 <b>Chế độ Thời trang Wearable:</b> Nhân vật mặc trực tiếp sản phẩm lên người, xoay người khoe phom dáng.")
+        summary_lines.append("👗 <b>Chế độ Thời trang Wearable (Chống ảo giác):</b> Nhân vật mặc trực tiếp sản phẩm lên người từ 0.0s, cố định vị trí, chống tự bay lượn.")
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
         summary_lines.append(f"🎯 <b>Ghi chú riêng:</b> {user_custom_note}")
     res["director_summary"] = "<br>".join(summary_lines)
@@ -1774,9 +1778,9 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 - NẾU NGƯỜI DÙNG ĐÃ NHẬP VAI TRÒ CỤ THỂ: Ưu tiên 100% yêu cầu người dùng!
                 - Ghi rõ kết quả vào trường 'koc_demographic_analysis' trong JSON.
 
-                🛑 QUY CHUẨN AN TOÀN CHO SẢN PHẨM ĐỒ LÓT & THỜI TRANG:
+                🛑 QUY CHUẨN AN TOÀN CHO SẢN PHẨM ĐỒ LÓT & THỜI TRANG (CHỐNG ẢO GIÁC):
                 - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom'), CẤM từ nhạy cảm ('khe ngực', 'vú', 'sexy').
-                - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI, tạo dáng tự nhiên, xoay người khoe phom dáng và chỉ tay vào điểm nhấn (chất liệu, cúc áo, đường may) đang mặc trên người.
+                - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay gây ảo giác.
 
                 🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
                 - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
@@ -1956,7 +1960,7 @@ if isinstance(ca, dict):
             exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
             
             soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
-            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
             
             c4_html = clean_html(f"""
             <div class="dna-card">
