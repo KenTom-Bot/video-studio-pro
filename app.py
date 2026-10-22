@@ -966,16 +966,16 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
-    🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
-    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom', 'nâng đỡ tự nhiên'), CẤM dùng từ nhạy cảm ('khe ngực', 'vú', 'vùng kín', 'sexy').
-    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay, cấm tự nhấc sản phẩm rời khỏi cơ thể gây ảo giác.
+    🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CTA):
+    - Nếu thể loại là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
+    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên: "Nay có ưu đãi cực sâu, {('mọi người' if is_viral else 'các chị em')} cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!".
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
     - TUYỆT ĐỐI CẤM các từ ngữ công nghệ/máy móc sáo rỗng: CẤM 'thuật toán gợi ý', CẤM 'máy vừa phân tích', CẤM 'hệ thống vừa báo', CẤM 'AI phát hiện'.
     - 🛑 QUY TẮC PHÁT ÂM: 100% viết và đọc là 'bốn' (bốn mươi, mười bốn...). CẤM 'tư', CẤM 'tứ'. Viết rõ 'một trăm'.
     - CẤM TUYỆT ĐỐI TỪ 'NGÀN' (DÙNG 'NGHÌN'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
-    - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00s.
+    - 100% CẢ 4 CẢNH LỜI THOẠI ĐỀU BẮT ĐẦU NGAY TỪ 0.00S.
     🛑 100% NGƯỜI VIỆT HƯ CẤU: {char_rules}
     """
 
@@ -994,11 +994,10 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         """
     else:
         outro_instruction = f"""
-        🛑 CÔNG THỨC CHỐT DEAL CẢNH 4 TIKTOK SHOP AN TOÀN (KHÓA KÉP 'KHOẢNG' & 'NAY GIẢM'):
-        - Neo khoảng giá: 'Bình thường khoảng [giá gốc làm tròn LÊN], nay giảm chỉ còn khoảng [giá sale làm tròn XUỐNG] thôi...'
-        - Miễn trừ: 'nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi...'
-        - CTA: '{audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'
-        - Số 4 đọc là 'bốn'. CẤM 'tư', CẤM 'tứ'. CẤM 'phiên live', CẤM 'trên live', CẤM 'trợ giá'.
+        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL):
+        - NẾU KỊCH BẢN THUỘC FLASH SALE / DEAL HỜI: Dùng công thức neo giá ('Bình thường khoảng [giá gốc], nay giảm còn khoảng [giá sale]...').
+        - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá trước đó): TUYỆT ĐỐI KHÔNG đọc giá ở cảnh 4. Dùng câu chốt mượt mà: 'Nay có ưu đãi cực sâu, {audience_pronoun} cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!'.
+        - Số 4 đọc là 'bốn'. CẤM 'tư', CẤM 'tứ'. CẤM 'phiên live', CẤM 'trợ giá'.
         """
 
     override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG: '{custom_note}'. BẮT BUỘC tuân thủ 100%!" if custom_note else ""
@@ -1092,6 +1091,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     check_str = f"{raw_prod_name} {fixed_title} {fixed_hook} {user_custom_note} {dna.get('what_and_unique', '')}"
     intimate_type = detect_intimate_apparel(check_str)
     is_fashion_wearable = detect_wearable_fashion(check_str) and intimate_type == "normal"
+    is_flashsale_script = any(k in f"{fixed_title} {fixed_hook}".lower() for k in ["flash sale", "săn deal", "deal hời", "giảm sốc", "ưu đãi sốc"])
     
     intimate_safety_rule = ""
     if intimate_type == "underwear_bra":
@@ -1131,6 +1131,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"wearing {clean_prod_en} naturally on body, already worn from 0.0s, fixed position on body with zero object movement, gracefully turning to show silhouette and gesturing toward the garment" 
         if is_fashion_wearable else 
         f"holding or interacting with {clean_prod_en} naturally in hands"
+    )
+
+    scene_4_voiceover = (
+        f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!"
+        if is_flashsale_script else 
+        f"Nay có ưu đãi cực sâu, {audience_pronoun} cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!"
     )
 
     prompt_text = f"""
@@ -1184,7 +1190,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
                 "action_en": "First, completing the usage smoothly; then presenting the satisfying outcome to camera",
-                "sfx": "Foley âm thanh trải nghiệm thực tế đời sống (không nhạc nền)",
+                "sfx": "Tiếng trải nghiệm thực tế đời sống (không nhạc nền)",
                 "director": "Desire | Bằng chứng thực tế | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
             }},
@@ -1195,9 +1201,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "camera_shot": "Vertical 9:16 warm eye-level closing shot",
                 "expression_en": "smiling warmly into lens with welcoming hands",
                 "action_en": "First, interacting with {clean_prod_en} steadily; then smoothly sharing recommendations with an open-palm hand gesture while smiling warmly to finish",
-                "sfx": "Foley âm thanh chuông ting nhẹ nhàng (không nhạc nền)",
-                "director": "{'Action | Kêu gọi tương tác follow' if is_viral else 'Action | Chốt deal an toàn'}",
-                "voiceover": "{'Đoạn thoại kết nối người xem tự nhiên dưới 28 từ kêu gọi follow' if is_viral else f'Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!'}"
+                "sfx": "Tiếng chuông ting nhẹ nhàng (không nhạc nền)",
+                "director": "{'Action | Chốt deal flashsale neo giá' if is_flashsale_script else 'Action | Chốt deal soft CTA ưu đãi chung'}",
+                "voiceover": "{scene_4_voiceover}"
             }}
         ]
     }}
@@ -1308,7 +1314,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Đồng nhất 100% cả 4 cảnh)",
         f"🌤 <b>Cảm biến môi trường & Veo 3 5-Layer:</b> Tự động đồng bộ Ánh sáng thời tiết, Khóa vật lý 3D & Định thời gian Lip-Sync chuẩn từng giây",
         f"🔇 <b>Âm thanh bản quyền:</b> Thuần Foley SFX thực tế đời sống & Voiceover, triệt tiêu 100% nhạc nền (Zero BGM)",
-        f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}"
+        f"💰 <b>Cảnh 4 (Chốt deal):</b> {'Neo giá Flash Sale đối lập' if is_flashsale_script else 'Soft CTA ưu đãi chung chung (An toàn TikTok Shop)'}"
     ]
     if is_fashion_wearable:
         summary_lines.append("👗 <b>Chế độ Thời trang Wearable (Chống ảo giác):</b> Nhân vật mặc trực tiếp sản phẩm lên người từ 0.0s, cố định vị trí, chống tự bay lượn.")
@@ -1808,9 +1814,9 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 - NẾU NGƯỜI DÙNG ĐÃ NHẬP VAI TRÒ CỤ THỂ: Ưu tiên 100% yêu cầu người dùng!
                 - Ghi rõ kết quả vào trường 'koc_demographic_analysis' trong JSON.
 
-                🛑 QUY CHUẨN AN TOÀN CHO SẢN PHẨM ĐỒ LÓT & THỜI TRANG (CHỐNG ẢO GIÁC):
-                - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom'), CẤM từ nhạy cảm ('khe ngực', 'vú', 'sexy').
-                - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay gây ảo giác.
+                🛑 QUY CHUẨN PHÂN HÓA CẢNH 4 (ACTION & CTA):
+                - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
+                - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên: "Nay có ưu đãi cực sâu, mọi người cứ bấm vào giỏ hàng góc trái kiểm tra tài khoản mình xem nhé!".
 
                 🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
                 - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
