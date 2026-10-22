@@ -282,7 +282,7 @@ def get_demographics_description(char_profiles, ai_persona_en=""):
     return primary_gender, (", ".join(parts[:-1]).capitalize() + " and " + parts[-1])
 
 # ==============================================================================
-# HỆ THỐNG BẢO VỆ TỰ ĐỘNG CHO ĐỒ LÓT, ÁO 2 DÂY & SẢN PHẨM THỜI TRANG (VEO 3 & TIKTOK SAFE)
+# HỆ THỐNG BẢO VỆ TỰ ĐỘNG & BỘ MÁY STYLIST ĐA NGÀNH
 # ==============================================================================
 def detect_intimate_apparel(text_to_check: str) -> str:
     if not text_to_check: return "normal"
@@ -306,6 +306,45 @@ def detect_wearable_fashion(text_to_check: str) -> bool:
         "sneakers", "boots", "shirt", "pants", "jeans", "shorts", "hat", "cap", "t-shirt"
     ]
     return any(k in t for k in fashion_keywords)
+
+def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool) -> str:
+    s_lower = f"{product_en} {setting_vi}".lower()
+    h_lower = hero_color.lower()
+    
+    # 1. Chọn giày dép chuẩn không gian
+    is_home_interior = any(k in s_lower for k in ["phòng ngủ", "giường", "nhà bếp", "bếp", "phòng tắm", "sofa", "phòng khách", "mặc nhà"])
+    if is_home_interior:
+        footwear_rule = "clean minimalist indoor house slippers (hoặc clean white ankle socks)"
+    else:
+        footwear_rule = "clean minimalist white leather sneakers or smart-casual loafers" if gender == "male" else "clean minimalist white sneakers, elegant beige loafers, or modest low-block slingback flats"
+        
+    # 2. Quy tắc tương phản màu sắc với sản phẩm
+    if any(k in h_lower for k in ["đen", "black", "xám", "grey", "gray", "xanh đậm", "navy", "nâu", "dark"]):
+        color_contrast_rule = "Màu áo/trang phục làm nền BẮT BUỘC là tông SÁNG/TRUNG TÍNH (Kem Ivory, Trắng Sữa, Be Sáng, Xanh Pastel nhạt) để tôn sản phẩm tối màu lên nổi bật."
+    elif any(k in h_lower for k in ["trắng", "white", "kem", "cream", "be", "beige", "vàng nhạt", "hồng nhạt"]):
+        color_contrast_rule = "Màu áo/trang phục làm nền BẮT BUỘC là tông TRẦM/ĐẬM THANH LỊCH (Xanh Navy, Nâu Mocha, Xám Than, Xanh Rêu trầm) để tôn sản phẩm sáng màu lên nổi bật."
+    else:
+        color_contrast_rule = "Màu áo/trang phục làm nền là tông TRUNG TÍNH ĐƠN SẮC (Trắng Kem, Be, Xám Nhạt hoặc Xanh Navy) sang trọng, không rối mắt."
+
+    # 3. Phối đồ theo nhóm ngành hàng
+    if intimate_type == "underwear_bra":
+        industry_outfit = "Áo sơ mi lụa/linen dài tay cài cúc lịch sự hoặc áo thun cổ tròn phối khoác ngoài bằng cardigan dệt kim mỏng + Quần âu ống suông dài cạp cao thanh lịch."
+    elif is_fashion:
+        industry_outfit = "Nhân vật mặc trực tiếp sản phẩm thời trang này lên người. Phối cùng phụ kiện và trang phục phụ trợ tinh tế, gọn gàng, tôn phom dáng (silhouette) thực tế."
+    else:
+        industry_outfit = (
+            "Phối đồ chuyên gia chuẩn KOC: "
+            "(1) Nam: Áo Polo dệt kim có cổ / Sơ mi Oxford xắn tay áo gọn gàng + Quần Chinos/Quần âu ống đứng; "
+            "(2) Nữ: Áo sơ mi kiểu Hàn Quốc / Áo thun ôm vừa vặn sơ vin gọn gàng cùng Quần âu ống suông cạp cao hoặc chân váy dài thanh lịch."
+        )
+
+    return f"""
+    🛑 BỘ MÁY STYLIST ĐA NGÀNH & BỐI CẢNH THÔNG MINH ('wardrobe_lock'):
+    - PHỐI TRANG PHỤC CHUẨN NGÀNH HÀNG: {industry_outfit}
+    - TƯƠNG PHẢN MÀU SẮC TÔN SẢN PHẨM: {color_contrast_rule}
+    - GIÀY DÉP CHUẨN KHÔNG GIAN: Sử dụng '{footwear_rule}'.
+    - KHÓA CHI TIẾT ĐỒNG NHẤT: Trong 'master_outfit_en', mô tả chi tiết chất liệu vải, kiểu cổ áo, tay áo và giày dép để giữ bất biến 100% suốt 4 cảnh.
+    """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
     r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'ergonomic seamless comfort top garment',
@@ -898,13 +937,13 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {pres_rule}
     {viral_directive}
     
-    🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
+    🛑 YÊU CẦU ĐA DẠNG HỌA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
     🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG:
-    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc gỗ/mannequin) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom', 'nâng đỡ tự nhiên'), CẤM dùng từ nhạy cảm ('khe ngực', 'vú', 'vùng kín', 'sexy').
-    - Nếu sản phẩm là thời trang mặc trên người (quần áo, giày dép, mũ nón): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI, tạo dáng tự nhiên, xoay người khoe phom dáng và chỉ tay vào điểm nhấn (chất liệu, cúc áo, đường may) đang mặc trên người.
+    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom', 'nâng đỡ tự nhiên'), CẤM dùng từ nhạy cảm ('khe ngực', 'vú', 'vùng kín', 'sexy').
+    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI, tạo dáng tự nhiên, xoay người khoe phom dáng và chỉ tay vào điểm nhấn (chất liệu, cúc áo, đường may) đang mặc trên người.
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
@@ -948,8 +987,8 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 QUY TẮC BẮT BUỘC VỀ TRANG PHỤC & ĐỒNG NHẤT NHÂN VẬT CHO MỌI SẢN PHẨM:
     1. TRANG PHỤC PHẢI THÍCH ỨNG CHÍNH XÁC VỚI SẢN PHẨM VÀ BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN ĐÓ:
-       - Phân tích kỹ ngành hàng và bối cảnh để chọn trang phục chuẩn xác:
-         • Đồ công nghệ / Gaming / PC: Áo phông/polo, hoodie/cardigan, quần jogger/chinos, giày sneaker. TUYỆT ĐỐI CẤM TẠP ĐỀ!
+       - Phân tích kỹ ngành hàng để chọn trang phục chuẩn xác:
+         • Đồ công nghệ / Gaming / PC: Áo phông/polo, hoodie/cardigan, quần jogger/chinos, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ!
          • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
          • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
          • Đồ lót / Nội y: Áo sơ mi pastel hoặc cardigan thanh lịch kín đáo kết hợp quần dài (tuyệt đối không mặc đồ lót lên người, chỉ cầm trên tay).
@@ -965,7 +1004,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP THỜI TIẾT, VEO 3 5-LAYER & THỜI TRANG MẶC TRÊN NGƯỜI
+# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP BỘ MÁY STYLIST ĐA NGÀNH & VEO 3 5-LAYER
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1041,12 +1080,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         intimate_safety_rule = """
         🛑 QUY CHUẢN TRÌNH BÀY SẢN PHẨM THỜI TRANG (WEARABLE ON-BODY TRY-ON):
         1. Nhân vật MẶC TRỰC TIẾP sản phẩm thời trang này lên người để khoe phom dáng (silhouette) thực tế.
-        2. HÀNH ĐỘNG: Nhân vật tạo dáng tự nhiên, xoay người nhẹ nhàng và đưa tay chạm/chỉ vào chi tiết điểm nhấn (chất liệu vải, cúc áo, cổ áo) đang mặc trên người.
+        2. HÀNH ĐỘNG: Nhân vật tạo dáng tự nhiên, xoay người nhẹ nhàng và đưa tay chạm/chỉ vào điểm nhấn (chất liệu vải, cúc áo, đường may) đang mặc trên người.
         """
     else:
         fallback_prod_name = f"authentic {hero_color_str} {raw_prod_name}".strip() if hero_color_str else f"authentic {raw_prod_name}"
 
     clean_prod_en = sanitize_third_party_ip(fallback_prod_name)
+
+    # GỌI BỘ MÁY STYLIST ĐA NGÀNH
+    stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable)
 
     condensed_dna = {
         "product": clean_prod_en,
@@ -1075,13 +1117,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     SẢN PHẨM: {clean_prod_en}
     GHI CHÚ ƯU TIÊN: {user_custom_note if user_custom_note else 'none'}
     {intimate_safety_rule}
+    {stylist_rules_text}
 
     TRẢ VỀ JSON:
     {{
         "title": "{fixed_title}",
         "wardrobe_lock": {{
-            "outfit_vi": "Mô tả chi tiết bằng tiếng Việt trang phục ăn khớp với {clean_prod_en} và bối cảnh {fixed_setting_base}",
-            "master_outfit_en": "Detailed English description of outfit matching {clean_prod_en}",
+            "outfit_vi": "Mô tả chi tiết bằng tiếng Việt trang phục phối theo Bộ máy Stylist đa ngành ăn khớp với {clean_prod_en} và bối cảnh {fixed_setting_base}",
+            "master_outfit_en": "Detailed English description of outfit matching {clean_prod_en} following multi-industry stylist rules",
             "hair_and_face_en": "{detected_demographic_en}, neat jet-black hair, warm natural skin tone"
         }},
         "scenes": [
@@ -1148,7 +1191,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     w_lock = res.get("wardrobe_lock", {})
     fallback_outfit_en = "modern clean casual top with comfortable trousers and lifestyle footwear"
-    fallback_outfit_vi = "Trang phục đời thường hiện đại, gọn gàng và lịch sự"
+    fallback_outfit_vi = "Trang phục phối theo Bộ máy Stylist đa ngành gọn gàng và lịch sự"
 
     final_outfit_en = sanitize_third_party_ip(w_lock.get("master_outfit_en") or fallback_outfit_en)
     final_outfit_vi = w_lock.get("outfit_vi") or fallback_outfit_vi
@@ -1231,14 +1274,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Chiến lược & Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh kịch bản:</b> {fixed_setting_base} | {goal_badge}",
-        f"👗 <b>Khóa trang phục ({fixed_setting_base}):</b> {final_outfit_vi} (Đồng nhất 100% cả 4 cảnh)",
+        f"👗 <b>Khóa trang phục (Bộ máy Stylist):</b> {final_outfit_vi} (Đồng nhất 100% cả 4 cảnh)",
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Đồng nhất 100% cả 4 cảnh)",
         f"🌤 <b>Cảm biến môi trường & Veo 3 5-Layer:</b> Tự động đồng bộ Ánh sáng thời tiết, Khóa vật lý 3D & Định thời gian Lip-Sync chuẩn từng giây",
         f"🔇 <b>Âm thanh bản quyền:</b> Thuần Foley SFX thực tế đời sống & Voiceover, triệt tiêu 100% nhạc nền (Zero BGM)",
         f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}"
     ]
     if is_fashion_wearable:
-        summary_lines.append("👗 <b>Chế độ Thời trang Wearable:</b> Nhân vật mặc trực tiếp sản phẩm lên người, xoay người khoe phom dáng & chỉ tay vào điểm nhấn.")
+        summary_lines.append("👗 <b>Chế độ Thời trang Wearable:</b> Nhân vật mặc trực tiếp sản phẩm lên người, xoay người khoe phom dáng.")
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có", "không có ghi chú đặc biệt, tuân thủ kịch bản chuẩn."]:
         summary_lines.append(f"🎯 <b>Ghi chú riêng:</b> {user_custom_note}")
     res["director_summary"] = "<br>".join(summary_lines)
@@ -1600,7 +1643,7 @@ with st.sidebar:
         components.html(support_iframe_code, height=115)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
-        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
+        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date"] == datetime.now().strftime("%Y-%m-%d") else 0
         u_lim = "Không giới hạn" if u_plan == "VIP" else (20 if u_plan == "Advanced" else (10 if u_plan == "Basic" else 3))
         st.info(f"**GÓI {u_plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Đã tạo: **{u_used}/{u_lim}**\n• Hạn dùng: {u_info.get('expires_at')}")
         if st.button("🚪 Đăng Xuất", disabled=is_system_busy): 
@@ -1737,7 +1780,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
 
                 🛑 QUY CHUẨN AN TOÀN CHO SẢN PHẨM ĐỒ LÓT & THỜI TRANG:
                 - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải. Dùng từ ngữ thanh lịch ('vòng một', 'gom phom'), CẤM từ nhạy cảm ('khe ngực', 'vú', 'sexy').
-                - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP sản phẩm lên người, xoay người khoe phom dáng và chỉ tay vào điểm nhấn trang phục.
+                - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI, tạo dáng tự nhiên, xoay người khoe phom dáng và chỉ tay vào điểm nhấn (chất liệu, cúc áo, đường may) đang mặc trên người.
 
                 🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
                 - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
