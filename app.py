@@ -113,7 +113,7 @@ def clean_html(raw_html: str) -> str:
     return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
 
 # ==============================================================================
-# THUẬT TOÁN PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT CHUẨN XÁC TỪNG CON SỐ
+# THUẬT TOÁN PHIÊN ÂM TIỀN TỆ TIẾNG VIỆT CHUẨN XÁC
 # ==============================================================================
 def number_to_vietnamese_words(n: int) -> str:
     if n == 0: return "không đồng"
@@ -215,62 +215,64 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
                 
     p_lower = str(price_text).lower().strip()
     p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+|gần\s+)+', '', p_lower).strip()
-    if is_orig:
-        if "trăm mười chín" in p_lower or "119" in p_lower:
-            return "gần một trăm hai mươi nghìn"
-        if "trăm" in p_lower:
-            return f"gần {p_lower}"
-        return f"gần {p_lower}"
-    else:
-        if any(k in p_lower for k in ["ba mươi", "37", "38", "hai mươi", "mấy chục"]):
-            return "mấy chục nghìn"
-        if "trăm" in p_lower:
-            match = re.search(r'([a-zà-ỹ\s]+trăm)', p_lower)
-            if match: return f"hơn {match.group(1).strip()} nghìn"
-        return f"hơn {p_lower}"
+    return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
-def get_demographics_description(char_profiles):
-    if not char_profiles:
+# ==============================================================================
+# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC: ƯU TIÊN USER > TỰ ĐỘNG THEO SẢN PHẨM CỦA AI
+# ==============================================================================
+def get_demographics_description(char_profiles, ai_persona_en=""):
+    # Kiểm tra xem người dùng có thực sự nhập vai trò nào không
+    user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
+    
+    # TRƯỜNG HỢP 1: NGƯỜI DÙNG ĐỂ TRỐNG -> LẤY TỰ ĐỘNG TỪ AI ĐÃ PHÂN TÍCH CHO SẢN PHẨM ĐÓ
+    if not user_roles and ai_persona_en and len(ai_persona_en.strip()) > 8:
+        ai_p_lower = ai_persona_en.lower()
+        gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
+        return gender, ai_persona_en.strip().capitalize()
+    
+    # TRƯỜNG HỢP 2: NẾU HOÀN TOÀN KHÔNG CÓ THÔNG TIN GÌ CẢ
+    if not char_profiles or not user_roles:
         return "female", "A 26-year-old native Vietnamese woman"
     
+    # TRƯỜNG HỢP 3: NGƯỜI DÙNG ĐÃ TỰ NHẬP VAI TRÒ -> ƯU TIÊN 100% THEO Ý NGƯỜI DÙNG
     parts = []
     primary_gender = "female"
     for idx, p in enumerate(char_profiles):
-        role_lower = str(p.get("role", "")).lower()
+        role_str = str(p.get("role", "")).strip()
+        if not role_str: continue
+        role_lower = role_str.lower()
         if any(k in role_lower for k in ["bố", "ba", "chồng", "bác trai"]):
-            desc = "a 28-year-old native Vietnamese father"
+            desc = f"a 28-year-old native Vietnamese father ({role_str})"
             if idx == 0: primary_gender = "male"
         elif any(k in role_lower for k in ["nam", "anh", "trai", "thanh niên"]):
-            desc = "a 26-year-old native Vietnamese young man"
+            desc = f"a 26-year-old native Vietnamese young man ({role_str})"
             if idx == 0: primary_gender = "male"
         elif any(k in role_lower for k in ["ông", "già", "bác già", "ông nội", "ông ngoại"]):
-            desc = "a 65-year-old native Vietnamese elderly man"
+            desc = f"a 65-year-old native Vietnamese elderly man ({role_str})"
             if idx == 0: primary_gender = "male"
         elif any(k in role_lower for k in ["bà", "bà nội", "bà ngoại"]):
-            desc = "a 65-year-old native Vietnamese elderly woman"
+            desc = f"a 65-year-old native Vietnamese elderly woman ({role_str})"
             if idx == 0: primary_gender = "female"
         elif any(k in role_lower for k in ["bé trai", "con trai"]):
-            desc = "a cute 4-year-old native Vietnamese boy"
+            desc = f"a cute 4-year-old native Vietnamese boy ({role_str})"
             if idx == 0: primary_gender = "male"
         elif any(k in role_lower for k in ["bé gái", "con gái"]):
-            desc = "a cute 3-year-old native Vietnamese girl"
+            desc = f"a cute 3-year-old native Vietnamese girl ({role_str})"
             if idx == 0: primary_gender = "female"
         elif any(k in role_lower for k in ["mẹ", "chị", "cô", "vợ"]):
-            desc = "a 26-year-old native Vietnamese mother"
+            desc = f"a 26-year-old native Vietnamese mother ({role_str})"
             if idx == 0: primary_gender = "female"
         else:
-            desc = f"a 26-year-old native Vietnamese {'man' if 'nam' in role_lower else 'woman'}"
-            if idx == 0: primary_gender = "male" if 'nam' in role_lower else "female"
+            is_m = ("nam" in role_lower or "trai" in role_lower or "anh" in role_lower)
+            desc = f"a 26-year-old native Vietnamese {'man' if is_m else 'woman'} ({role_str})"
+            if idx == 0: primary_gender = "male" if is_m else "female"
         parts.append(desc)
     
+    if not parts:
+        return "female", "A 26-year-old native Vietnamese woman"
     if len(parts) == 1:
-        full_demo = parts[0].capitalize()
-    elif len(parts) == 2:
-        full_demo = f"{parts[0].capitalize()} and {parts[1]}"
-    else:
-        full_demo = f"{', '.join(parts[:-1]).capitalize()} and {parts[-1]}"
-    
-    return primary_gender, full_demo
+        return primary_gender, parts[0].capitalize()
+    return primary_gender, (", ".join(parts[:-1]).capitalize() + " and " + parts[-1])
 
 def sanitize_third_party_ip(text: str) -> str:
     if not text: return ""
@@ -775,7 +777,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     
     🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
-    - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Ví dụ sản phẩm chuột gaming / bàn phím thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
+    - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
@@ -819,9 +821,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 
     🛑 QUY TẮC BẮT BUỘC VỀ TRANG PHỤC & ĐỒNG NHẤT NHÂN VẬT CHO MỌI SẢN PHẨM:
     1. TRANG PHỤC PHẢI THÍCH ỨNG CHÍNH XÁC VỚI SẢN PHẨM VÀ BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN ĐÓ:
-       - Phân tích ngành hàng và bối cảnh cụ thể của kịch bản để thiết kế 1 bộ trang phục chuẩn xác:
-         • Đồ công nghệ / Gaming / PC / Thiết bị thông minh: Áo phông/polo công nghệ trẻ trung hoặc hoodie/cardigan thoải mái, quần jogger/chinos/quần dài tối màu, giày sneaker hiện đại. TUYỆT ĐỐI CẤM TẠP DỀ!
-         • Đồ nấu ăn, đồ bếp: Áo thun/polo gọn gàng, tạp dề sạch sẽ (chỉ khi có nấu nướng).
+       - Phân tích kỹ ngành hàng và bối cảnh để chọn 1 bộ trang phục chuẩn xác:
+         • Đồ công nghệ / Gaming / PC / Thiết bị điện tử: Áo phông gamer / polo hiện đại hoặc áo hoodie/cardigan trẻ trung, quần jogger/chinos/quần dài tối màu, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ!
+         • Đồ nấu ăn, đồ bếp: Áo thun/polo, tạp dề nấu ăn sạch sẽ (chỉ khi có nấu nướng).
          • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
          • Đồ ngoài trời, dã ngoại: Áo thun/polo thể thao năng động, quần dài, giày sneaker.
          • Đồ phòng ngủ, chăm sóc da: Đồ mặc nhà homewear lịch sự, thoải mái.
@@ -852,8 +854,6 @@ def create_scene_details(target_id, mode, style):
     is_tiktok_shop = ("Viral" not in current_active_mode)
     is_viral = ("Viral" in current_active_mode)
     voice_guidance = build_voice_direction(current_active_mode, num_chars, char_profiles)
-    
-    detected_gender, detected_demographic_en = get_demographics_description(char_profiles)
 
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_hook = clean_and_normalize_voiceover(outline.get('hook', ''))
@@ -863,6 +863,11 @@ def create_scene_details(target_id, mode, style):
     
     dna = st.session_state.get("content_analysis") or {}
     
+    # LẤY THÔNG TIN KOC ĐÃ PHÂN TÍCH TỰ ĐỘNG Ở BƯỚC 1 (NẾU USER ĐỂ TRỐNG)
+    ai_koc_data = dna.get("koc_demographic_analysis", {})
+    ai_persona_en = ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else ""
+    detected_gender, detected_demographic_en = get_demographics_description(char_profiles, ai_persona_en)
+
     raw_orig_price = dna.get("original_price_spoken", "")
     raw_sale_price = dna.get("sale_price_spoken", "")
     exact_orig_raw = str(dna.get("exact_original_price_ocr", ""))
@@ -915,12 +920,12 @@ def create_scene_details(target_id, mode, style):
 
     THỂ LOẠI: '{current_active_mode}' | HÌNH THỨC: '{presentation_format}'
     KỊCH BẢN #{target_id}: TIÊU ĐỀ: '{fixed_title}' | HOOK ĐÃ DUYỆT: '{fixed_hook}' | BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN NÀY: '{fixed_setting_base}'
-    DIỄN VIÊN / KOC: {detected_demographic_en}.
+    DIỄN VIÊN / KOC (ĐÃ PHÂN TÍCH TƯƠNG THÍCH): {detected_demographic_en}.
     SẢN PHẨM: {clean_prod_en}
     GHI CHÚ ƯU TIÊN: {user_custom_note if user_custom_note else 'none'}
 
     🛑 YÊU CẦU THIẾT KẾ TRANG PHỤC 'wardrobe_lock' CHO MỌI SẢN PHẨM:
-    - Hãy phân tích SẢN PHẨM ('{clean_prod_en}') và BỐI CẢNH ('{fixed_setting_base}') để thiết kế 1 BỘ TRANG PHỤC DUY NHẤT phù hợp nhất cho KOC:
+    - Hãy phân tích SẢN PHẨM ('{clean_prod_en}') và BỐI CẢNH ('{fixed_setting_base}') để thiết kế 1 BỘ TRANG PHỤC DUY NHẤT phù hợp nhất cho KOC ({detected_demographic_en}):
       • Đồ công nghệ / Gaming / PC: Áo phông/polo năng động, áo hoodie/cardigan trẻ trung, quần jogger/chinos/trousers, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ!
       • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
       • Đồ văn phòng, công sở: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
@@ -934,7 +939,7 @@ def create_scene_details(target_id, mode, style):
         "wardrobe_lock": {{
             "outfit_vi": "Mô tả chi tiết bằng tiếng Việt bộ trang phục ăn khớp với {clean_prod_en} và bối cảnh {fixed_setting_base}",
             "master_outfit_en": "Detailed English description of top, bottom, and footwear perfectly matching {clean_prod_en} and {fixed_setting_base}",
-            "hair_and_face_en": "100% native Vietnamese person, neat jet-black hair, warm natural skin tone"
+            "hair_and_face_en": "{detected_demographic_en}, neat jet-black hair, warm natural skin tone"
         }},
         "scenes": [
             {{
@@ -998,7 +1003,6 @@ def create_scene_details(target_id, mode, style):
     scenes = res.get("scenes") or res.get("script") or []
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    # TRÍCH XUẤT BỘ TRANG PHỤC VÀ DIỆN MẠO ĐÃ ĐƯỢC AI THIẾT KẾ RIÊNG
     w_lock = res.get("wardrobe_lock", {})
     fallback_outfit_en = "modern clean casual top with comfortable trousers and lifestyle footwear"
     fallback_outfit_vi = "Trang phục đời thường hiện đại, gọn gàng và lịch sự"
@@ -1043,14 +1047,12 @@ def create_scene_details(target_id, mode, style):
         raw_action = scn.get("action_en") or f"First, demonstrating {clean_prod_en} naturally; then smoothly speaking to camera with steady hands"
         clean_action = re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip()
 
-        # Midjourney Prompt đồng nhất 100% diện mạo và trang phục
         img_core = f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}, featuring {clean_prod_en}, holding steady without dropping"
         scn["img_p"] = sanitize_third_party_ip(f"{img_core}, 8k resolution, soft natural studio lighting, sharp focus --ar 9:16 --style raw --v 6.1")
         scn["img_neg"] = base_negative_prompt
         
         clean_vo_for_audio = re.sub(r'\.{2,}', '.', scn.get("voiceover", "")).strip()
 
-        # Veo 3 Video Prompt đồng nhất 100% diện mạo và trang phục
         raw_vid = (
             f"{camera_shot}, live-action footage. Setting: {scene_setting_en}. Subject: {locked_character_prompt_segment}. "
             f"Action: {clean_action}, interacting with solid {clean_prod_en}. Character strictly maintains steady hand grip or places product intentionally on table, never dropping. "
@@ -1068,7 +1070,7 @@ def create_scene_details(target_id, mode, style):
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên:</b> {detected_demographic_en}",
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh kịch bản:</b> {fixed_setting_base} | {goal_badge}",
-        f"👗 <b>Khóa trang phục theo sản phẩm & bối cảnh ({fixed_setting_base}):</b> {final_outfit_vi} (Đồng nhất 100% cả 4 cảnh)",
+        f"👗 <b>Khóa trang phục ({fixed_setting_base}):</b> {final_outfit_vi} (Đồng nhất 100% cả 4 cảnh)",
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Đồng nhất 100% cả 4 cảnh)",
         f"🔇 <b>Âm thanh bản quyền:</b> Thuần Foley SFX thực tế đời sống & Voiceover, triệt tiêu 100% nhạc nền (Zero BGM)",
         f"💰 <b>Khoảng giá an toàn (Cảnh 4):</b> Bình thường khoảng {soft_orig_price}, nay giảm khoảng {soft_sale_price}"
@@ -1506,19 +1508,24 @@ num_chars = col_opt3.number_input("👤 Số Diễn viên (1 = Độc thoại KO
 char_inputs = []
 for i in range(num_chars):
     c_r, c_i = st.columns([2, 1])
-    # Tự động hóa vai trò cho mọi sản phẩm, không ép cứng và không gây NameError
-    role_default = "" if num_chars == 1 else ("Mẹ trẻ 26 tuổi người Việt" if i == 0 else ("Bé 4 tuổi người Việt" if i == 1 else f"Diễn viên {i+1} người Việt"))
-    role = c_r.text_input(f"Vai trò NV {i+1} (Để trống = AI tự phân tích):", value=role_default, key=f"r_{i}_{st.session_state.reset_key}")
+    # Tự do cho mọi sản phẩm: để trống = AI tự phân tích độ tuổi & giới tính phù hợp
+    role = c_r.text_input(
+        f"Vai trò NV {i+1} (Để trống để AI tự phân tích phù hợp):",
+        value="",
+        placeholder="Để trống = AI tự phân tích KOC (hoặc nhập: Nam 25t, Bác 50t...)",
+        key=f"r_{i}_{st.session_state.reset_key}"
+    )
     c_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"f_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
-    if c_file: char_inputs.append({"id": i+1, "role": role or f"Diễn viên {i+1}", "file": c_file})
+    if c_file or role.strip():
+        char_inputs.append({"id": i+1, "role": role.strip(), "file": c_file})
 
 if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
     can_run, msg = check_usage_limit(st.session_state.current_email)
     if not can_run: st.error(msg)
     else:
-        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, thiết lập Ma Trận Đa Giác Quan & Tỉ lệ thực tế..."):
+        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, phân tích KOC phù hợp & thiết lập Kịch bản..."):
             try:
-                st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": f"Diễn viên {i+1}"} for i in range(num_chars)]
+                st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": i+1, "role": ""} for i in range(num_chars)]
                 char_rules = generate_char_rules_string(st.session_state.character_profiles)
                 st.session_state.update({
                     "last_mode": mode, "last_style": style, "last_narrator": "On-camera", 
@@ -1550,11 +1557,21 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 INPUT: {input_context_str}
                 THỂ LOẠI: '{mode}' ({special_prompt_mode})
                 HÌNH THỨC VIDEO YÊU CẦU: '{selected_presentation_format}'
-                DIỄN VIÊN: {num_chars} nhân vật 100% người Việt bản địa ({', '.join([p['role'] for p in st.session_state.character_profiles])}).
+                DIỄN VIÊN: {num_chars} nhân vật 100% người Việt bản địa.
                 
+                🛑 QUY CHUẨN TỰ ĐỘNG PHÂN TÍCH CHÂN DUNG KOC PHÙ HỢP (KOC DEMOGRAPHIC ANALYSIS):
+                - NẾU NGƯỜI DÙNG ĐỂ TRỐNG VAI TRÒ: BẮT BUỘC bạn phải tự động phân tích tính chất sản phẩm, ngành hàng và bối cảnh để chọn ra chân dung KOC (độ tuổi, giới tính, phong thái) phù hợp nhất:
+                  • Đồ công nghệ / Gaming / Phụ kiện PC / Xe cộ: Nam thanh niên 22-26 tuổi am hiểu công nghệ, năng động, hiện đại.
+                  • Đồ gia dụng bếp / Chảo nồi / Nấu ăn: Nữ nội trợ / mẹ trẻ 28-35 tuổi ấm áp, chu đáo.
+                  • Mỹ phẩm / Chăm sóc da / Thời trang nữ: Nữ 20-25 tuổi da sáng, tươi tắn, thanh lịch.
+                  • Dụng cụ cầm tay / Cơ khí / Làm vườn / Cây cảnh: Nam trung niên / bác 40-50 tuổi từng trải, thực tế.
+                  • Mẹ & Bé: Mẹ bỉm 26-32 tuổi dịu dàng hoặc bố trẻ 28-32 tuổi.
+                - NẾU NGƯỜI DÙNG ĐÃ NHẬP VAI TRÒ CỤ THỂ: Ưu tiên 100% yêu cầu người dùng!
+                - Ghi rõ kết quả vào trường 'koc_demographic_analysis' trong JSON.
+
                 🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
                 - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
-                - TUYỆT ĐỐI BỎ QUA 100% TRANG PHỤC CŨ TRONG ẢNH! Trang phục sẽ do AI đạo diễn thiết kế riêng ăn khớp hoàn toàn với sản phẩm và bối cảnh!
+                - TUYỆT ĐỐI BỎ QUA 100% TRANG PHỤC CŨ TRONG ẢNH!
 
                 🛑 QUY CHUẨN MA TRẬN NHÂN XƯNG CHO MỌI NGÀNH HÀNG:
                 - Tự động nhận diện ngành hàng từ dữ liệu đầu vào:
@@ -1579,6 +1596,11 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "audience_pronoun": "anh em (nếu đồ công nghệ) / các chị em (nếu đồ gia dụng)",
                         "setting_archetype": "Bối cảnh chuẩn mực đời thực phù hợp sản phẩm",
                         "is_fixed_location": true,
+                        "koc_demographic_analysis": {{
+                            "gender": "male hoặc female",
+                            "persona_vi": "Mô tả chân dung KOC phù hợp bằng tiếng Việt",
+                            "persona_en": "a 24-year-old native Vietnamese tech-savvy young man"
+                        }},
                         "how_to_use": "Mô tả thao tác đời thực chuẩn xác",
                         "correct_ergonomic_grip": "Tư thế cầm nắm công thái học của sản phẩm",
                         "exact_original_price_ocr": "Giá gốc OCR",
@@ -1616,8 +1638,9 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                 for cb, cm in st.session_state["saved_reference_images"]:
                     payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
                 for c in char_inputs:
-                    cb, cm = compress_image_bytes(c['file'], 768, 75)
-                    payload.extend([f"ACTOR {c['id']} (EXTRACT FACE, EYE, SKIN TONE, JET-BLACK HAIR ONLY - DISCARD OLD CLOTHES/BACKGROUND):", types.Part.from_bytes(data=cb, mime_type=cm)])
+                    if c.get("file"):
+                        cb, cm = compress_image_bytes(c['file'], 768, 75)
+                        payload.extend([f"ACTOR {c['id']} (EXTRACT FACE, EYE, SKIN TONE, JET-BLACK HAIR ONLY - DISCARD OLD CLOTHES/BACKGROUND):", types.Part.from_bytes(data=cb, mime_type=cm)])
                 payload.append(prompt)
                 
                 res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, num_chars, initial_angle, custom_note.strip(), selected_presentation_format), max_tokens=6000)
@@ -1638,7 +1661,7 @@ if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="prima
                         "presentation_format": selected_presentation_format
                     })
                 st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã thiết lập Ma Trận Đa Giác Quan & Kịch bản hoàn hảo!"); time.sleep(0.3); st.rerun()
+                st.toast("✅ Đã phân tích KOC & Thiết lập kịch bản hoàn hảo!"); time.sleep(0.3); st.rerun()
             except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
@@ -1664,12 +1687,17 @@ if isinstance(ca, dict):
         st.markdown(c1_html, unsafe_allow_html=True)
 
     with col_row1_right:
+        koc_persona_desc = ca.get('koc_demographic_analysis', {}).get('persona_vi', 'Tự động chọn KOC phù hợp') if isinstance(ca.get('koc_demographic_analysis'), dict) else 'Tự động chọn KOC'
+        user_specified_actors = [p['role'] for p in st.session_state.get('character_profiles', []) if str(p.get('role', '')).strip()]
+        koc_display_str = f"👤 <b>KOC:</b> {', '.join(user_specified_actors)} (Người dùng chỉ định)" if user_specified_actors else f"🤖 <b>KOC tự động:</b> {koc_persona_desc}"
+
         pronoun_badge = f"🗣 <b>Nhân xưng:</b> KOC xưng <b>'{ca.get('self_pronoun', 'em')}'</b> - Gọi người xem là <b>'{ca.get('audience_pronoun', 'anh em / các bác')}'</b>"
         if is_viral_mode:
             c2_html = clean_html(f"""
             <div class="dna-card">
                 <div class="dna-card-title">🌟 2. Định Vị Kênh & Ma Trận Nhân Xưng</div>
-                <div class="dna-row"><span class="dna-label">👤 Định vị kênh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('target_user', viral_persona or 'KOC Chuyên gia đời sống'))}</span></div>
+                <div class="dna-row"><span class="dna-label">🎭 Chân dung KOC:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{koc_display_str}</span></div>
+                <div class="dna-row"><span class="dna-label">👤 Định vị kênh:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{clean_analysis_text(ca.get('target_user', viral_persona or 'KOC Chuyên gia đời sống'))}</span></div>
                 <div class="dna-row"><span class="dna-label">🗣 Nhân xưng chuẩn:</span><span class="dna-text" style="color:#15803d; font-weight:700;">{pronoun_badge}</span></div>
                 <div class="dna-row"><span class="dna-label">💎 Giá trị cốt lõi:</span><span class="dna-text">{clean_analysis_text(ca.get('core_value', ''))}</span></div>
             </div>
@@ -1677,7 +1705,8 @@ if isinstance(ca, dict):
         else:
             c2_html = clean_html(f"""
             <div class="dna-card">
-                <div class="dna-card-title">🔥 2. Mã Màu Bán Chạy & Ma Trận Nhân Xưng</div>
+                <div class="dna-card-title">🔥 2. Diễn Viên KOC & Mã Màu Bán Chạy</div>
+                <div class="dna-row"><span class="dna-label">🎭 Chân dung KOC:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{koc_display_str}</span></div>
                 <div class="dna-row"><span class="dna-label">⭐ Mẫu ưu tiên làm video:</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))}</span></div>
                 <div class="dna-row"><span class="dna-label">🗣 Nhân xưng chuẩn:</span><span class="dna-text" style="color:#15803d; font-weight:700;">{pronoun_badge}</span></div>
                 <div class="dna-row"><span class="dna-label">🎨 Toàn bộ bảng màu:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
@@ -1794,7 +1823,7 @@ if all_sc:
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
-            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx} (Chặn nhạc nền, rơi đồ, lặp từ & đổi màu)", expanded=False):
+            with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx}", expanded=False):
                 neg_val = scn.get('vid_neg', 'opposite gender, celebrity likeness, extra fingers, text, watermark')
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
@@ -1884,16 +1913,16 @@ if all_sc:
 
     extra_custom_note = st.text_area(
         "✍ Ghi chú AI cho kịch bản thêm (Ưu tiên cao nhất):", 
-        placeholder="Ví dụ: Kịch bản mở đầu bằng góc setup gaming, nhịp nói dồn dập, chuyển cảnh mượt mà...", 
+        placeholder="Ví dụ: Kịch bản mở đầu bằng câu chuyện đời thực, nhịp nói dồn dập, chuyển cảnh mượt mà...", 
         key=f"extra_custom_note_{st.session_state.reset_key}"
     )
 
     e_chars = []
     for i in range(c_num):
         c_r, c_i = st.columns([2, 1])
-        e_role = c_r.text_input(f"Vai trò NV {i+1} mới:", key=f"er_{i}_{st.session_state.reset_key}")
+        e_role = c_r.text_input(f"Vai trò NV {i+1} mới (Để trống = AI tự phân tích):", key=f"er_{i}_{st.session_state.reset_key}")
         e_file = c_i.file_uploader(f"Ảnh NV {i+1}", type=["jpg", "png"], key=f"ef_{i}_{st.session_state.reset_key}", label_visibility="collapsed")
-        if e_file: e_chars.append({"id": i+1, "role": e_role or f"Diễn viên {i+1}", "file": e_file})
+        if e_file or e_role.strip(): e_chars.append({"id": i+1, "role": e_role.strip() or f"Diễn viên {i+1}", "file": e_file})
 
     if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True, disabled=is_system_busy):
         can_run, msg = check_usage_limit(st.session_state.current_email)
