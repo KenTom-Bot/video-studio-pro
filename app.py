@@ -311,14 +311,12 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     s_lower = f"{product_en} {setting_vi}".lower()
     h_lower = hero_color.lower()
     
-    # 1. Chọn giày dép chuẩn không gian
     is_home_interior = any(k in s_lower for k in ["phòng ngủ", "giường", "nhà bếp", "bếp", "phòng tắm", "sofa", "phòng khách", "mặc nhà"])
     if is_home_interior:
         footwear_rule = "clean minimalist indoor house slippers (hoặc clean white ankle socks)"
     else:
         footwear_rule = "clean minimalist white leather sneakers or smart-casual loafers" if gender == "male" else "clean minimalist white sneakers, elegant beige loafers, or modest low-block slingback flats"
         
-    # 2. Quy tắc tương phản màu sắc với sản phẩm
     if any(k in h_lower for k in ["đen", "black", "xám", "grey", "gray", "xanh đậm", "navy", "nâu", "dark"]):
         color_contrast_rule = "Màu áo/trang phục làm nền BẮT BUỘC là tông SÁNG/TRUNG TÍNH (Kem Ivory, Trắng Sữa, Be Sáng, Xanh Pastel nhạt) để tôn sản phẩm tối màu lên nổi bật."
     elif any(k in h_lower for k in ["trắng", "white", "kem", "cream", "be", "beige", "vàng nhạt", "hồng nhạt"]):
@@ -326,7 +324,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     else:
         color_contrast_rule = "Màu áo/trang phục làm nền là tông TRUNG TÍNH ĐƠN SẮC (Trắng Kem, Be, Xám Nhạt hoặc Xanh Navy) sang trọng, không rối mắt."
 
-    # 3. Phối đồ theo nhóm ngành hàng
     if intimate_type == "underwear_bra":
         industry_outfit = "Áo sơ mi lụa/linen dài tay cài cúc lịch sự hoặc áo thun cổ tròn phối khoác ngoài bằng cardigan dệt kim mỏng + Quần âu ống suông dài cạp cao thanh lịch."
     elif is_fashion:
@@ -937,7 +934,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {pres_rule}
     {viral_directive}
     
-    🛑 YÊU CẦU ĐA DẠNG HỌA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
+    🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
@@ -988,7 +985,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     🛑 QUY TẮC BẮT BUỘC VỀ TRANG PHỤC & ĐỒNG NHẤT NHÂN VẬT CHO MỌI SẢN PHẨM:
     1. TRANG PHỤC PHẢI THÍCH ỨNG CHÍNH XÁC VỚI SẢN PHẨM VÀ BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN ĐÓ:
        - Phân tích kỹ ngành hàng để chọn trang phục chuẩn xác:
-         • Đồ công nghệ / Gaming / PC: Áo phông/polo, hoodie/cardigan, quần jogger/chinos, giày sneaker. TUYỆT ĐỐI CẤM TẠP DỀ!
+         • Đồ công nghệ / Gaming / PC: Áo phông/polo, hoodie/cardigan, quần jogger/chinos, giày sneaker. TUYỆT ĐỐI CẤM TẠP ĐỀ!
          • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
          • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
          • Đồ lót / Nội y: Áo sơ mi pastel hoặc cardigan thanh lịch kín đáo kết hợp quần dài (tuyệt đối không mặc đồ lót lên người, chỉ cầm trên tay).
@@ -1087,7 +1084,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     clean_prod_en = sanitize_third_party_ip(fallback_prod_name)
 
-    # GỌI BỘ MÁY STYLIST ĐA NGÀNH
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable)
 
     condensed_dna = {
@@ -1643,7 +1639,7 @@ with st.sidebar:
         components.html(support_iframe_code, height=115)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
-        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date"] == datetime.now().strftime("%Y-%m-%d") else 0
+        u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
         u_lim = "Không giới hạn" if u_plan == "VIP" else (20 if u_plan == "Advanced" else (10 if u_plan == "Basic" else 3))
         st.info(f"**GÓI {u_plan.upper()}**\n\n• Email: {st.session_state.current_email}\n• Đã tạo: **{u_used}/{u_lim}**\n• Hạn dùng: {u_info.get('expires_at')}")
         if st.button("🚪 Đăng Xuất", disabled=is_system_busy): 
