@@ -835,7 +835,7 @@ for key, default_val in [
     ("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng"),
     ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
     ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
-    ("current_processing_id", None), ("current_cloning_id", None)
+    ("current_processing_id", None), ("current_cloning_id", None), ("is_analyzed", False)
 ]:
     if key not in st.session_state: st.session_state[key] = default_val
 
@@ -1121,7 +1121,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif is_footwear_accessory:
         fallback_prod_name = f"authentic {hero_color_str} {raw_prod_name}".strip() if hero_color_str else f"authentic {raw_prod_name}"
         intimate_safety_rule = """
-        🛑 QUY CHUẨN CHO GIÀY DÉP & PHỤ KIỆN (CHỐNG CÚI GẬP NGƯỜI):
+        🛑 QUY CHUẢN CHO GIÀY DÉP & PHỤ KIỆN (CHỐNG CÚI GẬP NGƯỜI):
         1. Sản phẩm được đặt trên bệ trưng bày ngang tầm eo hoặc KOC mang trực tiếp lên người.
         2. KOC giữ nguyên tư thế THẲNG LƯNG, thanh lịch, giao tiếp tự nhiên với camera, TUYỆT ĐỐI KHÔNG cúi gập người xuống sàn nhà.
         """
@@ -1522,7 +1522,7 @@ with st.sidebar:
                 "generated_details": {}, "content_analysis": None, "active_script_id": None,
                 "current_input_context": "", "current_product_data_saved": None, "current_product_data": None,
                 "current_project_id": None, "saved_reference_images": [], "character_profiles": [],
-                "current_processing_id": None, "current_cloning_id": None
+                "current_processing_id": None, "current_cloning_id": None, "is_analyzed": False
             })
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.rerun()
@@ -1531,13 +1531,13 @@ with st.sidebar:
         
         c_save1, c_save2 = st.columns(2)
         if c_save1.button("💾 Lưu Dự Án", use_container_width=True, disabled=is_system_busy):
-            payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context"]}
+            payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context", "is_analyzed"]}
             success, msg = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
             if success: st.toast(f"✅ {msg}")
             else: st.error(f"❌ {msg}")
             
         if c_save2.button("📑 Lưu Bản Mới", use_container_width=True, disabled=is_system_busy, help="Lưu nội dung hiện tại thành một dự án mới hoàn toàn"):
-            payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context"]}
+            payload = {k: st.session_state[k] for k in ["content_analysis", "all_scripts", "cloned_scripts", "expanded_scripts", "generated_details", "character_profiles", "current_input_context", "is_analyzed"]}
             success, msg = save_project_to_db(st.session_state.current_email, f"{st.session_state.active_project_title} (Bản sao)", payload, project_id=None)
             if success: 
                 st.session_state.active_project_title = f"{st.session_state.active_project_title} (Bản sao)"
@@ -1561,7 +1561,7 @@ with st.sidebar:
                 creator_emails = sorted(list(set(p.get("user_email", "") for p in all_projects if p.get("user_email"))))
                 sel_creator = st.selectbox("👤 Lọc theo thành viên:", ["Tất cả thành viên"] + creator_emails, key="admin_sel_creator")
                 if sel_creator != "Tất cả thành viên":
-                    all_projects = [p for p in all_projects if p.get("user_email") == sel_creator]
+                    all_projects = [p for p in all_projects if p.get("user_email"] == sel_creator]
 
             search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên dự án...", key="search_proj_input")
             display_projects = [p for p in all_projects if search_proj.strip().lower() in p['project_title'].lower()] if search_proj.strip() else (all_projects if st.session_state.show_all_projects else all_projects[:3])
@@ -1601,6 +1601,7 @@ with st.sidebar:
                                 "current_input_context": sd.get("current_input_context", ""),
                                 "current_project_id": p['id'], 
                                 "active_project_title": p['project_title'], 
+                                "is_analyzed": sd.get("is_analyzed", True),
                                 "scroll_to_detail": True
                             })
                             st.rerun()
@@ -1730,219 +1731,222 @@ is_viral_mode = "Viral" in mode
 
 up_files, custom_note = [], ""
 viral_persona, viral_topic = "", ""
-if is_viral_mode:
-    col_v1, col_v2 = st.columns(2)
-    viral_persona = col_v1.text_input("👤 Định vị Kênh:", placeholder="Ví dụ: Mẹ bỉm sữa thông thái, KOC chuyên gia công nghệ...", key=f"viral_persona_{st.session_state.reset_key}")
-    viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, placeholder="Ví dụ: 3 mẹo setup góc làm việc gọn gàng, cách chọn chuột công thái học...", key=f"viral_topic_{st.session_state.reset_key}")
-    up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
-    
-    if up_files:
-        with st.expander(f"👁 Xem lại {len(up_files)} ảnh đã tải lên", expanded=False):
-            n_cols = min(len(up_files), 4)
-            cols = st.columns(n_cols)
-            for idx, f in enumerate(up_files):
-                cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
-                
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: cầm chắc chuột trên pad lót bàn, thao tác click đanh chắc):", key=f"custom_note_viral_{st.session_state.reset_key}")
-    hero_sku_override = ""
-else:
-    products_data = supabase.table("products").select("*").execute().data if supabase else []
-    if products_data:
-        selected_name = st.selectbox("📌 Chọn sản phẩm:", [p["product_name"] for p in products_data], key=f"prod_select_{st.session_state.reset_key}")
-        st.session_state.current_product_data = next(p for p in products_data if p["product_name"] == selected_name)
-    
-    col_f1, col_f2 = st.columns([2, 1])
-    up_files = col_f1.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
-    hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Đen nhám, Trắng, RGB, Size M...", key=f"hero_override_{st.session_state.reset_key}")
-    
-    if up_files:
-        with st.expander(f"👁 Xem lại {len(up_files)} ảnh sản phẩm đã tải lên", expanded=False):
-            n_cols = min(len(up_files), 4)
-            cols = st.columns(n_cols)
-            for idx, f in enumerate(up_files):
-                cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
-                
-    custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: cầm chắc chuột trên pad lót bàn, thao tác click đanh chắc):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
-# MẶC ĐỊNH HỆ THỐNG: Phong cách Điện Ảnh Chân Thực | 1 Diễn viên | Nhân vật nói trực tiếp On-camera
-style = "Điện Ảnh Chân Thực"
-num_chars = 1
-narrator_mode = "Nhân vật xuất hiện (On-camera)"
-
-# BỐ CỤC GỌN GÀNG TRÊN 1 HÀNG: GỘP CHIẾN LƯỢC & HÌNH THỨC + VAI TRÒ NV + UPLOAD ẢNH NV
-col_strat, col_role, col_actor_img = st.columns([1.4, 1.6, 1.0])
-
-unified_strategy_format = col_strat.selectbox(
-    "🧭 Chiến lược & Hình thức Video:",
-    UNIFIED_STRATEGY_FORMAT_OPTS,
-    index=0,
-    key=f"unified_strat_format_{st.session_state.reset_key}"
-)
-
-role_input = col_role.text_input(
-    "👤 Vai trò NV (Để trống để AI tự phân tích phù hợp):",
-    value="",
-    placeholder="Để trống = AI tự phân tích KOC (hoặc nhập: Nam 25t, Bác 50t...)",
-    key=f"r_0_{st.session_state.reset_key}"
-)
-
-c_file = col_actor_img.file_uploader(
-    "📸 Ảnh mẫu NV (Tùy chọn):",
-    type=["jpg", "png"],
-    key=f"f_0_{st.session_state.reset_key}"
-)
-
-char_inputs = []
-if c_file or role_input.strip():
-    char_inputs.append({"id": 1, "role": role_input.strip(), "file": c_file})
-
-if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
-    can_run, msg = check_usage_limit(st.session_state.current_email)
-    if not can_run: st.error(msg)
+# Chỉ hiển thị các trường nhập liệu khi chưa phân tích (is_analyzed == False)
+if not st.session_state.is_analyzed:
+    if is_viral_mode:
+        col_v1, col_v2 = st.columns(2)
+        viral_persona = col_v1.text_input("👤 Định vị Kênh:", placeholder="Ví dụ: Mẹ bỉm sữa thông thái, KOC chuyên gia công nghệ...", key=f"viral_persona_{st.session_state.reset_key}")
+        viral_topic = col_v2.text_area("💡 Chủ đề / Mẹo:", height=68, placeholder="Ví dụ: 3 mẹo setup góc làm việc gọn gàng, cách chọn chuột công thái học...", key=f"viral_topic_{st.session_state.reset_key}")
+        up_files = st.file_uploader("📦 Upload Ảnh:", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_viral_{st.session_state.reset_key}")
+        
+        if up_files:
+            with st.expander(f"👁 Xem lại {len(up_files)} ảnh đã tải lên", expanded=False):
+                n_cols = min(len(up_files), 4)
+                cols = st.columns(n_cols)
+                for idx, f in enumerate(up_files):
+                    cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                    
+        custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: cầm chắc chuột trên pad lót bàn, thao tác click đanh chắc):", key=f"custom_note_viral_{st.session_state.reset_key}")
+        hero_sku_override = ""
     else:
-        with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, phân tích KOC phù hợp & thiết lập Kịch bản..."):
-            try:
-                st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": 1, "role": ""}]
-                char_rules = generate_char_rules_string(st.session_state.character_profiles)
-                st.session_state.update({
-                    "last_mode": mode, "last_style": style, "last_narrator": "On-camera", 
-                    "last_presentation_format": unified_strategy_format,
-                    "current_input_context": custom_note.strip()
-                })
-                
-                if is_viral_mode:
-                    st.session_state.current_product_data_saved = {
-                        "channel_persona": viral_persona.strip(),
-                        "topic_or_tips": viral_topic.strip()
-                    }
-                    input_context_str = f"KÊNH / ĐỊNH VỊ: '{viral_persona.strip()}' | CHỦ ĐỀ / MẸO: '{viral_topic.strip()}' | NOTE: '{custom_note.strip()}'"
-                else:
-                    st.session_state.current_product_data_saved = st.session_state.get("current_product_data", {})
-                    input_context_str = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: '{custom_note.strip()}'"
-                
-                st.session_state["saved_reference_images"] = []
-                if up_files:
-                    for f in up_files:
-                        cb, cm = compress_image_bytes(f, 768, 75)
-                        st.session_state["saved_reference_images"].append((cb, cm))
+        products_data = supabase.table("products").select("*").execute().data if supabase else []
+        if products_data:
+            selected_name = st.selectbox("📌 Chọn sản phẩm:", [p["product_name"] for p in products_data], key=f"prod_select_{st.session_state.reset_key}")
+            st.session_state.current_product_data = next(p for p in products_data if p["product_name"] == selected_name)
+        
+        col_f1, col_f2 = st.columns([2, 1])
+        up_files = col_f1.file_uploader("📦 Upload Ảnh SP (Quét OCR Giá, Hero SKU & Bảng màu):", type=["jpg", "png"], accept_multiple_files=True, key=f"up_files_prod_{st.session_state.reset_key}")
+        hero_sku_override = col_f2.text_input("🎯 Màu / SKU ưu tiên (Tùy chọn):", placeholder="Ví dụ: Đen nhám, Trắng, RGB, Size M...", key=f"hero_override_{st.session_state.reset_key}")
+        
+        if up_files:
+            with st.expander(f"👁 Xem lại {len(up_files)} ảnh sản phẩm đã tải lên", expanded=False):
+                n_cols = min(len(up_files), 4)
+                cols = st.columns(n_cols)
+                for idx, f in enumerate(up_files):
+                    cols[idx % n_cols].image(f, caption=f"Ảnh {idx + 1}", use_container_width=True)
+                    
+        custom_note = st.text_area("✍ Ghi chú AI (Ưu tiên cao nhất - ví dụ: cầm chắc chuột trên pad lót bàn, thao tác click đanh chắc):", key=f"custom_note_prod_{st.session_state.reset_key}")
 
-                override_instruction = f"BẮT BUỘC KHÓA HERO SKU LÀ: '{hero_sku_override.strip()}' theo yêu cầu trực tiếp của người dùng." if hero_sku_override.strip() else "QUÉT OCR ƯU TIÊN TUYỆT ĐỐI Ô PHÂN LOẠI CÓ GẮN ICON NGỌN LỬA '🔥', 'Hot', 'Bán chạy', 'Top 1'. Nếu ô có tag này, BẮT BUỘC 100% chọn ô đó là Hero SKU! Không chọn màu khác khi đã có tag Hot/Bán chạy."
+    # MẶC ĐỊNH HỆ THỐNG: Phong cách Điện Ảnh Chân Thực | 1 Diễn viên | Nhân vật nói trực tiếp On-camera
+    style = "Điện Ảnh Chân Thực"
+    num_chars = 1
+    narrator_mode = "Nhân vật xuất hiện (On-camera)"
 
-                special_prompt_mode = "MỤC TIÊU VIRAL & XÂY KÊNH: Kích thích tương tác thảo luận, tạo bài học hữu ích hoặc sự thật bất ngờ, kéo Follower. TUYỆT ĐỐI KHÔNG BÁN HÀNG." if is_viral_mode else "MỤC TIÊU BÁN HÀNG TIKTOK SHOP: Tập trung vào giải quyết vấn đề, công năng và chốt đơn an toàn."
+    # BỐ CỤC GỌN GÀNG TRÊN 1 HÀNG: GỘP CHIẾN LƯỢC & HÌNH THỨC + VAI TRÒ NV + UPLOAD ẢNH NV
+    col_strat, col_role, col_actor_img = st.columns([1.4, 1.6, 1.0])
 
-                prompt = f"""
-                INPUT: {input_context_str}
-                THỂ LOẠI: '{mode}' ({special_prompt_mode})
-                CHIẾN LƯỢC & HÌNH THỨC VIDEO YÊU CẦU: '{unified_strategy_format}'
-                DIỄN VIÊN: 1 nhân vật 100% người Việt bản địa nói trực tiếp trước ống kính (On-camera).
-                
-                🛑 QUY CHUẨN TỰ ĐỘNG PHÂN TÍCH CHÂN DUNG KOC PHÙ HỢP (KOC DEMOGRAPHIC ANALYSIS):
-                - NẾU NGƯỜI DÙNG ĐỂ TRỐNG VAI TRÒ: BẮT BUỘC bạn phải tự động phân tích tính chất sản phẩm, ngành hàng và bối cảnh để chọn ra chân dung KOC (độ tuổi, giới tính, phong thái) phù hợp nhất:
-                  • Đồ công nghệ / Gaming / Phụ kiện PC / Xe cộ: Nam thanh niên 22-26 tuổi am hiểu công nghệ, năng động, hiện đại.
-                  • Đồ gia dụng bếp / Chảo nồi / Nấu ăn: Nữ nội trợ / mẹ trẻ 28-35 tuổi ấm áp, chu đáo.
-                  • Mỹ phẩm / Chăm sóc da / Thời trang nữ / Nội y: Nữ 22-26 tuổi da sáng, tươi tắn, thanh lịch.
-                  • Dụng cụ cầm tay / Cơ khí / Làm vườn / Cây cảnh: Nam trung niên / bác 40-50 tuổi từng trải, thực tế.
-                  • Mẹ & Bé: Mẹ bỉm 26-32 tuổi dịu dàng hoặc bố trẻ 28-32 tuổi.
-                - NẾU NGƯỜI DÙNG ĐÃ NHẬP VAI TRÒ CỤ THỂ: Ưu tiên 100% yêu cầu người dùng!
-                - Ghi rõ kết quả vào trường 'koc_demographic_analysis' trong JSON.
+    unified_strategy_format = col_strat.selectbox(
+        "🧭 Chiến lược & Hình thức Video:",
+        UNIFIED_STRATEGY_FORMAT_OPTS,
+        index=0,
+        key=f"unified_strat_format_{st.session_state.reset_key}"
+    )
 
-                🛑 QUY CHUẨN PHÂN HÓA CẢNH 4 (ACTION & CTA):
-                - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
-                - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kèm nhắc lại nỗi đau): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
+    role_input = col_role.text_input(
+        "👤 Vai trò NV (Để trống để AI tự phân tích phù hợp):",
+        value="",
+        placeholder="Để trống = AI tự phân tích KOC (hoặc nhập: Nam 25t, Bác 50t...)",
+        key=f"r_0_{st.session_state.reset_key}"
+    )
 
-                🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
-                - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
-                - TUYỆT ĐỐI BỎ QUA 100% TRANG PHỤC CŨ TRONG ẢNH!
+    c_file = col_actor_img.file_uploader(
+        "📸 Ảnh mẫu NV (Tùy chọn):",
+        type=["jpg", "png"],
+        key=f"f_0_{st.session_state.reset_key}"
+    )
 
-                🛑 QUY CHUẨN MA TRẬN NHÂN XƯNG CHO MỌI NGÀNH HÀNG:
-                - Tự động nhận diện ngành hàng từ dữ liệu đầu vào:
-                  • Đồ công nghệ / PC / Gaming / Thiết bị điện tử: self_pronoun = 'em', audience_pronoun = 'anh em' (hoặc 'các bác'). CẤM gọi 'các mẹ', CẤM 'các chị em'!
-                  • Đồ gia dụng bếp, tẩy rửa: self_pronoun = 'em', audience_pronoun = 'các chị em' (hoặc 'các bác').
-                  • Thời trang nữ / Mỹ phẩm / Nội y: self_pronoun = 'em', audience_pronoun = 'các chị em' / 'các nàng'.
-                  • Mẹ & Bé: self_pronoun = 'em', audience_pronoun = 'các mẹ'.
-                  • Đời sống / Ăn vặt: self_pronoun = 'em', audience_pronoun = 'mọi người' / 'cả nhà'.
+    char_inputs = []
+    if c_file or role_input.strip():
+        char_inputs.append({"id": 1, "role": role_input.strip(), "file": c_file})
 
-                🛑 QUY CHUẨN BỐI CẢNH ĐỜI THỰC PHÙ HỢP VỚI TỪNG SẢN PHẨM:
-                - BẮT BUỘC 5 kịch bản diễn ra ở 5 bối cảnh đời thực khác nhau ăn khớp tuyệt đối với tính chất của sản phẩm.
-
-                100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN.
-                🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). SỐ 4 ĐỌC LÀ 'BỐN' (CẤM 'TƯ', CẤM 'TỨ'). CẤM '1 TRĂM' (BẮT BUỘC VIẾT 'MỘT TRĂM'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
-                CHỈ ĐẠO HERO SKU: {override_instruction}
-                
-                BẮT BUỘC TRẢ VỀ JSON:
-                {{
-                    "content_analysis": {{
-                        "self_pronoun": "em",
-                        "audience_pronoun": "anh em / các chị em",
-                        "setting_archetype": "Bối cảnh chuẩn mực đời thực phù hợp sản phẩm",
-                        "is_fixed_location": true,
-                        "koc_demographic_analysis": {{
-                            "gender": "male hoặc female",
-                            "persona_vi": "Mô tả chân dung KOC phù hợp bằng tiếng Việt",
-                            "persona_en": "a 24-year-old native Vietnamese young woman"
-                        }},
-                        "how_to_use": "Mô tả thao tác đời thực chuẩn xác",
-                        "correct_ergonomic_grip": "Tư thế cầm nắm công thái học của sản phẩm",
-                        "exact_original_price_ocr": "Giá gốc OCR",
-                        "exact_sale_price_ocr": "Giá sale OCR",
-                        "original_price_spoken": "giá gốc bằng chữ",
-                        "sale_price_spoken": "giá sale bằng chữ",
-                        "rounded_soft_original_spoken": "khoảng giá gốc",
-                        "rounded_soft_sale_spoken": "khoảng giá sale",
-                        "recommended_setting_en": "Realistic clean modern setting under 15 words",
-                        "target_audience": "Tệp khách hàng mục tiêu",
-                        "core_value": "Giá trị cốt lõi",
-                        "pain_points": "Nỗi đau thực tế",
-                        "hook_element": "Yếu tố giật gân 3 giây đầu",
-                        "recommended_format": "Hình thức & Chiến lược đề xuất tối ưu",
-                        "format_reason": "Lý do đề xuất",
-                        "hero_sku_color": "Mã màu Hero SKU",
-                        "color_palette": "Bảng màu toàn bộ",
-                        "what_and_unique": "[Tên sản phẩm]: [Điểm độc bản USP]",
-                        "target_user": "Đối tượng phù hợp nhất",
-                        "why_buy": "Lý do thuyết phục nên mua",
-                        "where_and_convenience": "Hoàn cảnh ứng dụng và sự tiện lợi",
-                        "product_dimensions": "Kích thước đời thực",
-                        "prompt_dna_lock": "Visual DNA cho video"
-                    }},
-                    "outlines": [
-                        {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1 phù hợp sản phẩm...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp...", "actors": 1 }},
-                        {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": 1 }},
-                        {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": 1 }},
-                        {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": 1 }},
-                        {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh đời thực 5...", "hook": "...", "actors": 1 }}
-                    ]
-                }}
-                """
-                payload = ["IMAGES:"]
-                for cb, cm in st.session_state["saved_reference_images"]:
-                    payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
-                for c in char_inputs:
-                    if c.get("file"):
-                        cb, cm = compress_image_bytes(c['file'], 768, 75)
-                        payload.extend([f"ACTOR {c['id']} (EXTRACT FACE, EYE, SKIN TONE, JET-BLACK HAIR ONLY - DISCARD OLD CLOTHES/BACKGROUND):", types.Part.from_bytes(data=cb, mime_type=cm)])
-                payload.append(prompt)
-                
-                res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=6000)
-                st.session_state.content_analysis = res.get("content_analysis")
-                outlines = res.get("outlines", res.get("script_outlines", []))
-                
-                if not outlines:
-                    raise Exception("AI bị ngắt quãng do kết nối mạng trong lúc sinh kịch bản. Vui lòng bấm tạo lại.")
-                
-                for o in outlines: 
-                    if "hook" in o: o["hook"] = clean_and_normalize_voiceover(o["hook"])
-                    o.update({
-                        "duration_instruction": "Thời lượng động sinh học tối đa 10s", 
-                        "narrator_mode": "Nhân vật xuất hiện (On-camera)", 
-                        "character_profiles": st.session_state.character_profiles, 
-                        "actors": 1,
-                        "custom_note": custom_note.strip(),
-                        "presentation_format": unified_strategy_format
+    if st.button("🚀 Phân Tích Sản Phẩm Và Tạo Kịch Bản", type="primary", use_container_width=True, disabled=is_system_busy):
+        can_run, msg = check_usage_limit(st.session_state.current_email)
+        if not can_run: st.error(msg)
+        else:
+            with st.spinner("⏳ Đạo diễn AI đang quét dữ liệu, phân tích KOC phù hợp & thiết lập Kịch bản..."):
+                try:
+                    st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": 1, "role": ""}]
+                    char_rules = generate_char_rules_string(st.session_state.character_profiles)
+                    st.session_state.update({
+                        "last_mode": mode, "last_style": style, "last_narrator": "On-camera", 
+                        "last_presentation_format": unified_strategy_format,
+                        "current_input_context": custom_note.strip()
                     })
-                st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None})
-                st.toast("✅ Đã phân tích KOC & Thiết lập kịch bản hoàn hảo!"); time.sleep(0.3); st.rerun()
-            except Exception as e: st.error(f"❌ Lỗi: {e}")
+                    
+                    if is_viral_mode:
+                        st.session_state.current_product_data_saved = {
+                            "channel_persona": viral_persona.strip(),
+                            "topic_or_tips": viral_topic.strip()
+                        }
+                        input_context_str = f"KÊNH / ĐỊNH VỊ: '{viral_persona.strip()}' | CHỦ ĐỀ / MẸO: '{viral_topic.strip()}' | NOTE: '{custom_note.strip()}'"
+                    else:
+                        st.session_state.current_product_data_saved = st.session_state.get("current_product_data", {})
+                        input_context_str = f"SẢN PHẨM: {json.dumps(st.session_state.current_product_data_saved, ensure_ascii=False)} | NOTE: '{custom_note.strip()}'"
+                    
+                    st.session_state["saved_reference_images"] = []
+                    if up_files:
+                        for f in up_files:
+                            cb, cm = compress_image_bytes(f, 768, 75)
+                            st.session_state["saved_reference_images"].append((cb, cm))
+
+                    override_instruction = f"BẮT BUỘC KHÓA HERO SKU LÀ: '{hero_sku_override.strip()}' theo yêu cầu trực tiếp của người dùng." if hero_sku_override.strip() else "QUÉT OCR ƯU TIÊN TUYỆT ĐỐI Ô PHÂN LOẠI CÓ GẮN ICON NGỌN LỬA '🔥', 'Hot', 'Bán chạy', 'Top 1'. Nếu ô có tag này, BẮT BUỘC 100% chọn ô đó là Hero SKU! Không chọn màu khác khi đã có tag Hot/Bán chạy."
+
+                    special_prompt_mode = "MỤC TIÊU VIRAL & XÂY KÊNH: Kích thích tương tác thảo luận, tạo bài học hữu ích hoặc sự thật bất ngờ, kéo Follower. TUYỆT ĐỐI KHÔNG BÁN HÀNG." if is_viral_mode else "MỤC TIÊU BÁN HÀNG TIKTOK SHOP: Tập trung vào giải quyết vấn đề, công năng và chốt đơn an toàn."
+
+                    prompt = f"""
+                    INPUT: {input_context_str}
+                    THỂ LOẠI: '{mode}' ({special_prompt_mode})
+                    CHIẾN LƯỢC & HÌNH THỨC VIDEO YÊU CẦU: '{unified_strategy_format}'
+                    DIỄN VIÊN: 1 nhân vật 100% người Việt bản địa nói trực tiếp trước ống kính (On-camera).
+                    
+                    🛑 QUY CHUẨN TỰ ĐỘNG PHÂN TÍCH CHÂN DUNG KOC PHÙ HỢP (KOC DEMOGRAPHIC ANALYSIS):
+                    - NẾU NGƯỜI DÙNG ĐỂ TRỐNG VAI TRÒ: BẮT BUỘC bạn phải tự động phân tích tính chất sản phẩm, ngành hàng và bối cảnh để chọn ra chân dung KOC (độ tuổi, giới tính, phong thái) phù hợp nhất:
+                      • Đồ công nghệ / Gaming / Phụ kiện PC / Xe cộ: Nam thanh niên 22-26 tuổi am hiểu công nghệ, năng động, hiện đại.
+                      • Đồ gia dụng bếp / Chảo nồi / Nấu ăn: Nữ nội trợ / mẹ trẻ 28-35 tuổi ấm áp, chu đáo.
+                      • Mỹ phẩm / Chăm sóc da / Thời trang nữ / Nội y: Nữ 22-26 tuổi da sáng, tươi tắn, thanh lịch.
+                      • Dụng cụ cầm tay / Cơ khí / Làm vườn / Cây cảnh: Nam trung niên / bác 40-50 tuổi từng trải, thực tế.
+                      • Mẹ & Bé: Mẹ bỉm 26-32 tuổi dịu dàng hoặc bố trẻ 28-32 tuổi.
+                    - NẾU NGƯỜI DÙNG ĐÃ NHẬP VAI TRÒ CỤ THỂ: Ưu tiên 100% yêu cầu người dùng!
+                    - Ghi rõ kết quả vào trường 'koc_demographic_analysis' trong JSON.
+
+                    🛑 QUY CHUẨN PHÂN HÓA CẢNH 4 (ACTION & CTA):
+                    - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
+                    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kèm nhắc lại nỗi đau): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
+
+                    🛑 QUY CHUẨN ĐẶC BIỆT KHI CÓ ẢNH DIỄN VIÊN TẢI LÊN:
+                    - KHI CÓ ẢNH DIỄN VIÊN: CHỈ TRÍCH XUẤT ĐẶC TRƯNG SINH TRẮC HỌC KHUÔN MẶT, MẮT, SỐNG MŨI, TÔNG DA, TÓC ĐEN TỰ NHIÊN!
+                    - TUYỆT ĐỐI BỎ QUA 100% TRANG PHỤC CŨ TRONG ẢNH!
+
+                    🛑 QUY CHUẨN MA TRẬN NHÂN XƯNG CHO MỌI NGÀNH HÀNG:
+                    - Tự động nhận diện ngành hàng từ dữ liệu đầu vào:
+                      • Đồ công nghệ / PC / Gaming / Thiết bị điện tử: self_pronoun = 'em', audience_pronoun = 'anh em' (hoặc 'các bác'). CẤM gọi 'các mẹ', CẤM 'các chị em'!
+                      • Đồ gia dụng bếp, tẩy rửa: self_pronoun = 'em', audience_pronoun = 'các chị em' (hoặc 'các bác').
+                      • Thời trang nữ / Mỹ phẩm / Nội y: self_pronoun = 'em', audience_pronoun = 'các chị em' / 'các nàng'.
+                      • Mẹ & Bé: self_pronoun = 'em', audience_pronoun = 'các mẹ'.
+                      • Đời sống / Ăn vặt: self_pronoun = 'em', audience_pronoun = 'mọi người' / 'cả nhà'.
+
+                    🛑 QUY CHUẨN BỐI CẢNH ĐỜI THỰC PHÙ HỢP VỚI TỪNG SẢN PHẨM:
+                    - BẮT BUỘC 5 kịch bản diễn ra ở 5 bối cảnh đời thực khác nhau ăn khớp tuyệt đối với tính chất của sản phẩm.
+
+                    100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN.
+                    🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). SỐ 4 ĐỌC LÀ 'BỐN' (CẤM 'TƯ', CẤM 'TỨ'). CẤM '1 TRĂM' (BẮT BUỘC VIẾT 'MỘT TRĂM'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
+                    CHỈ ĐẠO HERO SKU: {override_instruction}
+                    
+                    BẮT BUỘC TRẢ VỀ JSON:
+                    {{
+                        "content_analysis": {{
+                            "self_pronoun": "em",
+                            "audience_pronoun": "anh em / các chị em",
+                            "setting_archetype": "Bối cảnh chuẩn mực đời thực phù hợp sản phẩm",
+                            "is_fixed_location": true,
+                            "koc_demographic_analysis": {{
+                                "gender": "male hoặc female",
+                                "persona_vi": "Mô tả chân dung KOC phù hợp bằng tiếng Việt",
+                                "persona_en": "a 24-year-old native Vietnamese young woman"
+                            }},
+                            "how_to_use": "Mô tả thao tác đời thực chuẩn xác",
+                            "correct_ergonomic_grip": "Tư thế cầm nắm công thái học của sản phẩm",
+                            "exact_original_price_ocr": "Giá gốc OCR",
+                            "exact_sale_price_ocr": "Giá sale OCR",
+                            "original_price_spoken": "giá gốc bằng chữ",
+                            "sale_price_spoken": "giá sale bằng chữ",
+                            "rounded_soft_original_spoken": "khoảng giá gốc",
+                            "rounded_soft_sale_spoken": "khoảng giá sale",
+                            "recommended_setting_en": "Realistic clean modern setting under 15 words",
+                            "target_audience": "Tệp khách hàng mục tiêu",
+                            "core_value": "Giá trị cốt lõi",
+                            "pain_points": "Nỗi đau thực tế",
+                            "hook_element": "Yếu tố giật gân 3 giây đầu",
+                            "recommended_format": "Hình thức & Chiến lược đề xuất tối ưu",
+                            "format_reason": "Lý do đề xuất",
+                            "hero_sku_color": "Mã màu Hero SKU",
+                            "color_palette": "Bảng màu toàn bộ",
+                            "what_and_unique": "[Tên sản phẩm]: [Điểm độc bản USP]",
+                            "target_user": "Đối tượng phù hợp nhất",
+                            "why_buy": "Lý do thuyết phục nên mua",
+                            "where_and_convenience": "Hoàn cảnh ứng dụng và sự tiện lợi",
+                            "product_dimensions": "Kích thước đời thực",
+                            "prompt_dna_lock": "Visual DNA cho video"
+                        }},
+                        "outlines": [
+                            {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh đời thực 1 phù hợp sản phẩm...", "hook": "Câu hook ngắn gọn nhân vật nói trực tiếp...", "actors": 1 }},
+                            {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh đời thực 2...", "hook": "...", "actors": 1 }},
+                            {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh đời thực 3...", "hook": "...", "actors": 1 }},
+                            {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh đời thực 4...", "hook": "...", "actors": 1 }},
+                            {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh đời thực 5...", "hook": "...", "actors": 1 }}
+                        ]
+                    }}
+                    """
+                    payload = ["IMAGES:"]
+                    for cb, cm in st.session_state["saved_reference_images"]:
+                        payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
+                    for c in char_inputs:
+                        if c.get("file"):
+                            cb, cm = compress_image_bytes(c['file'], 768, 75)
+                            payload.extend([f"ACTOR {c['id']} (EXTRACT FACE, EYE, SKIN TONE, JET-BLACK HAIR ONLY - DISCARD OLD CLOTHES/BACKGROUND):", types.Part.from_bytes(data=cb, mime_type=cm)])
+                    payload.append(prompt)
+                    
+                    res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=6000)
+                    st.session_state.content_analysis = res.get("content_analysis")
+                    outlines = res.get("outlines", res.get("script_outlines", []))
+                    
+                    if not outlines:
+                        raise Exception("AI bị ngắt quãng do kết nối mạng trong lúc sinh kịch bản. Vui lòng bấm tạo lại.")
+                    
+                    for o in outlines: 
+                        if "hook" in o: o["hook"] = clean_and_normalize_voiceover(o["hook"])
+                        o.update({
+                            "duration_instruction": "Thời lượng động sinh học tối đa 10s", 
+                            "narrator_mode": "Nhân vật xuất hiện (On-camera)", 
+                            "character_profiles": st.session_state.character_profiles, 
+                            "actors": 1,
+                            "custom_note": custom_note.strip(),
+                            "presentation_format": unified_strategy_format
+                        })
+                    st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None, "is_analyzed": True})
+                    st.toast("✅ Đã phân tích KOC & Thiết lập kịch bản hoàn hảo!"); time.sleep(0.3); st.rerun()
+                except Exception as e: st.error(f"❌ Lỗi: {e}")
 
 # ==============================================================================
 # BỐ CỤC: 2 CỘT ĐỐI XỨNG & ĐÁNH SỐ ĐỘNG LIỀN MẠCH
@@ -2028,7 +2032,7 @@ if isinstance(ca, dict):
             exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
             
             soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
-            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
             
             c4_html = clean_html(f"""
             <div class="dna-card">
