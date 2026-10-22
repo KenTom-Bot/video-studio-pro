@@ -312,8 +312,8 @@ def detect_footwear_or_accessory(text_to_check: str) -> bool:
     t = text_to_check.lower()
     return any(k in t for k in ["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi", "ví", "balo", "mũ", "nón", "kính", "shoe", "bag", "hat", "cap"])
 
-def get_universal_physics_rules(product_name: str) -> str:
-    p = product_name.lower()
+def get_universal_physics_rules(product_name: str, vo_text: str = "") -> str:
+    p = f"{product_name} {vo_text}".lower()
     if any(k in p for k in ["mỹ phẩm", "kem", "serum", "son", "phấn", "skincare", "cream", "lipstick", "lotion", "foundation"]):
         return (
             "[COSMETICS & SKIN PHYSICS]: Realistic application physics. "
@@ -328,16 +328,18 @@ def get_universal_physics_rules(product_name: str) -> str:
             "surface tension, and splash dynamics; cutting or biting reveals realistic internal textures (juiciness, crispness, melting layers), "
             "zero floating food particles or magical morphing."
         )
-    elif any(k in p for k in ["nồi", "máy xay", "máy sấy", "quạt", "hút bụi", "cooker", "blender", "dryer", "vacuum", "machine"]):
+    elif any(k in p for k in ["nồi", "máy xay", "máy sấy", "quạt", "hút bụi", "chà sàn", "lau nhà", "cooker", "blender", "dryer", "vacuum", "mop", "brush", "machine"]):
         return (
-            "[APPLIANCE MECHANICS]: Strict mechanical operation physics. "
-            "Lids open correctly along hinges with escaping steam; blenders show high-speed blades cutting ingredients inside transparent jars; "
-            "vacuums cleanly suck surface debris into the nozzle; moving parts follow exact mechanical engineering, zero floating parts."
+            "[APPLIANCE & CLEANING MECHANICS - RIGID ACTION]: Strict mechanical operation physics directly matching voiceover actions. "
+            "For vacuum cleaners: nozzle slides closely over the floor, instantly sucking up visible dust and debris right as it passes over, leaving a spotless clean trail. "
+            "For cleaning brushes / floor scrubbers: vigorously scrubbing back and forth with firm downward pressure, aggressively removing stubborn stains on the floor surface. "
+            "For hair dryers: powerful airflow blowing hair naturally, zero visible glowing wind rays. "
+            "Lids open correctly along hinges with escaping steam; blenders show high-speed blades cutting ingredients inside transparent jars."
         )
     else:
         return (
             "[UNIVERSAL REAL-WORLD PHYSICS]: Strict adherence to real-world gravity, solid material permanence, "
-            "and correct ergonomic interaction. Zero floating objects, zero magical teleportation."
+            "and correct ergonomic interaction matching spoken action. Zero floating objects, zero magical teleportation."
         )
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool) -> str:
@@ -971,13 +973,11 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
     - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
 
-    🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CTA):
-    - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
-    - Nếu là các kịch bản còn lại (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt Soft CTA tự nhiên (kèm nhắc lại nỗi đau): "Nay có giá ưu đãi cực sâu, chị em nào mà bị... thì xem ngay sản phẩm ở giỏ hàng góc trái nhé!".
-
-    🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
-    - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải.
-    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI KHÔNG hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay gây ảo giác.
+    🛑 QUY TẮC CẤU TRÚC PHÂN CẢNH (STORYTELLING & PAS / NỖI ĐAU):
+    - CẢNH 1 (HOOOK & NỖI ĐAU): Tuyệt đối KHÔNG xuất hiện sản phẩm. Tập trung hoàn toàn vào bối cảnh, âm thanh môi trường và biểu cảm khuôn mặt/thể trạng mệt mỏi, bất lực của nhân vật trước nỗi đau thực tế. Thoại mở màn tập trung bóc trần vấn đề.
+    - CẢNH 2 (GIẢI PHÁP XUẤT HIỆN): Sản phẩm chính thức xuất hiện (trên bệ trưng bày hoặc mặc trên người). KOC đưa ra câu nối dẫn dắt mượt mà (VD: "May mà tớ tìm ra cách này...", "Đừng lo, có em này cứu cánh đây...").
+    - CẢNH 3 (TEST THỰC TẾ TRỰC QUAN): Thao tác thực chiến mạnh mẽ, dứt khoát y hệt nội dung thoại mô tả công dụng (máy hút bụi đi đến đâu sạch đến đó, chà sàn chà mạnh đánh bay vết bẩn).
+    - CẢNH 4 (CHỐT DEAL KÈM NỖI ĐAU): Neo giá nếu là Flash Sale, hoặc dùng Soft CTA xoáy sâu nỗi đau: "Nay có giá ưu đãi cực sâu, chị em nào mà đang gặp vấn đề tương tự thì rinh ngay sản phẩm ở giỏ hàng góc trái nhé!".
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
@@ -1003,7 +1003,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         """
     else:
         outro_instruction = f"""
-        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL):
+        🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL KÈM NỖI ĐAU):
         - NẾU KỊCH BẢN THUỘC FLASH SALE / DEAL HỜI: Dùng công thức neo giá ('Bình thường khoảng [giá gốc], nay giảm còn khoảng [giá sale]...').
         - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá trước đó): TUYỆT ĐỐI KHÔNG đọc giá ở cảnh 4. Dùng câu chốt mượt mà xoáy sâu nỗi đau: 'Nay có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp vấn đề tương tự thì rinh ngay sản phẩm ở giỏ hàng góc trái nhé!'.
         - Số 4 đọc là 'bốn'. CẤM 'tư', CẤM 'tứ'. CẤM 'phiên live', CẤM 'trợ giá'.
@@ -1018,20 +1018,22 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     {outro_instruction}
     {override_rule}
 
+    🛑 QUY TẮC CẤU TRÚC 4 PHÂN CẢNH (CẢNH 1 KHÔNG SẢN PHẨM - CẢNH 2 CÓ CẦU NỐI DẪN DẮT):
+    - CẢNH 1: Tập trung vào nỗi đau và biểu cảm bối rối/mệt mỏi của nhân vật. TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM. Thoại bóc trần vấn đề.
+    - CẢNH 2: Sản phẩm xuất hiện với câu nối dẫn dắt tự nhiên ("May mà tớ tìm ra cách này...").
+    - CẢNH 3: Test công năng trực quan thực tế cực kỳ mạnh mẽ, thao tác làm đến đâu rõ kết quả đến đó.
+    - CẢNH 4: Chốt đơn kèm câu chốt nhắc lại nỗi đau và Soft CTA.
+
     🛑 QUY TẮC BẮT BUỘC VỀ TRANG PHỤC & ĐỒNG NHẤT NHÂN VẬT CHO MỌI SẢN PHẨM:
     1. TRANG PHỤC PHẢI THÍCH ỨNG CHÍNH XÁC VỚI SẢN PHẨM VÀ BỐI CẢNH CỤ THỂ CỦA KỊCH BẢN ĐÓ:
-       - Phân tích kỹ ngành hàng để chọn trang phục chuẩn xác:
-         • Đồ công nghệ / Gaming / PC: Áo phông/polo, hoodie/cardigan, quần jogger/chinos, giày sneaker. TUYỆT ĐỐI CẤM TẠP ĐỀ!
-         • Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
-         • Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
-         • Đồ lót / Nội y: Áo sơ mi pastel hoặc cardigan thanh lịch kín đáo kết hợp quần dài (tuyệt đối không mặc đồ lót lên người, chỉ cầm trên tay).
-         • Sản phẩm thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP sản phẩm lên người từ giây 0.0s, cố định vị trí trên cơ thể, tuyệt đối không cầm trên tay hay để sản phẩm tự bay lượn.
-       - Áp dụng linh hoạt cho MỌI SẢN PHẨM, không giới hạn ngành hàng.
-    2. KHÓA ĐỒNG NHẤT 100% XUYÊN SUỐT 4 PHÂN CẢNH TRONG CÙNG 1 KỊCH BẢN:
-       - Từ Cảnh 1 đến Cảnh 4, nhân vật BẮT BUỘC giữ nguyên 100% duy nhất: khuôn mặt thuần Việt, màu tóc đen tuyền, kiểu tóc, trang phục và giày dép.
+       - Đồ công nghệ / Gaming / PC: Áo phông/polo, hoodie/cardigan, quần jogger/chinos, giày sneaker. TUYỆT ĐỐI CẤM TẠP ĐỀ!
+       - Đồ nấu ăn, bếp núc: Áo thun/polo, tạp dề nấu ăn sạch sẽ.
+       - Đồ công sở, văn phòng: Sơ mi/blouse thanh lịch, quần âu, giày da/cao gót.
+       - Sản phẩm thời trang mặc trên người (quần áo, váy, giày dép): Mặc trực tiếp từ giây 0.0s, cố định vị trí, không cầm trên tay.
+    2. KHÓA ĐỒNG NHẤT 100% XUYÊN SUỐT 4 PHÂN CẢNH TRONG CÙNG 1 KỊCH BẢN (Khuôn mặt, màu tóc, kiểu tóc, trang phục và giày dép bất biến).
 
     🛑 KHÓA ÂM THANH: CHỈ DÙNG FOLEY HIỆU ỨNG THỰC TẾ & VOICE, KHỬ 100% NHẠC NỀN (ZERO BGM).
-    🛑 KHÓA TIẾP XÚC VẬT LÝ & CHỐNG ẢO GIÁC ĐÔI TAY: Tương tác tự nhiên, sản phẩm mặc trên người hoặc cầm chắc trên tay, tay thả lỏng/chống hông tự nhiên, cấm tự với lấy đồ, cấm tự bay lượn.
+    🛑 KHÓA TIẾP XÚC VẬT LÝ & CHỐNG ẢO GIÁC ĐÔI TAY: Tương tác tự nhiên, tay thả lỏng/chống hông, cấm tự với lấy đồ, cấm tự bay lượn.
     🛑 100% CẢ 4 CẢNH LÀ NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP NGAY TỪ 0.00S.
     {char_rules}
     """
@@ -1131,7 +1133,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     clean_prod_en = sanitize_third_party_ip(fallback_prod_name)
 
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable)
-    physics_rules_text = get_universal_physics_rules(clean_prod_en)
+    temp_vo_hint = f"{fixed_title} {fixed_hook}"
+    physics_rules_text = get_universal_physics_rules(clean_prod_en, temp_vo_hint)
 
     condensed_dna = {
         "product": clean_prod_en,
@@ -1169,6 +1172,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {stylist_rules_text}
     {physics_rules_text}
 
+    🛑 YÊU CẦU CẤU TRÚC 4 PHÂN CẢNH THEO MẠCH TRUYỆN (STORYTELLING & PAS):
+    - CẢNH 1 (HOOOK & NỖI ĐAU): Tập trung vào không gian bối cảnh và biểu cảm gương mặt/thể trạng mệt mỏi, bất lực của nhân vật. TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM XUẤT HIỆN. Thoại bóc trần vấn đề.
+    - CẢNH 2 (GIẢI PHÁP XUẤT HIỆN): Sản phẩm chính thức xuất hiện. KOC đưa ra câu nối dẫn dắt tự nhiên ("May mà tớ tìm ra cách này...").
+    - CẢNH 3 (TEST THỰC TẾ TRỰC QUAN): Thao tác thực chiến mạnh mẽ, dứt khoát y hệt nội dung thoại mô tả công dụng.
+    - CẢNH 4 (CHỐT DEAL KÈM NỖI ĐAU): Neo giá nếu là Flash Sale, hoặc dùng Soft CTA nhắc lại nỗi đau.
+
     TRẢ VỀ JSON:
     {{
         "title": "{fixed_title}",
@@ -1180,35 +1189,35 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
-                "setting": "Mô tả bối cảnh mở màn tiếng Việt ăn khớp 100% với kịch bản...",
-                "setting_en": "English setting description",
+                "setting": "Mô tả bối cảnh mở màn tiếng Việt thể hiện nỗi đau, KHÔNG CÓ SẢN PHẨM...",
+                "setting_en": "English setting description showing problem, NO PRODUCT",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
-                "expression_en": "looking at camera with natural engaging expression",
-                "action_en": "First, {action_phrases}; then smoothly speaking to camera with steady hands",
-                "sfx": "Foley âm thanh thao tác thực tế (không nhạc nền)",
-                "director": "Attention | Bám sát '{fixed_title}' | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại mở màn (18-35 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' chuẩn tiếng Hà Nội..."
+                "expression_en": "looking at camera with troubled, tired, or frustrated expression",
+                "action_en": "expressing frustration or dealing with the problem naturally without product in hands",
+                "sfx": "Foley âm thanh thực tế đời sống (không nhạc nền)",
+                "director": "Attention | Bám sát '{fixed_title}' | Nỗi đau thuần túy, không có sản phẩm | Thoại on-camera từ 0.00s",
+                "voiceover": "Đoạn thoại mở màn (18-35 từ) bóc trần nỗi đau..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
-                "setting": "Mô tả bối cảnh cận cảnh ăn khớp với thoại...",
-                "setting_en": "English setting description",
+                "setting": "Mô tả bối cảnh khi sản phẩm xuất hiện trên bệ trưng bày hoặc trên người...",
+                "setting_en": "English setting with product appearing",
                 "camera_shot": "Vertical 9:16 eye-level medium close-up",
-                "expression_en": "focused and confident",
-                "action_en": "First, demonstrating the key feature of {clean_prod_en}; then inspecting with clean hand separation",
+                "expression_en": "relieved and confident",
+                "action_en": "First, introducing {clean_prod_en} with a natural smooth bridging motion; then speaking to camera",
                 "sfx": "Tiếng thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
-                "director": "Interest | Thao tác trực quan | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại KOC nói trực tiếp đào sâu tính năng (20-35 từ)..."
+                "director": "Interest | Cầu nối giải pháp xuất hiện | Thoại on-camera từ 0.00s",
+                "voiceover": "Đoạn thoại KOC có câu nối dẫn dắt giải pháp (20-35 từ)..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
-                "setting": "Mô tả bối cảnh trải nghiệm ăn khớp với thoại...",
+                "setting": "Mô tả bối cảnh trải nghiệm thực tế ăn khớp với thoại...",
                 "setting_en": "English setting description",
                 "camera_shot": "Vertical 9:16 eye-level lifestyle shot",
                 "expression_en": "smiling contentedly with an approving head nod",
-                "action_en": "First, completing the usage smoothly; then presenting the satisfying outcome to camera",
+                "action_en": "First, executing the strong physical action matching voiceover (e.g., scrubbing firmly, vacuuming instantly); then showing clean results",
                 "sfx": "Tiếng trải nghiệm thực tế đời sống (không nhạc nền)",
-                "director": "Desire | Bằng chứng thực tế | Thoại on-camera từ 0.00s",
+                "director": "Desire | Test công năng thực chiến mạnh mẽ | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm (20-35 từ)..."
             }},
             {{
@@ -1262,7 +1271,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     )
     
     total_sec = 0.0
-    for scn in scenes:
+    for idx_scn, scn in enumerate(scenes):
         if "voiceover" in scn: 
             scn["voiceover"] = clean_and_normalize_voiceover(scn["voiceover"])
         if "director" in scn: 
@@ -1295,11 +1304,22 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         raw_action = scn.get("action_en") or f"First, demonstrating {clean_prod_en} naturally; then smoothly speaking to camera with steady hands"
         clean_action = sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', raw_action, flags=re.IGNORECASE).strip())
 
-        img_core = (
-            f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {env_lighting_en}. "
-            f"Subject: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}, "
-            f"featuring {clean_prod_en} with firm anatomical finger grip and accurate real-world scale"
-        )
+        scene_physics_override = get_universal_physics_rules(clean_prod_en, vo_text_current)
+
+        # QUY TẮC THAM CHIẾU ẢNH: Cảnh 1 KHÔNG CÓ SẢN PHẨM, KHÔNG THAM CHIẾU SẢN PHẨM
+        if idx_scn == 0:
+            img_core = (
+                f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {env_lighting_en}. "
+                f"Subject: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}, "
+                f"showing emotional problem or frustration, zero product in hands"
+            )
+        else:
+            img_core = (
+                f"{camera_shot}, commercial live-action photography, {scene_setting_en}, {env_lighting_en}. "
+                f"Subject: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}, "
+                f"featuring {clean_prod_en} with firm anatomical finger grip and accurate real-world scale"
+            )
+
         scn["img_p"] = sanitize_third_party_ip(f"{img_core}, 8k resolution, photorealistic skin texture, sharp focus --ar 9:16 --style raw --v 6.1")
         scn["img_neg"] = base_negative_prompt
         
@@ -1320,18 +1340,32 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             camera_shot
         )
 
-        raw_vid = (
-            f"[CAMERA & LIGHTING]: {camera_angle_fix}, smooth Steadicam gimbal live-action footage, {env_lighting_en}. "
-            f"[SETTING]: {scene_setting_en}. "
-            f"[SUBJECT LOCK]: {locked_character_prompt_segment}, {micro_expr_en}, maintaining an elegant upright posture, zero bending down or hunching. "
-            f"[ACTION & RIGID PHYSICS]: {clean_action}. {wearable_vid_lock}. Subject and product maintain consistent 3D geometry, "
-            f"strict anatomical hand placement, zero floating parts, zero phantom limbs, zero unexpected grasping. "
-            f"[LIP-SYNC & TIMING ({dynamic_scene_sec}s total)]: From 0.0s to {actual_speech_time}s, subject speaks directly to camera with accurate "
-            f"Vietnamese lip-sync and natural facial micro-expressions; for the final {cushion_sec}s, subject smoothly closes mouth into a natural "
-            f"warm smile with gentle breathing and subtle head nod. "
-            f"[AUDIO & VOICEOVER]: Clear native Northern Vietnamese (Hanoi accent) voice speaking at a natural pace: \"{clean_vo_for_audio}\". "
-            f"Strictly clean diegetic Foley sound effects only [{combined_sfx}], 100% zero background music, zero BGM, pure clean camera footage, no text overlays."
-        )
+        # Cảnh 1 video tuyệt đối không có sản phẩm
+        if idx_scn == 0:
+            raw_vid = (
+                f"[CAMERA & LIGHTING]: {camera_angle_fix}, smooth Steadicam gimbal live-action footage, {env_lighting_en}. "
+                f"[SETTING]: {scene_setting_en}. "
+                f"[SUBJECT LOCK]: {locked_character_prompt_segment}, {micro_expr_en}, showing a relatable life problem or emotional frustration, zero product in view. "
+                f"[LIP-SYNC & TIMING ({dynamic_scene_sec}s total)]: From 0.0s to {actual_speech_time}s, subject speaks directly to camera with accurate "
+                f"Vietnamese lip-sync and natural facial micro-expressions; for the final {cushion_sec}s, subject smoothly closes mouth into a natural "
+                f"breathing pose with subtle head nod. "
+                f"[AUDIO & VOICEOVER]: Clear native Northern Vietnamese (Hanoi accent) voice speaking at a natural pace: \"{clean_vo_for_audio}\". "
+                f"Strictly clean diegetic Foley sound effects only [{combined_sfx}], 100% zero background music, zero BGM, pure clean camera footage, no text overlays."
+            )
+        else:
+            raw_vid = (
+                f"[CAMERA & LIGHTING]: {camera_angle_fix}, smooth Steadicam gimbal live-action footage, {env_lighting_en}. "
+                f"[SETTING]: {scene_setting_en}. "
+                f"[SUBJECT LOCK]: {locked_character_prompt_segment}, {micro_expr_en}, maintaining an elegant upright posture, zero bending down or hunching. "
+                f"[ACTION & RIGID PHYSICS]: {clean_action}. {wearable_vid_lock}. {scene_physics_override}. Subject and product maintain consistent 3D geometry, "
+                f"strict anatomical hand placement, zero floating parts, zero phantom limbs, zero unexpected grasping. "
+                f"[LIP-SYNC & TIMING ({dynamic_scene_sec}s total)]: From 0.0s to {actual_speech_time}s, subject speaks directly to camera with accurate "
+                f"Vietnamese lip-sync and natural facial micro-expressions; for the final {cushion_sec}s, subject smoothly closes mouth into a natural "
+                f"warm smile with gentle breathing and subtle head nod. "
+                f"[AUDIO & VOICEOVER]: Clear native Northern Vietnamese (Hanoi accent) voice speaking at a natural pace: \"{clean_vo_for_audio}\". "
+                f"Strictly clean diegetic Foley sound effects only [{combined_sfx}], 100% zero background music, zero BGM, pure clean camera footage, no text overlays."
+            )
+
         scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         scn["vid_neg"] = base_negative_prompt
         
@@ -2032,7 +2066,7 @@ if isinstance(ca, dict):
             exact_sale_raw = str(ca.get('exact_sale_price_ocr', ''))
             
             soft_orig = ca.get('rounded_soft_original_spoken') or convert_to_soft_price_range(orig_p_display, is_orig=True, exact_raw_str=exact_orig_raw)
-            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_p_display, is_orig=False, exact_raw_str=exact_sale_raw)
+            soft_sale = ca.get('rounded_soft_sale_spoken') or convert_to_soft_price_range(sale_price_spoken, is_orig=False, exact_raw_str=exact_sale_raw)
             
             c4_html = clean_html(f"""
             <div class="dna-card">
