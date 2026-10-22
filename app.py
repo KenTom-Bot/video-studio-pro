@@ -286,11 +286,6 @@ def get_demographics_description(char_profiles, ai_persona_en=""):
 # HỆ THỐNG BẢO VỆ TỰ ĐỘNG CHO ĐỒ LÓT, ÁO 2 DÂY & SẢN PHẨM NHẠY CẢM (VEO 3 & TIKTOK SAFE)
 # ==============================================================================
 def detect_intimate_apparel(text_to_check: str) -> str:
-    """
-    Phát hiện sản phẩm thuộc nhóm nhạy cảm:
-    - 'underwear_bra': áo lót, quần lót, nội y, bikini, đồ bơi, váy ngủ, dung dịch vệ sinh...
-    - 'camisole': áo 2 dây, áo hai dây, áo ống, áo quây, croptop sát nách...
-    """
     if not text_to_check: return "normal"
     t = text_to_check.lower()
     if any(k in t for k in [
@@ -525,7 +520,7 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\báp\s*voucher\b', 'nay giảm'),
         (r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b', 'một trăm bốn mươi'),
         (r'\b1\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
-        (r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi'),
+        (r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b', 'một trăm bốn mươi'),
         (r'\bmột\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
         (r'\btrăm\s*(?:tư|tứ)\s*mươi\b', 'trăm bốn mươi'),
         (r'\btrăm\s*(?:tư|tứ)\b', 'trăm bốn mươi'),
@@ -1416,7 +1411,7 @@ with st.sidebar:
             st.session_state.update({
                 "all_scripts": [], "cloned_scripts": [], "expanded_scripts": [],
                 "generated_details": {}, "content_analysis": None, "active_script_id": None,
-                "current_input_context": "", "current_product_data_saved": None, "current_product_data", None,
+                "current_input_context": "", "current_product_data_saved": None, "current_product_data": None,
                 "current_project_id": None, "saved_reference_images": [], "character_profiles": [],
                 "current_processing_id": None, "current_cloning_id": None
             })
