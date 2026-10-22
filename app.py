@@ -977,7 +977,7 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
     🛑 QUY TẮC BẢO VỆ NỘI DUNG NHẠY CẢM & THỜI TRANG (CHỐNG ẢO GIÁC SẢN PHẨM):
     - Nếu sản phẩm là áo lót, quần lót, nội y, bikini: TUYỆT ĐỐI KHÔNG cho nhân vật mặc trực tiếp lên người! Nhân vật mặc đồ đời thường kín đáo và CẦM SẢN PHẨM TRÊN TAY (hoặc treo trên móc) để kiểm tra độ co giãn, chất vải.
-    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI CẤM hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay gây ảo giác.
+    - Nếu sản phẩm là thời trang mặc trên người (quần áo, váy, giày dép): Nhân vật MẶC TRỰC TIẾP SẢN PHẨM LÊN NGƯỜI từ giây đầu tiên (0.0s), cố định vị trí trên cơ thể suốt video. TUYỆT ĐỐI KHÔNG hành động tự động cầm sản phẩm trên tay, cấm sản phẩm tự bay vào tay gây ảo giác.
 
     🛑 BỘ MÁY NGỮ PHÁP VĂN NÓI XUÔI CHIỀU & PHÁT ÂM CHUẨN HÀ NỘI:
     - CÂU CÚ PHẢI TUYỆT ĐỐI XUÔI THEO VĂN NÓI ĐỜI THƯỜNG CỦA NGƯỜI HÀ NỘI.
@@ -1121,7 +1121,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif is_footwear_accessory:
         fallback_prod_name = f"authentic {hero_color_str} {raw_prod_name}".strip() if hero_color_str else f"authentic {raw_prod_name}"
         intimate_safety_rule = """
-        🛑 QUY CHUẢN CHO GIÀY DÉP & PHỤ KIỆN (CHỐNG CÚI GẬP NGƯỜI):
+        🛑 QUY CHUẨN CHO GIÀY DÉP & PHỤ KIỆN (CHỐNG CÚI GẬP NGƯỜI):
         1. Sản phẩm được đặt trên bệ trưng bày ngang tầm eo hoặc KOC mang trực tiếp lên người.
         2. KOC giữ nguyên tư thế THẲNG LƯNG, thanh lịch, giao tiếp tự nhiên với camera, TUYỆT ĐỐI KHÔNG cúi gập người xuống sàn nhà.
         """
@@ -1561,7 +1561,7 @@ with st.sidebar:
                 creator_emails = sorted(list(set(p.get("user_email", "") for p in all_projects if p.get("user_email"))))
                 sel_creator = st.selectbox("👤 Lọc theo thành viên:", ["Tất cả thành viên"] + creator_emails, key="admin_sel_creator")
                 if sel_creator != "Tất cả thành viên":
-                    all_projects = [p for p in all_projects if p.get("user_email"] == sel_creator]
+                    all_projects = [p for p in all_projects if p.get("user_email") == sel_creator]
 
             search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên dự án...", key="search_proj_input")
             display_projects = [p for p in all_projects if search_proj.strip().lower() in p['project_title'].lower()] if search_proj.strip() else (all_projects if st.session_state.show_all_projects else all_projects[:3])
@@ -1784,7 +1784,7 @@ if not st.session_state.is_analyzed:
     )
 
     role_input = col_role.text_input(
-        "👤 Vai trò NV (Để trống để AI tự phân tích phù hợp):",
+        "👤 Vai trò NV (Để trống = AI tự phân tích phù hợp):",
         value="",
         placeholder="Để trống = AI tự phân tích KOC (hoặc nhập: Nam 25t, Bác 50t...)",
         key=f"r_0_{st.session_state.reset_key}"
