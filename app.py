@@ -407,7 +407,6 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         else:
             return "Vertical 9:16 warm eye-level medium shot"
     else:
-        # Chế độ Product-Hero cho mọi sản phẩm phi thời trang: Khóa tiêu cự trực tiếp vào sản phẩm ở trung tâm tiền cảnh
         if scene_idx == 0:
             return f"Vertical 9:16 product-focused medium shot, {clean_prod_en} held prominently in foreground center toward the lens"
         elif scene_idx == 1:
@@ -1003,14 +1002,18 @@ def repair_and_parse_json(text_content: str):
         pass
     raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng bấm tạo lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2600):
-    models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite", "gemini-2.5-flash"]
+# ==============================================================================
+# HÀM GỌI GEMINI API: ĐÃ XÓA MODEL 2.5 CŨ, CHỈ DÙNG 3.8-FLASH & 3.8-FLASH-LITE
+# ==============================================================================
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+    models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
     last_exception = None
     for model_name in models_to_try:
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 res = client.models.generate_content(
-                    model=model_name, contents=contents,
+                    model=model_name,
+                    contents=contents,
                     config=types.GenerateContentConfig(
                         system_instruction=sys_inst,
                         response_mime_type="application/json",
@@ -1025,9 +1028,9 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2
                 if "404" in err_str or "not_found" in err_str:
                     break
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
-                    time.sleep((attempt + 1) * 1.2)
+                    time.sleep((attempt + 1) * 1.5)
                     continue
-                time.sleep(0.6)
+                time.sleep(0.8)
     if last_exception:
         if "503" in str(last_exception) or "unavailable" in str(last_exception).lower():
             raise Exception("Google API bận tạm thời (503). Vui lòng đợi 5s rồi bấm lại.")
@@ -1227,7 +1230,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         setting_archetype=fixed_setting_base, is_fixed_location=True,
         is_pas_story=is_pas_story
     )
-    res = call_gemini([prompt_text], sys_inst, max_tokens=2400)
+    res = call_gemini([prompt_text], sys_inst, max_tokens=4096)
     if not res:
         raise Exception("AI không phản hồi. Vui lòng bấm tạo lại.")
     
@@ -1295,7 +1298,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
         scene_physics = get_universal_physics_rules(clean_prod_en, vo_text_current, is_fashion=is_fashion_wearable)
 
-        # Đảo ngược ưu tiên Chủ thể cho sản phẩm phi thời trang: Đưa HERO PRODUCT lên đầu để khóa tiêu cự ống kính!
         if is_pas_scn1_no_prod:
             img_core = (
                 f"{camera_shot}, {scene_setting_en}, {env_lighting_en}. "
@@ -1327,7 +1329,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 f"[AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_for_audio}\". Foley only [{combined_sfx}], zero BGM, no text overlays."
             )
         elif not is_fashion_wearable:
-            # Chế độ Product-Hero cho Video: Khóa tiêu cự ống kính trực tiếp vào sản phẩm ở trung tâm tiền cảnh
             raw_vid = (
                 f"[PRODUCT-CENTRIC CAMERA & SETTING]: {camera_shot}, gimbal live-action, {scene_setting_en}, {env_lighting_en}. "
                 f"[{locked_product_prompt_segment}]. "
@@ -1409,7 +1410,7 @@ def clone_script(script_id):
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", 1, "Nhân bản", user_custom_note, presentation_format), max_tokens=1800)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", "", 1, "Nhân bản", user_custom_note, presentation_format), max_tokens=2500)
     clones = res.get("outlines", res.get("script_outlines", []))
     formatted_clones = []
     for idx, cl in enumerate(clones):
@@ -1449,7 +1450,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
         ]
     }}
     """
-    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, active_format, active_note, active_format), max_tokens=1800)
+    res = call_gemini([prompt], get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, active_format, active_note, active_format), max_tokens=2500)
     more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts):
         if "hook" in sc:
@@ -1936,7 +1937,7 @@ if not st.session_state.is_analyzed:
                             payload.extend([f"ACTOR {c['id']} (EXTRACT AGE, GENDER, HAIR ONLY):", types.Part.from_bytes(data=cb, mime_type=cm)])
                     payload.append(prompt)
                     
-                    res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=2800)
+                    res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=4096)
                     st.session_state.content_analysis = res.get("content_analysis")
                     outlines = res.get("outlines", res.get("script_outlines", []))
                     
@@ -2181,7 +2182,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Tiêu Cự Trung Tâm Vào Sản Phẩm & Siêu Nén Token)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Tiêu Cự Trung Tâm Vào Sản Phẩm & Gemini 3.8 Flash)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 st.session_state.scroll_to_detail = True
