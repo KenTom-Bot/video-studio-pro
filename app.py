@@ -471,9 +471,6 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
             f"holding {clean_prod_en} steadily in one hand while sharing recommendations with a warm open-palm gesture"
         )
 
-# ==============================================================================
-# BỘ MÁY STYLIST THỜI TRANG CHUYÊN SÂU & ĐỒNG NHẤT TOÀN DIỆN
-# ==============================================================================
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "") -> str:
     s_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower()
     h_lower = hero_color.lower()
@@ -1072,7 +1069,7 @@ def repair_and_parse_json(text_content: str):
     except: pass
     raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng bấm tạo lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=6500):
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4000):
     models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
     last_exception = None
     for model_name in models_to_try:
@@ -1114,7 +1111,7 @@ def build_voice_direction(mode, num_chars, character_profiles):
     return " | ".join(dirs)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn trang phục, giữ nguyên diện mạo suốt 4 cảnh."
+    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn sản phẩm, giữ nguyên diện mạo suốt 4 cảnh."
     rules = "DANH SÁCH DIỄN VIÊN (100% NHÂN VẬT HƯ CẤU ĐỜI THƯỜNG - FICTIONAL SYNTHETIC PERSONA, DIỆN MẠO & PHỤ KIỆN ĐỒNG NHẤT SUỐT 4 CẢNH):\n"
     for p in profiles: 
         rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn trang phục. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
@@ -2166,7 +2163,7 @@ if not st.session_state.is_analyzed:
                             payload.extend([f"ACTOR {c['id']} (EXTRACT GENERAL AGE, GENDER, HAIR STYLE ONLY - CREATE FICTIONAL VIETNAMESE PERSONA - DISCARD OLD CLOTHES):", types.Part.from_bytes(data=cb, mime_type=cm)])
                     payload.append(prompt)
                     
-                    res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=6000)
+                    res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=4000)
                     st.session_state.content_analysis = res.get("content_analysis")
                     outlines = res.get("outlines", res.get("script_outlines", []))
                     
