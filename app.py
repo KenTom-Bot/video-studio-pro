@@ -285,7 +285,7 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     return primary_gender, (", ".join(parts[:-1]).capitalize() + " and " + parts[-1])
 
 # ==============================================================================
-# HỆ THỐNG BẢO VỆ TỰ ĐỘNG & ĐẠO DIỄN BỐI CẢNH THÔNG MINH THEO SỰ KIỆN (EVENT-MATCHED SETTING)
+# HỆ THỐNG BẢO VỆ TỰ ĐỘNG & ĐẠO DIỄN BỐI CẢNH THÔNG MINH (3 NHÁNH CẦU NỐI)
 # ==============================================================================
 def detect_intimate_apparel(text_to_check: str) -> str:
     if not text_to_check: return "normal"
@@ -329,6 +329,26 @@ EVENT_MATCHED_SETTING_INSTRUCTION = """
 - Đối với kịch bản Nỗi đau / PAS có sự kiện (VD: "Sợ mặc xấu khi đi ăn cưới"):
   + Cảnh 1 (Nỗi đau): Nhân vật ở phòng thay đồ/phòng ngủ tại nhà than thở, lo lắng.
   + Cảnh 2, 3, 4 (Giải pháp & Tỏa sáng): Bối cảnh chuyển sang không gian sự kiện thực tế (Sảnh tiệc cưới sang trọng hoặc trước gương lớn ngập sáng chuẩn bị dự tiệc) để người xem thấy rõ sự lột xác!
+"""
+
+DUAL_BRANCH_BRIDGE_INSTRUCTION = """
+🛑 QUY TẮC CẦU NỐI NGỮ NGHĨA 3 NHÁNH THỰC CHIẾN GIỮA CẢNH 1 VÀ CẢNH 2 (ÁP DỤNG CHO MỌI SẢN PHẨM & MỌI NGÀNH HÀNG):
+Để lời thoại giữa Cảnh 1 và Cảnh 2 liên kết logic nhân-quả mượt mà, TUYỆT ĐỐI KHÔNG ghép câu máy móc mà BẮT BUỘC phân hóa theo 3 nhánh dựa vào nội dung mở đầu của Cảnh 1:
+
+1. NHÁNH 1 - DẠNG NÓI VỀ GIÁ RẺ / SĂN SALE / DEAL HỜI Ở CẢNH 1:
+   - Khi Cảnh 1 mở đầu bằng việc khoe giá rẻ, săn sale sốc (VD: "Chưa tới năm mươi nghìn", "Săn sale giá giật mình"...):
+   - Cảnh 2 TUYỆT ĐỐI KHÔNG dùng từ "Bí quyết", mà BẮT BUỘC dùng mô hình "Cận cảnh minh chứng chất lượng":
+     + Mẫu câu: "Nhìn cận cảnh bề mặt/chi tiết của em này mới thấy đáng đồng tiền bát gạo! [Mô tả chất liệu/độ xịn xò trực tiếp trên tay]..."
+
+2. NHÁNH 2 - DẠNG NỖI ĐAU / RẮC RỐI ĐỜI SỐNG Ở CẢNH 1 (Cấu trúc PAS):
+   - Khi Cảnh 1 mở đầu bằng sự bất tiện, nỗi sợ, rắc rối (VD: "Sợ mặc xấu", "Dọn nhà mệt bở hơi tai"...):
+   - Cảnh 2 BẮT BUỘC mở đầu bằng "Cứu tinh giải pháp":
+     + Mẫu câu: "Chân ái cứu nguy cho [vấn đề Cảnh 1] chính là [Điểm đắt giá] của em [Sản phẩm] này đây! [Mô tả ưu điểm thực tế]..."
+
+3. NHÁNH 3 - DẠNG MẸO HAY / BÍ QUYẾT CHỌN ĐỒ Ở CẢNH 1:
+   - Khi Cảnh 1 mở đầu bằng lời hứa hẹn bật mí mẹo, công thức, bí quyết (VD: "Muốn da sáng bật tông thì cứ áp dụng đúng công thức này..."):
+   - Cảnh 2 BẮT BUỘC dùng mô hình "Giải mã bí quyết":
+     + Mẫu câu: "Bí quyết nằm ở chỗ cứ ưu tiên [tiêu chí/công năng] như ở em [Sản phẩm] này này! Nhờ có [đặc điểm] mà [tạo ra kết quả]..."
 """
 
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False) -> str:
@@ -656,7 +676,6 @@ SOUTHERN_TO_HANOI = {
     r'\bcay\s*the\b': 'cay tê',
     r'\bthe\s*the\b': 'tê tê',
     r'\bsánh\s*dẻo\b': 'sền sệt',
-    r'\bk‍♂️\b': 'k',
     r'\bkẹo\s*lại\b': 'sệt lại',
     r'\bđậu\s*phộng\b': 'hạt lạc',
     r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm',
@@ -1095,32 +1114,11 @@ def build_voice_direction(mode, num_chars, character_profiles):
     return " | ".join(dirs)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn sản phẩm, giữ nguyên diện mạo suốt 4 cảnh."
+    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn trang phục, giữ nguyên diện mạo suốt 4 cảnh."
     rules = "DANH SÁCH DIỄN VIÊN (100% NHÂN VẬT HƯ CẤU ĐỜI THƯỜNG - FICTIONAL SYNTHETIC PERSONA, DIỆN MẠO & PHỤ KIỆN ĐỒNG NHẤT SUỐT 4 CẢNH):\n"
     for p in profiles: 
-        rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn sản phẩm. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
+        rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn trang phục. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
     return rules
-
-def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
-    combined = f"{strategy_str} {title_str}".lower()
-    return any(k in combined for k in [
-        "nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"
-    ])
-
-DUAL_BRANCH_BRIDGE_INSTRUCTION = """
-🛑 QUY TẮC CẦU NỐI NGỮ NGHĨA 2 NHÁNH GIỮA CẢNH 1 VÀ CẢNH 2 (ÁP DỤNG CHO MỌI SẢN PHẨM & MỌI NGÀNH HÀNG):
-Để lời thoại giữa Cảnh 1 và Cảnh 2 liên kết logic nhân-quả tự nhiên như KOC thật, TUYỆT ĐỐI KHÔNG ghép câu máy móc mà BẮT BUỘC đi theo 1 trong 2 nhánh sau dựa vào nội dung mở đầu của Cảnh 1:
-
-1. NHÁNH A - ĐI TỪ NỖI ĐAU / VẤN ĐỀ THỰC TẾ (Cấu trúc PAS - Cách 2):
-   - Khi Cảnh 1 mở đầu bằng một sự bất tiện, nỗi sợ, rắc rối đời sống hoặc nhược điểm (VD: sợ chọn nhầm đồ kém chất lượng, mệt mỏi vì dọn dẹp lâu, khó chịu vì bất tiện khi dùng đồ cũ...):
-   - Lời thoại Cảnh 2 BẮT BUỘC mở đầu bằng "Cầu nối Giải pháp/Chân ái cứu nguy" rồi mới giới thiệu sản phẩm:
-     + Mẫu câu đa ngành: "Chân ái cứu nguy cho [vấn đề Cảnh 1] chính là [Đặc điểm cốt lõi] của em [Tên sản phẩm] này đây! [Mô tả ưu điểm thực tế giải quyết thẳng vào nỗi đau đó]..."
-
-2. NHÁNH B - ĐI TỪ BÍ QUYẾT / MẸO HAY / CÔNG THỨC (Cấu trúc Giải mã - Cách 3):
-   - Khi Cảnh 1 mở đầu bằng một lời hứa hẹn bật mí mẹo, công thức, bí quyết hoặc tiêu chí chọn đồ thông thái (VD: "Muốn [kết quả tốt] mà không cần [tốn công/tốn kém] thì cứ áp dụng đúng công thức/nguyên tắc này..."):
-   - Lời thoại Cảnh 2 TUYỆT ĐỐI CẤM dùng câu "May mà tìm ra...", mà BẮT BUỘC phải "Giải mã công thức/bí quyết đó trước rồi lấy sản phẩm làm dẫn chứng chuẩn xác":
-     + Mẫu câu đa ngành: "Bí quyết nằm ở chỗ cứ ưu tiên [tiêu chí/công năng/thiết kế cốt lõi] như ở em [Tên sản phẩm] này này! Nhờ có [đặc điểm đắt giá] mà [tạo ra kết quả vượt trội đúng như lời hứa ở Cảnh 1]..."
-"""
 
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
     is_multi = (num_chars >= 2)
@@ -1196,15 +1194,15 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         scene_flow_rule = """
         🛑 QUY TẮC CẤU TRÚC 4 PHÂN CẢNH DẠNG STORYTELLING / NỖI ĐAU (PAS):
         - CẢNH 1: Tập trung hoàn toàn vào nỗi đau và biểu cảm bối rối/mệt mỏi của nhân vật tại nhà (Phòng ngủ / Phòng thay đồ). TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM XUẤT HIỆN. Thoại mở màn xoáy sâu vào nỗi đau/vấn đề đời thực.
-        - CẢNH 2: Sản phẩm chính thức xuất hiện với Cầu nối Nhánh A ("Chân ái cứu nguy chính là...") hoặc Nhánh B ("Bí quyết nằm ở chỗ cứ ưu tiên..."). Bối cảnh chuyển sang không gian sự kiện thực tế (Sảnh tiệc cưới sang trọng, văn phòng...) hoặc trước gương lớn chuẩn bị đi sự kiện. Góc máy tiến sát (Close-up / Dolly-in) và nhân vật thao tác mạnh mẽ.
+        - CẢNH 2: Sản phẩm chính thức xuất hiện với cầu nối chuẩn 3 Nhánh (Nhánh 1 nếu Cảnh 1 nói về Giá rẻ/Săn sale; Nhánh 2 nếu Cảnh 1 nói về Nỗi đau; Nhánh 3 nếu Cảnh 1 nói về Mẹo hay/Bí quyết). Bối cảnh chuyển sang không gian sự kiện thực tế (Sảnh tiệc cưới sang trọng, văn phòng...) hoặc trước gương lớn chuẩn bị đi sự kiện. Góc máy tiến sát (Close-up / Dolly-in) và nhân vật thao tác mạnh mẽ.
         - CẢNH 3: Góc máy cận cảnh chi tiết (Detailed Close-up / Dynamic Push-in) test công năng trực quan thực tế cực kỳ mạnh mẽ, thao tác làm đến đâu rõ kết quả đến đó.
         - CẢNH 4: Chốt đơn kèm câu chốt nhắc lại nỗi đau và Soft CTA.
         """
     else:
         scene_flow_rule = """
         🛑 QUY TẮC CẤU TRÚC 4 PHÂN CẢNH DẠNG TRỰC DIỆN / BÍ QUYẾT / REVIEW:
-        - CẢNH 1: Mở màn cuốn hút (nêu bí quyết, công thức chọn đồ hoặc điểm ấn tượng nhất) tại bối cảnh sự kiện phù hợp.
-        - CẢNH 2: Nối tiếp mượt mà bằng Cầu nối Nhánh B hoặc Nhánh A. Góc máy tiến sát (Close-up / Dolly-in) khoe rõ chi tiết sản phẩm.
+        - CẢNH 1: Mở màn cuốn hút (nêu giá hời, bí quyết chọn đồ hoặc điểm ấn tượng nhất) tại bối cảnh sự kiện phù hợp.
+        - CẢNH 2: Nối tiếp mượt mà bằng Cầu nối 3 Nhánh tương ứng với ý mở màn Cảnh 1. Góc máy tiến sát (Close-up / Dolly-in) khoe rõ chi tiết sản phẩm.
         - CẢNH 3: Góc máy cận cảnh chi tiết (Detailed Close-up / Dynamic Push-in) test công năng trực quan thực tế cực kỳ mạnh mẽ.
         - CẢNH 4: Chốt đơn kèm câu chốt nhắc lại nỗi đau/nhu cầu và Soft CTA.
         """
@@ -1406,7 +1404,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{scene_1_action_guide}",
                 "sfx": "Foley âm thanh thực tế đời sống (không nhạc nền)",
                 "director": "Attention | Bám sát '{fixed_title}' | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại mở màn (18-32 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' đặt vấn đề/nỗi đau (Nhánh A) hoặc bật mí công thức/bí quyết (Nhánh B)..."
+                "voiceover": "Đoạn thoại mở màn (18-32 từ) xưng '{self_pronoun}' gọi '{audience_pronoun}' đặt vấn đề/nỗi đau (Nhánh 2), nói về giá rẻ/săn sale (Nhánh 1), hoặc bật mí bí quyết (Nhánh 3)..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -1416,8 +1414,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "relieved, confident and enthusiastic",
                 "action_en": "{action_scene_2} (bám sát 100% lời thoại Cảnh 2)",
                 "sfx": "Tiếng sột soạt chất vải / tiếng thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
-                "director": "Interest | Bối cảnh sự kiện chuẩn xác + Quay sát sản phẩm + Cầu nối Nhánh A/B | Thoại on-camera từ 0.00s",
-                "voiceover": "Đoạn thoại KOC (22-35 từ) BẮT BUỘC mở đầu bằng câu nối giải quyết nỗi đau ('Chân ái cứu nguy chính là...') hoặc giải mã công thức ('Bí quyết nằm ở chỗ cứ ưu tiên...') rồi gắn mượt mà vào sản phẩm..."
+                "director": "Interest | Bối cảnh sự kiện chuẩn xác + Quay sát sản phẩm + Cầu nối chuẩn 3 Nhánh ứng với Cảnh 1 | Thoại on-camera từ 0.00s",
+                "voiceover": "Đoạn thoại KOC (22-35 từ) BẮT BUỘC tuân thủ Nhánh 1 (Cận cảnh minh chứng chất lượng nếu Cảnh 1 nói giá rẻ), Nhánh 2 (Cứu tinh giải pháp nếu Cảnh 1 nói nỗi đau), hoặc Nhánh 3 (Giải mã bí quyết nếu Cảnh 1 nói mẹo)..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -1587,7 +1585,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh sự kiện thông minh:</b> {fixed_setting_base} | {goal_badge}",
         f"👗 <b>Bộ máy Stylist Chuyên Sâu (Set đồ + Giày dép + Phụ kiện Vòng cổ/Khuyên tai/Vòng tay):</b> {final_outfit_vi} (Đồng nhất 100% cả 4 cảnh)",
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Tách biệt hoàn toàn khỏi người mẫu trong ảnh gốc)",
-        f"🔗 <b>Cầu nối Ngữ nghĩa 2 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo Nhánh Giải pháp Nỗi đau (Cách 2) hoặc Giải mã Bí quyết (Cách 3)",
+        f"🔗 <b>Cầu nối Ngữ nghĩa 3 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo Nhánh Giá rẻ/Săn sale (Nhánh 1), Giải pháp Nỗi đau (Nhánh 2) hoặc Giải mã Bí quyết (Nhánh 3)",
         f"⚡ <b>Ma trận 10 Bộ luật Hành động Thực chiến & Dolly-In:</b> Cảnh 2 & 3 tự động đẩy máy quay cận cảnh, kích hoạt chuyển động thực tế mạnh mẽ theo đúng ngành hàng",
         f"🛡 <b>Bảo vệ Veo 3 (Fictional Persona Lock):</b> Đã gắn nhãn nhân vật hư cấu AI & lọc sạch từ khóa nhạy cảm chống lỗi vi phạm chính sách người nổi tiếng",
         f"💰 <b>Cảnh 4 (Chốt deal):</b> {'Neo giá Flash Sale đối lập' if is_flashsale_script else 'Soft CTA xoáy sâu nỗi đau (An toàn TikTok Shop)'}"
@@ -2399,7 +2397,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} với Bối cảnh sự kiện thông minh, Stylist chuyên sâu & Anti-Celebrity..."):
+            with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} với Bối cảnh sự kiện thông minh, Cầu nối 3 Nhánh & Anti-Celebrity..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run); st.session_state.scroll_to_detail = True; success = True
         except Exception as e: error_msg = str(e)
