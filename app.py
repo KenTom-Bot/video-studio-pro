@@ -1571,4 +1571,96 @@ if all_sc:
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
             with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx}", expanded=False):
-                neg_val = scn.get('vid_neg', '
+                neg_val = scn.get('vid_neg', 'extra fingers, text, watermark, background music')
+                st.code(neg_val, language="text")
+                safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
+            st.markdown("---")
+
+    if comp_sc:
+        st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
+        for outline in comp_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2, c3 = st.columns([2.5, 1, 1])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
+                if str(sc_id) != str(st.session_state.active_script_id):
+                    if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
+                        st.session_state.active_script_id = int(sc_id); st.rerun()
+                btn_clone_ph = c3.empty()
+                if str(st.session_state.current_cloning_id) == str(sc_id):
+                    if btn_clone_ph.button("🛑 Đang nhân bản... (Bấm để Hủy)", key=f"unhang_c_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.current_cloning_id = None; st.rerun()
+                else:
+                    if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email)
+                        if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
+                        else: st.error(msg)
+
+    if pend_sc:
+        st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
+        for outline in pend_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2 = st.columns([3, 1.2])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
+                btn_detail_ph = c2.empty()
+                if str(st.session_state.current_processing_id) == str(sc_id):
+                    if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.current_processing_id = None; st.rerun()
+                else:
+                    if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
+                        if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
+                        else: st.error(msg)
+
+    if st.session_state.current_processing_id is not None:
+        target_id_to_run = st.session_state.current_processing_id
+        success, error_msg = False, ""
+        try:
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Tiêu Cự Trung Tâm Vào Sản Phẩm & Gemini 3.8 Flash)..."):
+                create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
+                st.session_state.active_script_id = int(target_id_to_run)
+                success = True
+        except Exception as e: error_msg = str(e)
+            
+        st.session_state.current_processing_id = None
+        if success: st.toast(f"✅ Đã dựng kịch bản #{target_id_to_run} & tự động lưu cập nhật vào dự án!"); st.rerun()
+        else: st.error(f"❌ Lỗi khi dựng kịch bản: {error_msg}")
+
+    if st.session_state.current_cloning_id is not None:
+        clone_id_to_run = st.session_state.current_cloning_id
+        success, error_msg = False, ""
+        try:
+            with st.spinner(f"⏳ Đang nhân bản 5 biến thể cho kịch bản #{clone_id_to_run} & tự động lưu cập nhật..."):
+                st.session_state.cloned_scripts.extend(clone_script(clone_id_to_run))
+                auto_save_current_session()
+                success = True
+        except Exception as e: error_msg = str(e)
+            
+        st.session_state.current_cloning_id = None
+        if success: st.toast("✅ Đã nhân bản thành công 5 kịch bản voice bám sát gốc!"); st.rerun()
+        else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
+
+    # ==========================================================================
+    # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
+    # ==========================================================================
+    st.divider()
+    st.markdown("### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
+    
+    cy1, cy2, cy3 = st.columns([1.4, 1.6, 1.0])
+    c_unified_more = cy1.selectbox("🧭 Chiến lược & Hình thức Video mới:", UNIFIED_STRATEGY_FORMAT_OPTS, index=0, key=f"more_unified_{st.session_state.reset_key}")
+    e_role = cy2.text_input("👤 Vai trò NV mới (Để trống = AI tự phân tích):", value="", placeholder="Để trống = Giữ nguyên hoặc AI tự phân tích...", key=f"er_0_{st.session_state.reset_key}")
+    e_file = cy3.file_uploader("📸 Ảnh mẫu NV mới (Tùy chọn):", type=["jpg", "png"], key=f"ef_0_{st.session_state.reset_key}")
+    extra_custom_note = st.text_area("✍ Ghi chú AI cho kịch bản thêm (Ưu tiên cao nhất):", placeholder="Ví dụ: Quần là dạng váy 1 ống rộng...", key=f"extra_custom_note_{st.session_state.reset_key}")
+
+    if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True, disabled=is_system_busy):
+        can_run, msg = check_usage_limit(st.session_state.current_email)
+        if can_run:
+            with st.spinner("⏳ Đang sáng tạo thêm 5 kịch bản & tự động lưu cập nhật vào dự án..."):
+                p_chars = [{"id": 1, "role": e_role.strip()}] if e_role.strip() else st.session_state.character_profiles
+                st.session_state.expanded_scripts.extend(generate_more_scripts(c_unified_more, p_chars, extra_custom_note))
+                auto_save_current_session()
+                st.toast("✅ Đã sinh thêm 5 kịch bản mới & tự động lưu cập nhật vào dự án!"); st.rerun()
+        else: st.error(msg)
