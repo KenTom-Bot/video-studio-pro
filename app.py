@@ -81,6 +81,9 @@ def init_gemini_client():
 supabase = init_supabase()
 client = init_gemini_client()
 
+# ==============================================================================
+# CÁC HÀM TIỆN ÍCH (UTILITIES) & XỬ LÝ DỮ LIỆU
+# ==============================================================================
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text)) if text else 0
 
@@ -115,8 +118,34 @@ def clean_html(raw_html: str) -> str:
         return ""
     return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
 
+def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
+    raw = ""
+    if isinstance(ca_data, dict):
+        raw = str(ca_data.get("what_and_unique", "")).strip()
+    if not raw and fallback_topic:
+        raw = fallback_topic.strip()
+    if not raw:
+        return f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+    
+    pattern = r'^(?:SẢN PHẨM LÀ GÌ\s*&?\s*(?:CÓ GÌ ĐẶC BIỆT)?|CHỦ ĐỀ|SẢN PHẨM)\s*:\s*'
+    clean = re.sub(pattern, '', raw, flags=re.IGNORECASE).strip()
+    
+    if ":" in clean:
+        prod_name = clean.split(":", 1)[0].strip()
+    elif " - " in clean:
+        prod_name = clean.split(" - ", 1)[0].strip()
+    else:
+        prod_name = clean
+
+    prod_name = re.sub(r'[\[\]\*\"\'`]', '', prod_name).strip()
+    if len(prod_name) > 55:
+        prod_name = prod_name[:52].strip() + "..."
+    
+    date_tag = datetime.now().strftime('%d/%m')
+    return f"{prod_name} ({date_tag})" if prod_name else f"Chiến dịch ({date_tag})"
+
 # ==============================================================================
-# BỘ NHẬN DIỆN NGÀNH HÀNG GIA DỤNG / ĐỒ CỨNG & KHÓA THAM CHIẾU TUYỆT ĐỐI
+# BỘ KHÓA MÀU SẮC, HÌNH HỌC & CHỐNG NHẦM QUẦN 2 ỐNG KHI MẶC VÁY 1 ỐNG
 # ==============================================================================
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     if not text_to_check:
@@ -333,7 +362,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 # ==============================================================================
-# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC & VÓC DÁNG (TINH GỌN, CHỐNG TRÙNG LẶP)
+# HÀM XÁC ĐỊNH NHÂN KHẨU HỌC & VÓC DÁNG (TINH GỌN)
 # ==============================================================================
 def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en=""):
     user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
@@ -359,7 +388,7 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     return "female", f"25yo Vietnamese woman{extra_physique}"
 
 # ==============================================================================
-# HỆ THỐNG PHÂN LOẠI NGÀNH HÀNG & GÓC QUAY TRỌNG TÂM SẢN PHẨM (PRODUCT-HERO CAMERA)
+# HỆ THỐNG ĐẠO DIỄN GÓC MÁY & PHÂN LOẠI NGÀNH HÀNG
 # ==============================================================================
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
     combined = f"{strategy_str} {title_str}".lower()
@@ -411,15 +440,15 @@ def detect_footwear_or_accessory(text_to_check: str) -> bool:
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. CẦU NỐI 3 NHÁNH (CẢNH 1 -> CẢNH 2, CẤM LẶP TỪ CỦA CẢNH 1):
-   - Nhánh 1 (Cảnh 1 khoe Giá rẻ/Săn sale) -> Cảnh 2 dùng "Cận cảnh minh chứng": "Nhìn cận cảnh bề mặt/chi tiết của em này mới thấy đáng đồng tiền bát gạo!..." (CẤM dùng từ "Bí quyết").
-   - Nhánh 2 (Cảnh 1 nêu Nỗi đau/Bất tiện PAS) -> Cảnh 2 dùng "Cứu tinh giải pháp": "Chân ái cứu nguy cho [vấn đề] chính là [ưu điểm] của em [SP] này đây!...".
-   - Nhánh 3 (Cảnh 1 nêu Mẹo hay/Bí quyết) -> Cảnh 2 dùng "Giải mã bí quyết": "Bí quyết nằm ở chỗ cứ ưu tiên [đặc tính] như ở em [SP] này này!...".
-2. ĐẠO DIỄN GÓC MÁY LẤY SẢN PHẨM LÀM TRỌNG TÂM (PRODUCT-CENTRIC & STRICT REFERENCE TRACKING):
-   - Nếu là Thời trang: Lấy phom dáng cơ thể, đường rũ vải làm trung tâm. Nếu có ghi chú "quần váy / váy 1 ống" -> BẮT BUỘC dịch là "full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)", CẤM dùng từ "pants/trousers"!
-   - Nếu là Đồ gia dụng / Thiết bị / Đồ cứng (Strict Rigid Appliance): BẮT BUỘC KHOÁ CHẶT HÌNH ẢNH THEO ĐÚNG ẢNH THAM CHIẾU (100% exact shape, color, proportions, and surface details identical to reference image). CẤM sinh thêm chi tiết thừa, cấm biến dạng sản phẩm! Máy quay tập trung vào sản phẩm ở tiền cảnh, KOC thao tác gọn gàng phía sau.
-3. VĂN NÓI HÀ NỘI THUẦN VIỆT 100% & CHỐT ĐƠN CẢNH 4:
-   - Trong 'voiceover' (lời thoại): 100% dùng Tiếng Việt thuần túy, giọng Hà Nội (dùng 'mềm rũ' chứ không dùng 'mềm rủ', số 4 đọc 'bốn', dùng 'nghìn' cấm 'ngàn', viết rõ 'một trăm'). TUYỆT ĐỐI CẤM chèn từ tiếng Anh vào lời thoại!
-   - Cảnh 4: Nếu là kịch bản Flash Sale -> đọc giá neo đối lập. Các kịch bản khác -> Soft CTA nhắc lại nỗi đau + bấm giỏ hàng góc trái.
+   - Nhánh 1 (Giá rẻ/Săn sale) -> Cảnh 2: "Cận cảnh minh chứng chất lượng..." (CẤM dùng từ "Bí quyết").
+   - Nhánh 2 (Nỗi đau PAS) -> Cảnh 2: "Cứu tinh giải pháp cho vấn đề...".
+   - Nhánh 3 (Mẹo hay) -> Cảnh 2: "Bí quyết nằm ở chỗ...".
+2. PRODUCT-CENTRIC FOCUS & STRICT REFERENCE TRACKING:
+   - Nếu là Thời trang: Góc máy tập trung phom dáng, độ rũ. Nếu ghi chú "quần váy / váy 1 ống" -> BẮT BUỘC dịch "full-length A-line maxi skirt (single unsplit skirt tube, zero leg division)", CẤM "pants/trousers".
+   - Nếu là Đồ gia dụng / Thiết bị (Strict Rigid Appliance): BẮT BUỘC KHOÁ CHẶT THEO ẢNH THAM CHIẾU (100% exact shape, color, surface details identical to reference image). Zero morphing, zero hallucinated parts! Zoom thẳng vào SP ở tiền cảnh (60% khung hình).
+3. VĂN NÓI HÀ NỘI THUẦN VIỆT 100%:
+   - 'voiceover': 100% Tiếng Việt, giọng Hà Nội ('mềm rũ', 'bốn', 'nghìn', 'một trăm'). TUYỆT ĐỐI CẤM chèn từ tiếng Anh vào thoại. Cấm 'thuật toán', 'trợ giá'.
+   - Cảnh 4: Neo giá Flash Sale hoặc Soft CTA nhắc lại nỗi đau + bấm giỏ hàng.
 """
 
 def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool) -> str:
@@ -435,7 +464,6 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         else:
             return "Vertical 9:16 warm eye-level medium shot"
     elif is_appliance:
-        # Góc quay chuyên biệt cho Đồ gia dụng: Bám sát 100% hình mẫu tham chiếu, không sáng tạo chi tiết thừa
         if scene_idx == 0:
             return f"Vertical 9:16 product-focused medium shot, exact reference-matching {clean_prod_en} held steadily in foreground center"
         elif scene_idx == 1:
@@ -455,7 +483,6 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
             return f"Vertical 9:16 balanced medium shot with {clean_prod_en} displayed clearly in foreground center"
 
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False, is_appliance: bool = False) -> str:
-    p = f"{product_name} {vo_text}".lower()
     if is_fashion:
         return "Natural fabric drape in motion; subject steps smoothly, turns 45 degrees, and touches fabric softly (worn on body, zero duplicate item in hands)."
     elif is_appliance:
@@ -464,7 +491,6 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
         return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry from 0.0s to end (zero morphing); hands hold product in center frame, tilt 15 degrees, and trace surface."
 
 def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_appliance: bool):
-    p = f"{clean_prod_en} {check_str}".lower()
     if is_fashion_wearable:
         return (
             "stepping forward confidently and gesturing expressively while speaking",
@@ -507,23 +533,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
 
     return f"STYLIST LOCK: {contrast} | Giày: {footwear} | Phụ kiện cố định 4 cảnh: {jewelry}{skirt_rule}."
-
-INTIMATE_SAFE_ENGLISH_LEXICON = {
-    r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort top garment',
-    r'\bbrassieres?\b': 'seamless support garment',
-    r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable base-layer garment',
-    r'\bunderwears?\b': 'soft cotton comfort apparel',
-    r'\bbriefs?\b': 'seamless base-layer garment',
-    r'\bthongs?\b': 'seamless fabric garment',
-    r'\blingerie\b': 'pastel loungewear apparel',
-    r'\bbikinis?\b': 'resort activewear',
-    r'\bcleavage\b': 'modest neckline',
-    r'\bsexy\b': 'elegant modern',
-    r'\báo\s*lót\b': 'seamless comfort top garment',
-    r'\bquần\s*lót\b': 'seamless base-layer garment',
-    r'\bđồ\s*lót\b': 'comfort apparel piece',
-    r'\bnội\s*y\b': 'comfort loungewear piece'
-}
 
 def sanitize_third_party_ip(text: str) -> str:
     if not text:
@@ -798,9 +807,6 @@ def format_ocr_prices(ca_data: dict) -> str:
         return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
-# ==============================================================================
-# CẢM BIẾN THỜI TIẾT, ÁNH SÁNG MÔI TRƯỜNG & FOLEY TỰ ĐỘNG (TINH GỌN)
-# ==============================================================================
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
@@ -898,27 +904,6 @@ def check_usage_limit(email, is_detailing=False):
         save_single_account(email, acc)
     return True, ""
 
-def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt", custom_color: str = "#16a34a"):
-    b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
-    html_id = f"btn_{uuid.uuid4().hex[:8]}"
-    html_code = f"""
-    <button id="{html_id}" style="background:{custom_color}; color:white; border:none; padding:7px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer; width:100%; transition: 0.2s;">{button_label}</button>
-    <script>
-    document.getElementById("{html_id}").addEventListener("click", function() {{
-        const text = decodeURIComponent(escape(atob("{b64}")));
-        navigator.clipboard.writeText(text).then(() => {{
-            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
-            setTimeout(() => {{ document.getElementById("{html_id}").innerText = "{button_label}"; }}, 2000);
-        }}).catch(() => {{
-            const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
-            document.execCommand('copy'); document.body.removeChild(ta);
-            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
-        }});
-    }});
-    </script>
-    """
-    components.html(html_code, height=42)
-
 def save_project_to_db(email, title, payload_data, project_id=None):
     if not supabase:
         return False, "Chưa kết nối cơ sở dữ liệu."
@@ -998,6 +983,9 @@ is_system_busy = (
     st.session_state.get("current_cloning_id") is not None
 )
 
+if is_system_busy:
+    lock_ui()
+
 if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMAIL:
     current_acc_lock = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
     if current_acc_lock.get("active_session_id") != st.session_state.session_id:
@@ -1007,6 +995,14 @@ if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMA
             save_single_account(st.session_state.current_email, st.session_state.licensed_accounts[st.session_state.current_email])
             st.rerun()
         st.stop()
+
+if st.session_state.scroll_to_top:
+    components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0)
+    st.session_state.scroll_to_top = False
+
+if st.session_state.scroll_to_detail:
+    components.html("""<script>setTimeout(() => { var el = window.parent.document.getElementById('detailed-view-anchor'); if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); } }, 250);</script>""", height=0)
+    st.session_state.scroll_to_detail = False
 
 def repair_and_parse_json(text_content: str):
     if not text_content:
@@ -1110,7 +1106,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - KHÓA CHẶT THAM CHIẾU GIA DỤNG & VÁY 1 ỐNG
+# HÀM TẠO CHI TIẾT KỊCH BẢN - CHỈ TRUYỀN 'raw_prod_name' LÊN LỜI THOẠI ĐỂ TRÁNH LỖI NGÔN NGỮ
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1212,7 +1208,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         )
 
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, raw_vi_info=check_str)
-    action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable)
+    action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance)
 
     scene_4_voiceover_guide = (
         f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!"
@@ -1221,12 +1217,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     )
 
     prompt_text = f"""
-    SP: {raw_prod_name} | EN_LOCKED: {clean_prod_en} ({locked_color_en}) | Đau: {dna.get('pain_points', '')} | Công năng: {dna.get('how_to_use', '')}
+    TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu: {hero_color_str})
+    MÔ TẢ TIẾNG ANH (CHỈ DÙNG CHO 'action_en'): {clean_prod_en} ({locked_color_en})
+    Nỗi đau: {dna.get('pain_points', '')} | Công năng: {dna.get('how_to_use', '')}
     Kịch bản #{target_id}: '{fixed_title}' | Hook: '{fixed_hook}' | Bối cảnh: '{fixed_setting_base}'
     GHI CHÚ BẮT BUỘC: '{user_custom_note if user_custom_note else 'none'}'
     KOC: {detected_demographic_en} | {stylist_rules_text}
 
-    TRẢ VỀ JSON GỌN:
+    TRẢ VỀ JSON GỌN (LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn từ tiếng Anh vào lời thoại):
     {{
         "title": "{fixed_title}",
         "wardrobe_lock": {{
@@ -1359,7 +1357,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         if is_single_skirt_mode:
             clean_action = enforce_single_tube_skirt_syntax(clean_action)
 
-        scene_physics = get_universal_physics_rules(clean_prod_en, vo_text_current, is_fashion=is_fashion_wearable)
+        scene_physics = get_universal_physics_rules(clean_prod_en, vo_text_current, is_fashion=is_fashion_wearable, is_appliance=is_strict_appliance)
 
         if is_pas_scn1_no_prod:
             img_core = (
@@ -2023,6 +2021,7 @@ if not st.session_state.is_analyzed:
                             "presentation_format": unified_strategy_format
                         })
                     
+                    # TỰ ĐỘNG LẤY TÊN SẢN PHẨM IN ĐẬM ĐỂ ĐẶT TÊN DỰ ÁN VÀ LƯU NGAY LẬP TỨC
                     auto_proj_title = extract_bold_product_title(ca_result, fallback_topic=viral_topic)
                     st.session_state.update({
                         "active_project_title": auto_proj_title,
@@ -2262,7 +2261,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} & tự động lưu cập nhật vào dự án '{st.session_state.active_project_title}'..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Siêu Nén Token & Khóa Tên Sản Phẩm)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
