@@ -285,7 +285,7 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     return primary_gender, (", ".join(parts[:-1]).capitalize() + " and " + parts[-1])
 
 # ==============================================================================
-# HỆ THỐNG BẢO VỆ TỰ ĐỘNG & MA TRẬN 10 BỘ LUẬT HÀNH ĐỘNG THỰC CHIẾN ĐA NGÀNH HÀNG
+# HỆ THỐNG BẢO VỆ TỰ ĐỘNG & ĐẠO DIỄN BỐI CẢNH THÔNG MINH THEO SỰ KIỆN (EVENT-MATCHED SETTING)
 # ==============================================================================
 def detect_intimate_apparel(text_to_check: str) -> str:
     if not text_to_check: return "normal"
@@ -318,10 +318,22 @@ def detect_footwear_or_accessory(text_to_check: str) -> bool:
         "shoe", "bag", "backpack", "hat", "cap", "watch", "glasses"
     ])
 
+EVENT_MATCHED_SETTING_INSTRUCTION = """
+🛑 QUY TẮC ĐẠO DIỄN BỐI CẢNH THÔNG MINH THEO SỰ KIỆN / ĐIỂM ĐẾN (EVENT-MATCHED SETTING):
+- Nếu tiêu đề, hook hoặc ghi chú nhắc đến một sự kiện/địa điểm cụ thể (VD: "đi ăn cưới", "đi tiệc", "đi làm", "đi cafe", "đi du lịch", "dạo phố"...):
+  + Bối cảnh tư liệu PHẢI ĐẶT ĐÚNG không gian thực tế sang trọng, tinh tế của sự kiện đó với hậu cảnh xóa phông nhẹ (shallow depth of field, soft bokeh), tuyệt đối KHÔNG CÓ ĐÁM ĐÔNG người lạ gây nhiễu phía sau (zero background crowd).
+  + Cụ thể:
+    • Đi ăn cưới / Đi tiệc: Sảnh chờ tiệc cưới khách sạn 5 sao sang trọng (Luxury hotel wedding reception foyer with warm chandelier bokeh and white floral arrangements).
+    • Đi làm / Công sở: Sảnh văn phòng kính hiện đại hoặc góc làm việc cao cấp (Modern sunlit glass office lobby / minimalist executive workspace).
+    • Đi cafe / Dạo phố: Quán cafe sân vườn phong cách Hàn Quốc hoặc góc phố boutique nắng đẹp (Aesthetic sunlit patio cafe / upscale boutique street).
+- Đối với kịch bản Nỗi đau / PAS có sự kiện (VD: "Sợ mặc xấu khi đi ăn cưới"):
+  + Cảnh 1 (Nỗi đau): Nhân vật ở phòng thay đồ/phòng ngủ tại nhà than thở, lo lắng.
+  + Cảnh 2, 3, 4 (Giải pháp & Tỏa sáng): Bối cảnh chuyển sang không gian sự kiện thực tế (Sảnh tiệc cưới sang trọng hoặc trước gương lớn ngập sáng chuẩn bị dự tiệc) để người xem thấy rõ sự lột xác!
+"""
+
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False) -> str:
     p = f"{product_name} {vo_text}".lower()
     
-    # 1. THỜI TRANG & QUẦN ÁO (WEARABLE FASHION)
     if is_fashion or any(k in p for k in ["váy", "đầm", "áo", "quần", "thời trang", "vải", "form", "dáng", "dress", "shirt", "pants", "skirt", "garment", "outfit"]):
         return (
             "[1. DYNAMIC FASHION & GARMENT KINEMATICS]: Active, expressive full-body and close-up fashion demonstration directly matching the voiceover! "
@@ -330,21 +342,18 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
             "Camera actively pushes in (dolly-in) to capture crisp fabric weave, stitching details, matching jewelry/footwear, and how the garment flatters the Vietnamese figure in motion. "
             "Garment stays worn on the body naturally (zero duplicate garments appearing in hands)."
         )
-    # 2. GIÀY DÉP, TÚI XÁCH & PHỤ KIỆN (FOOTWEAR, BAGS & ACCESSORIES)
     elif any(k in p for k in ["giày", "dép", "sneaker", "boot", "sandal", "túi", "ví", "balo", "thắt lưng", "kính", "đồng hồ", "mũ", "nón", "shoe", "bag", "backpack", "wallet", "watch"]):
         return (
             "[2. FOOTWEAR, BAGS & ACCESSORIES TACTILE MECHANICS]: Close-up tactile quality and durability test at chest/waist level (zero bending down)! "
             "For footwear: subject holds the shoe at chest level or on an elevated display stand, pressing thumbs firmly into the insole to show soft cushioning rebound, or flexing the sole to prove flexibility and anti-slip grip. "
             "For bags/wallets/backpacks: subject smoothly unzips the metal zipper, opens the compartment wide toward the camera lens to reveal spacious organized interior, and runs fingers over the water-resistant leather/fabric texture."
         )
-    # 3. MỸ PHẨM, SKINCARE & LÀM ĐẸP (COSMETICS, SKINCARE & PERSONAL CARE)
     elif any(k in p for k in ["mỹ phẩm", "kem", "serum", "son", "phấn", "sáp", "dưỡng", "sữa rửa mặt", "tẩy trang", "dầu gội", "nước hoa", "skincare", "cream", "lipstick", "lotion", "foundation", "balm", "cleanser", "perfume"]):
         return (
             "[3. COSMETICS & SKINCARE MACRO APPLICATION]: Vigorous, sensory close-up application physics matching voiceover! "
             "Creams/serums/balms are scooped or dispensed and glided smoothly onto skin or lips in a macro shot, showing instant velvety absorption, rich hydration glow, and smooth skin texture without stickiness. "
             "Lipsticks/cushions apply in a single decisive stroke revealing immediate true-to-life color payoff and plump finish; cleansers lather into rich, fine micro-foam; perfumes spray a fine, delicate mist."
         )
-    # 4. GIA DỤNG, VỆ SINH & NHÀ CỬA (APPLIANCES & CLEANING TOOLS)
     elif any(k in p for k in ["hút bụi", "chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "quạt", "máy sấy", "bàn là", "bàn ủi", "vacuum", "mop", "brush", "scrubber", "dryer", "fan", "iron", "cleaner"]):
         return (
             "[4. APPLIANCE & CLEANING VIGOROUS MECHANICS]: Strong, unmistakable physical force and instant visual proof matching voiceover! "
@@ -352,7 +361,6 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
             "For floor scrubbers / cleaning brushes / mops: subject applies firm downward pressure, vigorously scrubbing back and forth to visibly wipe away stubborn stains, grease, or foam on the spot. "
             "For hair dryers / fans / steamers: powerful airflow visibly blowing hair strands or thick steam instantly smoothing out fabric wrinkles."
         )
-    # 5. ĐỒ BẾP & DỤNG CỤ NẤU NƯỚNG (KITCHENWARE & COOKWARE)
     elif any(k in p for k in ["nồi", "chảo", "dao", "thớt", "máy xay", "ép", "bếp", "hộp đựng", "bình giữ nhiệt", "cốc", "ly", "cooker", "pan", "pot", "knife", "blender", "juicer", "thermos", "kitchen"]):
         return (
             "[5. KITCHENWARE & CULINARY ACTION PHYSICS]: High-impact culinary utility demonstration matching voiceover! "
@@ -360,14 +368,12 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
             "For knives/choppers/blenders: slicing cleanly and effortlessly through fresh ingredients in one smooth stroke, or high-speed blades visibly vortexing fruits into a smooth puree inside a clear jar. "
             "For thermos/containers: pouring steaming hot or ice-cold liquid with tight leak-proof seal verification."
         )
-    # 6. THỰC PHẨM, ĐỒ ĂN VẶT & ĐỒ UỐNG (FOOD, SNACKS & BEVERAGES)
     elif any(k in p for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "mì", "nước", "trà", "cà phê", "sữa", "hạt", "khô gà", "khô bò", "sốt", "gia vị", "food", "cake", "snack", "drink", "coffee", "tea", "soup", "noodles", "sauce"]):
         return (
             "[6. FOOD & BEVERAGE SENSORY APPETITE PHYSICS]: Mouth-watering macro food dynamics matching voiceover! "
             "Subject breaks, tears, or cuts the food item right in front of the close-up lens to reveal crispy crust, tender juicy fibers, or rich melting filling inside. "
             "Hot dishes emit natural rising steam; sauces/beverages pour with thick, glossy viscosity; subject takes a satisfying bite or sip with an authentic delighted expression and approving nod."
         )
-    # 7. CÔNG NGHỆ, ĐIỆN TỬ & PHỤ KIỆN PC/ĐIỆN THOẠI (TECH, GADGETS & ELECTRONICS)
     elif any(k in p for k in ["chuột", "bàn phím", "tai nghe", "loa", "sạc", "cáp", "ốp lưng", "giá đỡ", "đèn", "camera", "máy tính", "điện thoại", "mouse", "keyboard", "headphone", "speaker", "charger", "cable", "phone", "laptop", "tech", "gaming"]):
         return (
             "[7. TECH & GADGET PRECISION ERGONOMICS]: Crisp tactile mechanical operation matching voiceover! "
@@ -375,21 +381,18 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
             "plugging in cables/chargers with a firm magnetic or mechanical snap showing instant charging indicator; "
             "adjusting stands/hinges smoothly with solid stability, while camera tracks in closely on the sleek matte/metallic finish and sharp LED/screen details."
         )
-    # 8. MẸ & BÉ, ĐỒ CHƠI (MOM & BABY, TOYS)
     elif any(k in p for k in ["bỉm", "tã", "bình sữa", "xe đẩy", "đồ chơi", "cho bé", "em bé", "trẻ em", "sữa bột", "khăn ướt", "diaper", "baby", "toy", "stroller", "bottle"]):
         return (
             "[8. MOM & BABY GENTLE SAFETY & DURABILITY TEST]: Clear close-up demonstration of softness, safety, and convenience matching voiceover! "
             "Subject presses fingers gently onto the ultra-soft, breathable surface, stretches elastic bands to show snug leak-proof comfort, "
             "or pours liquid to demonstrate instant absorbency and dry surface, with warm, reassuring parental care."
         )
-    # 9. THỂ THAO, SỨC KHỎE & MASSAGE (FITNESS, HEALTH & MASSAGE)
     elif any(k in p for k in ["massage", "mát xa", "tập", "thể thao", "gym", "yoga", "đai lưng", "cân", "sức khỏe", "viên uống", "thực phẩm chức năng", "fitness", "massager", "sport", "workout", "supplement"]):
         return (
             "[9. FITNESS, MASSAGE & WELLNESS KINEMATICS]: Active physical relief and strength demonstration matching voiceover! "
             "For massagers/supports: pressing the device directly against neck, shoulder, or back muscles showing rhythmic percussion/kneading action and visible muscle relaxation. "
             "For fitness gear: pulling resistance bands or gripping equipment firmly to show high tensile strength and ergonomic non-slip support."
         )
-    # 10. NỘI THẤT, CHĂN GA GỐI ĐỆM & ĐỜI SỐNG (BEDDING, DECOR & LIFESTYLE)
     elif any(k in p for k in ["gối", "chăn", "đệm", "nệm", "ga giường", "thảm", "rèm", "ghế", "bàn", "kệ", "tủ", "pillow", "blanket", "mattress", "cushion", "chair", "sofa", "rug"]):
         return (
             "[10. BEDDING & HOME COMFORT REBOUND PHYSICS]: Sensory comfort and material resilience test matching voiceover! "
@@ -449,7 +452,7 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
         )
 
 # ==============================================================================
-# BỘ MÁY STYLIST THỜI TRANG CHUYÊN SÂU (PHỐI SET, GIÀY DÉP, TRANG SỨC & VÓC DÁNG)
+# BỘ MÁY STYLIST THỜI TRANG CHUYÊN SÂU & ĐỒNG NHẤT TOÀN DIỆN
 # ==============================================================================
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "") -> str:
     s_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower()
@@ -463,7 +466,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_bottom_only = any(k in s_lower for k in ["quần", "chân váy", "pants", "trousers", "jeans", "shorts", "skirt"]) and not any(k in s_lower for k in ["bộ", "set", "áo"])
     is_open_neck = any(k in s_lower for k in ["cổ thuyền", "cổ v", "cổ tim", "trễ vai", "cổ vuông", "hai dây", "boat neck", "v-neck", "off-shoulder", "square neck"])
 
-    # 1. Chọn Giày Dép chuẩn theo từng tiểu mục Thời trang & Bối cảnh
     if is_home_pijama or (is_home_interior and not is_fashion):
         footwear_rule = "clean minimalist pastel indoor house slippers (dép bông/dép đi trong nhà sạch đẹp)"
     elif is_fashion:
@@ -478,7 +480,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     else:
         footwear_rule = "clean minimalist white leather sneakers or smart-casual loafers" if gender == "male" else "clean minimalist white sneakers, elegant beige loafers, or modest low-block slingback flats"
 
-    # 2. Quy tắc tương phản màu sắc
     if any(k in h_lower for k in ["đen", "black", "xám", "grey", "gray", "xanh đậm", "navy", "nâu", "đỏ mận", "đỏ đô", "rượu vang", "burgundy", "maroon", "dark"]):
         color_contrast_rule = "Phối trang phục đi kèm (nếu có), giày dép và phụ kiện tông SÁNG SANG TRỌNG (Kem Ivory, Trắng Sữa, Be Sáng, Ngọc Trai, Vàng Ánh Kim nhạt) để làm bừng sáng và tôn sắc độ trầm của sản phẩm."
     elif any(k in h_lower for k in ["trắng", "white", "kem", "cream", "be", "beige", "vàng nhạt", "hồng phấn", "pastel"]):
@@ -486,7 +487,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     else:
         color_contrast_rule = "Phối màu trang phục đi kèm và giày dép theo tông TRUNG TÍNH ĐƠN SẮC (Trắng Kem, Be Nude, Xám Nhạt hoặc Đen) hài hòa, sang trọng."
 
-    # 3. Quy tắc Phối Set Quần Áo & Khóa Phụ Kiện Trang Sức (Vòng cổ, Khuyên tai, Vòng tay)
     if intimate_type == "underwear_bra":
         industry_outfit = "Áo sơ mi lụa/linen dài tay cài cúc lịch sự hoặc áo thun cổ tròn phối khoác ngoài bằng cardigan dệt kim mỏng + Quần âu ống suông dài cạp cao thanh lịch."
         jewelry_rule = "dainty pearl stud earrings and a minimalist wristwatch (khuyên tai nụ ngọc trai nhỏ và đồng hồ thanh lịch)."
@@ -1100,9 +1100,6 @@ def generate_char_rules_string(profiles):
         rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn trang phục. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
     return rules
 
-# ==============================================================================
-# CƠ CHẾ PHÂN LOẠI KỊCH BẢN & BỘ CẦU NỐI NGỮ NGHĨA 2 NHÁNH ĐA NGÀNH HÀNG
-# ==============================================================================
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
     combined = f"{strategy_str} {title_str}".lower()
     return any(k in combined for k in [
@@ -1151,14 +1148,14 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
     {pres_rule}
     {viral_directive}
     {DUAL_BRANCH_BRIDGE_INSTRUCTION}
+    {EVENT_MATCHED_SETTING_INSTRUCTION}
     
     🛑 YÊU CẦU ĐA DẠNG HÓA 5 BỐI CẢNH HOÀN TOÀN KHÁC NHAU:
     - BẮT BUỘC mỗi kịch bản trong 5 kịch bản phải diễn ra ở 1 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
-    - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer... TUYỆT ĐỐI KHÔNG đưa bối cảnh nhà bếp hay nấu nướng vào đồ công nghệ!
+    - BỐI CẢNH PHẢI ĐÚNG VỚI SẢN PHẨM VÀ SỰ KIỆN: Đồ công nghệ / PC / Gaming thì bối cảnh là góc setup máy tính gaming, bàn làm việc công nghệ, phòng riêng streamer...
 
     🛑 QUY TẮC CẤU TRÚC PHÂN CẢNH THEO CHIẾN LƯỢC:
     - Đối với các kịch bản dạng Giải Quyết Nỗi Đau (PAS), Lifestyle POV, Tình Huống Đời Thường: Cảnh 1 tập trung hoàn toàn vào bối cảnh và biểu cảm nỗi đau (không xuất hiện sản phẩm), sang Cảnh 2 sản phẩm mới xuất hiện cùng câu nối dẫn dắt mượt mà.
-    - Đối với các kịch bản Bóc Hộp, Flash Sale, Review Trực Diện, Chia Sẻ Mẹo Hay: Sản phẩm xuất hiện tự nhiên và kết nối giữa Cảnh 1 sang Cảnh 2 bằng cầu nối giải mã công thức/bí quyết.
 
     🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CTA):
     - Nếu chiến lược là Flash Sale / Săn Deal hời: Cảnh 4 BẮT BUỘC sử dụng công thức neo giá đối lập (Giá gốc lớn -> Giá sale hời).
@@ -1190,24 +1187,24 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
         outro_instruction = f"""
         🛑 QUY TẮC PHÂN HÓA CẢNH 4 (ACTION & CHỐT DEAL KÈM NỖI ĐAU):
         - NẾU KỊCH BẢN THUỘC FLASH SALE / DEAL HỜI: Dùng công thức neo giá ('Bình thường khoảng [giá gốc], nay giảm còn khoảng [giá sale]...').
-        - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá trước đó): TUYỆT ĐỐI KHÔNG đọc giá ở cảnh 4. Dùng câu chốt mượt mà xoáy sâu nỗi đau thực tế của sản phẩm đó: 'Nay có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng [nhắc lại cụ thể nỗi đau/nhu cầu] thì rinh ngay em nó ở giỏ hàng góc trái nhé!'.
+        - NẾU LÀ CÁC KỊCH BẢN THƯỜNG KHÁC (không nói giá ở các cảnh trước): Cảnh 4 TUYỆT ĐỐI KHÔNG đọc giá cụ thể. Dùng câu chốt mượt mà xoáy sâu nỗi đau thực tế của sản phẩm đó: 'Nay có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng [nhắc lại cụ thể nỗi đau/nhu cầu] thì rinh ngay em nó ở giỏ hàng góc trái nhé!'.
         - Số 4 đọc là 'bốn'. CẤM 'tư', CẤM 'tứ'. CẤM 'phiên live', CẤM 'trợ giá'.
         """
 
     if is_pas_story:
         scene_flow_rule = """
         🛑 QUY TẮC CẤU TRÚC 4 PHÂN CẢNH DẠNG STORYTELLING / NỖI ĐAU (PAS):
-        - CẢNH 1: Tập trung hoàn toàn vào nỗi đau và biểu cảm bối rối/mệt mỏi của nhân vật. TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM XUẤT HIỆN. Thoại mở màn xoáy sâu vào nỗi đau/vấn đề đời thực.
-        - CẢNH 2: Sản phẩm chính thức xuất hiện với Cầu nối Nhánh A ("Chân ái cứu nguy chính là...") hoặc Nhánh B ("Bí quyết nằm ở chỗ cứ ưu tiên...") ăn khớp 100% với câu mở màn Cảnh 1. Góc máy tiến sát (Close-up / Dolly-in) và nhân vật thao tác mạnh mẽ để chứng minh giải pháp.
+        - CẢNH 1: Tập trung hoàn toàn vào nỗi đau và biểu cảm bối rối/mệt mỏi của nhân vật tại nhà (Phòng ngủ / Phòng thay đồ). TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM XUẤT HIỆN. Thoại mở màn xoáy sâu vào nỗi đau/vấn đề đời thực.
+        - CẢNH 2: Sản phẩm chính thức xuất hiện với Cầu nối Nhánh A ("Chân ái cứu nguy chính là...") hoặc Nhánh B ("Bí quyết nằm ở chỗ cứ ưu tiên..."). Bối cảnh chuyển sang không gian sự kiện thực tế (Sảnh tiệc cưới sang trọng, văn phòng...) hoặc trước gương lớn chuẩn bị đi sự kiện. Góc máy tiến sát (Close-up / Dolly-in) và nhân vật thao tác mạnh mẽ.
         - CẢNH 3: Góc máy cận cảnh chi tiết (Detailed Close-up / Dynamic Push-in) test công năng trực quan thực tế cực kỳ mạnh mẽ, thao tác làm đến đâu rõ kết quả đến đó.
         - CẢNH 4: Chốt đơn kèm câu chốt nhắc lại nỗi đau và Soft CTA.
         """
     else:
         scene_flow_rule = """
         🛑 QUY TẮC CẤU TRÚC 4 PHÂN CẢNH DẠNG TRỰC DIỆN / BÍ QUYẾT / REVIEW:
-        - CẢNH 1: Mở màn cuốn hút (nêu bí quyết, công thức chọn đồ hoặc điểm ấn tượng nhất).
-        - CẢNH 2: Nối tiếp mượt mà bằng Cầu nối Nhánh B ("Bí quyết nằm ở chỗ cứ ưu tiên [đặc tính cốt lõi] như ở em [Sản phẩm] này này...") hoặc Nhánh A ("Chân ái cứu nguy chính là..."). Góc máy tiến sát (Close-up / Dolly-in) khoe rõ chi tiết sản phẩm.
-        - CẢNH 3: Góc máy cận cảnh chi tiết (Detailed Close-up / Dynamic Push-in) test công năng trực quan thực tế cực kỳ mạnh mẽ, thao tác làm đến đâu rõ kết quả đến đó.
+        - CẢNH 1: Mở màn cuốn hút (nêu bí quyết, công thức chọn đồ hoặc điểm ấn tượng nhất) tại bối cảnh sự kiện phù hợp.
+        - CẢNH 2: Nối tiếp mượt mà bằng Cầu nối Nhánh B hoặc Nhánh A. Góc máy tiến sát (Close-up / Dolly-in) khoe rõ chi tiết sản phẩm.
+        - CẢNH 3: Góc máy cận cảnh chi tiết (Detailed Close-up / Dynamic Push-in) test công năng trực quan thực tế cực kỳ mạnh mẽ.
         - CẢNH 4: Chốt đơn kèm câu chốt nhắc lại nỗi đau/nhu cầu và Soft CTA.
         """
 
@@ -1218,6 +1215,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     CHỈ ĐẠO GIỌNG: {voice_guidance}
     {dialogue_type_rule}
     {DUAL_BRANCH_BRIDGE_INSTRUCTION}
+    {EVENT_MATCHED_SETTING_INSTRUCTION}
     {scene_flow_rule}
     {outro_instruction}
     {override_rule}
@@ -1239,7 +1237,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP STYLIST CHUYÊN SÂU & 10 BỘ LUẬT THỰC CHIẾN
+# HÀM TẠO CHI TIẾT KỊCH BẢN - TÍCH HỢP BỐI CẢNH SỰ KIỆN & STYLIST CHUYÊN SÂU
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1358,9 +1356,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     )
 
     scene_1_setting_guide = (
-        "Mô tả bối cảnh mở màn tiếng Việt thể hiện nỗi đau đời thực, KHÔNG CÓ SẢN PHẨM..."
+        "Mô tả bối cảnh mở màn tiếng Việt thể hiện nỗi đau đời thực tại phòng thay đồ/phòng ngủ ở nhà, KHÔNG CÓ SẢN PHẨM..."
         if is_pas_story else
-        "Mô tả bối cảnh mở màn tiếng Việt ăn khớp 100% với kịch bản..."
+        "Mô tả bối cảnh mở màn tiếng Việt ăn khớp 100% với kịch bản sự kiện..."
     )
     scene_1_action_guide = (
         "expressing frustration or dealing with the everyday problem naturally with expressive hand gestures, zero product in hands"
@@ -1386,12 +1384,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {stylist_rules_text}
     {physics_rules_text}
     {DUAL_BRANCH_BRIDGE_INSTRUCTION}
+    {EVENT_MATCHED_SETTING_INSTRUCTION}
 
     TRẢ VỀ JSON:
     {{
         "title": "{fixed_title}",
         "wardrobe_lock": {{
-            "outfit_vi": "Mô tả chi tiết bằng tiếng Việt toàn bộ Set đồ Stylist phối (Áo/Váy/Quần + Giày dép cụ thể + Phụ kiện Vòng cổ, Khuyên tai, Vòng tay/Đồng hồ) ăn khớp hoàn hảo với {clean_prod_en} và bối cảnh {fixed_setting_base}",
+            "outfit_vi": "Mô tả chi tiết bằng tiếng Việt toàn bộ Set đồ Stylist phối (Áo/Váy/Quần + Giày dép cụ thể + Phụ kiện Vòng cổ, Khuyên tai, Vòng tay/Đồng hồ) ăn khớp hoàn hảo với {clean_prod_en} và bối cảnh sự kiện",
             "master_outfit_en": "Detailed English description of the complete coordinated outfit (main garment + matching top/bottom if needed + specific footwear) following the Deep Fashion Stylist rules",
             "jewelry_and_accessories_en": "Detailed English description of matching jewelry and accessories (e.g., dainty gold pendant necklace, pearl drop earrings, thin minimalist bracelet/wristwatch) locked across all scenes",
             "hair_and_face_en": "{detected_demographic_en}"
@@ -1400,7 +1399,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             {{
                 "scene": 1, "aida_stage": "Attention",
                 "setting": "{scene_1_setting_guide}",
-                "setting_en": "English setting description",
+                "setting_en": "English setting description (e.g. cozy modern bedroom or home dressing room with warm lighting)",
                 "camera_shot": "Vertical 9:16 eye-level medium shot",
                 "expression_en": "{'looking at camera with troubled, tired, or frustrated expression' if is_pas_story else 'looking at camera with lively, engaging expression'}",
                 "action_en": "{scene_1_action_guide}",
@@ -1410,30 +1409,30 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
-                "setting": "Mô tả bối cảnh cận cảnh khi sản phẩm xuất hiện giải quyết vấn đề...",
-                "setting_en": "English setting with product",
-                "camera_shot": "Vertical 9:16 dynamic camera push-in (dolly-in) to medium close-up shot focusing closely on the product details",
+                "setting": "Mô tả bối cảnh sự kiện thực tế sang trọng (VD: Sảnh chờ tiệc cưới 5 sao với đèn chùm ấm áp và hoa tươi xóa phông bokeh, hoặc không gian tương ứng với tiêu đề kịch bản)...",
+                "setting_en": "English setting with luxury event venue (e.g. upscale hotel wedding reception foyer with warm chandelier bokeh, zero background crowd)",
+                "camera_shot": "Vertical 9:16 dynamic camera push-in (dolly-in) to medium close-up shot focusing closely on the product details and event setting",
                 "expression_en": "relieved, confident and enthusiastic",
                 "action_en": "{action_scene_2} (bám sát 100% lời thoại Cảnh 2)",
-                "sfx": "Tiếng thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
-                "director": "Interest | Quay sát sản phẩm + Cầu nối Nhánh A/B khớp Cảnh 1 | Thoại on-camera từ 0.00s",
+                "sfx": "Tiếng sột soạt chất vải / tiếng thao tác vật lý chân thực của sản phẩm (không nhạc nền)",
+                "director": "Interest | Bối cảnh sự kiện chuẩn xác + Quay sát sản phẩm + Cầu nối Nhánh A/B | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC (22-35 từ) BẮT BUỘC mở đầu bằng câu nối giải quyết nỗi đau ('Chân ái cứu nguy chính là...') hoặc giải mã công thức ('Bí quyết nằm ở chỗ cứ ưu tiên...') rồi gắn mượt mà vào sản phẩm..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
-                "setting": "Mô tả bối cảnh trải nghiệm thực tế cận cảnh ăn khớp với thoại...",
-                "setting_en": "English setting description",
+                "setting": "Mô tả bối cảnh sự kiện tiếp tục duy trì sự sang trọng và đồng bộ...",
+                "setting_en": "English setting description at the luxury event venue",
                 "camera_shot": "Vertical 9:16 close-up tracking shot capturing product texture, fit, and active physical performance",
                 "expression_en": "smiling contentedly with an approving head nod",
                 "action_en": "{action_scene_3} (thao tác thực tế mạnh mẽ, sống động khớp 100% lời thoại Cảnh 3)",
                 "sfx": "Tiếng trải nghiệm thực tế đời sống rõ nét (không nhạc nền)",
-                "director": "Desire | Quay cận cảnh & Thao tác thực chiến mạnh mẽ | Thoại on-camera từ 0.00s",
+                "director": "Desire | Quay cận cảnh tại sự kiện & Thao tác thực chiến mạnh mẽ | Thoại on-camera từ 0.00s",
                 "voiceover": "Đoạn thoại KOC nói trực tiếp trải nghiệm công năng thực tế và kết quả rõ rệt (20-35 từ)..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
-                "setting": "Mô tả bối cảnh kết thúc...",
-                "setting_en": "English warm closing setting",
+                "setting": "Mô tả bối cảnh kết thúc tại sự kiện...",
+                "setting_en": "English warm closing setting at the luxury event venue",
                 "camera_shot": "Vertical 9:16 warm eye-level medium shot",
                 "expression_en": "smiling warmly into lens with welcoming hands",
                 "action_en": "{action_scene_4}",
@@ -1584,7 +1583,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     goal_badge = "🌟 <b>Định hướng:</b> Xây Kênh & Kéo Tương Tác / Follow" if is_viral else "🛒 <b>Định hướng:</b> Chốt đơn TikTok Shop an toàn"
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Chiến lược & Hình thức:</b> {presentation_format} | 👤 <b>Khóa diễn viên & Vóc dáng (Anti-Celebrity):</b> {detected_demographic_en}",
-        f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh kịch bản:</b> {fixed_setting_base} | {goal_badge}",
+        f"🗣 <b>Đại từ xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh sự kiện thông minh:</b> {fixed_setting_base} | {goal_badge}",
         f"👗 <b>Bộ máy Stylist Chuyên Sâu (Set đồ + Giày dép + Phụ kiện Vòng cổ/Khuyên tai/Vòng tay):</b> {final_outfit_vi} (Đồng nhất 100% cả 4 cảnh)",
         f"🎨 <b>Khóa màu Hero SKU:</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} (Tách biệt hoàn toàn khỏi người mẫu trong ảnh gốc)",
         f"🔗 <b>Cầu nối Ngữ nghĩa 2 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo Nhánh Giải pháp Nỗi đau (Cách 2) hoặc Giải mã Bí quyết (Cách 3)",
@@ -2103,8 +2102,8 @@ if not st.session_state.is_analyzed:
                       • Mẹ & Bé: self_pronoun = 'em', audience_pronoun = 'các mẹ'.
                       • Đời sống / Ăn vặt: self_pronoun = 'em', audience_pronoun = 'mọi người' / 'cả nhà'.
 
-                    🛑 QUY CHUẨN BỐI CẢNH ĐỜI THỰC PHÙ HỢP VỚI TỪNG SẢN PHẨM:
-                    - BẮT BUỘC 5 kịch bản diễn ra ở 5 bối cảnh đời thực khác nhau ăn khớp tuyệt đối với tính chất của sản phẩm.
+                    🛑 QUY CHUẨN BỐI CẢNH ĐỜI THỰC PHÙ HỢP VỚI TỪNG SẢN PHẨM & SỰ KIỆN:
+                    - BẮT BUỘC 5 kịch bản diễn ra ở 5 bối cảnh đời thực khác nhau ăn khớp tuyệt đối với tính chất của sản phẩm và sự kiện (VD: Đi ăn cưới -> Sảnh tiệc cưới sang trọng).
 
                     100% CẢ 4 PHÂN CẢNH ĐỀU LÀ DO CHÍNH NHÂN VẬT MỞ MIỆNG NÓI TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-CAMERA LIP-SYNC) NGAY TỪ 0.00S BẰNG GIỌNG HÀ NỘI CHUẨN.
                     🛑 CẤM TUYỆT ĐỐI TỪ 'NGÀN' (BẮT BUỘC DÙNG 'NGHÌN'). SỐ 4 ĐỌC LÀ 'BỐN' (CẤM 'TƯ', CẤM 'TỨ'). CẤM '1 TRĂM' (BẮT BUỘC VIẾT 'MỘT TRĂM'). CẤM 'TRỢ GIÁ', 'PHIÊN LIVE'.
@@ -2261,8 +2260,8 @@ if isinstance(ca, dict):
         if is_viral_mode:
             c4_html = clean_html(f"""
             <div class="dna-card">
-                <div class="dna-card-title">💡 4. Chuẩn Bối Cảnh & Mẹo Đời Sống</div>
-                <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Góc làm việc / Phòng riêng hiện đại'))}</span></div>
+                <div class="dna-card-title">💡 4. Chuẩn Bối Cảnh Sự Kiện & Mẹo Đời Sống</div>
+                <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh sự kiện:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Sảnh chờ tiệc cưới / Văn phòng sang trọng'))}</span></div>
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
                 <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#d97706; font-weight:600;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label" style="color:#15803d;">📣 Kêu gọi tương tác (CTA):</span><span class="dna-text" style="color:#15803d; font-weight:700;">Thảo luận, chia sẻ mẹo hay & Follow kênh đón xem tập sau</span></div>
@@ -2279,8 +2278,8 @@ if isinstance(ca, dict):
             
             c4_html = clean_html(f"""
             <div class="dna-card">
-                <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh, Động Lực Học & Mức Giá</div>
-                <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Góc làm việc / Phòng riêng hiện đại'))}</span></div>
+                <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh Sự Kiện, Động Lực Học & Mức Giá</div>
+                <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh sự kiện:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Sảnh chờ tiệc cưới / Văn phòng sang trọng'))}</span></div>
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
                 <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
@@ -2399,7 +2398,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} với Bộ máy Stylist Chuyên Sâu, 10 Bộ luật Thực chiến & Anti-Celebrity..."):
+            with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} với Bối cảnh sự kiện thông minh, Stylist chuyên sâu & Anti-Celebrity..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run); st.session_state.scroll_to_detail = True; success = True
         except Exception as e: error_msg = str(e)
