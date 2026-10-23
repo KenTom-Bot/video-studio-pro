@@ -329,7 +329,7 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     return "female", f"25yo Vietnamese woman{extra_physique}"
 
 # ==============================================================================
-# HỆ THỐNG PHÂN LOẠI NGÀNH HÀNG & QUY LUẬT VẬT LÝ CÔ ĐỌNG (COMPACT PHYSICS)
+# HỆ THỐNG PHÂN LOẠI NGÀNH HÀNG & GÓC QUAY TRỌNG TÂM SẢN PHẨM (PRODUCT-HERO CAMERA)
 # ==============================================================================
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
     combined = f"{strategy_str} {title_str}".lower()
@@ -384,33 +384,57 @@ COMPACT_CORE_RULES = """
    - Nhánh 1 (Cảnh 1 khoe Giá rẻ/Săn sale) -> Cảnh 2 dùng "Cận cảnh minh chứng": "Nhìn cận cảnh bề mặt/chi tiết của em này mới thấy đáng đồng tiền bát gạo!..." (CẤM dùng từ "Bí quyết").
    - Nhánh 2 (Cảnh 1 nêu Nỗi đau/Bất tiện PAS) -> Cảnh 2 dùng "Cứu tinh giải pháp": "Chân ái cứu nguy cho [vấn đề] chính là [ưu điểm] của em [SP] này đây!...".
    - Nhánh 3 (Cảnh 1 nêu Mẹo hay/Bí quyết) -> Cảnh 2 dùng "Giải mã bí quyết": "Bí quyết nằm ở chỗ cứ ưu tiên [đặc tính] như ở em [SP] này này!...".
-2. ĐẠO DIỄN BỐI CẢNH SỰ KIỆN (ZERO CROWD):
-   - Khớp bối cảnh thực tế theo sự kiện (Đi ăn cưới -> Sảnh tiệc cưới khách sạn 5 sao đèn chùm xóa phông bokeh; Đi làm -> Văn phòng kính hiện đại; Đi cafe -> Quán cafe sân vườn nắng đẹp). CẤM đám đông người lạ phía sau.
+2. ĐẠO DIỄN GÓC MÁY LẤY SẢN PHẨM LÀM TRỌNG TÂM (PRODUCT-CENTRIC FOCUS):
+   - Nếu là Thời trang mặc trên người: Góc máy lấy phom dáng cơ thể, cổ áo, đường eo và độ rũ của vải làm trung tâm.
+   - Nếu là Sản phẩm Phi Thời Trang (Gia dụng, Giỏ nhựa, Mỹ phẩm, Công nghệ, Giày dép, Đồ bếp...): BẮT BUỘC LẤY SẢN PHẨM LÀM TRỌNG TÂM TIỀN CẢNH (occupying 50%-60% of foreground center frame)! Ở Cảnh 2 và Cảnh 3, máy quay zoom thẳng vào chính giữa sản phẩm (tack-sharp macro focus on product), tay nhân vật thao tác trực tiếp trên sản phẩm, nhân vật chỉ làm nền thuyết minh phía sau!
 3. CHỐNG BIẾN DẠNG SẢN PHẨM (RIGID-BODY ANTI-MORPHING):
-   - Với vật thể cứng (giỏ nhựa, kệ, gia dụng, điện tử, hộp, giày dép): Giữ nguyên 100% khung hình học 3D cố định (100% rigid non-deforming structure). CẤM viết hành động gập/mở (unfolding/folding), bẻ cong hay biến đổi hình dáng. Chỉ cầm chắc quai/thân, nghiêng nhẹ 15 độ, vuốt viền hoặc thả đồ vào trong.
+   - Với vật thể cứng: Giữ nguyên 100% khung hình học 3D cố định (100% rigid non-deforming structure). CẤM viết hành động gập/mở (unfolding/folding), bẻ cong hay biến đổi hình dáng. Chỉ cầm chắc quai/thân, nghiêng nhẹ 15 độ đón sáng, vuốt viền hoặc thả đồ vào trong.
 4. VĂN NÓI HÀ NỘI & CHỐT ĐƠN CẢNH 4:
    - 100% giọng Hà Nội, số 4 đọc 'bốn' (cấm 'tư/tứ'), dùng 'nghìn' (cấm 'ngàn'), viết rõ 'một trăm'. Cấm từ 'thuật toán', 'trợ giá', 'phiên live'.
    - Cảnh 4: Nếu là kịch bản Flash Sale -> đọc giá neo đối lập. Các kịch bản khác -> Soft CTA nhắc lại nỗi đau + bấm giỏ hàng góc trái.
 """
+
+def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str) -> str:
+    if is_pas_scene1 and not is_fashion:
+        return "Vertical 9:16 eye-level medium shot"
+    if is_fashion:
+        if scene_idx == 0:
+            return "Vertical 9:16 eye-level three-quarter full-body shot showcasing the outfit"
+        elif scene_idx == 1:
+            return "Vertical 9:16 smooth camera dolly-in to medium close-up focusing sharply on garment neckline, waist cut, and fabric weave"
+        elif scene_idx == 2:
+            return "Vertical 9:16 dynamic close-up tracking shot following the flowing garment drape and silhouette in motion"
+        else:
+            return "Vertical 9:16 warm eye-level medium shot"
+    else:
+        # Chế độ Product-Hero cho mọi sản phẩm phi thời trang: Khóa tiêu cự trực tiếp vào sản phẩm ở trung tâm tiền cảnh
+        if scene_idx == 0:
+            return f"Vertical 9:16 product-focused medium shot, {clean_prod_en} held prominently in foreground center toward the lens"
+        elif scene_idx == 1:
+            return f"Vertical 9:16 direct camera zoom-in (dolly-in) macro close-up locked onto {clean_prod_en} filling 60% of the center frame, tack-sharp focus on product surface and rim, presenter softly framed behind"
+        elif scene_idx == 2:
+            return f"Vertical 9:16 tight close-up action shot centered directly on {clean_prod_en} in real-time use, camera lens locked on the product's functional details in foreground"
+        else:
+            return f"Vertical 9:16 balanced medium shot with {clean_prod_en} displayed clearly in foreground center"
 
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False) -> str:
     p = f"{product_name} {vo_text}".lower()
     if is_fashion:
         return "Natural fabric drape in motion; subject steps smoothly, turns 45 degrees, and touches fabric softly (worn on body, zero duplicate item in hands)."
     elif any(k in p for k in ["giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "khay", "móc", "basket", "hamper", "rack", "organizer", "bin", "box", "shelf", "holder"]):
-        return "100% rigid non-deforming 3D frame (zero folding, bending, or morphing); subject holds handle steadily, taps sturdy rim, or places folded clothes neatly inside."
+        return "CAMERA FOCUS LOCKED ON PRODUCT CENTERPIECE: 100% rigid non-deforming 3D frame (zero folding, bending, or morphing); hands hold handle steadily in foreground, tap sturdy rim up close, or drop folded clothes neatly into the basket."
     elif any(k in p for k in ["giày", "dép", "sneaker", "boot", "sandal", "túi xách", "ví", "balo", "shoe", "handbag", "backpack", "wallet"]):
-        return "100% rigid outer silhouette at chest level (zero bending down); subject presses insole gently or traces stitching smoothly."
+        return "CAMERA FOCUS LOCKED ON PRODUCT AT CHEST LEVEL: 100% rigid outer silhouette (zero bending down); hands press insole gently or trace stitching right in front of the lens."
     elif any(k in p for k in ["mỹ phẩm", "kem", "serum", "son", "phấn", "sáp", "dưỡng", "sữa rửa mặt", "tẩy trang", "skincare", "cream", "lipstick", "lotion", "balm", "cleanser"]):
-        return "Rigid container shape lock; subject glides texture smoothly onto skin in macro close-up showing instant glow."
+        return "CAMERA FOCUS LOCKED ON PRODUCT & TEXTURE: Rigid container shape lock in foreground; fingers glide texture smoothly onto skin in macro close-up showing instant glow."
     elif any(k in p for k in ["hút bụi", "chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "quạt", "máy sấy", "bàn là", "vacuum", "mop", "brush", "scrubber", "dryer"]):
-        return "Rigid tool body lock; subject glides/scrubs firmly across surface, visibly removing dirt on the spot."
+        return "CAMERA FOCUS LOCKED ON WORKING HEAD OF PRODUCT: Rigid tool body lock; product glides/scrubs firmly across surface in close-up, visibly removing dirt on the spot."
     elif any(k in p for k in ["nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "bình giữ nhiệt", "cooker", "pan", "pot", "knife", "blender", "thermos"]):
-        return "Rigid cookware geometry lock; food glides smoothly on non-stick surface with natural steam."
+        return "CAMERA FOCUS LOCKED ON COOKWARE CENTERPIECE: Rigid cookware geometry lock; food glides smoothly on non-stick surface in foreground close-up."
     elif any(k in p for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "mì", "nước", "trà", "cà phê", "sữa", "food", "snack", "drink", "coffee"]):
-        return "Appetizing macro texture up close; subject takes a hearty bite/sip with delighted nod."
+        return "CAMERA FOCUS LOCKED ON FOOD CENTERPIECE: Appetizing macro texture right in front of lens; subject takes a hearty bite/sip with delighted nod."
     else:
-        return "100% rigid non-deforming 3D geometry from 0.0s to end (zero morphing); subject holds steadily, tilts 15 degrees, and traces surface."
+        return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry from 0.0s to end (zero morphing); hands hold product in center frame, tilt 15 degrees, and trace surface."
 
 def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool):
     p = f"{clean_prod_en} {check_str}".lower()
@@ -423,24 +447,24 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
         )
     elif any(k in p for k in ["giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "khay", "móc", "basket", "hamper", "rack", "organizer", "bin", "box", "shelf", "holder"]):
         return (
-            f"holding the rigid {clean_prod_en} steadily by its handle at chest level",
-            f"holding the rigid {clean_prod_en} up close and tracing fingers along its sturdy rim without deforming its shape",
-            f"keeping the rigid {clean_prod_en} steady while placing folded clothes neatly inside it",
-            f"holding the rigid {clean_prod_en} steadily at waist level with a warm open-palm gesture"
+            f"holding the rigid {clean_prod_en} prominently in foreground center toward the camera lens",
+            f"holding the rigid {clean_prod_en} close to the lens as the main centerpiece while fingers trace its sturdy rim and perforated wall without deforming its shape",
+            f"keeping the rigid {clean_prod_en} centered in close-up focus while hands place folded clothes neatly inside it to show capacity",
+            f"holding the rigid {clean_prod_en} clearly in foreground center with a warm open-palm gesture"
         )
     elif any(k in p for k in ["mỹ phẩm", "kem", "serum", "son", "phấn", "sáp", "dưỡng", "cream", "lipstick", "lotion", "balm", "skincare"]):
         return (
-            f"holding {clean_prod_en} clearly near face level while speaking",
-            f"dabbing a small amount of texture from {clean_prod_en} onto the back of hand up close",
-            f"spreading the texture smoothly onto skin in close-up showing instant glow",
-            f"holding {clean_prod_en} steadily and smiling warmly"
+            f"holding {clean_prod_en} prominently in foreground center near face level",
+            f"holding {clean_prod_en} right in front of the macro lens and dabbing a small amount of texture onto the back of hand",
+            f"spreading the texture smoothly onto skin in foreground focus while holding {clean_prod_en}",
+            f"holding {clean_prod_en} clearly in foreground center and smiling warmly"
         )
     else:
         return (
-            f"holding the rigid {clean_prod_en} clearly at chest level toward the lens",
-            f"tilting {clean_prod_en} 15 degrees up close and tracing fingers along its solid surface without changing its shape",
-            f"demonstrating {clean_prod_en} with steady hand movements while preserving 100% rigid geometry",
-            f"holding {clean_prod_en} steadily in one hand with a warm open-palm gesture"
+            f"holding the rigid {clean_prod_en} prominently in foreground center toward the lens",
+            f"positioning {clean_prod_en} right in front of the close-up lens, tilting it 15 degrees and tracing fingers along its solid surface without changing its shape",
+            f"demonstrating {clean_prod_en} in foreground center focus with steady hand movements while preserving 100% rigid geometry",
+            f"holding {clean_prod_en} clearly in foreground center with a warm open-palm gesture"
         )
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "") -> str:
@@ -1027,17 +1051,17 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False):
     is_viral = ("Viral" in mode)
-    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP giải quyết vấn đề tại bối cảnh thực tế." if is_pas_story else "Direct Flow: SP xuất hiện xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
+    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP làm TRỌNG TÂM TIỀN CẢNH giải quyết vấn đề." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM TIỀN CẢNH xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
     return f"""
     ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}
     {f"ƯU TIÊN CAO NHẤT: {custom_note}" if custom_note else ""}
     {COMPACT_CORE_RULES}
     - Cảnh 4: {"Kêu gọi thảo luận & follow (không bán hàng)" if is_viral else "Chốt deal chuẩn quy tắc"}.
-    - 'action_en' viết ngắn gọn (dưới 22 từ), 100% tiếng Anh, giữ nguyên khung hình học cứng của sản phẩm.
+    - 'action_en' viết ngắn gọn (dưới 22 từ), 100% tiếng Anh, đặt sản phẩm ở trung tâm tiền cảnh và giữ nguyên khung hình học cứng của sản phẩm.
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - PROMPT SIÊU NÉN, TỐC ĐỘ CAO & KHÓA MÀU/HÌNH HỌC
+# HÀM TẠO CHI TIẾT KỊCH BẢN - LẤY SẢN PHẨM LÀM TRỌNG TÂM TIỀN CẢNH (PRODUCT-HERO)
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1123,7 +1147,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
     locked_product_prompt_segment = (
-        f"Product Lock: {clean_prod_en} in {locked_color_en}{dim_tag} (100% rigid non-deforming geometry, exact same solid color across all scenes)"
+        f"HERO PRODUCT CENTERPIECE: {clean_prod_en} in {locked_color_en}{dim_tag} occupying foreground center focus (100% rigid non-deforming geometry, identical solid color across all scenes)"
         if not is_fashion_wearable else
         f"Garment Lock: wearing {clean_prod_en} in {locked_color_en} directly on body"
     )
@@ -1158,7 +1182,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "{'troubled, frustrated expression' if is_pas_story else 'lively, engaging expression'}",
                 "action_en": "{'expressing frustration with empty hands, zero product' if is_pas_story else action_scene_1} (under 18 words)",
                 "sfx": "Foley thực tế (không nhạc)",
-                "director": "Attention | Thoại từ 0.00s",
+                "director": "Attention | {'Nêu nỗi đau mở màn' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh thu hút ngay từ 0.00s'}",
                 "voiceover": "Thoại mở màn (18-30 từ)..."
             }},
             {{
@@ -1166,9 +1190,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "setting": "Bối cảnh thực tế...",
                 "setting_en": "Concise English setting (under 12 words)",
                 "expression_en": "relieved, confident and enthusiastic",
-                "action_en": "{action_scene_2} (under 20 words, keep rigid shape)",
+                "action_en": "{action_scene_2} (under 20 words, product in foreground center focus, keep rigid shape)",
                 "sfx": "Tiếng thao tác thực tế",
-                "director": "Interest | Quay sát SP + Cầu nối 3 nhánh",
+                "director": "Interest | Máy quay zoom thẳng vào chính giữa sản phẩm (Product Centerpiece) + Cầu nối 3 nhánh",
                 "voiceover": "Thoại Cảnh 2 (22-34 từ) khớp Cầu nối 3 nhánh..."
             }},
             {{
@@ -1176,9 +1200,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "setting": "Bối cảnh đồng bộ...",
                 "setting_en": "Concise English setting (under 12 words)",
                 "expression_en": "smiling contentedly with approving nod",
-                "action_en": "{action_scene_3} (under 20 words, keep rigid shape)",
+                "action_en": "{action_scene_3} (under 20 words, product in foreground center focus, keep rigid shape)",
                 "sfx": "Tiếng trải nghiệm thực tế",
-                "director": "Desire | Cận cảnh công năng",
+                "director": "Desire | Góc máy cận cảnh khóa nét vào điểm hoạt động của sản phẩm",
                 "voiceover": "Thoại Cảnh 3 (20-34 từ) test công năng..."
             }},
             {{
@@ -1188,7 +1212,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "smiling warmly with open-palm gesture",
                 "action_en": "{action_scene_4} (under 18 words)",
                 "sfx": "Tiếng chuông ting nhẹ",
-                "director": "Action | Chốt deal",
+                "director": "Action | Giữ sản phẩm nổi bật ở tiền cảnh & Chốt deal",
                 "voiceover": "{scene_4_voiceover_guide}"
             }}
         ]
@@ -1220,13 +1244,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
 
-    # Khối khóa nhân vật siêu gọn (Chống lặp từ, vượt bộ lọc Celebrity)
     locked_character_prompt_segment = (
         f"Fictional everyday {detected_demographic_en} (synthetic AI persona, ordinary citizen), "
         f"wearing {final_outfit_en}, styled with {final_jewelry_en}"
     )
 
     base_negative_prompt = (
+        "product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, "
         "morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, "
         "duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, "
         "bending down, background music, bgm, singing"
@@ -1254,10 +1278,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         setting_vi_current = scn.get("setting", fixed_setting_base)
         env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text_current, setting_vi_current)
         
-        if idx_scn in [1, 2]:
-            camera_shot = "Vertical 9:16 smooth dolly-in medium close-up shot"
-        else:
-            camera_shot = "Vertical 9:16 eye-level medium shot"
+        is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
+        camera_shot = get_product_centric_camera_shot(
+            idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en
+        )
         
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
         combined_sfx = f"{base_sfx}, {env_sfx_en}" if env_sfx_en else base_sfx
@@ -1271,30 +1295,45 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
         scene_physics = get_universal_physics_rules(clean_prod_en, vo_text_current, is_fashion=is_fashion_wearable)
 
-        # Prompt Ảnh Tinh Gọn (~65-80 từ)
-        if idx_scn == 0 and is_pas_story and not is_fashion_wearable:
+        # Đảo ngược ưu tiên Chủ thể cho sản phẩm phi thời trang: Đưa HERO PRODUCT lên đầu để khóa tiêu cự ống kính!
+        if is_pas_scn1_no_prod:
             img_core = (
                 f"{camera_shot}, {scene_setting_en}, {env_lighting_en}. "
                 f"Subject: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action} (empty hands, zero product)"
             )
+        elif not is_fashion_wearable and idx_scn in [1, 2]:
+            img_core = (
+                f"{camera_shot}, {scene_setting_en}, {env_lighting_en}. "
+                f"[{locked_product_prompt_segment}]. "
+                f"Presenter in background: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}"
+            )
         else:
             img_core = (
                 f"{camera_shot}, {scene_setting_en}, {env_lighting_en}. "
-                f"Subject: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}. "
-                f"{locked_product_prompt_segment}"
+                f"[{locked_product_prompt_segment}]. "
+                f"Subject: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action}"
             )
 
-        scn["img_p"] = sanitize_third_party_ip(f"{img_core}, photorealistic 8k --ar 9:16 --style raw --v 6.1")
+        scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
         scn["img_neg"] = base_negative_prompt
         
         clean_vo_for_audio = re.sub(r'\.{2,}', '.', vo_text_current).strip()
 
-        # Prompt Video 5 Lớp Tinh Gọn (~95-115 từ)
-        if idx_scn == 0 and is_pas_story and not is_fashion_wearable:
+        if is_pas_scn1_no_prod:
             raw_vid = (
                 f"[CAMERA & SETTING]: {camera_shot}, gimbal live-action, {scene_setting_en}, {env_lighting_en}. "
                 f"[SUBJECT]: {locked_character_prompt_segment}, {micro_expr_en}, {clean_action} (empty hands, zero product). "
                 f"[TIMING ({dynamic_scene_sec}s)]: 0.0s-{actual_speech_time}s accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. "
+                f"[AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_for_audio}\". Foley only [{combined_sfx}], zero BGM, no text overlays."
+            )
+        elif not is_fashion_wearable:
+            # Chế độ Product-Hero cho Video: Khóa tiêu cự ống kính trực tiếp vào sản phẩm ở trung tâm tiền cảnh
+            raw_vid = (
+                f"[PRODUCT-CENTRIC CAMERA & SETTING]: {camera_shot}, gimbal live-action, {scene_setting_en}, {env_lighting_en}. "
+                f"[{locked_product_prompt_segment}]. "
+                f"[PRODUCT ACTION & PHYSICS]: {clean_action}. {scene_physics} "
+                f"[PRESENTER]: {locked_character_prompt_segment}, {micro_expr_en}. "
+                f"[TIMING ({dynamic_scene_sec}s)]: 0.0s-{actual_speech_time}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. "
                 f"[AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_for_audio}\". Foley only [{combined_sfx}], zero BGM, no text overlays."
             )
         else:
@@ -1314,12 +1353,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     
     goal_badge = "🌟 <b>Định hướng:</b> Xây Kênh & Follow" if is_viral else "🛒 <b>Định hướng:</b> Chốt đơn TikTok Shop"
+    cam_mode_badge = "👗 <b>Chế độ Quay:</b> Fashion Silhouette & Fabric Focus" if is_fashion_wearable else "🎯 <b>Chế độ Quay:</b> Product-Hero Centerpiece (Zoom & Khóa nét thẳng vào Sản phẩm ở tiền cảnh)"
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> ~{int(total_sec)}s | 🎬 <b>Chiến lược:</b> {presentation_format} | 👤 <b>KOC (Anti-Celebrity):</b> {detected_demographic_en}",
         f"🗣 <b>Nhân xưng:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh:</b> {fixed_setting_base} | {goal_badge}",
-        f"👗 <b>Stylist Lock (4 cảnh):</b> {final_outfit_vi}",
+        f"{cam_mode_badge} | 👗 <b>Stylist Lock (4 cảnh):</b> {final_outfit_vi}",
         f"🧱 <b>Khóa Hình Học Cứng & Màu (Anti-Morphing):</b> <code>{clean_prod_en} in {locked_color_en}</code>",
-        f"⚡ <b>Tối ưu Prompt & Token:</b> Đã nén gọn 55% độ dài Prompt Ảnh/Video giúp Veo 3 & Midjourney bắt nét chính xác, phản hồi nhanh gấp đôi"
+        f"⚡ <b>Tối ưu Prompt & Token:</b> Đảo ngược ưu tiên đưa Sản phẩm lên đầu Prompt ở Cảnh 2 & 3 giúp máy quay luôn lấy sản phẩm làm trung tâm"
     ]
     res["director_summary"] = "<br>".join(summary_lines)
     
@@ -2074,13 +2114,13 @@ if all_sc:
             
             c_p1, c_p2 = st.columns(2)
             with c_p1:
-                st.markdown("**🖼 Prompt Ảnh Tinh Gọn (Midjourney / Flux - Khóa Hình Học 3D & Màu Sắc):**")
+                st.markdown("**🖼 Prompt Ảnh Tinh Gọn (Midjourney / Flux - Lấy Sản Phẩm Làm Trọng Tâm Tiền Cảnh):**")
                 st.code(img_p := scn.get('img_p', ''), language="text")
                 safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
                 st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Anti-Morphing, Anti-Celebrity & Khóa Màu):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Zoom & Khóa Nét Vào Sản Phẩm, Anti-Morphing):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
@@ -2141,7 +2181,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Siêu nén Token & Khóa Hình Học 3D)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Tiêu Cự Trung Tâm Vào Sản Phẩm & Siêu Nén Token)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 st.session_state.scroll_to_detail = True
