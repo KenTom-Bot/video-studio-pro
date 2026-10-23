@@ -39,12 +39,11 @@ st.markdown("""
     .dna-row { margin-bottom: 9px; line-height: 1.65; }
     .dna-label { font-weight: 700; color: #0f172a; font-size: 14px; display: inline-block; margin-right: 5px; }
     .dna-text { font-weight: 400 !important; color: #334155 !important; font-size: 14px !important; line-height: 1.65 !important; }
-    .dna-bullet { margin-left: 10px; margin-top: 3px; color: #334155; font-weight: 400; font-size: 14px; line-height: 1.65; }
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. KHỞI TẠO TỪ ĐIỂN & HẰNG SỐ CỐT LÕI
+# 2. KHỞI TẠO TỪ ĐIỂN, HẰNG SỐ CỐT LÕI
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -62,16 +61,15 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. CẦU NỐI 3 NHÁNH (CẢNH 1 -> CẢNH 2, CẤM LẶP TỪ CỦA CẢNH 1):
-   - Nhánh 1 (Giá rẻ/Săn sale) -> Cảnh 2: "Cận cảnh minh chứng chất lượng..." (CẤM dùng từ "Bí quyết").
-   - Nhánh 2 (Nỗi đau PAS) -> Cảnh 2: "Cứu tinh giải pháp cho vấn đề...".
-   - Nhánh 3 (Mẹo hay) -> Cảnh 2: "Bí quyết nằm ở chỗ...".
-2. PRODUCT-CENTRIC FOCUS & STRICT REFERENCE TRACKING:
-   - Nếu là Thời trang: Lấy phom dáng cơ thể làm trung tâm. Nếu ghi chú "quần váy / váy 1 ống" -> BẮT BUỘC dịch "full-length A-line maxi skirt (single unsplit skirt tube, zero leg division)", CẤM "pants/trousers".
-   - Nếu là Đồ gia dụng / Thiết bị (Strict Rigid Appliance): BẮT BUỘC KHOÁ CHẶT THEO ẢNH THAM CHIẾU (100% exact shape, color, surface details identical to reference image). Zero morphing, zero hallucinated parts! Zoom thẳng vào SP ở tiền cảnh (60% khung hình).
+1. CẦU NỐI 3 NHÁNH (CẢNH 1 -> CẢNH 2, CẤM LẶP TỪ CẢNH 1):
+   - Nhánh Giá rẻ -> Cảnh 2: "Cận cảnh minh chứng chất lượng...". CẤM dùng từ "Bí quyết".
+   - Nhánh Nỗi đau -> Cảnh 2: "Cứu tinh giải pháp cho vấn đề...".
+   - Nhánh Mẹo hay -> Cảnh 2: "Bí quyết nằm ở chỗ...".
+2. PRODUCT SCALE & CAMERA RULES (CHỐNG SẢN PHẨM KHỔNG LỒ):
+   - NẾU LÀ ĐỒ CÁN DÀI (Chổi, cây chà sàn): Cấm dùng Macro Close-up. Máy quay phải dùng Medium-Wide shot hoặc Waist-down shot để lấy được cả người và vật, bảo toàn 100% tỷ lệ kích thước thật (real-world scale).
+   - Nếu là Thời trang: Khóa Váy 1 ống ("full-length A-line maxi skirt", cấm "pants").
 3. VĂN NÓI HÀ NỘI THUẦN VIỆT 100%:
-   - 'voiceover': 100% Tiếng Việt, giọng Hà Nội ('mềm rũ', 'bốn', 'nghìn', 'một trăm'). TUYỆT ĐỐI CẤM chèn từ tiếng Anh vào thoại. Cấm 'thuật toán', 'trợ giá'.
-   - Cảnh 4: Neo giá Flash Sale hoặc Soft CTA nhắc lại nỗi đau + bấm giỏ hàng.
+   - Thoại: 100% Tiếng Việt ('mềm rũ', 'bốn', 'nghìn', 'một trăm'). CẤM chèn tiếng Anh.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -156,7 +154,7 @@ SOUTHERN_TO_HANOI = {
 }
 
 # ==============================================================================
-# 3. KẾT NỐI API & DB
+# 3. KẾT NỐI API & DB CƠ BẢN
 # ==============================================================================
 @st.cache_resource(show_spinner=False)
 def init_supabase():
@@ -384,30 +382,7 @@ def format_ocr_prices(ca_data: dict) -> str:
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
-def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
-    combined = f"{strategy_str} {title_str}".lower()
-    return any(k in combined for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
-
-def detect_intimate_apparel(text_to_check: str) -> str:
-    if not text_to_check: return "normal"
-    t = text_to_check.lower()
-    if any(k in t for k in ["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"]): return "underwear_bra"
-    if any(k in t for k in ["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"]): return "camisole"
-    return "normal"
-
-def detect_wearable_fashion(text_to_check: str) -> bool:
-    if not text_to_check: return False
-    t = text_to_check.lower()
-    if any(k in t for k in ["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"]): return False
-    fashion_keywords = ["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama"]
-    return any(k in t for k in fashion_keywords)
-
-def detect_footwear_or_accessory(text_to_check: str) -> bool:
-    if not text_to_check: return False
-    t = text_to_check.lower()
-    if any(k in t for k in ["giỏ", "rổ", "thùng", "hộp", "kệ", "basket", "hamper", "organizer", "bin"]): return False
-    return any(k in t for k in ["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", "shoe", "handbag", "backpack", "wallet", "watch", "glasses"])
-
+# --- CAMERA, PHYSICS & LOGIC ---
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     if not text_to_check: return False
     appliance_keywords = ["giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "bình", "cốc", "ly", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", "pan", "pot", "tool", "vacuum", "dryer", "blower"]
@@ -484,17 +459,50 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     elif any(k in role_lower for k in ["bà", "bà nội", "bà ngoại"]): return "female", "65yo Vietnamese senior woman"
     return "female", f"25yo Vietnamese woman{extra_physique}"
 
-def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool) -> str:
+def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
+    return any(k in f"{strategy_str} {title_str}".lower() for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
+
+def detect_intimate_apparel(text_to_check: str) -> str:
+    if not text_to_check: return "normal"
+    t = text_to_check.lower()
+    if any(k in t for k in ["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"]): return "underwear_bra"
+    if any(k in t for k in ["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"]): return "camisole"
+    return "normal"
+
+def detect_wearable_fashion(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    t = text_to_check.lower()
+    if any(k in t for k in ["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"]): return False
+    return any(k in t for k in ["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama"])
+
+def detect_footwear_or_accessory(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    t = text_to_check.lower()
+    if any(k in t for k in ["giỏ", "rổ", "thùng", "hộp", "kệ", "basket", "hamper", "organizer", "bin"]): return False
+    return any(k in t for k in ["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", "shoe", "handbag", "backpack", "wallet", "watch", "glasses"])
+
+# HÀM MỚI TỐI ƯU CẬN CẢNH ĐỒ CÁN DÀI
+def detect_long_handle_tool(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
+
+def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool, is_long_handle: bool) -> str:
     if is_pas_scene1 and not is_fashion: return "Vertical 9:16 eye-level medium shot"
     if is_fashion:
         if scene_idx == 0: return "Vertical 9:16 eye-level three-quarter full-body shot showcasing the outfit"
         elif scene_idx == 1: return "Vertical 9:16 smooth camera dolly-in to medium close-up focusing sharply on garment neckline, waist cut, and fabric weave"
         elif scene_idx == 2: return "Vertical 9:16 dynamic close-up tracking shot following the flowing garment drape and silhouette in motion"
         else: return "Vertical 9:16 warm eye-level medium shot"
+    elif is_long_handle:
+        # Nếu là cây lau/chổi, TUYỆT ĐỐI KHÔNG close-up, phải dùng góc rộng từ eo xuống để thấy tỷ lệ thực.
+        if scene_idx == 0: return f"Vertical 9:16 full-body wide shot, exact reference-matching {clean_prod_en} held at normal realistic scale"
+        elif scene_idx == 1: return f"Vertical 9:16 medium-wide tracking shot, keeping both human and {clean_prod_en} in frame to maintain normal true-to-life size (NO macro close-up)"
+        elif scene_idx == 2: return f"Vertical 9:16 waist-down medium-wide shot showing the {clean_prod_en} working on the floor at normal realistic scale"
+        else: return f"Vertical 9:16 full-body balanced shot, exact reference-matching {clean_prod_en} displayed at normal scale"
     elif is_appliance:
-        if scene_idx == 0: return f"Vertical 9:16 product-focused medium shot, exact reference-matching {clean_prod_en} held steadily, maintaining realistic human-to-product scale"
+        if scene_idx == 0: return f"Vertical 9:16 product-focused medium shot, exact reference-matching {clean_prod_en} held steadily, maintaining realistic scale"
         elif scene_idx == 1: return f"Vertical 9:16 close-up shot locked on {clean_prod_en}, maintaining 100% accurate true-to-life scale and identical proportions, tack-sharp focus"
-        elif scene_idx == 2: return f"Vertical 9:16 tight close-up action shot centered directly on {clean_prod_en}, strictly maintaining accurate real-world scale during clean subtle interaction"
+        elif scene_idx == 2: return f"Vertical 9:16 tight close-up action shot centered directly on {clean_prod_en}, strictly maintaining accurate real-world scale during subtle interaction"
         else: return f"Vertical 9:16 balanced medium shot with exact reference-matching {clean_prod_en} displayed in realistic scale"
     else:
         if scene_idx == 0: return f"Vertical 9:16 product-focused medium shot, {clean_prod_en} held prominently, maintaining realistic human-to-product scale"
@@ -502,37 +510,46 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         elif scene_idx == 2: return f"Vertical 9:16 tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
-def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False, is_appliance: bool = False) -> str:
+def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False, is_appliance: bool = False, is_long_handle: bool = False) -> str:
     p = f"{product_name} {vo_text}".lower()
     if is_fashion: return "Natural fabric drape in motion; subject steps smoothly, turns 45 degrees, and touches fabric softly (worn on body, zero duplicate item in hands)."
     elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return "CAMERA FOCUS LOCKED ON PRODUCT AND AIRFLOW TARGET: 100% rigid non-deforming body lock, true-to-life scale. Creates a powerful, completely invisible and transparent airflow (ZERO fire, ZERO sparks, ZERO smoke, ZERO plasma). The invisible breeze realistically blows away dust, leaves, or softly blows hair."
     elif any(k in p for k in ["hút bụi", "vacuum"]): return "CAMERA FOCUS LOCKED ON VACUUM HEAD AND DUSTBIN: 100% rigid non-deforming body lock, true-to-life scale. The nozzle glides firmly, visibly sucking dirt, crumbs, or debris off the surface directly into the transparent dustbin in real-time."
-    elif any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "CAMERA FOCUS LOCKED ON WORKING HEAD OF PRODUCT: Rigid tool body lock, true-to-life scale; product glides/scrubs firmly across surface in close-up, visibly removing dirt/stains on the spot."
+    elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs firmly across the floor/surface, visibly removing dirt/stains on the spot."
     elif is_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts, zero giant products. The product stays completely rigid while presenter's hands perform a clean interaction."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); hands hold product, tilt 15 degrees, and trace surface."
 
-def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_appliance: bool):
+def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_appliance: bool, is_long_handle: bool):
     p = f"{clean_prod_en} {check_str}".lower()
     if is_fashion_wearable: return ("stepping forward confidently and gesturing expressively while speaking", "turning 45 degrees gracefully while running one hand smoothly along the waist and neckline fabric", "swaying slightly so the hem flows naturally and touching the fabric to show softness", "posing confidently with a warm open-palm gesture")
     elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return (f"holding the rigid {clean_prod_en} maintaining realistic scale", f"turning on {clean_prod_en} up close, showing completely transparent and invisible airflow (no sparks)", f"aiming {clean_prod_en} to forcefully blow away dust or leaves with invisible breeze", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
-    elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding the rigid {clean_prod_en} maintaining realistic scale", f"positioning {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} in close-up focus, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
+    elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding the rigid {clean_prod_en} maintaining realistic scale", f"positioning {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} in focus, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
+    elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} steadily", f"demonstrating the exact reference-matching {clean_prod_en} on the floor without any added details or scale distortion", f"gliding the {clean_prod_en} smoothly across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
     elif is_appliance: return (f"holding the exact reference-matching {clean_prod_en} steadily at realistic scale", f"presenting the exact reference-matching {clean_prod_en} without any added details or scale distortion", f"demonstrating {clean_prod_en} with precise hand interaction while keeping 100% fidelity and true scale", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
-    else: return (f"holding the rigid {clean_prod_en} at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the close-up lens, tracing fingers along its solid surface without distorting scale", f"demonstrating {clean_prod_en} with steady hand movements while preserving 100% rigid geometry and true scale", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
+    else: return (f"holding the rigid {clean_prod_en} at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers along its solid surface without distorting scale", f"demonstrating {clean_prod_en} with steady hand movements while preserving 100% rigid geometry and true scale", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "") -> str:
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
+    
+    # Logic phát hiện Giày dép theo ngữ cảnh
     is_home = any(k in s_lower for k in ["pijama", "đồ ngủ", "mặc nhà", "phòng ngủ", "nhà bếp", "phòng tắm", "máy giặt", "giặt"])
     is_evening = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
+    is_cleaning_wet = any(k in s_lower for k in ["chà", "lau", "rửa", "vệ sinh", "dọn dẹp", "nước", "xà phòng", "ướt", "sàn"])
     is_single_skirt = detect_single_tube_skirt(s_lower)
     
-    footwear = "clean minimalist pastel indoor slippers" if (is_home and not is_fashion) else ("elegant pointed-toe high heels or strappy heeled sandals" if (is_fashion and is_evening and gender == "female") else "clean minimalist white sneakers or smart-casual loafers")
+    if is_cleaning_wet: footwear = "barefoot or wearing waterproof plastic slippers" # Ép mang dép nhựa hoặc chân trần khi chà rửa
+    elif is_home and not is_fashion: footwear = "clean minimalist pastel indoor slippers"
+    elif is_fashion and is_evening and gender == "female": footwear = "elegant pointed-toe high heels or strappy heeled sandals"
+    else: footwear = "clean minimalist white sneakers or smart-casual loafers"
+    
     contrast = "Áo KOC màu Beige/Mocha/Xanh pastel tương phản làm nổi bật SP màu sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục tông sáng/trung tính thanh lịch tôn SP"
     jewelry = "dainty necklace, pearl stud earrings, and thin bracelet/watch" if gender == "female" else "minimalist wristwatch"
     skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
-    return f"STYLIST LOCK: {contrast} | Giày: {footwear} | Phụ kiện cố định 4 cảnh: {jewelry}{skirt_rule}."
+    return f"STYLIST LOCK: {contrast} | Footwear: {footwear} | Phụ kiện cố định 4 cảnh: {jewelry}{skirt_rule}."
+
 
 # ==============================================================================
-# 6. QUẢN LÝ DB (SUPABASE) VÀ LƯU TRỮ
+# 5. QUẢN LÝ DB (SUPABASE) VÀ LƯU TRỮ
 # ==============================================================================
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0869628316", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
@@ -586,6 +603,7 @@ def save_project_to_db(email, title, payload_data, project_id=None):
             if res.data and len(res.data) > 0:
                 st.session_state.last_autosave_time = datetime.now().strftime("%H:%M:%S")
                 return True, f"Đã tự động cập nhật vào dự án '{title}'!"
+        
         res = supabase.table("saved_projects").insert({"user_email": email, "project_title": title, "script_content": clean_content}).execute()
         if res.data and len(res.data) > 0:
             st.session_state.current_project_id = res.data[0]['id']
@@ -615,7 +633,7 @@ def auto_save_current_session():
         return False, str(e)
 
 # ==============================================================================
-# 7. KHỞI TẠO SESSION STATE TOÀN CỤC CHUẨN XÁC
+# 6. KHỞI TẠO SESSION STATE TOÀN CỤC CHUẨN XÁC NHẤT 
 # ==============================================================================
 if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
 for key, default_val in [
@@ -650,7 +668,7 @@ if st.session_state.scroll_to_top: components.html("<script>window.parent.scroll
 if st.session_state.scroll_to_detail: components.html("""<script>setTimeout(() => { var el = window.parent.document.getElementById('detailed-view-anchor'); if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); } }, 250);</script>""", height=0); st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 8. HỆ THỐNG GỌI GEMINI API: KHÓA CỨNG GEMINI-3.8-FLASH & LITE
+# 7. HỆ THỐNG GỌI GEMINI API: KHÓA CỨNG GEMINI-3.8-FLASH & LITE
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -710,10 +728,10 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False):
     is_viral = ("Viral" in mode)
     pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP làm TRỌNG TÂM TIỀN CẢNH giải quyết vấn đề." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM TIỀN CẢNH xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
-    return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG (BẮT BUỘC TUÂN THỦ TUYỆT ĐỐI): {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- Cảnh 4: {'Kêu gọi thảo luận & follow (không bán hàng)' if is_viral else 'Chốt deal chuẩn quy tắc'}.\n- 'action_en' viết ngắn gọn (dưới 22 từ), 100% tiếng Anh, đặt sản phẩm ở trung tâm tiền cảnh và giữ nguyên khung hình học cứng của sản phẩm."
+    return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG (BẮT BUỘC TUÂN THỦ TUYỆT ĐỐI): {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- Cảnh 4: {'Kêu gọi thảo luận & follow (không bán hàng)' if is_viral else 'Chốt deal chuẩn quy tắc'}.\n- 'action_en' viết ngắn gọn (dưới 22 từ), 100% tiếng Anh."
 
 # ==============================================================================
-# 9. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
+# 8. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -759,6 +777,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_fashion_wearable = detect_wearable_fashion(check_str) and intimate_type == "normal" and not is_footwear_accessory
     is_single_skirt_mode = detect_single_tube_skirt(check_str)
     is_strict_appliance = detect_strict_rigid_appliance(check_str) and not is_fashion_wearable
+    is_long_handle = detect_long_handle_tool(check_str + " " + ai_product_visual_en)
     is_flashsale_script = any(k in f"{fixed_title} {fixed_hook} {presentation_format}".lower() for k in ["flash sale", "săn deal", "deal hời", "giảm sốc", "ưu đãi sốc"])
     
     base_prod_en = f"{locked_color_en} seamless comfort fabric garment" if intimate_type == "underwear_bra" else (ai_product_visual_en if ai_product_visual_en else f"{locked_color_en} {raw_prod_name}")
@@ -771,7 +790,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     else: locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en} in {locked_color_en}{dim_tag} occupying foreground center focus (100% rigid non-deforming geometry, identical solid color across all scenes)" if not is_fashion_wearable else f"Garment Lock: wearing {clean_prod_en} in {locked_color_en} directly on body"
 
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str)
-    action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance)
+    
+    # Ép lấy footwear riêng ra để đính vào prompt Image nếu cần
+    footwear_match = re.search(r'Footwear:\s*([^|]+)', stylist_rules_text)
+    forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
+
+    action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle)
     
     scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng [nhắc lại nỗi đau cụ thể] thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
 
@@ -788,7 +812,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "title": "{fixed_title}",
         "wardrobe_lock": {{
             "outfit_vi": "Set đồ Stylist tiếng Việt",
-            "master_outfit_en": "Concise English outfit + footwear (under 18 words, DO NOT start with 'Wearing', {'MUST use full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division), NEVER use the word pants or trousers' if is_single_skirt_mode else 'coordinated style'})",
+            "master_outfit_en": "Concise English outfit (under 12 words, DO NOT start with 'Wearing', {'MUST use full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division), NEVER use the word pants or trousers' if is_single_skirt_mode else 'coordinated style'})",
             "jewelry_and_accessories_en": "Concise English jewelry (under 10 words)"
         }},
         "scenes": [
@@ -807,9 +831,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "setting": "Bối cảnh thực tế...",
                 "setting_en": "Concise English setting (under 12 words)",
                 "expression_en": "relieved, confident and enthusiastic",
-                "action_en": "{action_scene_2} (under 20 words, product in foreground center focus, keep rigid shape)",
+                "action_en": "{action_scene_2} (under 20 words)",
                 "sfx": "Tiếng thao tác thực tế",
-                "director": "Interest | Zoom thẳng vào chính giữa sản phẩm + Cầu nối 3 nhánh",
+                "director": "Interest | Giữ đúng tỷ lệ sản phẩm + Cầu nối 3 nhánh",
                 "voiceover": "Thoại Cảnh 2 100% tiếng Việt (22-34 từ)..."
             }},
             {{
@@ -817,9 +841,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "setting": "Bối cảnh đồng bộ...",
                 "setting_en": "Concise English setting (under 12 words)",
                 "expression_en": "smiling contentedly with approving nod",
-                "action_en": "{action_scene_3} (under 20 words, product in foreground center focus, keep rigid shape)",
+                "action_en": "{action_scene_3} (under 20 words)",
                 "sfx": "Tiếng trải nghiệm thực tế",
-                "director": "Desire | Cận cảnh khóa nét vào điểm hoạt động của sản phẩm",
+                "director": "Desire | Thao tác cận cảnh không biến dạng sản phẩm",
                 "voiceover": "Thoại Cảnh 3 100% tiếng Việt (20-34 từ)..."
             }},
             {{
@@ -841,15 +865,17 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
     w_lock = res.get("wardrobe_lock", {})
-    raw_outfit_en = sanitize_third_party_ip(w_lock.get("master_outfit_en") or "smart-casual coordinated outfit with clean sneakers")
+    raw_outfit_en = sanitize_third_party_ip(w_lock.get("master_outfit_en") or "smart-casual coordinated outfit")
     final_outfit_en = enforce_single_tube_skirt_syntax(re.sub(r'^(?:consistently\s+)?wearing\s+', '', raw_outfit_en.strip(), flags=re.IGNORECASE).strip().rstrip('.')) if is_single_skirt_mode else re.sub(r'^(?:consistently\s+)?wearing\s+', '', raw_outfit_en.strip(), flags=re.IGNORECASE).strip().rstrip('.')
     final_jewelry_en = re.sub(r'^(?:styled\s+with\s+)', '', sanitize_third_party_ip(w_lock.get("jewelry_and_accessories_en") or "minimalist stud earrings and wristwatch").strip(), flags=re.IGNORECASE).strip().rstrip('.')
     final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
-    locked_character_prompt_segment = f"Fictional everyday {detected_demographic_en} (synthetic AI persona, ordinary citizen), wearing {final_outfit_en}, styled with {final_jewelry_en}"
+    
+    # BẮT BUỘC NHÚNG CHÍNH XÁC GIÀY DÉP VÀO LỆNH HÌNH ẢNH CỦA KOC ĐỂ VƯỢT QUYỀN GEMINI
+    locked_character_prompt_segment = f"Fictional everyday {detected_demographic_en} (synthetic AI persona, ordinary citizen), wearing {final_outfit_en}, wearing {forced_footwear}, styled with {final_jewelry_en}"
 
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     appliance_neg_extra = "hallucinated parts, extra handles, extra spouts, modified shape, changing proportions, warped structure, " if is_strict_appliance else ""
-    base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}oversized product, giant product, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, bending down, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines"
+    base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}oversized product, giant product, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, bending down, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     
     total_sec = 0.0
     for idx_scn, scn in enumerate(scenes):
@@ -868,7 +894,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
         env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text, scn.get("setting", fixed_setting_base))
         is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
-        cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance)
+        cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle)
         
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
         scn["sfx"] = f"{base_sfx}, {env_sfx_en}" if env_sfx_en else base_sfx
@@ -878,7 +904,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("action_en") or action_scene_2, flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
 
-        scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_appliance=is_strict_appliance)
+        scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_appliance=is_strict_appliance, is_long_handle=is_long_handle)
 
         if is_pas_scn1_no_prod:
             img_core = f"{cam_shot}, {scene_set}, {env_lighting_en}. Subject: {locked_character_prompt_segment}, {micro_expr}, {clean_act} (empty hands, zero product)"
@@ -912,13 +938,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s (Tối đa 10s/cảnh) | 🎬 <b>Chiến lược:</b> {presentation_format}",
         f"🗣 <b>Nhân xưng:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh:</b> {fixed_setting_base} | {goal_badge}",
         f"{cam_mode_badge}",
-        f"👗 <b>Bộ máy Stylist Chuyên Sâu (Set đồ + Phụ kiện):</b> {final_outfit_vi}",
+        f"👗 <b>Bộ máy Stylist Chuyên Sâu (Set đồ + Giày dép + Phụ kiện):</b> {final_outfit_vi} (Đã chốt chính xác giày dép khớp ngữ cảnh)",
         f"🎨 <b>Khóa Màu & Hình Khối Sản Phẩm (Product Color Lock):</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} in {locked_color_en}</code>",
         f"🔗 <b>Cầu nối Ngữ nghĩa 3 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo quy luật",
         f"🛡 <b>Bảo vệ Veo 3 (Anti-Celebrity):</b> Đã gắn nhãn KOC thuần Việt ({detected_demographic_en}) & lọc sạch từ khóa nhạy cảm",
     ]
     if is_single_skirt_mode: summary_lines.append("👗 <b>Khóa Váy 1 Ống Rộng (Single Unsplit Skirt Tube Lock):</b> Đã chuyển đổi thành Maxi Skirt, chặn quần 2 ống trong Negative Prompt.")
-    if is_strict_appliance: summary_lines.append("🏠 <b>Khóa Tham Chiếu Đồ Gia Dụng (Strict Reference Appliance):</b> Bám sát 100% hình mẫu tham chiếu, khóa cứng hình học 3D, cấm làm to sản phẩm khổng lồ.")
+    if is_long_handle: summary_lines.append("🧹 <b>Chống Sản Phẩm Khổng Lồ (Long-Handle Scale Lock):</b> Tự động phát hiện dụng cụ cán dài, chặn Macro Close-up, ép góc quay rộng bảo toàn 100% tỷ lệ thực tế.")
+    elif is_strict_appliance: summary_lines.append("🏠 <b>Khóa Tham Chiếu Đồ Gia Dụng (Strict Reference Appliance):</b> Bám sát 100% hình mẫu tham chiếu, khóa cứng hình học 3D, cấm làm to sản phẩm khổng lồ.")
     if any(k in f"{raw_prod_name} {user_custom_note}".lower() for k in ["máy sấy", "máy thổi", "quạt", "hút bụi"]): summary_lines.append("💨 <b>Cơ chế Vật lý Gió/Hút Bụi Tàng hình:</b> Kích hoạt hiệu ứng gió/hút rác thực tế, cấm tia lửa (sparks) và khói (smoke) trong Negative Prompt.")
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có"]: summary_lines.append(f"🎯 <b>Ghi chú riêng của người dùng:</b> {user_custom_note}")
     res["director_summary"] = "<br>".join(summary_lines)
@@ -1002,7 +1029,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     return more_scripts
 
 # ==============================================================================
-# 10. GIAO DIỆN THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN
+# 9. GIAO DIỆN THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -1042,7 +1069,7 @@ with st.sidebar:
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_r
                         st.rerun()
-                    else: st.error("⚠️ Thông tin không hợp lệ hoặc tài khoản đã tồn tại!")
+                    else: st.error("⚠️ Thông tái hoặc tài khoản đã tồn tại!")
     else:
         if is_system_busy:
             if st.button("🛑 HỦY KẸT & MỞ KHÓA NGAY", type="secondary", use_container_width=True, key="sidebar_unhang_btn"):
@@ -1245,7 +1272,7 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 11. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
+# 10. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
