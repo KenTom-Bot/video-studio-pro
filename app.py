@@ -471,6 +471,9 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
             f"holding {clean_prod_en} steadily in one hand while sharing recommendations with a warm open-palm gesture"
         )
 
+# ==============================================================================
+# BỘ MÁY STYLIST THỜI TRANG CHUYÊN SÂU & ĐỒNG NHẤT TOÀN DIỆN
+# ==============================================================================
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "") -> str:
     s_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower()
     h_lower = hero_color.lower()
@@ -1111,7 +1114,7 @@ def build_voice_direction(mode, num_chars, character_profiles):
     return " | ".join(dirs)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn sản phẩm, giữ nguyên diện mạo suốt 4 cảnh."
+    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn trang phục, giữ nguyên diện mạo suốt 4 cảnh."
     rules = "DANH SÁCH DIỄN VIÊN (100% NHÂN VẬT HƯ CẤU ĐỜI THƯỜNG - FICTIONAL SYNTHETIC PERSONA, DIỆN MẠO & PHỤ KIỆN ĐỒNG NHẤT SUỐT 4 CẢNH):\n"
     for p in profiles: 
         rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn trang phục. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
@@ -1207,7 +1210,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     override_rule = f"🛑 CHỈ THỊ ƯU TIÊN CAO NHẤT TỪ NGƯỜI DÙNG: '{custom_note}'. BẮT BUỘC tuân thủ 100%!" if custom_note else ""
 
     return f"""
-    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK SHOP & VIRAL ĐA GIÁC QUAN. PHONG CÁCH: Điện Ảnh Chân Thực
+    BẠN LÀ TỔNG ĐẠO DIỄN VIRTUAL TIKTOK & VIRAL ĐA GIÁC QUAN. PHONG CÁCH: Điện Ảnh Chân Thực
     CHỈ ĐẠO GIỌNG: {voice_guidance}
     {dialogue_type_rule}
     {DUAL_BRANCH_BRIDGE_INSTRUCTION}
@@ -1448,7 +1451,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         setting_archetype=fixed_setting_base, is_fixed_location=True,
         is_pas_story=is_pas_story
     )
-    res = call_gemini([prompt_text], sys_inst, max_tokens=6500)
+    res = call_gemini([prompt_text], sys_inst, max_tokens=4000)
     if not res: raise Exception("AI không phản hồi hoặc trả về dữ liệu rỗng. Vui lòng bấm tạo lại.")
     
     scenes = res.get("scenes") or res.get("script") or []
@@ -1964,6 +1967,16 @@ if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở 
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
+# THÊM NÚT CỨU HỘ KHI APP BỊ TREO TIẾN TRÌNH
+if is_system_busy:
+    st.warning("⚠️ Hệ thống đang bận hoặc tiến trình trước đó bị kẹt.")
+    if st.button("🛑 Bấm vào đây để Hủy kẹt & Đặt lại trạng thái ngay", type="secondary"):
+        st.session_state.current_processing_id = None
+        st.session_state.current_cloning_id = None
+        st.toast("✅ Đã mở khóa hệ thống thành công!")
+        time.sleep(0.3)
+        st.rerun()
+
 user_allowed_modules = st.session_state.licensed_accounts.get(st.session_state.current_email, {}).get("roles", ALL_MODULES) or ALL_MODULES
 mode = st.selectbox("🎯 Thể loại:", user_allowed_modules, key=f"mode_sel_{st.session_state.reset_key}")
 is_viral_mode = "Viral" in mode
@@ -2138,7 +2151,7 @@ if not st.session_state.is_analyzed:
                             "color_palette": "Bảng màu toàn bộ",
                             "what_and_unique": "[Tên sản phẩm]: [Điểm độc bản USP]",
                             "target_user": "Đối tượng phù hợp nhất",
-                            "why_buy": "Lý do thuyết phục nên mua",
+                            "why_buy": "LÝ do thuyết phục nên mua",
                             "where_and_convenience": "Hoàn cảnh ứng dụng và sự tiện lợi",
                             "product_dimensions": "Kích thước đời thực",
                             "prompt_dna_lock": "Visual DNA cho video"
@@ -2277,7 +2290,7 @@ if isinstance(ca, dict):
                 <div class="dna-card-title">⚙ 4. Chuẩn Bối Cảnh Sự Kiện, Động Lực Học & Mức Giá</div>
                 <div class="dna-row"><span class="dna-label">🏙 Chuẩn bối cảnh sự kiện:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{clean_analysis_text(ca.get('setting_archetype', 'Sảnh chờ tiệc cưới / Văn phòng sang trọng'))}</span></div>
                 <div class="dna-row"><span class="dna-label">📍 Cơ chế tọa độ:</span><span class="dna-text" style="color:#0284c7; font-weight:600;">{loc_type_str}</span></div>
-                <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#0284c7; font-weight:700;">{dim_txt_display}</span></div>
+                <div class="dna-row"><span class="dna-label">📐 Tỉ lệ thực tế:</span><span class="dna-text" style="color:#d97706; font-weight:700;">{dim_txt_display}</span></div>
                 <div class="dna-row"><span class="dna-label">💰 Mức giá (OCR):</span><span class="dna-text">{format_ocr_prices(ca)}</span></div>
                 <div class="dna-row"><span class="dna-label" style="color:#dc2626;">🎯 Mức giá đồng bộ (Nay giảm):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">Bình thường khoảng {soft_orig}, nay giảm khoảng {soft_sale}</span></div>
             </div>
@@ -2423,20 +2436,20 @@ if all_sc:
     st.divider()
     st.markdown("### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
     
-    cg1, cg2, cg3 = st.columns([1.4, 1.6, 1.0])
-    c_unified_more = cg1.selectbox(
+    cy1, cy2, cy3 = st.columns([1.4, 1.6, 1.0])
+    c_unified_more = cy1.selectbox(
         "🧭 Chiến lược & Hình thức Video mới:",
         UNIFIED_STRATEGY_FORMAT_OPTS,
         index=0,
         key=f"more_unified_{st.session_state.reset_key}"
     )
-    e_role = cg2.text_input(
+    e_role = cy2.text_input(
         "👤 Vai trò NV mới (Để trống = AI tự phân tích):",
         value="",
         placeholder="Để trống = Giữ nguyên hoặc AI tự phân tích...",
         key=f"er_0_{st.session_state.reset_key}"
     )
-    e_file = cg3.file_uploader(
+    e_file = cy3.file_uploader(
         "📸 Ảnh mẫu NV mới (Tùy chọn):",
         type=["jpg", "png"],
         key=f"ef_0_{st.session_state.reset_key}"
