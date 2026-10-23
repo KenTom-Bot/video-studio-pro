@@ -28,6 +28,7 @@ st.markdown("""
     div[data-testid="stButton"] > button[kind="secondary"], div[data-testid="stFormSubmitButton"] > button[kind="secondary"] { background: linear-gradient(135deg, #ff4b4b 0%, #ff7300 100%) !important; color: #ffffff !important; box-shadow: 0 3px 8px rgba(255, 75, 75, 0.35) !important; padding: 0.55rem 1rem !important; font-weight: bold !important; border: none !important; width: 100%; }
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #bbf7d0; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
+    .autosave-badge { color: #0369a1; font-weight: 700; background: #e0f2fe; padding: 4px 10px; border-radius: 6px; font-size: 12px; border: 1px solid #bae6fd; display: inline-block; margin-top: 4px; }
     .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; color: #1e3a8a; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 12px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: block; width: 100%; margin-top: 4px; line-height: 1.8; white-space: pre-line; }
     .timing-badge { font-size: 13.5px; font-weight: 700; color: #1e40af; background: #dbeafe; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; display: inline-block; margin-bottom: 6px; }
@@ -113,6 +114,37 @@ def clean_html(raw_html: str) -> str:
     if not raw_html:
         return ""
     return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
+
+# ==============================================================================
+# HÀM TRÍCH XUẤT TÊN SẢN PHẨM ĐƯỢC IN ĐẬM ĐỂ ĐẶT TÊN DỰ ÁN TỰ ĐỘNG
+# ==============================================================================
+def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
+    raw = ""
+    if isinstance(ca_data, dict):
+        raw = str(ca_data.get("what_and_unique", "")).strip()
+    if not raw and fallback_topic:
+        raw = fallback_topic.strip()
+    if not raw:
+        return f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
+    
+    # Xóa tiền tố thừa nếu có
+    pattern = r'^(?:SẢN PHẨM LÀ GÌ\s*&?\s*(?:CÓ GÌ ĐẶC BIỆT)?|CHỦ ĐỀ|SẢN PHẨM)\s*:\s*'
+    clean = re.sub(pattern, '', raw, flags=re.IGNORECASE).strip()
+    
+    # Lấy đúng phần tên sản phẩm (phần được tô đậm trước dấu ':' hoặc ' - ')
+    if ":" in clean:
+        prod_name = clean.split(":", 1)[0].strip()
+    elif " - " in clean:
+        prod_name = clean.split(" - ", 1)[0].strip()
+    else:
+        prod_name = clean
+
+    prod_name = re.sub(r'[\[\]\*\"\'`]', '', prod_name).strip()
+    if len(prod_name) > 55:
+        prod_name = prod_name[:52].strip() + "..."
+    
+    date_tag = datetime.now().strftime('%d/%m')
+    return f"{prod_name} ({date_tag})" if prod_name else f"Chiến dịch ({date_tag})"
 
 # ==============================================================================
 # BỘ KHÓA MÀU SẮC, HÌNH HỌC & CHỐNG NHẦM QUẦN 2 ỐNG KHI MẶC VÁY 1 ỐNG
@@ -911,7 +943,8 @@ def save_project_to_db(email, title, payload_data, project_id=None):
                 "script_content": clean_content
             }).eq("id", project_id).execute()
             if res.data and len(res.data) > 0:
-                return True, "Đã cập nhật dự án thành công!"
+                st.session_state.last_autosave_time = datetime.now().strftime("%H:%M:%S")
+                return True, f"Đã tự động cập nhật vào dự án '{title}'!"
         
         res = supabase.table("saved_projects").insert({
             "user_email": email,
@@ -920,14 +953,15 @@ def save_project_to_db(email, title, payload_data, project_id=None):
         }).execute()
         if res.data and len(res.data) > 0:
             st.session_state.current_project_id = res.data[0]['id']
-            return True, "Đã tự động lưu dự án thành công!"
+            st.session_state.last_autosave_time = datetime.now().strftime("%H:%M:%S")
+            return True, f"Đã tự động tạo & lưu dự án '{title}'!"
         return False, "Không thể lưu dữ liệu dự án."
     except Exception as e:
         return False, str(e)
 
 def auto_save_current_session():
     if not st.session_state.get("is_logged_in") or not supabase:
-        return
+        return False, ""
     try:
         dedup_details = {str(k): v for k, v in st.session_state.get("generated_details", {}).items()}
         st.session_state.generated_details = dedup_details
@@ -941,14 +975,14 @@ def auto_save_current_session():
             "current_input_context": st.session_state.get("current_input_context", ""),
             "is_analyzed": st.session_state.get("is_analyzed", False)
         }
-        save_project_to_db(
+        return save_project_to_db(
             st.session_state.current_email,
             st.session_state.active_project_title,
             payload,
             st.session_state.current_project_id
         )
-    except Exception:
-        pass
+    except Exception as e:
+        return False, str(e)
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -963,7 +997,8 @@ for key, default_val in [
     ("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng"),
     ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
     ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
-    ("current_processing_id", None), ("current_cloning_id", None), ("is_analyzed", False)
+    ("current_processing_id", None), ("current_cloning_id", None), ("is_analyzed", False),
+    ("last_autosave_time", "")
 ]:
     if key not in st.session_state:
         st.session_state[key] = default_val
@@ -1088,7 +1123,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - LẤY SẢN PHẨM LÀM TRỌNG TÂM & KHÓA VÁY 1 ỐNG
+# HÀM TẠO CHI TIẾT KỊCH BẢN - TỰ ĐỘNG LƯU CẬP NHẬT VÀO DỰ ÁN HIỆN TẠI
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1557,29 +1592,23 @@ with st.sidebar:
                 "generated_details": {}, "content_analysis": None, "active_script_id": None,
                 "current_input_context": "", "current_product_data_saved": None, "current_product_data": None,
                 "current_project_id": None, "saved_reference_images": [], "character_profiles": [],
-                "current_processing_id": None, "current_cloning_id": None, "is_analyzed": False
+                "current_processing_id": None, "current_cloning_id": None, "is_analyzed": False,
+                "last_autosave_time": ""
             })
             st.session_state.active_project_title = f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
             st.rerun()
             
         st.session_state.active_project_title = st.text_input("Tên dự án hiện tại:", value=st.session_state.active_project_title)
         
+        if st.session_state.get("last_autosave_time"):
+            st.markdown(f"<div class='autosave-badge'>☁️ Đã tự động lưu lúc {st.session_state.last_autosave_time}</div>", unsafe_allow_html=True)
+
         c_save1, c_save2 = st.columns(2)
         if c_save1.button("💾 Lưu Dự Án", use_container_width=True, disabled=is_system_busy):
-            dedup_details = {str(k): v for k, v in st.session_state.get("generated_details", {}).items()}
-            payload = {
-                "content_analysis": st.session_state.get("content_analysis"),
-                "all_scripts": st.session_state.get("all_scripts", []),
-                "cloned_scripts": st.session_state.get("cloned_scripts", []),
-                "expanded_scripts": st.session_state.get("expanded_scripts", []),
-                "generated_details": dedup_details,
-                "character_profiles": st.session_state.get("character_profiles", []),
-                "current_input_context": st.session_state.get("current_input_context", ""),
-                "is_analyzed": st.session_state.get("is_analyzed", False)
-            }
-            success, msg = save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
+            success, msg = auto_save_current_session()
             if success:
                 st.toast(f"✅ {msg}")
+                st.rerun()
             else:
                 st.error(f"❌ {msg}")
             
@@ -1595,9 +1624,10 @@ with st.sidebar:
                 "current_input_context": st.session_state.get("current_input_context", ""),
                 "is_analyzed": st.session_state.get("is_analyzed", False)
             }
-            success, msg = save_project_to_db(st.session_state.current_email, f"{st.session_state.active_project_title} (Bản sao)", payload, project_id=None)
+            new_title = f"{st.session_state.active_project_title} (Bản sao)"
+            success, msg = save_project_to_db(st.session_state.current_email, new_title, payload, project_id=None)
             if success: 
-                st.session_state.active_project_title = f"{st.session_state.active_project_title} (Bản sao)"
+                st.session_state.active_project_title = new_title
                 st.toast("✅ Đã lưu thành dự án mới độc lập!")
                 st.rerun()
             else:
@@ -1609,7 +1639,6 @@ with st.sidebar:
         
         if supabase:
             try:
-                # CHỈ TẢI METADATA SIÊU NHẸ (KHÔNG TẢI CỘT SCRIPT_CONTENT NẶNG KHI VỪA MỞ APP)
                 if is_admin_user:
                     res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").order("created_at", desc=True).limit(50).execute()
                 else:
@@ -1632,7 +1661,9 @@ with st.sidebar:
             else:
                 for p in display_projects:
                     proj_creator = p.get("user_email", "N/A")
-                    with st.expander(f"🎬 {p['project_title']}"):
+                    is_current_open = (str(st.session_state.get("current_project_id")) == str(p['id']))
+                    exp_label = f"🟢 {p['project_title']}" if is_current_open else f"🎬 {p['project_title']}"
+                    with st.expander(exp_label):
                         if is_admin_user:
                             st.markdown(f"<span style='font-size:12px; color:#1e40af; background:#dbeafe; padding:2px 8px; border-radius:4px; font-weight:600;'>👤 Tạo bởi: {proj_creator}</span>", unsafe_allow_html=True)
                             st.caption(f"📅 Ngày tạo: {p.get('created_at', '')[:10]}")
@@ -1641,7 +1672,7 @@ with st.sidebar:
                         if st.button("✏️ Cập Nhật Tên", key=f"ren_btn_{p['id']}", use_container_width=True, disabled=is_system_busy):
                             if new_p_name.strip() and new_p_name.strip() != p['project_title']:
                                 supabase.table("saved_projects").update({"project_title": new_p_name.strip()}).eq("id", p['id']).execute()
-                                if str(st.session_state.get("current_project_id")) == str(p['id']):
+                                if is_current_open:
                                     st.session_state.active_project_title = new_p_name.strip()
                                 st.toast("✅ Đã đổi tên dự án thành công!")
                                 st.rerun()
@@ -1666,7 +1697,7 @@ with st.sidebar:
                             st.rerun()
                         if col_d.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True, disabled=is_system_busy):
                             supabase.table("saved_projects").delete().eq("id", p['id']).execute()
-                            if str(st.session_state.get("current_project_id")) == str(p['id']):
+                            if is_current_open:
                                 st.session_state.current_project_id = None
                             st.toast("✅ Đã xóa dự án!")
                             st.rerun()
@@ -1877,7 +1908,7 @@ if not st.session_state.is_analyzed:
         if not can_run:
             st.error(msg)
         else:
-            with st.spinner("⏳ Đạo diễn AI đang quét cấu trúc hình học 3D, khóa màu sắc tiếng Anh & phối đồ Stylist..."):
+            with st.spinner("⏳ Đạo diễn AI đang phân tích sản phẩm, tạo 5 kịch bản & tự động lưu dự án theo tên sản phẩm..."):
                 try:
                     st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": 1, "role": ""}]
                     char_rules = generate_char_rules_string(st.session_state.character_profiles)
@@ -1972,7 +2003,8 @@ if not st.session_state.is_analyzed:
                     payload.append(prompt)
                     
                     res = call_gemini(payload, get_sys_inst_outlines(mode, style, "On-camera", char_rules, 1, unified_strategy_format, custom_note.strip(), unified_strategy_format), max_tokens=4096)
-                    st.session_state.content_analysis = res.get("content_analysis")
+                    ca_result = res.get("content_analysis") or {}
+                    st.session_state.content_analysis = ca_result
                     outlines = res.get("outlines", res.get("script_outlines", []))
                     
                     if not outlines:
@@ -1989,9 +2021,21 @@ if not st.session_state.is_analyzed:
                             "custom_note": custom_note.strip(),
                             "presentation_format": unified_strategy_format
                         })
-                    st.session_state.update({"all_scripts": outlines, "cloned_scripts": [], "expanded_scripts": [], "generated_details": {}, "active_script_id": None, "is_analyzed": True})
+                    
+                    # TỰ ĐỘNG LẤY TÊN SẢN PHẨM IN ĐẬM ĐỂ ĐẶT TÊN DỰ ÁN VÀ LƯU NGAY LẬP TỨC
+                    auto_proj_title = extract_bold_product_title(ca_result, fallback_topic=viral_topic)
+                    st.session_state.update({
+                        "active_project_title": auto_proj_title,
+                        "current_project_id": None,
+                        "all_scripts": outlines,
+                        "cloned_scripts": [],
+                        "expanded_scripts": [],
+                        "generated_details": {},
+                        "active_script_id": None,
+                        "is_analyzed": True
+                    })
                     auto_save_current_session()
-                    st.toast("✅ Đã phân tích Sản phẩm nhanh chóng & tự động lưu dự án!")
+                    st.toast(f"✅ Đã phân tích & tự động lưu dự án: {auto_proj_title}!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"❌ Lỗi: {e}")
@@ -2002,7 +2046,10 @@ if not st.session_state.is_analyzed:
 ca = st.session_state.content_analysis
 if isinstance(ca, dict):
     st.divider()
-    st.markdown("### 🔍 **Phân Tích Chi Tiết**")
+    col_hdr1, col_hdr2 = st.columns([2.5, 1.5])
+    col_hdr1.markdown("### 🔍 **Phân Tích Chi Tiết**")
+    if st.session_state.get("last_autosave_time"):
+        col_hdr2.markdown(f"<div style='text-align:right;'><span class='autosave-badge'>☁️ Dự án: <b>{st.session_state.active_project_title}</b> (Đã tự động lưu {st.session_state.last_autosave_time})</span></div>", unsafe_allow_html=True)
     
     col_row1_left, col_row1_right = st.columns(2)
     with col_row1_left:
@@ -2168,7 +2215,7 @@ if all_sc:
             sc_id = outline["id"]
             with st.container(border=True):
                 c1, c2, c3 = st.columns([2.5, 1, 1])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}**")
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
                 c1.caption(f"⚡ *{outline.get('hook')}*")
                 if str(sc_id) != str(st.session_state.active_script_id):
                     if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
@@ -2215,7 +2262,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Tiêu Cự Trung Tâm Vào Sản Phẩm & Gemini 3.8 Flash)..."):
+            with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} & tự động lưu cập nhật vào dự án '{st.session_state.active_project_title}'..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
@@ -2224,7 +2271,7 @@ if all_sc:
             
         st.session_state.current_processing_id = None
         if success:
-            st.toast(f"✅ Đã hoàn tất dựng kịch bản #{target_id_to_run}!")
+            st.toast(f"✅ Đã dựng kịch bản #{target_id_to_run} & tự động lưu cập nhật vào dự án!")
             st.rerun()
         else:
             st.error(f"❌ Lỗi khi dựng kịch bản: {error_msg}")
@@ -2234,7 +2281,7 @@ if all_sc:
         success = False
         error_msg = ""
         try:
-            with st.spinner(f"⏳ Đang nhân bản 5 biến thể trung thành cho kịch bản #{clone_id_to_run}..."):
+            with st.spinner(f"⏳ Đang nhân bản 5 biến thể cho kịch bản #{clone_id_to_run} & tự động lưu cập nhật..."):
                 new_clones = clone_script(clone_id_to_run)
                 st.session_state.cloned_scripts.extend(new_clones)
                 auto_save_current_session()
@@ -2244,7 +2291,7 @@ if all_sc:
             
         st.session_state.current_cloning_id = None
         if success:
-            st.toast("✅ Đã nhân bản thành công 5 kịch bản voice bám sát gốc!")
+            st.toast("✅ Đã nhân bản 5 kịch bản & tự động lưu cập nhật vào dự án!")
             st.rerun()
         else:
             st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
@@ -2283,12 +2330,12 @@ if all_sc:
     if st.button("🚀 Gọi Thêm 5 Kịch Bản Mới", type="primary", use_container_width=True, disabled=is_system_busy):
         can_run, msg = check_usage_limit(st.session_state.current_email)
         if can_run:
-            with st.spinner("⏳ Đang sáng tạo thêm 5 kịch bản theo đúng chiến lược và ghi chú AI ưu tiên..."):
+            with st.spinner("⏳ Đang sáng tạo thêm 5 kịch bản & tự động lưu cập nhật vào dự án..."):
                 p_chars = [{"id": 1, "role": e_role.strip()}] if e_role.strip() else st.session_state.character_profiles
                 new_sc = generate_more_scripts(c_unified_more, p_chars, extra_custom_note)
                 st.session_state.expanded_scripts.extend(new_sc)
                 auto_save_current_session()
-                st.toast("✅ Đã sinh thêm 5 kịch bản mới theo đúng yêu cầu!")
+                st.toast("✅ Đã sinh thêm 5 kịch bản mới & tự động lưu cập nhật vào dự án!")
                 st.rerun()
         else:
             st.error(msg)
