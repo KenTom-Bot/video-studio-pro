@@ -16,25 +16,9 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & GA4
+# 1. CẤU HÌNH GIAO DIỆN NHẸ & CHỐNG NGHẼN KHỞI TẠO
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
-
-ga_script = """
-<script>
-    if (!window.parent.document.getElementById('ga-script')) {
-        var script = document.createElement('script');
-        script.id = 'ga-script';
-        script.src = "https://www.googletagmanager.com/gtag/js?id=G-19YJP7NJ6W";
-        script.async = true;
-        window.parent.document.head.appendChild(script);
-        var script2 = document.createElement('script');
-        script2.innerHTML = `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-19YJP7NJ6W');`;
-        window.parent.document.head.appendChild(script2);
-    }
-</script>
-"""
-components.html(ga_script, width=0, height=0)
 
 st.markdown("""
 <style>
@@ -72,17 +56,29 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def init_supabase():
     try:
-        return create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+        url = st.secrets.get("SUPABASE_URL", os.environ.get("SUPABASE_URL", ""))
+        key = st.secrets.get("SUPABASE_KEY", os.environ.get("SUPABASE_KEY", ""))
+        if url and key:
+            return create_client(url, key)
     except Exception:
-        return None
+        pass
+    return None
+
+@st.cache_resource(show_spinner=False)
+def init_gemini_client():
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
+        if api_key:
+            return genai.Client(api_key=api_key)
+    except Exception:
+        pass
+    return None
 
 supabase = init_supabase()
-
-api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
-client = genai.Client(api_key=api_key) if api_key else None
+client = init_gemini_client()
 
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text)) if text else 0
@@ -832,8 +828,8 @@ def load_licensed_accounts():
     if not supabase:
         return accs
     try:
-        res = supabase.table("licensed_accounts").select("*").execute()
-        for row in res.data:
+        res = supabase.table("licensed_accounts").select("*").limit(200).execute()
+        for row in (res.data or []):
             accs[row["email"]] = {
                 "roles": row.get("roles", ALL_MODULES), "phone": row.get("phone", ""),
                 "password": row.get("password", ""), "expires_at": row.get("expires_at", "2099-12-31"),
@@ -885,7 +881,7 @@ def check_usage_limit(email, is_detailing=False):
 
 def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt", custom_color: str = "#16a34a"):
     b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
-    html_id = f"btn_{int(time.time()*10000)}_{len(text_to_copy)}"
+    html_id = f"btn_{uuid.uuid4().hex[:8]}"
     html_code = f"""
     <button id="{html_id}" style="background:{custom_color}; color:white; border:none; padding:7px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer; width:100%; transition: 0.2s;">{button_label}</button>
     <script>
@@ -933,7 +929,6 @@ def auto_save_current_session():
     if not st.session_state.get("is_logged_in") or not supabase:
         return
     try:
-        # Chuẩn hóa generated_details chỉ lưu key dạng chuỗi để tránh nhân đôi payload gây lỗi kết nối WebSocket
         dedup_details = {str(k): v for k, v in st.session_state.get("generated_details", {}).items()}
         st.session_state.generated_details = dedup_details
         payload = {
@@ -958,7 +953,7 @@ def auto_save_current_session():
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 for key, default_val in [
-    ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", load_licensed_accounts()),
+    ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", None),
     ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
     ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
     ("current_input_context", ""), ("current_product_data_saved", None), ("current_product_data", None),
@@ -972,6 +967,9 @@ for key, default_val in [
 ]:
     if key not in st.session_state:
         st.session_state[key] = default_val
+
+if st.session_state.licensed_accounts is None:
+    st.session_state.licensed_accounts = load_licensed_accounts()
 
 is_system_busy = (
     st.session_state.get("current_processing_id") is not None or 
@@ -987,14 +985,6 @@ if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMA
             save_single_account(st.session_state.current_email, st.session_state.licensed_accounts[st.session_state.current_email])
             st.rerun()
         st.stop()
-
-if st.session_state.scroll_to_top:
-    components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0)
-    st.session_state.scroll_to_top = False
-
-if st.session_state.scroll_to_detail:
-    components.html("""<script>setTimeout(() => { var el = window.parent.document.getElementById('detailed-view-anchor'); if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); } }, 250);</script>""", height=0)
-    st.session_state.scroll_to_detail = False
 
 def repair_and_parse_json(text_content: str):
     if not text_content:
@@ -1038,6 +1028,8 @@ def repair_and_parse_json(text_content: str):
 # HÀM GỌI GEMINI API: KHÓA CỨNG GEMINI-3.8-FLASH & GEMINI-3.8-FLASH-LITE
 # ==============================================================================
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+    if not client:
+        raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
     models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
     last_exception = None
     for model_name in models_to_try:
@@ -1419,7 +1411,7 @@ def clone_script(script_id):
         return []
     
     cur_len = len(all_combined)
-    target_detail = st.session_state.generated_details.get(str(script_id), st.session_state.generated_details.get(int(script_id) if str(script_id).isdigit() else "", {}))
+    target_detail = st.session_state.generated_details.get(str(script_id), {})
     user_custom_note = target.get("custom_note") or st.session_state.get("current_input_context", "").strip()
     presentation_format = target.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
     
@@ -1504,15 +1496,15 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     return more_scripts
 
 # ==============================================================================
-# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN TOÀN NĂNG
+# 3. THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN TOÀN NĂNG (TRUY VẤN SIÊU NHẸ)
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
         tabs = st.tabs(["🔐 Đăng Nhập", "🚀 Đăng Ký"])
         with tabs[0]:
             with st.form("login_form", border=False):
-                email_input = st.text_input("Email:", key="f_login_email", autocomplete="new-password")
-                pass_input = st.text_input("Mật khẩu:", type="password", key="f_login_pass", autocomplete="new-password")
+                email_input = st.text_input("Email:", key="f_login_email")
+                pass_input = st.text_input("Mật khẩu:", type="password", key="f_login_pass")
                 submit_login = st.form_submit_button("🔑 Đăng Nhập", type="primary", use_container_width=True)
                 if submit_login:
                     email_c, pass_c = email_input.strip(), pass_input.strip()
@@ -1521,19 +1513,18 @@ with st.sidebar:
                         save_single_account(email_c, st.session_state.licensed_accounts[email_c])
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_c
-                        st.toast("✅ Đăng nhập thành công!")
                         st.rerun()
                     else:
                         st.error("❌ Email hoặc mật khẩu không đúng!")
             
             with st.expander("❓ Quên mật khẩu?"):
-                st.info("💡 Nếu quên mật khẩu, vui lòng liên hệ Hotline / Zalo Admin: **0869 628 316** để được xác thực tài khoản và cấp lại mật khẩu ngay lập tức.")
+                st.info("💡 Nếu quên mật khẩu, vui lòng liên hệ Hotline / Zalo Admin: **0869 628 316** để được hỗ trợ ngay lập tức.")
                         
         with tabs[1]:
             with st.form("register_form", border=False):
-                r_email = st.text_input("Email đăng ký:", key="f_reg_email", autocomplete="new-password")
-                r_phone = st.text_input("Số điện thoại:", key="f_reg_phone", autocomplete="new-password")
-                r_pass = st.text_input("Mật khẩu mới:", type="password", key="f_reg_pass", autocomplete="new-password")
+                r_email = st.text_input("Email đăng ký:", key="f_reg_email")
+                r_phone = st.text_input("Số điện thoại:", key="f_reg_phone")
+                r_pass = st.text_input("Mật khẩu mới:", type="password", key="f_reg_pass")
                 r_purpose = st.selectbox("🎯 Mục đích:", ["🛒 TikTok Shop", "🌟 Viral & Xây Kênh", "⚡ Cả hai"], key="f_reg_purpose")
                 submit_reg = st.form_submit_button("🚀 Đăng Ký", type="secondary", use_container_width=True)
                 if submit_reg:
@@ -1548,12 +1539,10 @@ with st.sidebar:
                         save_single_account(email_r, st.session_state.licensed_accounts[email_r])
                         st.session_state.is_logged_in = True
                         st.session_state.current_email = email_r
-                        st.toast("✅ Đăng ký thành công!")
                         st.rerun()
                     else:
                         st.error("⚠️ Thông tin không hợp lệ hoặc tài khoản đã tồn tại!")
     else:
-        # NÚT HỦY KẸT GHIM CỐ ĐỊNH TRÊN ĐẦU SIDEBAR ĐỂ LUÔN NHÌN THẤY
         if is_system_busy:
             if st.button("🛑 HỦY KẸT & MỞ KHÓA NGAY", type="secondary", use_container_width=True, key="sidebar_unhang_btn"):
                 st.session_state.current_processing_id = None
@@ -1594,7 +1583,7 @@ with st.sidebar:
             else:
                 st.error(f"❌ {msg}")
             
-        if c_save2.button("📑 Lưu Bản Mới", use_container_width=True, disabled=is_system_busy, help="Lưu nội dung hiện tại thành một dự án mới hoàn toàn"):
+        if c_save2.button("📑 Lưu Bản Mới", use_container_width=True, disabled=is_system_busy):
             dedup_details = {str(k): v for k, v in st.session_state.get("generated_details", {}).items()}
             payload = {
                 "content_analysis": st.session_state.get("content_analysis"),
@@ -1620,10 +1609,11 @@ with st.sidebar:
         
         if supabase:
             try:
+                # CHỈ TẢI METADATA SIÊU NHẸ (KHÔNG TẢI CỘT SCRIPT_CONTENT NẶNG KHI VỪA MỞ APP)
                 if is_admin_user:
-                    res = supabase.table("saved_projects").select("*").order("created_at", desc=True).execute()
+                    res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").order("created_at", desc=True).limit(50).execute()
                 else:
-                    res = supabase.table("saved_projects").select("*").eq("user_email", st.session_state.current_email).order("created_at", desc=True).execute()
+                    res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").eq("user_email", st.session_state.current_email).order("created_at", desc=True).limit(30).execute()
                 all_projects = res.data or []
             except Exception:
                 all_projects = []
@@ -1658,7 +1648,8 @@ with st.sidebar:
                         
                         col_o, col_d = st.columns(2)
                         if col_o.button("📂 Mở", key=f"o_{p['id']}", use_container_width=True, disabled=is_system_busy):
-                            sd = p.get("script_content", {})
+                            full_row = supabase.table("saved_projects").select("script_content").eq("id", p['id']).single().execute()
+                            sd = (full_row.data or {}).get("script_content", {})
                             loaded_details = {str(k): v for k, v in sd.get("generated_details", {}).items()}
                             st.session_state.update({
                                 "content_analysis": sd.get("content_analysis"), 
@@ -1670,8 +1661,7 @@ with st.sidebar:
                                 "current_input_context": sd.get("current_input_context", ""),
                                 "current_project_id": p['id'], 
                                 "active_project_title": p['project_title'], 
-                                "is_analyzed": sd.get("is_analyzed", True),
-                                "scroll_to_detail": True
+                                "is_analyzed": sd.get("is_analyzed", True)
                             })
                             st.rerun()
                         if col_d.button("🗑 Xóa", key=f"d_{p['id']}", type="secondary", use_container_width=True, disabled=is_system_busy):
@@ -1695,9 +1685,9 @@ with st.sidebar:
             st.markdown("---")
             st.markdown("### ⚙ QUẢN TRỊ ADMIN")
             with st.expander("➕ Cấp Quyền Mới", expanded=False):
-                adm_acc = st.text_input("Email:", autocomplete="new-password", key="adm_in_acc")
-                adm_phone = st.text_input("SĐT:", autocomplete="new-password", key="adm_in_phone")
-                adm_pass = st.text_input("Mật khẩu:", value="123456", autocomplete="new-password", key="adm_in_pass")
+                adm_acc = st.text_input("Email:", key="adm_in_acc")
+                adm_phone = st.text_input("SĐT:", key="adm_in_phone")
+                adm_pass = st.text_input("Mật khẩu:", value="123456", key="adm_in_pass")
                 adm_roles_choice = st.multiselect("🎯 Thể loại:", ALL_MODULES, default=ALL_MODULES, key="adm_in_roles")
                 adm_plan = st.radio("Gói cước:", ["Trial", "Basic", "Advanced", "VIP"], horizontal=True, key="adm_in_plan")
                 adm_dur = st.selectbox("Thời hạn:", ["3 Ngày", "7 Ngày", "1 Tháng", "3 Tháng", "6 Tháng", "1 Năm", "2 Năm", "Vĩnh viễn", "Tùy chỉnh (Chọn ngày)"], key="adm_in_dur")
@@ -1706,7 +1696,6 @@ with st.sidebar:
                 if adm_dur == "Tùy chỉnh (Chọn ngày)":
                     custom_date = st.date_input("Chọn ngày hết hạn:", value=date.today() + timedelta(days=30), min_value=date.today(), key="adm_custom_date")
                     calculated_exp_str = custom_date.strftime("%Y-%m-%d")
-                    st.caption(f"📅 Hạn mới: **{calculated_exp_str}**")
                 elif adm_dur == "Vĩnh viễn":
                     calculated_exp_str = "2099-12-31"
                 else:
@@ -1734,9 +1723,8 @@ with st.sidebar:
             for acc_mail, info in filt_accs:
                 with st.expander(f"👤 {acc_mail} ({info.get('plan_type')})"):
                     st.write(f"📞 SĐT: `{info.get('phone', 'N/A')}` | ⏳ Hạn: `{info.get('expires_at')}`")
-                    
                     new_user_pass = st.text_input("🔑 Đổi mật khẩu:", value=info.get("password", ""), key=f"pass_edit_{acc_mail}")
-                    if st.button("⚡ Đặt 123456", key=f"btn_quick_reset_{acc_mail}", use_container_width=True, disabled=is_system_busy, help="Reset mật khẩu tài khoản này về 123456"):
+                    if st.button("⚡ Đặt 123456", key=f"btn_quick_reset_{acc_mail}", use_container_width=True, disabled=is_system_busy):
                         st.session_state.licensed_accounts[acc_mail]["password"] = "123456"
                         save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
                         st.toast(f"✅ Đã reset mật khẩu của {acc_mail} về '123456'!")
@@ -1768,7 +1756,7 @@ with st.sidebar:
                         st.session_state.licensed_accounts[acc_mail]["plan_type"] = new_plan
                         st.session_state.licensed_accounts[acc_mail]["expires_at"] = target_exp_str
                         save_single_account(acc_mail, st.session_state.licensed_accounts[acc_mail])
-                        st.toast("✅ Đã cập nhật tài khoản và mật khẩu thành công!")
+                        st.toast("✅ Đã cập nhật!")
                         st.rerun()
                     if c_act2.button("🗑 Xóa", key=f"del_acc_{acc_mail}", type="secondary", use_container_width=True, disabled=is_system_busy):
                         delete_single_account(acc_mail)
@@ -1788,12 +1776,12 @@ with st.sidebar:
                         st.rerun()
 
         st.markdown("---")
-        support_iframe_code = """
-        <!DOCTYPE html><html><head><meta charset="utf-8">
-        <style>* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; } .support-container { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 14px; padding: 12px 10px; text-align: center; } .support-title { font-size: 14px; font-weight: 800; color: #15803d; margin-bottom: 7px; display: flex; align-items: center; justify-content: center; gap: 6px; } .hotline-card { background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%); border-radius: 10px; padding: 8px 6px; text-align: center; } .hotline-label { color: #fecdd3 !important; font-size: 12.5px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; justify-content: center; gap: 5px; } .hotline-number { color: #ffffff !important; font-size: 20px; font-weight: 900; letter-spacing: 1.2px; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }</style></head>
-        <body><div class="support-container"><div class="support-title"><svg style="width: 17px; height: 17px; fill: #15803d;" viewBox="0 0 24 24"><path d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3c.55 0 1-.45 1-1v-4.18A3 3 0 0 0 21 14V10a9 9 0 0 0-9-9z"/></svg><span>HỖ TRỢ TRỰC TIẾP</span></div><div class="hotline-card"><div class="hotline-label"><span>Hotline / Zalo:</span></div><div class="hotline-number">0869 628 316</div></div></div></body></html>
-        """
-        components.html(support_iframe_code, height=115)
+        st.markdown("""
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:12px;padding:10px;text-align:center;margin-bottom:10px;">
+            <div style="font-size:13px;font-weight:800;color:#15803d;">🎧 HỖ TRỢ TRỰC TIẾP (ZALO/HOTLINE)</div>
+            <div style="font-size:18px;font-weight:900;color:#991b1b;margin-top:4px;">0869 628 316</div>
+        </div>
+        """, unsafe_allow_html=True)
         u_info = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
         u_plan = u_info.get("plan_type", "Trial")
         u_used = u_info.get("daily_usage_count", 0) if u_info.get("last_generation_date") == datetime.now().strftime("%Y-%m-%d") else 0
@@ -1808,7 +1796,7 @@ if not st.session_state.is_logged_in:
     st.stop()
 
 # ==============================================================================
-# 5. KHÔNG GIAN SÁNG TẠO CHÍNH (ĐÃ TỐI ƯU HÓA GIAO DIỆN GỌN GÀNG)
+# 5. KHÔNG GIAN SÁNG TẠO CHÍNH
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
@@ -2124,10 +2112,8 @@ if all_sc:
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
     if st.session_state.active_script_id is not None:
-        st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None
-            st.session_state.scroll_to_top = True
             st.rerun()
             
         active_id = st.session_state.active_script_id
@@ -2187,7 +2173,6 @@ if all_sc:
                 if str(sc_id) != str(st.session_state.active_script_id):
                     if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
                         st.session_state.active_script_id = int(sc_id)
-                        st.session_state.scroll_to_detail = True
                         st.rerun()
                 btn_clone_ph = c3.empty()
                 if str(st.session_state.current_cloning_id) == str(sc_id):
@@ -2213,7 +2198,6 @@ if all_sc:
                 c1.caption(f"⚡ *{outline.get('hook')}*")
                 btn_detail_ph = c2.empty()
                 if str(st.session_state.current_processing_id) == str(sc_id):
-                    # NÚT HỦY KẸT HIỂN THỊ NGAY TẠI DÒNG KỊCH BẢN ĐANG CHẠY
                     if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
                         st.session_state.current_processing_id = None
                         st.rerun()
@@ -2234,7 +2218,6 @@ if all_sc:
             with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Tiêu Cự Trung Tâm Vào Sản Phẩm & Gemini 3.8 Flash)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
-                st.session_state.scroll_to_detail = True
                 success = True
         except Exception as e:
             error_msg = str(e)
@@ -2267,7 +2250,7 @@ if all_sc:
             st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
 
     # ==========================================================================
-    # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI (ĐỒNG BỘ GIAO DIỆN GỌN GÀNG)
+    # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
     # ==========================================================================
     st.divider()
     st.markdown("### ➕ **Gọi Thêm 5 Kịch Bản Mới**")
