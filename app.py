@@ -127,11 +127,9 @@ def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
     if not raw:
         return f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"
     
-    # Xóa tiền tố thừa nếu có
     pattern = r'^(?:SẢN PHẨM LÀ GÌ\s*&?\s*(?:CÓ GÌ ĐẶC BIỆT)?|CHỦ ĐỀ|SẢN PHẨM)\s*:\s*'
     clean = re.sub(pattern, '', raw, flags=re.IGNORECASE).strip()
     
-    # Lấy đúng phần tên sản phẩm (phần được tô đậm trước dấu ':' hoặc ' - ')
     if ":" in clean:
         prod_name = clean.split(":", 1)[0].strip()
     elif " - " in clean:
@@ -438,8 +436,8 @@ COMPACT_CORE_RULES = """
    - Nếu là Sản phẩm Phi Thời Trang (Gia dụng, Giỏ nhựa, Mỹ phẩm, Công nghệ, Giày dép, Đồ bếp...): BẮT BUỘC LẤY SẢN PHẨM LÀM TRỌNG TÂM TIỀN CẢNH (occupying 50%-60% of foreground center frame)! Ở Cảnh 2 và Cảnh 3, máy quay zoom thẳng vào chính giữa sản phẩm (tack-sharp macro focus on product), tay nhân vật thao tác trực tiếp trên sản phẩm, nhân vật chỉ làm nền thuyết minh phía sau!
 3. CHỐNG BIẾN DẠNG SẢN PHẨM (RIGID-BODY ANTI-MORPHING):
    - Với vật thể cứng: Giữ nguyên 100% khung hình học 3D cố định (100% rigid non-deforming structure). CẤM viết hành động gập/mở (unfolding/folding), bẻ cong hay biến đổi hình dáng. Chỉ cầm chắc quai/thân, nghiêng nhẹ 15 độ đón sáng, vuốt viền hoặc thả đồ vào trong.
-4. VĂN NÓI HÀ NỘI & CHỐT ĐƠN CẢNH 4:
-   - 100% giọng Hà Nội, số 4 đọc 'bốn' (cấm 'tư/tứ'), dùng 'nghìn' (cấm 'ngàn'), viết rõ 'một trăm'. Cấm từ 'thuật toán', 'trợ giá', 'phiên live'.
+4. VĂN NÓI HÀ NỘI THUẦN VIỆT 100% & CHỐT ĐƠN CẢNH 4:
+   - Trong 'voiceover' (lời thoại): 100% dùng Tiếng Việt thuần túy, giọng Hà Nội (dùng 'mềm rũ' chứ không dùng 'mềm rủ', số 4 đọc 'bốn', dùng 'nghìn' cấm 'ngàn', viết rõ 'một trăm'). TUYỆT ĐỐI CẤM chèn từ tiếng Anh (như 'premium everyday', 'solid', 'matte') vào trong câu thoại tiếng Việt!
    - Cảnh 4: Nếu là kịch bản Flash Sale -> đọc giá neo đối lập. Các kịch bản khác -> Soft CTA nhắc lại nỗi đau + bấm giỏ hàng góc trái.
 """
 
@@ -560,8 +558,12 @@ def sanitize_third_party_ip(text: str) -> str:
     platforms = [r'\btiktok\s*(?:shop)?\b', r'\bshopee\b', r'\blazada\b', r'\bfacebook\b', r'\binstagram\b', r'\byoutube\b']
     for p in platforms:
         cleaned = re.sub(p, 'online store', cleaned, flags=re.IGNORECASE)
+    # Dịch chuẩn chất liệu "lụa Titan" sang tiếng Anh cho Prompt Ảnh/Video trước khi lọc thương hiệu
+    cleaned = re.sub(r'\blụa\s*titan\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btitan\s*silk\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btitan\b', 'lustrous satin', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(
-        r'\b(?:titan|emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b',
+        r'\b(?:emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b',
         'premium everyday', cleaned, flags=re.IGNORECASE
     )
     cleaned = re.sub(
@@ -622,6 +624,14 @@ POLICY_REPLACEMENTS = {
 }
 
 SOUTHERN_TO_HANOI = {
+    r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp',
+    r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp',
+    r'\bpremium\s+everyday\b': 'cao cấp',
+    r'\blustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp',
+    r'\bmềm\s*rủ\b': 'mềm rũ',
+    r'\bsiêu\s*rủ\b': 'siêu rũ',
+    r'\bđộ\s*rủ\b': 'độ rũ',
+    r'\brủ\s*xuống\b': 'rũ xuống',
     r'\báp\s*mã\b': 'nay giảm',
     r'\báp\s*voucher\b': 'nay giảm',
     r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi',
@@ -753,6 +763,10 @@ def clean_and_normalize_voiceover(text: str) -> str:
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
     for pattern, rep in [
+        (r'\blụa\s+premium\s+everyday\b', 'lụa cao cấp'),
+        (r'\bpremium\s+everyday\b', 'cao cấp'),
+        (r'\bmềm\s*rủ\b', 'mềm rũ'),
+        (r'\bđộ\s*rủ\b', 'độ rũ'),
         (r'\báp\s*mã\b', 'nay giảm'),
         (r'\báp\s*voucher\b', 'nay giảm'),
         (r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b', 'một trăm bốn mươi'),
@@ -1123,7 +1137,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     """
 
 # ==============================================================================
-# HÀM TẠO CHI TIẾT KỊCH BẢN - TỰ ĐỘNG LƯU CẬP NHẬT VÀO DỰ ÁN HIỆN TẠI
+# HÀM TẠO CHI TIẾT KỊCH BẢN - TỰ ĐỘNG LƯU CẬP NHẬT & TÁCH BIỆT TÊN VIỆT / ANH
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -1185,7 +1199,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     ai_hero_color_en = dna.get("hero_sku_color_en", "").strip()
     locked_color_en = translate_and_lock_color_en(hero_color_str, ai_hero_color_en)
 
-    raw_prod_name = str(dna.get("what_and_unique", "product")).strip()
+    raw_prod_name = str(dna.get("what_and_unique", "sản phẩm")).strip()
     if ":" in raw_prod_name:
         raw_prod_name = raw_prod_name.split(":", 1)[0].strip()
 
@@ -1227,12 +1241,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     )
 
     prompt_text = f"""
-    SP: {raw_prod_name} | EN_LOCKED: {clean_prod_en} ({locked_color_en}) | Đau: {dna.get('pain_points', '')} | Công năng: {dna.get('how_to_use', '')}
+    TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu: {hero_color_str})
+    MÔ TẢ TIẾNG ANH (CHỈ DÙNG CHO 'action_en'): {clean_prod_en} ({locked_color_en})
+    Nỗi đau: {dna.get('pain_points', '')} | Công năng: {dna.get('how_to_use', '')}
     Kịch bản #{target_id}: '{fixed_title}' | Hook: '{fixed_hook}' | Bối cảnh: '{fixed_setting_base}'
     GHI CHÚ BẮT BUỘC: '{user_custom_note if user_custom_note else 'none'}'
     KOC: {detected_demographic_en} | {stylist_rules_text}
 
-    TRẢ VỀ JSON GỌN:
+    TRẢ VỀ JSON GỌN (LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn từ tiếng Anh như 'premium everyday' vào lời thoại):
     {{
         "title": "{fixed_title}",
         "wardrobe_lock": {{
@@ -1249,7 +1265,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{'expressing frustration with empty hands, zero product' if is_pas_story else action_scene_1} (under 18 words)",
                 "sfx": "Foley thực tế (không nhạc)",
                 "director": "Attention | {'Nêu nỗi đau mở màn' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh thu hút ngay từ 0.00s'}",
-                "voiceover": "Thoại mở màn (18-30 từ)..."
+                "voiceover": "Thoại mở màn 100% tiếng Việt tự nhiên (18-30 từ)..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -1259,7 +1275,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_2} (under 20 words, product in foreground center focus, keep rigid shape)",
                 "sfx": "Tiếng thao tác thực tế",
                 "director": "Interest | Máy quay zoom thẳng vào chính giữa sản phẩm (Product Centerpiece) + Cầu nối 3 nhánh",
-                "voiceover": "Thoại Cảnh 2 (22-34 từ) khớp Cầu nối 3 nhánh..."
+                "voiceover": "Thoại Cảnh 2 100% tiếng Việt (22-34 từ) khớp Cầu nối 3 nhánh..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -1269,7 +1285,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_3} (under 20 words, product in foreground center focus, keep rigid shape)",
                 "sfx": "Tiếng trải nghiệm thực tế",
                 "director": "Desire | Góc máy cận cảnh khóa nét vào điểm hoạt động của sản phẩm",
-                "voiceover": "Thoại Cảnh 3 (20-34 từ) test công năng..."
+                "voiceover": "Thoại Cảnh 3 100% tiếng Việt (20-34 từ) test công năng..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
@@ -1387,7 +1403,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
         scn["img_neg"] = base_negative_prompt
         
-        clean_vo_for_audio = re.sub(r'\.{2,}', '.', vo_text_current).strip()
+        clean_vo_for_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text_current).strip())
 
         if is_pas_scn1_no_prod:
             raw_vid = (
@@ -1415,7 +1431,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 f"[AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_for_audio}\". Foley only [{combined_sfx}], zero BGM, no text overlays."
             )
 
-        scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
+        # Chỉ lọc IP trên phần mô tả tiếng Anh, bảo toàn nguyên vẹn câu thoại tiếng Việt trong ngoặc kép
+        vid_parts = raw_vid.split('Native Hanoi Vietnamese voice:')
+        if len(vid_parts) == 2:
+            scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "Native Hanoi Vietnamese voice:" + vid_parts[1]
+        else:
+            scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         scn["vid_neg"] = base_negative_prompt
         
     res["scenes"] = scenes
@@ -2022,7 +2043,6 @@ if not st.session_state.is_analyzed:
                             "presentation_format": unified_strategy_format
                         })
                     
-                    # TỰ ĐỘNG LẤY TÊN SẢN PHẨM IN ĐẬM ĐỂ ĐẶT TÊN DỰ ÁN VÀ LƯU NGAY LẬP TỨC
                     auto_proj_title = extract_bold_product_title(ca_result, fallback_topic=viral_topic)
                     st.session_state.update({
                         "active_project_title": auto_proj_title,
@@ -2175,7 +2195,7 @@ if all_sc:
         st.markdown(f"<div class='detail-header-box'>{director_summary_html}</div>", unsafe_allow_html=True)
         
         for idx, scn in enumerate(asc.get("scenes", []), 1):
-            vo_text = scn.get('voiceover', '')
+            vo_text = clean_and_normalize_voiceover(scn.get('voiceover', ''))
             actual_words = count_words(vo_text)
             comma_count = vo_text.count(',') + vo_text.count(';')
             period_count = vo_text.count('.') + vo_text.count('!') + vo_text.count('?')
@@ -2216,7 +2236,7 @@ if all_sc:
             with st.container(border=True):
                 c1, c2, c3 = st.columns([2.5, 1, 1])
                 c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{outline.get('hook')}*")
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
                 if str(sc_id) != str(st.session_state.active_script_id):
                     if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
                         st.session_state.active_script_id = int(sc_id)
@@ -2242,7 +2262,7 @@ if all_sc:
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
                 c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{outline.get('hook')}*")
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
                 btn_detail_ph = c2.empty()
                 if str(st.session_state.current_processing_id) == str(sc_id):
                     if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
