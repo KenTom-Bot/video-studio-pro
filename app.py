@@ -44,7 +44,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. KHỞI TẠO TỪ ĐIỂN, HẰNG SỐ & API CLIENTS (CHỈ CHẠY 1 LẦN)
+# 2. KHỞI TẠO TỪ ĐIỂN & HẰNG SỐ CỐT LÕI
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -155,6 +155,9 @@ SOUTHERN_TO_HANOI = {
     r'\bmấy\s+bồ\b': 'các bạn', r'\bưng\s+bụng\b': 'vừa ý'
 }
 
+# ==============================================================================
+# 3. KẾT NỐI API & DB
+# ==============================================================================
 @st.cache_resource(show_spinner=False)
 def init_supabase():
     try:
@@ -175,7 +178,7 @@ supabase = init_supabase()
 client = init_gemini_client()
 
 # ==============================================================================
-# 3. TẤT CẢ CÁC HÀM TIỆN ÍCH, XỬ LÝ TEXT, GÓC QUAY (ĐƯỢC KHAI BÁO TOÀN DIỆN TẠI ĐÂY)
+# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT & GÓC QUAY (ĐẦY ĐỦ 100%)
 # ==============================================================================
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
@@ -231,46 +234,32 @@ def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
     if len(prod_name) > 55: prod_name = prod_name[:52].strip() + "..."
     return f"{prod_name} ({datetime.now().strftime('%d/%m')})" if prod_name else f"Chiến dịch ({datetime.now().strftime('%d/%m')})"
 
-def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    if not text_to_check: return False
-    appliance_keywords = ["giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "bình", "cốc", "ly", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", "pan", "pot", "tool", "vacuum", "dryer", "blower"]
-    return any(k in text_to_check.lower() for k in appliance_keywords)
-
-def detect_single_tube_skirt(text_to_check: str) -> bool:
-    if not text_to_check: return False
-    return any(k in text_to_check.lower() for k in ["1 ống", "một ống", "quần váy", "váy 1 ống", "dạng váy", "quần giả váy", "single tube", "skirt-pants", "culottes skirt", "unsplit skirt"])
-
-def enforce_single_tube_skirt_syntax(text_en: str) -> str:
-    if not text_en: return ""
-    cleaned = text_en
-    patterns = [r'\bwide-?leg\s+(?:silk\s+)?(?:skirt-?pants|pants|trousers)\b', r'\bskirt-?pants\b', r'\bsilk\s+(?:pants|trousers)\b', r'\bflowing\s+(?:pants|trousers)\b', r'\bloose\s+(?:pants|trousers)\b', r'\bpants\b', r'\btrousers\b']
-    for pat in patterns: cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
+def normalize_hanoi_dialect(text: str) -> str:
+    if not text: return ""
+    cleaned = text
+    for pattern, rep in SOUTHERN_TO_HANOI.items(): cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
-def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
-    c = f"{color_vi} {ai_color_en}".lower().strip()
-    if any(k in c for k in ["trắng", "white", "kem", "sữa"]): return "solid pure matte-white (monochrome white, zero grey)"
-    elif any(k in c for k in ["đen", "black"]): return "solid matte-black"
-    elif any(k in c for k in ["xám", "ghi", "grey", "gray"]): return "solid uniform light-grey"
-    elif any(k in c for k in ["hồng", "pink", "pastel"]): return "solid pastel-pink"
-    elif any(k in c for k in ["đỏ mận", "đỏ đô", "rượu vang", "burgundy", "maroon", "wine"]): return "solid deep burgundy-red"
-    elif any(k in c for k in ["đỏ", "red"]): return "solid vibrant-red"
-    elif any(k in c for k in ["xanh dương", "xanh biển", "xanh lam", "blue", "navy"]): return "solid classic-blue"
-    elif any(k in c for k in ["xanh lá", "xanh rêu", "xanh bơ", "green", "mint", "sage"]): return "solid sage-green"
-    elif any(k in c for k in ["vàng", "yellow", "gold"]): return "solid warm-yellow"
-    elif any(k in c for k in ["nâu", "brown", "mocha", "cafe"]): return "solid mocha-brown"
-    elif any(k in c for k in ["be", "beige", "nude"]): return "solid cream-beige"
-    elif any(k in c for k in ["tím", "purple", "lavender", "lilac"]): return "solid lavender-purple"
-    if ai_color_en and len(ai_color_en.strip()) > 2: return f"solid uniform {ai_color_en.strip()}"
-    return "solid uniform reference-color"
-
-def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False) -> str:
-    if not action_text: return ""
-    cleaned = action_text
-    if not is_fashion:
-        destructive_patterns = [(r'\bunfolding\b', 'holding steadily'), (r'\bfolding\b', 'holding securely'), (r'\bcollapsing\b', 'presenting up close'), (r'\bflexing\b', 'pressing fingers gently on'), (r'\bbending\b', 'tilting slightly'), (r'\btwisting\b', 'turning 15 degrees'), (r'\btransforming\b', 'showcasing'), (r'\bdeforming\b', 'presenting'), (r'\bstretching\b', 'tracing fingers along'), (r'\bsqueezing\b', 'gripping firmly'), (r'\bopening\s+and\s+closing\b', 'displaying clearly')]
-        for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
+def sanitize_policy_text(text: str) -> str:
+    if not text: return ""
+    cleaned = normalize_hanoi_dialect(text)
+    for pattern, rep in POLICY_REPLACEMENTS.items(): cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bngàn\b', 'nghìn', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btrợ\s*giá\b', 'giảm giá sâu có hạn', cleaned, flags=re.IGNORECASE)
     return cleaned
+
+def sanitize_third_party_ip(text: str) -> str:
+    if not text: return ""
+    cleaned = text
+    for p in [r'\btiktok\s*(?:shop)?\b', r'\bshopee\b', r'\blazada\b', r'\bfacebook\b', r'\binstagram\b', r'\byoutube\b']: cleaned = re.sub(p, 'online store', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\blụa\s*titan\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btitan\s*silk\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btitan\b', 'lustrous satin', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\b(?:emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b', 'premium everyday', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\b(?:celebrity|celebrities|public\s+figure|famous\s+person|famous\s+model|supermodel|star|idol|influencer|koc|kol|deepfake|real\s+person|real\s+human|authentic\s+person)\b', 'fictional everyday character', cleaned, flags=re.IGNORECASE)
+    for pattern, safe_term in INTIMATE_SAFE_ENGLISH_LEXICON.items(): cleaned = re.sub(pattern, safe_term, cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bwearing\s+wearing\b', 'wearing', cleaned, flags=re.IGNORECASE)
+    return re.sub(r'\.\.+', '.', cleaned)
 
 def number_to_vietnamese_words(n: int) -> str:
     if n == 0: return "không đồng"
@@ -343,20 +332,6 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+|gần\s+)+', '', str(price_text).lower().strip()).strip()
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
-def normalize_hanoi_dialect(text: str) -> str:
-    if not text: return ""
-    cleaned = text
-    for pattern, rep in SOUTHERN_TO_HANOI.items(): cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
-    return cleaned
-
-def sanitize_policy_text(text: str) -> str:
-    if not text: return ""
-    cleaned = normalize_hanoi_dialect(text)
-    for pattern, rep in POLICY_REPLACEMENTS.items(): cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bngàn\b', 'nghìn', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\btrợ\s*giá\b', 'giảm giá sâu có hạn', cleaned, flags=re.IGNORECASE)
-    return cleaned
-
 def clean_and_normalize_voiceover(text: str) -> str:
     if not text: return ""
     cleaned = sanitize_policy_text(text)
@@ -379,19 +354,6 @@ def clean_and_normalize_voiceover(text: str) -> str:
     cleaned = re.sub(r'\ban\s*toàn\s*rất\b', 'rất an toàn', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\b([a-zà-ỹ]+)\s+rất\s+luôn\b', r'cực kỳ \1 luôn', cleaned, flags=re.IGNORECASE)
     return cleaned
-
-def sanitize_third_party_ip(text: str) -> str:
-    if not text: return ""
-    cleaned = text
-    for p in [r'\btiktok\s*(?:shop)?\b', r'\bshopee\b', r'\blazada\b', r'\bfacebook\b', r'\binstagram\b', r'\byoutube\b']: cleaned = re.sub(p, 'online store', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\blụa\s*titan\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\btitan\s*silk\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\btitan\b', 'lustrous satin', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\b(?:emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b', 'premium everyday', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\b(?:celebrity|celebrities|public\s+figure|famous\s+person|famous\s+model|supermodel|star|idol|influencer|koc|kol|deepfake|real\s+person|real\s+human|authentic\s+person)\b', 'fictional everyday character', cleaned, flags=re.IGNORECASE)
-    for pattern, safe_term in INTIMATE_SAFE_ENGLISH_LEXICON.items(): cleaned = re.sub(pattern, safe_term, cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bwearing\s+wearing\b', 'wearing', cleaned, flags=re.IGNORECASE)
-    return re.sub(r'\.\.+', '.', cleaned)
 
 def clean_analysis_text(text) -> str:
     if not text: return ""
@@ -421,6 +383,71 @@ def format_ocr_prices(ca_data: dict) -> str:
     orig, sale = ca_data.get('original_price_spoken', ''), ca_data.get('sale_price_spoken', '')
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
+
+def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
+    combined = f"{strategy_str} {title_str}".lower()
+    return any(k in combined for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
+
+def detect_intimate_apparel(text_to_check: str) -> str:
+    if not text_to_check: return "normal"
+    t = text_to_check.lower()
+    if any(k in t for k in ["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"]): return "underwear_bra"
+    if any(k in t for k in ["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"]): return "camisole"
+    return "normal"
+
+def detect_wearable_fashion(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    t = text_to_check.lower()
+    if any(k in t for k in ["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"]): return False
+    fashion_keywords = ["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama"]
+    return any(k in t for k in fashion_keywords)
+
+def detect_footwear_or_accessory(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    t = text_to_check.lower()
+    if any(k in t for k in ["giỏ", "rổ", "thùng", "hộp", "kệ", "basket", "hamper", "organizer", "bin"]): return False
+    return any(k in t for k in ["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", "shoe", "handbag", "backpack", "wallet", "watch", "glasses"])
+
+def detect_strict_rigid_appliance(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    appliance_keywords = ["giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "bình", "cốc", "ly", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", "pan", "pot", "tool", "vacuum", "dryer", "blower"]
+    return any(k in text_to_check.lower() for k in appliance_keywords)
+
+def detect_single_tube_skirt(text_to_check: str) -> bool:
+    if not text_to_check: return False
+    return any(k in text_to_check.lower() for k in ["1 ống", "một ống", "quần váy", "váy 1 ống", "dạng váy", "quần giả váy", "single tube", "skirt-pants", "culottes skirt", "unsplit skirt"])
+
+def enforce_single_tube_skirt_syntax(text_en: str) -> str:
+    if not text_en: return ""
+    cleaned = text_en
+    patterns = [r'\bwide-?leg\s+(?:silk\s+)?(?:skirt-?pants|pants|trousers)\b', r'\bskirt-?pants\b', r'\bsilk\s+(?:pants|trousers)\b', r'\bflowing\s+(?:pants|trousers)\b', r'\bloose\s+(?:pants|trousers)\b', r'\bpants\b', r'\btrousers\b']
+    for pat in patterns: cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
+    return cleaned
+
+def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
+    c = f"{color_vi} {ai_color_en}".lower().strip()
+    if any(k in c for k in ["trắng", "white", "kem", "sữa"]): return "solid pure matte-white (monochrome white, zero grey)"
+    elif any(k in c for k in ["đen", "black"]): return "solid matte-black"
+    elif any(k in c for k in ["xám", "ghi", "grey", "gray"]): return "solid uniform light-grey"
+    elif any(k in c for k in ["hồng", "pink", "pastel"]): return "solid pastel-pink"
+    elif any(k in c for k in ["đỏ mận", "đỏ đô", "rượu vang", "burgundy", "maroon", "wine"]): return "solid deep burgundy-red"
+    elif any(k in c for k in ["đỏ", "red"]): return "solid vibrant-red"
+    elif any(k in c for k in ["xanh dương", "xanh biển", "xanh lam", "blue", "navy"]): return "solid classic-blue"
+    elif any(k in c for k in ["xanh lá", "xanh rêu", "xanh bơ", "green", "mint", "sage"]): return "solid sage-green"
+    elif any(k in c for k in ["vàng", "yellow", "gold"]): return "solid warm-yellow"
+    elif any(k in c for k in ["nâu", "brown", "mocha", "cafe"]): return "solid mocha-brown"
+    elif any(k in c for k in ["be", "beige", "nude"]): return "solid cream-beige"
+    elif any(k in c for k in ["tím", "purple", "lavender", "lilac"]): return "solid lavender-purple"
+    if ai_color_en and len(ai_color_en.strip()) > 2: return f"solid uniform {ai_color_en.strip()}"
+    return "solid uniform reference-color"
+
+def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False) -> str:
+    if not action_text: return ""
+    cleaned = action_text
+    if not is_fashion:
+        destructive_patterns = [(r'\bunfolding\b', 'holding steadily'), (r'\bfolding\b', 'holding securely'), (r'\bcollapsing\b', 'presenting up close'), (r'\bflexing\b', 'pressing fingers gently on'), (r'\bbending\b', 'tilting slightly'), (r'\btwisting\b', 'turning 15 degrees'), (r'\btransforming\b', 'showcasing'), (r'\bdeforming\b', 'presenting'), (r'\bstretching\b', 'tracing fingers along'), (r'\bsqueezing\b', 'gripping firmly'), (r'\bopening\s+and\s+closing\b', 'displaying clearly')]
+        for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
+    return cleaned
 
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
@@ -505,7 +532,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     return f"STYLIST LOCK: {contrast} | Giày: {footwear} | Phụ kiện cố định 4 cảnh: {jewelry}{skirt_rule}."
 
 # ==============================================================================
-# 4. HỆ THỐNG QUẢN TRỊ TÀI KHOẢN VÀ DỮ LIỆU DB (SUPABASE)
+# 6. QUẢN LÝ DB (SUPABASE) VÀ LƯU TRỮ
 # ==============================================================================
 def load_licensed_accounts():
     accs = {ADMIN_EMAIL: {"roles": ALL_MODULES, "phone": "0869628316", "expires_at": "2099-12-31", "password": "admin", "plan_type": "VIP", "active_session_id": ""}}
@@ -559,14 +586,14 @@ def save_project_to_db(email, title, payload_data, project_id=None):
             if res.data and len(res.data) > 0:
                 st.session_state.last_autosave_time = datetime.now().strftime("%H:%M:%S")
                 return True, f"Đã tự động cập nhật vào dự án '{title}'!"
-        
         res = supabase.table("saved_projects").insert({"user_email": email, "project_title": title, "script_content": clean_content}).execute()
         if res.data and len(res.data) > 0:
             st.session_state.current_project_id = res.data[0]['id']
             st.session_state.last_autosave_time = datetime.now().strftime("%H:%M:%S")
             return True, f"Đã tự động tạo & lưu dự án '{title}'!"
         return False, "Không thể lưu dữ liệu dự án."
-    except Exception as e: return False, str(e)
+    except Exception as e:
+        return False, str(e)
 
 def auto_save_current_session():
     if not st.session_state.get("is_logged_in") or not supabase: return False, ""
@@ -584,10 +611,46 @@ def auto_save_current_session():
             "is_analyzed": st.session_state.get("is_analyzed", False)
         }
         return save_project_to_db(st.session_state.current_email, st.session_state.active_project_title, payload, st.session_state.current_project_id)
-    except Exception as e: return False, str(e)
+    except Exception as e:
+        return False, str(e)
 
 # ==============================================================================
-# 5. HỆ THỐNG GỌI GEMINI API: KHÓA CỨNG GEMINI-3.8-FLASH & LITE
+# 7. KHỞI TẠO SESSION STATE TOÀN CỤC CHUẨN XÁC
+# ==============================================================================
+if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
+for key, default_val in [
+    ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", None),
+    ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
+    ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
+    ("current_input_context", ""), ("current_product_data_saved", None), ("current_product_data", None),
+    ("reset_key", 0), ("scroll_to_top", False), ("scroll_to_detail", False),
+    ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
+    ("last_mode", "🛒 TikTok Shop & Bán Hàng"), ("last_style", "Điện Ảnh Chân Thực"), ("last_narrator", "On-camera"),
+    ("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng"),
+    ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
+    ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
+    ("current_processing_id", None), ("current_cloning_id", None), ("is_analyzed", False), ("last_autosave_time", "")
+]:
+    if key not in st.session_state: st.session_state[key] = default_val
+
+if st.session_state.licensed_accounts is None: st.session_state.licensed_accounts = load_licensed_accounts()
+is_system_busy = (st.session_state.get("current_processing_id") is not None or st.session_state.get("current_cloning_id") is not None)
+
+if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMAIL:
+    current_acc_lock = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
+    if current_acc_lock.get("active_session_id") != st.session_state.session_id:
+        st.error("🚨 TÀI KHOẢN ĐANG ĐĂNG NHẬP Ở THIẾT BỊ KHÁC.")
+        if st.button("🔌 Sử dụng trên thiết bị này", type="primary"):
+            st.session_state.licensed_accounts[st.session_state.current_email]["active_session_id"] = st.session_state.session_id
+            save_single_account(st.session_state.current_email, st.session_state.licensed_accounts[st.session_state.current_email])
+            st.rerun()
+        st.stop()
+
+if st.session_state.scroll_to_top: components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0); st.session_state.scroll_to_top = False
+if st.session_state.scroll_to_detail: components.html("""<script>setTimeout(() => { var el = window.parent.document.getElementById('detailed-view-anchor'); if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); } }, 250);</script>""", height=0); st.session_state.scroll_to_detail = False
+
+# ==============================================================================
+# 8. HỆ THỐNG GỌI GEMINI API: KHÓA CỨNG GEMINI-3.8-FLASH & LITE
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -650,7 +713,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
     return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG (BẮT BUỘC TUÂN THỦ TUYỆT ĐỐI): {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- Cảnh 4: {'Kêu gọi thảo luận & follow (không bán hàng)' if is_viral else 'Chốt deal chuẩn quy tắc'}.\n- 'action_en' viết ngắn gọn (dưới 22 từ), 100% tiếng Anh, đặt sản phẩm ở trung tâm tiền cảnh và giữ nguyên khung hình học cứng của sản phẩm."
 
 # ==============================================================================
-# 6. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
+# 9. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
@@ -939,42 +1002,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     return more_scripts
 
 # ==============================================================================
-# 10. KHỞI TẠO SESSION STATE TOÀN CỤC CHUẨN XÁC
-# ==============================================================================
-if "session_id" not in st.session_state: st.session_state.session_id = str(uuid.uuid4())
-for key, default_val in [
-    ("is_logged_in", False), ("current_email", ""), ("licensed_accounts", None),
-    ("all_scripts", []), ("cloned_scripts", []), ("expanded_scripts", []),
-    ("generated_details", {}), ("content_analysis", None), ("active_script_id", None),
-    ("current_input_context", ""), ("current_product_data_saved", None), ("current_product_data", None),
-    ("reset_key", 0), ("scroll_to_top", False), ("scroll_to_detail", False),
-    ("active_project_title", f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}"),
-    ("last_mode", "🛒 TikTok Shop & Bán Hàng"), ("last_style", "Điện Ảnh Chân Thực"), ("last_narrator", "On-camera"),
-    ("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng"),
-    ("target_duration_instruction", ""), ("character_profiles", []), ("current_project_id", None),
-    ("saved_reference_images", []), ("show_all_projects", False), ("show_all_admin_accounts", False),
-    ("current_processing_id", None), ("current_cloning_id", None), ("is_analyzed", False), ("last_autosave_time", "")
-]:
-    if key not in st.session_state: st.session_state[key] = default_val
-
-if st.session_state.licensed_accounts is None: st.session_state.licensed_accounts = load_licensed_accounts()
-is_system_busy = (st.session_state.get("current_processing_id") is not None or st.session_state.get("current_cloning_id") is not None)
-
-if st.session_state.is_logged_in and st.session_state.current_email != ADMIN_EMAIL:
-    current_acc_lock = st.session_state.licensed_accounts.get(st.session_state.current_email, {})
-    if current_acc_lock.get("active_session_id") != st.session_state.session_id:
-        st.error("🚨 TÀI KHOẢN ĐANG ĐĂNG NHẬP Ở THIẾT BỊ KHÁC.")
-        if st.button("🔌 Sử dụng trên thiết bị này", type="primary"):
-            st.session_state.licensed_accounts[st.session_state.current_email]["active_session_id"] = st.session_state.session_id
-            save_single_account(st.session_state.current_email, st.session_state.licensed_accounts[st.session_state.current_email])
-            st.rerun()
-        st.stop()
-
-if st.session_state.scroll_to_top: components.html("<script>window.parent.scrollTo({top: 0, behavior: 'smooth'});</script>", height=0); st.session_state.scroll_to_top = False
-if st.session_state.scroll_to_detail: components.html("""<script>setTimeout(() => { var el = window.parent.document.getElementById('detailed-view-anchor'); if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } else { window.parent.scrollTo({top: 400, behavior: 'smooth'}); } }, 250);</script>""", height=0); st.session_state.scroll_to_detail = False
-
-# ==============================================================================
-# 11. GIAO DIỆN THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN
+# 10. GIAO DIỆN THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN
 # ==============================================================================
 with st.sidebar:
     if not st.session_state.is_logged_in:
@@ -1017,7 +1045,7 @@ with st.sidebar:
                     else: st.error("⚠️ Thông tin không hợp lệ hoặc tài khoản đã tồn tại!")
     else:
         if is_system_busy:
-            if st.button("🛑 HỦY KẸT & M mở Khóa NGAY", type="secondary", use_container_width=True, key="sidebar_unhang_btn"):
+            if st.button("🛑 HỦY KẸT & MỞ KHÓA NGAY", type="secondary", use_container_width=True, key="sidebar_unhang_btn"):
                 st.session_state.current_processing_id = None
                 st.session_state.current_cloning_id = None
                 st.rerun()
@@ -1217,7 +1245,7 @@ with st.sidebar:
 if not st.session_state.is_logged_in: st.info("👈 Vui lòng đăng nhập ở thanh bên."); st.stop()
 
 # ==============================================================================
-# 12. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
+# 11. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
 # ==============================================================================
 st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
