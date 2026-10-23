@@ -656,6 +656,7 @@ SOUTHERN_TO_HANOI = {
     r'\bcay\s*the\b': 'cay tê',
     r'\bthe\s*the\b': 'tê tê',
     r'\bsánh\s*dẻo\b': 'sền sệt',
+    r'\bk‍♂️\b': 'k',
     r'\bkẹo\s*lại\b': 'sệt lại',
     r'\bđậu\s*phộng\b': 'hạt lạc',
     r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm',
@@ -1094,10 +1095,10 @@ def build_voice_direction(mode, num_chars, character_profiles):
     return " | ".join(dirs)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn trang phục, giữ nguyên diện mạo suốt 4 cảnh."
+    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn sản phẩm, giữ nguyên diện mạo suốt 4 cảnh."
     rules = "DANH SÁCH DIỄN VIÊN (100% NHÂN VẬT HƯ CẤU ĐỜI THƯỜNG - FICTIONAL SYNTHETIC PERSONA, DIỆN MẠO & PHỤ KIỆN ĐỒNG NHẤT SUỐT 4 CẢNH):\n"
     for p in profiles: 
-        rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn trang phục. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
+        rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn sản phẩm. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
     return rules
 
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
@@ -1674,7 +1675,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     active_format = unified_strategy_format if unified_strategy_format else st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
     dna = st.session_state.get("content_analysis") or {}
     self_pronoun = dna.get("self_pronoun", "em")
-    audience_pronoun = dna.get("audience_pronoun", "các chị em" if "Viral" not in mode else "mọi người")
+    audience_pronoun = dna.get("audience_pronoun", "các chị em" if not is_viral else "mọi người")
     condensed_dna = {
         "product": dna.get("what_and_unique", ""),
         "hero_sku": dna.get("hero_sku_color", ""),
