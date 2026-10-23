@@ -287,6 +287,12 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
 # ==============================================================================
 # HỆ THỐNG BẢO VỆ TỰ ĐỘNG & ĐẠO DIỄN BỐI CẢNH THÔNG MINH (3 NHÁNH CẦU NỐI)
 # ==============================================================================
+def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
+    combined = f"{strategy_str} {title_str}".lower()
+    return any(k in combined for k in [
+        "nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"
+    ])
+
 def detect_intimate_apparel(text_to_check: str) -> str:
     if not text_to_check: return "normal"
     t = text_to_check.lower()
@@ -471,9 +477,6 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
             f"holding {clean_prod_en} steadily in one hand while sharing recommendations with a warm open-palm gesture"
         )
 
-# ==============================================================================
-# BỘ MÁY STYLIST THỜI TRANG CHUYÊN SÂU & ĐỒNG NHẤT TOÀN DIỆN
-# ==============================================================================
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "") -> str:
     s_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower()
     h_lower = hero_color.lower()
@@ -1114,7 +1117,7 @@ def build_voice_direction(mode, num_chars, character_profiles):
     return " | ".join(dirs)
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn trang phục, giữ nguyên diện mạo suốt 4 cảnh."
+    if not profiles: return "100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng cân đối tôn sản phẩm, giữ nguyên diện mạo suốt 4 cảnh."
     rules = "DANH SÁCH DIỄN VIÊN (100% NHÂN VẬT HƯ CẤU ĐỜI THƯỜNG - FICTIONAL SYNTHETIC PERSONA, DIỆN MẠO & PHỤ KIỆN ĐỒNG NHẤT SUỐT 4 CẢNH):\n"
     for p in profiles: 
         rules += f" - Diễn viên {p['id']} ({p['role']}): 100% nhân vật hư cấu đời thường Việt Nam (fictional synthetic persona), tóc đen tự nhiên, vóc dáng tôn trang phục. Giữ nguyên kiểu tóc, giới tính, trang phục, giày dép và phụ kiện xuyên suốt 4 cảnh.\n"
@@ -1803,7 +1806,7 @@ with st.sidebar:
                 creator_emails = sorted(list(set(p.get("user_email", "") for p in all_projects if p.get("user_email"))))
                 sel_creator = st.selectbox("👤 Lọc theo thành viên:", ["Tất cả thành viên"] + creator_emails, key="admin_sel_creator")
                 if sel_creator != "Tất cả thành viên":
-                    all_projects = [p for p in all_projects if p.get("user_email") == sel_creator]
+                    all_projects = [p for p in all_projects if p.get("user_email"] == sel_creator]
 
             search_proj = st.text_input("🔍 Tìm kiếm dự án:", placeholder="Nhập tên dự án...", key="search_proj_input")
             display_projects = [p for p in all_projects if search_proj.strip().lower() in p['project_title'].lower()] if search_proj.strip() else (all_projects if st.session_state.show_all_projects else all_projects[:3])
@@ -2151,7 +2154,7 @@ if not st.session_state.is_analyzed:
                             "color_palette": "Bảng màu toàn bộ",
                             "what_and_unique": "[Tên sản phẩm]: [Điểm độc bản USP]",
                             "target_user": "Đối tượng phù hợp nhất",
-                            "why_buy": "LÝ do thuyết phục nên mua",
+                            "why_buy": "Lý do thuyết phục nên mua",
                             "where_and_convenience": "Hoàn cảnh ứng dụng và sự tiện lợi",
                             "product_dimensions": "Kích thước đời thực",
                             "prompt_dna_lock": "Visual DNA cho video"
