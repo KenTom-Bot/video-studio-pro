@@ -65,12 +65,13 @@ COMPACT_CORE_RULES = """
 1. ĐỒNG NHẤT BỐI CẢNH & NHÂN VẬT (MASTER LOCK):
    - Sinh 1 'master_setting_en' và dùng cho CẢ 4 CẢNH (không được đổi phòng, đổi cảnh).
    - Sinh 1 'master_character_en' duy nhất miêu tả từ tóc, mặt, quần áo, đến giày dép. KHÔNG THAY ĐỔI TRANG PHỤC trong suốt video.
-2. PRODUCT SCALE & CAMERA RULES (CHỐNG SẢN PHẨM KHỔNG LỒ):
+2. PRODUCT SCALE, CAMERA & PATTERN RULES:
+   - Nếu Sản phẩm có họa tiết/nhiều màu: PHẢI GIỮ ĐÚNG HỌA TIẾT, không được biến thành màu trơn.
    - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người, lắc lư hay bước đi. Nhân vật phải ĐỨNG IM (zero body rotation). Chỉ dùng BÀN TAY thao tác. Sản phẩm là TRỌNG TÂM tuyệt đối của khung hình.
    - Nếu là Đồ gia dụng/Công nghệ/Bình sữa: BẮT BUỘC KHOÁ CHẶT THEO ẢNH THAM CHIẾU. Zero morphing!
 3. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
    - Thoại: 100% Tiếng Việt ('mềm rũ', 'bốn', 'nghìn', 'một trăm').
-   - TUYỆT ĐỐI CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong lời thoại (voiceover) để tránh lỗi máy AI đọc bị vấp, lắp từ. Chữ phải viết ra thành câu liền mạch tự nhiên.
+   - TUYỆT ĐỐI CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong lời thoại (voiceover) để tránh lỗi máy AI đọc bị vấp, lắp từ.
    - NẾU LÀ TPCN/THUỐC: Cấm dùng từ "chữa bệnh, đặc trị, cam kết khỏi". Chỉ dùng "hỗ trợ, bảo vệ, bổ sung".
 4. LUẬT MẸ VÀ BÉ:
    - Tuyệt đối không để em bé một mình. Luôn luôn phải có "A caring mother safely holding/interacting with her baby".
@@ -440,22 +441,18 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     for pat in patterns: cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
     return cleaned
 
+# HÀM MỚI: BỘ BẢO TỒN HỌA TIẾT & MÀU SẮC (PATTERN PRESERVATION)
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
     c = f"{color_vi} {ai_color_en}".lower().strip()
-    if any(k in c for k in ["trắng", "white", "kem", "sữa"]): return "solid pure matte-white (monochrome white, zero grey)"
-    elif any(k in c for k in ["đen", "black"]): return "solid matte-black"
-    elif any(k in c for k in ["xám", "ghi", "grey", "gray"]): return "solid uniform light-grey"
-    elif any(k in c for k in ["hồng", "pink", "pastel"]): return "solid pastel-pink"
-    elif any(k in c for k in ["đỏ mận", "đỏ đô", "rượu vang", "burgundy", "maroon", "wine"]): return "solid deep burgundy-red"
-    elif any(k in c for k in ["đỏ", "red"]): return "solid vibrant-red"
-    elif any(k in c for k in ["xanh dương", "xanh biển", "xanh lam", "blue", "navy"]): return "solid classic-blue"
-    elif any(k in c for k in ["xanh lá", "xanh rêu", "xanh bơ", "green", "mint", "sage"]): return "solid sage-green"
-    elif any(k in c for k in ["vàng", "yellow", "gold"]): return "solid warm-yellow"
-    elif any(k in c for k in ["nâu", "brown", "mocha", "cafe"]): return "solid mocha-brown"
-    elif any(k in c for k in ["be", "beige", "nude"]): return "solid cream-beige"
-    elif any(k in c for k in ["tím", "purple", "lavender", "lilac"]): return "solid lavender-purple"
-    if ai_color_en and len(ai_color_en.strip()) > 2: return f"solid uniform {ai_color_en.strip()}"
-    return "solid uniform reference-color"
+    # Nếu trong chuỗi màu/họa tiết có các từ khóa thể hiện vân, sọc, hoa, họa tiết -> Giữ nguyên, KHÔNG ép màu trơn
+    if any(k in c for k in ["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"]):
+        return f"exact reference-matching pattern and colors ({ai_color_en})"
+    
+    # Nếu không có họa tiết, nhưng có màu, cũng KHÔNG dùng "solid uniform" nữa để an toàn, dùng exact reference
+    if ai_color_en and len(ai_color_en.strip()) > 2:
+        return f"exact reference-matching {ai_color_en.strip()}"
+        
+    return "exact reference-matching color and pattern"
 
 def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False, is_food: bool = False) -> str:
     if not action_text: return ""
@@ -898,22 +895,22 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     ai_koc_data = dna.get("koc_demographic_analysis", {})
     detected_gender, detected_demographic_en = get_demographics_description(char_profiles, ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else "", ai_koc_data.get("body_and_hair_en", "") if isinstance(ai_koc_data, dict) else "", is_mom_baby)
 
-    base_prod_en = f"{locked_color_en} seamless comfort fabric garment" if intimate_type == "underwear_bra" else (ai_product_visual_en if ai_product_visual_en else f"{locked_color_en} {raw_prod_name}")
+    base_prod_en = f"{locked_color_en} seamless comfort fabric garment" if intimate_type == "underwear_bra" else (ai_product_visual_en if ai_product_visual_en else f"{raw_prod_name}")
     clean_prod_en = sanitize_third_party_ip(base_prod_en)
     if is_single_skirt_mode: clean_prod_en = enforce_single_tube_skirt_syntax(clean_prod_en)
     elif not is_fashion_wearable and not is_food and not is_cosmetics: clean_prod_en = re.sub(r'\b(?:foldable|collapsible|folding)\b', 'rigid structured', clean_prod_en, flags=re.IGNORECASE)
 
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
     
-    # 🌟 LỚP KHÓA MÀU ĐƠN LẬP (SINGLE COLOR LOCK) 🌟
-    color_lock_tag = f"[STRICT SINGLE COLOR LOCK: The product MUST BE ONLY {locked_color_en}, completely ignoring other colored variants in the reference]"
+    # 🌟 LỚP KHÓA MÀU ĐƠN LẬP BẢO TỒN HỌA TIẾT (STRICT VISUAL LOCK) 🌟
+    color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
     
     if is_strict_appliance or is_mom_baby_hard: 
-        locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: exact reference-matching {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, proportions, and surface details. Zero hallucinated parts, zero extra details."
+        locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, proportions, and surface details. Zero hallucinated parts."
     elif is_food or is_cosmetics or is_mom_baby or is_medicine: 
         locked_product_prompt_segment = f"PRODUCT FOCUS: {clean_prod_en}. {color_lock_tag} as the main subject."
     else: 
-        locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry, identical solid color across all scenes)." if not is_fashion_wearable else f"Garment Lock: wearing {clean_prod_en}. {color_lock_tag} directly on body."
+        locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en}{dim_tag} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry)." if not is_fashion_wearable else f"Garment Lock: wearing {clean_prod_en}. {color_lock_tag} directly on body."
 
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str, is_food, is_cosmetics, is_mom_baby, is_medicine)
     
@@ -925,8 +922,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng khó chịu như trên thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
 
     prompt_text = f"""
-    TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu: {hero_color_str})
-    MÔ TẢ TIẾNG ANH (CHỈ DÙNG CHO 'action_en'): {clean_prod_en} ({locked_color_en})
+    TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
+    MÔ TẢ TIẾNG ANH (CHỈ DÙNG CHO 'action_en'): {clean_prod_en}
     Nỗi đau: {dna.get('pain_points', '')} | Công năng: {dna.get('how_to_use', '')}
     Kịch bản #{target_id}: '{fixed_title}' | Hook: '{fixed_hook}' | Bối cảnh gốc: '{fixed_setting_base}'
     GHI CHÚ BẮT BUỘC: '{user_custom_note if user_custom_note else 'none'}'
@@ -998,7 +995,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     appliance_neg_extra = "hallucinated parts, extra handles, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
     
     # BỔ SUNG KHÓA NEGATIVE MÀU SẮC
-    color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, "
+    color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     
     base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}changing background, changing room, different room, changing clothes, changing shoes, different face, different hair, changing outfit, inconsistent wardrobe, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
@@ -1076,7 +1073,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🗣 <b>Nhân xưng:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh Master (Đồng nhất 4 cảnh):</b> {fixed_setting_base} | {goal_badge}",
         f"{cam_mode_badge}",
         f"👗 <b>Khóa Diện mạo & Stylist (Master Character Lock):</b> {final_outfit_vi} (Đã chốt chính xác giày dép khớp ngữ cảnh, chống tự đổi quần áo ở các cảnh)",
-        f"🎨 <b>Khóa Màu Đơn Lập (Strict Single Color Lock):</b> Ép loại bỏ hoàn toàn các màu tạp trong ảnh gốc, chỉ giữ lại DUY NHẤT màu: {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} in {locked_color_en}</code>",
+        f"🎨 <b>Khóa Họa tiết & Màu sắc (Pattern/Color Lock):</b> Ép loại bỏ hoàn toàn các màu tạp trong ảnh gốc, bảo tồn 100% họa tiết/màu của: {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} | {locked_color_en}</code>",
         f"🎙 <b>Lõi Chống Vấp Thoại (Anti-Stutter):</b> Đã dọn sạch 100% ký tự đặc biệt, dấu chấm lửng (...), ngoặc vuông/tròn để AI đọc trôi chảy.",
         f"🔗 <b>Cầu nối Ngữ nghĩa 3 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo quy luật",
         f"🛡 <b>Bảo vệ Veo 3 (Anti-Celebrity):</b> Đã gắn nhãn KOC thuần Việt ({detected_demographic_en}) & lọc sạch từ khóa nhạy cảm",
@@ -1515,8 +1512,8 @@ if st.session_state.get("trigger_main_generation"):
             
             st.session_state["saved_reference_images"] = args["temp_images"]
 
-            # LỚP KHÓA MÀU GEMINI (ÉP TRÍCH XUẤT 1 MÀU DUY NHẤT TỪ ẢNH CHỨA NHIỀU MÀU)
-            override_instruction = f"Khóa màu Hero SKU (Product Color Lock): '{args['hero_sku_override']}'. NẾU TRONG ẢNH THAM CHIẾU CÓ NHIỀU SẢN PHẨM KHÁC MÀU NHAU, BẮT BUỘC BỎ QUA CÁC MÀU KHÁC, CHỈ TẬP TRUNG VÀ GIỮ LẠI DUY NHẤT MÀU '{args['hero_sku_override']}' ĐỂ MIÊU TẢ." if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot/Bán chạy hoặc màu nổi bật nhất. NẾU TRONG ẢNH CÓ NHIỀU MÀU, BẮT BUỘC CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU CÒN LẠI!"
+            # BỘ LỌC GEMINI (BẢO TỒN HỌA TIẾT & LOẠI BỎ MÀU TẠP)
+            override_instruction = f"Khóa màu/Họa tiết Hero SKU: '{args['hero_sku_override']}'. NẾU CÓ NHIỀU MÀU TRONG ẢNH, CHỈ GIỮ LẠI ĐÚNG MÀU/HỌA TIẾT NÀY!" if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot. NẾU ẢNH CÓ HỌA TIẾT, BẮT BUỘC PHẢI MÔ TẢ CHI TIẾT HỌA TIẾT. NẾU ẢNH CÓ NHIỀU MÀU, CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU KHÁC!"
             skirt_note_rule = "ĐẶC BIỆT: Ghi chú có yêu cầu 'quần dạng váy 1 ống / quần váy', trong 'product_visual_en' BẮT BUỘC mô tả là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', TUYỆT ĐỐI CẤM dùng từ 'pants' hoặc 'trousers'!" if detect_single_tube_skirt(args["custom_note"]) else ""
 
             prompt = f"""
@@ -1555,8 +1552,8 @@ if st.session_state.get("trigger_main_generation"):
                     "hook_element": "Yếu tố Hook 3s đầu",
                     "recommended_format": "Hình thức đề xuất",
                     "format_reason": "Lý do đề xuất",
-                    "hero_sku_color": "Mã màu Hero SKU tiếng Việt (VD: Trắng tinh)",
-                    "hero_sku_color_en": "Exact English color (e.g., solid pure matte-white)",
+                    "hero_sku_color": "Màu sắc/Họa tiết Hero SKU tiếng Việt (VD: Trắng họa tiết hoa)",
+                    "hero_sku_color_en": "Exact English color and pattern (e.g., floral printed red, striped blue, or exact reference color)",
                     "product_visual_en": "Concise English product description under 14 words",
                     "color_palette": "Bảng màu",
                     "what_and_unique": "[Tên SP]: [Điểm độc bản USP]",
@@ -1657,7 +1654,7 @@ if isinstance(ca, dict):
                 <div class="dna-card-title">🔥 2. KOC Thuần Việt, Stylist & Khóa Màu Sản Phẩm</div>
                 <div class="dna-row"><span class="dna-label">🎭 Chân dung KOC:</span><span class="dna-text" style="color:#2563eb; font-weight:700;">{koc_display_str}</span></div>
                 <div class="dna-row"><span class="dna-label">👗 Stylist Phối đồ:</span><span class="dna-text" style="color:#7c3aed; font-weight:600;">{stylist_coord_str}</span></div>
-                <div class="dna-row"><span class="dna-label">⭐ Khóa màu Hero SKU (4 cảnh):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))} ({locked_color_preview})</span></div>
+                <div class="dna-row"><span class="dna-label">⭐ Khóa màu/Họa tiết (4 cảnh):</span><span class="dna-text" style="color:#dc2626; font-weight:700;">{clean_analysis_text(ca.get('hero_sku_color', 'Tự động'))} ({locked_color_preview})</span></div>
                 <div class="dna-row"><span class="dna-label">🗣 Nhân xưng chuẩn:</span><span class="dna-text" style="color:#15803d; font-weight:700;">{pronoun_badge}</span></div>
                 <div class="dna-row"><span class="dna-label">🎨 Bảng màu SP:</span><span class="dna-text">{clean_analysis_text(ca.get('color_palette', ''))}</span></div>
             </div>"""), unsafe_allow_html=True)
@@ -1817,7 +1814,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Màu Đơn Lập Tuyệt Đối)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Bảo tồn họa tiết & Khóa Màu Đơn Lập)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
