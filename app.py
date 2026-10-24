@@ -582,7 +582,7 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         
     else:
         if scene_idx == 0: return f"Vertical 9:16 stable product-focused medium shot, {clean_prod_en} held prominently, maintaining realistic human-to-product scale"
-        elif scene_idx == 1: return f"Vertical 9:16 stable close-up shot locked onto {clean_prod_en}, strictly maintaining true-to-life realistic scale, tack-sharp focus"
+        elif scene_idx == 1: return f"Vertical 9:16 stable close-up shot (dolly-in) locked onto {clean_prod_en}, strictly maintaining true-to-life realistic scale, tack-sharp focus"
         elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
@@ -904,9 +904,16 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif not is_fashion_wearable and not is_food and not is_cosmetics: clean_prod_en = re.sub(r'\b(?:foldable|collapsible|folding)\b', 'rigid structured', clean_prod_en, flags=re.IGNORECASE)
 
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
-    if is_strict_appliance or is_mom_baby_hard: locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: exact reference-matching {clean_prod_en} in {locked_color_en}{dim_tag} maintaining 100% identical shape, proportions, and surface details. Zero hallucinated parts, zero extra details"
-    elif is_food or is_cosmetics or is_mom_baby or is_medicine: locked_product_prompt_segment = f"PRODUCT FOCUS: {clean_prod_en} in {locked_color_en} as the main subject"
-    else: locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en} in {locked_color_en}{dim_tag} occupying foreground center focus (100% rigid non-deforming geometry, identical solid color across all scenes)" if not is_fashion_wearable else f"Garment Lock: wearing {clean_prod_en} in {locked_color_en} directly on body"
+    
+    # 🌟 LỚP KHÓA MÀU ĐƠN LẬP (SINGLE COLOR LOCK) 🌟
+    color_lock_tag = f"[STRICT SINGLE COLOR LOCK: The product MUST BE ONLY {locked_color_en}, completely ignoring other colored variants in the reference]"
+    
+    if is_strict_appliance or is_mom_baby_hard: 
+        locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: exact reference-matching {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, proportions, and surface details. Zero hallucinated parts, zero extra details."
+    elif is_food or is_cosmetics or is_mom_baby or is_medicine: 
+        locked_product_prompt_segment = f"PRODUCT FOCUS: {clean_prod_en}. {color_lock_tag} as the main subject."
+    else: 
+        locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry, identical solid color across all scenes)." if not is_fashion_wearable else f"Garment Lock: wearing {clean_prod_en}. {color_lock_tag} directly on body."
 
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str, is_food, is_cosmetics, is_mom_baby, is_medicine)
     
@@ -941,7 +948,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{'speaking actively from 0.0s while showing frustration through fast dynamic body language (empty hands, zero product)' if is_pas_story else action_scene_1} (under 18 words)",
                 "sfx": "Foley thực tế (không nhạc)",
                 "director": "Attention | {'Nêu nỗi đau mở màn' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh'}",
-                "voiceover": "Thoại mở màn tiếng Việt liền mạch, KHÔNG dùng dấu chấm lửng (tối đa 25 từ)"
+                "voiceover": "Thoại mở màn 100% tiếng Việt tự nhiên (18-30 từ)..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -950,7 +957,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_2} (under 20 words)",
                 "sfx": "Tiếng thao tác thực tế",
                 "director": "Interest | Giữ đúng tỷ lệ sản phẩm + Cầu nối 3 nhánh",
-                "voiceover": "Thoại Cảnh 2 liền mạch, KHÔNG dùng dấu chấm lửng (tối đa 25 từ)"
+                "voiceover": "Thoại Cảnh 2 100% tiếng Việt (22-34 từ)..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -959,7 +966,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_3} (under 20 words)",
                 "sfx": "Tiếng trải nghiệm thực tế",
                 "director": "Desire | Thao tác cận cảnh không biến dạng sản phẩm",
-                "voiceover": "Thoại Cảnh 3 liền mạch, KHÔNG dùng dấu chấm lửng (tối đa 25 từ)"
+                "voiceover": "Thoại Cảnh 3 100% tiếng Việt (20-34 từ)..."
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
@@ -989,7 +996,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     appliance_neg_extra = "hallucinated parts, extra handles, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
-    base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}changing background, changing room, different room, changing clothes, changing shoes, different face, different hair, changing outfit, inconsistent wardrobe, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
+    
+    # BỔ SUNG KHÓA NEGATIVE MÀU SẮC
+    color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, "
+    
+    base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}changing background, changing room, different room, changing clothes, changing shoes, different face, different hair, changing outfit, inconsistent wardrobe, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
@@ -1065,7 +1076,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🗣 <b>Nhân xưng:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh Master (Đồng nhất 4 cảnh):</b> {fixed_setting_base} | {goal_badge}",
         f"{cam_mode_badge}",
         f"👗 <b>Khóa Diện mạo & Stylist (Master Character Lock):</b> {final_outfit_vi} (Đã chốt chính xác giày dép khớp ngữ cảnh, chống tự đổi quần áo ở các cảnh)",
-        f"🎨 <b>Khóa Màu & Hình Khối Sản Phẩm (Product Color Lock):</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} in {locked_color_en}</code>",
+        f"🎨 <b>Khóa Màu Đơn Lập (Strict Single Color Lock):</b> Ép loại bỏ hoàn toàn các màu tạp trong ảnh gốc, chỉ giữ lại DUY NHẤT màu: {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} in {locked_color_en}</code>",
         f"🎙 <b>Lõi Chống Vấp Thoại (Anti-Stutter):</b> Đã dọn sạch 100% ký tự đặc biệt, dấu chấm lửng (...), ngoặc vuông/tròn để AI đọc trôi chảy.",
         f"🔗 <b>Cầu nối Ngữ nghĩa 3 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo quy luật",
         f"🛡 <b>Bảo vệ Veo 3 (Anti-Celebrity):</b> Đã gắn nhãn KOC thuần Việt ({detected_demographic_en}) & lọc sạch từ khóa nhạy cảm",
@@ -1504,7 +1515,8 @@ if st.session_state.get("trigger_main_generation"):
             
             st.session_state["saved_reference_images"] = args["temp_images"]
 
-            override_instruction = f"Khóa Hero SKU: '{args['hero_sku_override']}'." if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot/Bán chạy. Phân biệt rõ màu thật của SP với bóng đổ 3D xám trên ảnh!"
+            # LỚP KHÓA MÀU GEMINI (ÉP TRÍCH XUẤT 1 MÀU DUY NHẤT TỪ ẢNH CHỨA NHIỀU MÀU)
+            override_instruction = f"Khóa màu Hero SKU (Product Color Lock): '{args['hero_sku_override']}'. NẾU TRONG ẢNH THAM CHIẾU CÓ NHIỀU SẢN PHẨM KHÁC MÀU NHAU, BẮT BUỘC BỎ QUA CÁC MÀU KHÁC, CHỈ TẬP TRUNG VÀ GIỮ LẠI DUY NHẤT MÀU '{args['hero_sku_override']}' ĐỂ MIÊU TẢ." if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot/Bán chạy hoặc màu nổi bật nhất. NẾU TRONG ẢNH CÓ NHIỀU MÀU, BẮT BUỘC CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU CÒN LẠI!"
             skirt_note_rule = "ĐẶC BIỆT: Ghi chú có yêu cầu 'quần dạng váy 1 ống / quần váy', trong 'product_visual_en' BẮT BUỘC mô tả là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', TUYỆT ĐỐI CẤM dùng từ 'pants' hoặc 'trousers'!" if detect_single_tube_skirt(args["custom_note"]) else ""
 
             prompt = f"""
@@ -1805,7 +1817,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Chống Vấp Thoại Lắp Từ & Khóa Bối Cảnh Toàn Cục)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Màu Đơn Lập Tuyệt Đối)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
