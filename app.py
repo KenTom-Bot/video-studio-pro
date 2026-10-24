@@ -66,13 +66,13 @@ COMPACT_CORE_RULES = """
    - Sinh 1 'master_setting_en' và dùng cho CẢ 4 CẢNH.
    - Sinh 1 'master_character_en' duy nhất. KHÔNG THAY ĐỔI TRANG PHỤC suốt video.
 2. PRODUCT SCALE & CAMERA RULES:
-   - NẾU LÀ ĐỒ CÁN DÀI: Phải dùng Waist-down shot. Cấm Macro Close-up để giữ tỷ lệ thật.
+   - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người, lắc lư hay bước đi. Nhân vật phải ĐỨNG IM (zero body rotation). Chỉ dùng BÀN TAY thao tác. Sản phẩm là TRỌNG TÂM tuyệt đối của khung hình.
    - Nếu là Đồ gia dụng/Công nghệ/Bình sữa: BẮT BUỘC KHOÁ CHẶT THEO ẢNH. Zero morphing!
 3. VĂN NÓI HÀ NỘI THUẦN VIỆT 100% VÀ TUÂN THỦ CHÍNH SÁCH:
    - Thoại: 100% Tiếng Việt ('mềm rũ', 'bốn', 'nghìn'). CẤM chèn tiếng Anh.
    - NẾU LÀ TPCN/THUỐC: Cấm dùng từ "chữa bệnh, đặc trị, cam kết khỏi". Chỉ dùng "hỗ trợ, bảo vệ, bổ sung".
 4. LUẬT MẸ VÀ BÉ:
-   - Tuyệt đối không để em bé một mình. Luôn luôn phải có "A caring mother/parent safely holding/interacting with her baby".
+   - Tuyệt đối không để em bé một mình. Luôn luôn phải có "A caring mother safely holding/interacting with her baby".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -89,7 +89,6 @@ INTIMATE_SAFE_ENGLISH_LEXICON = {
 }
 
 POLICY_REPLACEMENTS = {
-    # Từ ngữ cường điệu chung
     r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm',
     r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\btuyệt\s*đối\s*yên\s*tâm\b': 'cực kỳ yên tâm',
     r'\bhoàn\s*toàn\s*yên\s*tâm\b': 'cực kỳ yên tâm', r'\bhoàn\s*toàn\s*an\s*toàn\b': 'rất an toàn',
@@ -98,7 +97,6 @@ POLICY_REPLACEMENTS = {
     r'\b100\s*%\b': 'rất nhiều', r'\bchắc\s*chắn\b': 'rất có thể', r'\bcam\s*kết\b': 'an tâm',
     r'\bvĩnh\s*viễn\b': 'lâu dài', r'\bchuẩn\s*đét\b': 'vừa vặn', r'\bsố\s*1\b': 'hàng đầu',
     r'\bthần\s*dược\b': 'bí quyết', r'\btốt\s*nhất\b': 'rất tốt',
-    # Từ ngữ TPCN/Y tế/Mỹ phẩm nhạy cảm
     r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\bchữa\s*khỏi\b': 'hỗ trợ cải thiện',
     r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\bthuốc\s*đặc\s*trị\b': 'sản phẩm chuyên biệt',
     r'\btriệt\s*để\b': 'hiệu quả', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả',
@@ -107,10 +105,8 @@ POLICY_REPLACEMENTS = {
     r'\bbác\s*sĩ\s*khuyên\s*dùng\b': 'được nhiều người tin dùng',
     r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn',
     r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn',
-    # Từ ngữ Sale/Livestream
     r'\btrợ\s*giá\b': 'giảm giá sâu có hạn', r'\bphiên\s*live\b': 'đợt ưu đãi này', 
     r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi',
-    # Từ ngữ nhạy cảm Nội y
     r'\bkhe\s*ngực\b': 'phom dáng', r'\bnâng\s*ngực\b': 'nâng đỡ phom dáng', r'\bchống\s*xệ\s*ngực\b': 'giữ phom săn chắc',
     r'\bxệ\s*ngực\b': 'mất phom', r'\bvùng\s*kín\b': 'vùng nhạy cảm', r'\bnhũ\s*hoa\b': 'điểm nhạy cảm',
     r'\blộ\s*nhũ\s*hoa\b': 'lộ viền kém duyên', r'\bgợi\s*cảm\b': 'tinh tế cuốn hút'
@@ -139,7 +135,6 @@ SOUTHERN_TO_HANOI = {
     r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước',
     r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát',
     r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà',
-    r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc',
     r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác',
     r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru',
     r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một',
@@ -460,7 +455,15 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
     if not action_text: return ""
     cleaned = action_text
     if not is_fashion and not is_food:
-        destructive_patterns = [(r'\bunfolding\b', 'holding steadily'), (r'\bfolding\b', 'holding securely'), (r'\bcollapsing\b', 'presenting up close'), (r'\bflexing\b', 'pressing fingers gently on'), (r'\bbending\b', 'tilting slightly'), (r'\btwisting\b', 'turning 15 degrees'), (r'\btransforming\b', 'showcasing'), (r'\bdeforming\b', 'presenting'), (r'\bstretching\b', 'tracing fingers along'), (r'\bsqueezing\b', 'gripping firmly'), (r'\bopening\s+and\s+closing\b', 'displaying clearly')]
+        destructive_patterns = [
+            (r'\bunfolding\b', 'holding steadily'), (r'\bfolding\b', 'holding securely'), 
+            (r'\bcollapsing\b', 'presenting up close'), (r'\bflexing\b', 'pressing fingers gently on'), 
+            (r'\bbending\b', 'tilting slightly'), (r'\btwisting\b', 'holding firmly'), 
+            (r'\btransforming\b', 'showcasing'), (r'\bdeforming\b', 'presenting'), 
+            (r'\bstretching\b', 'tracing fingers along'), (r'\bsqueezing\b', 'gripping firmly'), 
+            (r'\bopening\s+and\s+closing\b', 'displaying clearly'),
+            (r'\b(?:turning|swaying|spinning|walking|stepping|dancing|moving around|tracking)\b', 'standing still')
+        ]
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
@@ -533,25 +536,25 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
 def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool) -> str:
-    if is_pas_scene1 and not is_fashion: return "Vertical 9:16 eye-level medium shot"
+    if is_pas_scene1 and not is_fashion: return "Vertical 9:16 stable eye-level medium shot"
     
     if is_food or is_medicine:
-        if scene_idx == 0: return f"Vertical 9:16 warm inviting medium shot, displaying {clean_prod_en}"
-        elif scene_idx == 1: return f"Vertical 9:16 macro close-up shot focused deeply on the texture/details of {clean_prod_en}"
-        elif scene_idx == 2: return f"Vertical 9:16 dynamic close-up action shot showing interaction with {clean_prod_en}"
-        else: return f"Vertical 9:16 balanced eye-level medium shot showing {clean_prod_en}"
+        if scene_idx == 0: return f"Vertical 9:16 stable warm inviting medium shot, displaying {clean_prod_en}"
+        elif scene_idx == 1: return f"Vertical 9:16 stable macro close-up shot focused deeply on the texture/details of {clean_prod_en}"
+        elif scene_idx == 2: return f"Vertical 9:16 stable dynamic close-up action shot showing interaction with {clean_prod_en}"
+        else: return f"Vertical 9:16 stable balanced eye-level medium shot showing {clean_prod_en}"
         
     elif is_cosmetics:
-        if scene_idx == 0: return f"Vertical 9:16 elegant medium shot holding {clean_prod_en}"
-        elif scene_idx == 1: return f"Vertical 9:16 smooth macro close-up swatching or focusing on the texture of {clean_prod_en}"
-        elif scene_idx == 2: return f"Vertical 9:16 close-up beauty shot showing application of {clean_prod_en}"
-        else: return f"Vertical 9:16 radiant medium shot with {clean_prod_en}"
+        if scene_idx == 0: return f"Vertical 9:16 stable elegant medium shot holding {clean_prod_en}"
+        elif scene_idx == 1: return f"Vertical 9:16 stable smooth macro close-up swatching or focusing on the texture of {clean_prod_en}"
+        elif scene_idx == 2: return f"Vertical 9:16 stable close-up beauty shot showing application of {clean_prod_en}"
+        else: return f"Vertical 9:16 stable radiant medium shot with {clean_prod_en}"
 
     elif is_mom_baby:
-        if scene_idx == 0: return f"Vertical 9:16 soft warm medium shot holding {clean_prod_en}"
-        elif scene_idx == 1: return f"Vertical 9:16 close-up shot showing the soft material/texture of {clean_prod_en}"
-        elif scene_idx == 2: return f"Vertical 9:16 gentle close-up action shot testing or using {clean_prod_en}"
-        else: return f"Vertical 9:16 balanced cozy medium shot with {clean_prod_en}"
+        if scene_idx == 0: return f"Vertical 9:16 stable soft warm medium shot holding {clean_prod_en}"
+        elif scene_idx == 1: return f"Vertical 9:16 stable close-up shot showing the soft material/texture of {clean_prod_en}"
+        elif scene_idx == 2: return f"Vertical 9:16 stable gentle close-up action shot testing or using {clean_prod_en}"
+        else: return f"Vertical 9:16 stable balanced cozy medium shot with {clean_prod_en}"
 
     elif is_fashion:
         if scene_idx == 0: return "Vertical 9:16 eye-level three-quarter full-body shot showcasing the outfit"
@@ -560,30 +563,30 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         else: return "Vertical 9:16 warm eye-level medium shot"
         
     elif is_long_handle:
-        if scene_idx == 0: return f"Vertical 9:16 full-body wide shot, exact reference-matching {clean_prod_en} held at normal realistic scale"
-        elif scene_idx == 1: return f"Vertical 9:16 medium-wide tracking shot, keeping both human and {clean_prod_en} in frame to maintain normal true-to-life size (NO macro close-up)"
-        elif scene_idx == 2: return f"Vertical 9:16 waist-down medium-wide shot showing the {clean_prod_en} working on the floor at normal realistic scale"
-        else: return f"Vertical 9:16 full-body balanced shot, exact reference-matching {clean_prod_en} displayed at normal scale"
+        if scene_idx == 0: return f"Vertical 9:16 stable full-body wide shot, exact reference-matching {clean_prod_en} held at normal realistic scale"
+        elif scene_idx == 1: return f"Vertical 9:16 stable medium-wide shot, keeping both human and {clean_prod_en} in frame to maintain normal true-to-life size (NO macro close-up)"
+        elif scene_idx == 2: return f"Vertical 9:16 stable waist-down medium-wide shot showing the {clean_prod_en} working on the floor at normal realistic scale"
+        else: return f"Vertical 9:16 stable full-body balanced shot, exact reference-matching {clean_prod_en} displayed at normal scale"
         
     elif is_appliance:
-        if scene_idx == 0: return f"Vertical 9:16 product-focused medium shot, exact reference-matching {clean_prod_en} held steadily, maintaining realistic scale"
-        elif scene_idx == 1: return f"Vertical 9:16 close-up shot locked on {clean_prod_en}, maintaining 100% accurate true-to-life scale and identical proportions, tack-sharp focus"
-        elif scene_idx == 2: return f"Vertical 9:16 tight close-up action shot centered directly on {clean_prod_en}, strictly maintaining accurate real-world scale during subtle interaction"
-        else: return f"Vertical 9:16 balanced medium shot with exact reference-matching {clean_prod_en} displayed in realistic scale"
+        if scene_idx == 0: return f"Vertical 9:16 stable product-focused medium shot, exact reference-matching {clean_prod_en} held steadily, maintaining realistic scale"
+        elif scene_idx == 1: return f"Vertical 9:16 stable close-up shot locked on {clean_prod_en}, maintaining 100% accurate true-to-life scale and identical proportions, tack-sharp focus"
+        elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot centered directly on {clean_prod_en}, strictly maintaining accurate real-world scale during subtle interaction"
+        else: return f"Vertical 9:16 stable balanced medium shot with exact reference-matching {clean_prod_en} displayed in realistic scale"
         
     else:
-        if scene_idx == 0: return f"Vertical 9:16 product-focused medium shot, {clean_prod_en} held prominently, maintaining realistic human-to-product scale"
-        elif scene_idx == 1: return f"Vertical 9:16 close-up shot (dolly-in) locked onto {clean_prod_en}, strictly maintaining true-to-life realistic scale, tack-sharp focus"
-        elif scene_idx == 2: return f"Vertical 9:16 tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
-        else: return f"Vertical 9:16 balanced medium shot with {clean_prod_en} displayed with realistic scale"
+        if scene_idx == 0: return f"Vertical 9:16 stable product-focused medium shot, {clean_prod_en} held prominently, maintaining realistic human-to-product scale"
+        elif scene_idx == 1: return f"Vertical 9:16 stable close-up shot locked onto {clean_prod_en}, strictly maintaining true-to-life realistic scale, tack-sharp focus"
+        elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
+        else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False, is_appliance: bool = False, is_long_handle: bool = False, is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False, is_mom_baby_hard: bool = False) -> str:
     p = f"{product_name} {vo_text}".lower()
     
-    if is_food: return "Mouth-watering visual physics; showing steam rising, juicy texture, melting, or smooth pulling/stretching if applicable. Natural food interaction."
+    if is_food: return "Mouth-watering visual physics; showing steam rising, juicy texture, melting, or smooth pulling/stretching if applicable. Presenter stands completely still; natural hand interaction only."
     elif is_cosmetics: 
-        if any(k in p for k in ["son", "môi", "lip"]): return "Smooth creamy/pigmented texture; visibly leaving a rich color stroke or flawless texture on the skin/lips. Delicate and elegant interaction."
-        return "Smooth creamy or watery texture physics; visibly absorbing into the skin with a glowing, flawless finish. Delicate and elegant interaction."
+        if any(k in p for k in ["son", "môi", "lip"]): return "Smooth creamy/pigmented texture; visibly leaving a rich color stroke or flawless texture on the skin/lips. Delicate hand interaction only; body remains perfectly still."
+        return "Smooth creamy or watery texture physics; visibly absorbing into the skin with a glowing, flawless finish. Delicate hand interaction only; body remains perfectly still."
     elif is_mom_baby: 
         if is_mom_baby_hard: return "STRICT REFERENCE TRACKING for the baby product. 100% rigid non-deforming geometry, true-to-life scale. Safe and gentle interaction."
         return "Ultra-soft fabric/material texture; showing gentle elasticity, high liquid absorption, or completely safe smooth surfaces."
@@ -593,13 +596,13 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return "CAMERA FOCUS LOCKED ON PRODUCT AND AIRFLOW TARGET: 100% rigid non-deforming body lock, true-to-life scale. Creates a powerful, completely invisible and transparent airflow (ZERO fire, ZERO sparks, ZERO smoke, ZERO plasma). The invisible breeze realistically blows away dust, leaves, or softly blows hair."
     elif any(k in p for k in ["hút bụi", "vacuum"]): return "CAMERA FOCUS LOCKED ON VACUUM HEAD AND DUSTBIN: 100% rigid non-deforming body lock, true-to-life scale. The nozzle glides swiftly and firmly, visibly sucking dirt, crumbs, or debris off the surface directly into the transparent dustbin in real-time."
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot."
-    elif is_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts, zero giant products. The product stays completely rigid while presenter's hands perform a fast, decisive, clean interaction."
-    else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); hands hold product, tilt 15 degrees, and trace surface decisively."
+    elif is_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts, zero giant products. The product stays completely rigid while presenter stands perfectly still; only hands perform a fast, decisive, clean interaction."
+    else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold product firmly and trace surface decisively."
 
 def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool):
     p = f"{clean_prod_en} {check_str}".lower()
     
-    if is_food: return (f"holding {clean_prod_en} and presenting it deliciously", f"taking a satisfying bite or showing the inside texture of {clean_prod_en}", f"pouring, dipping, or stretching {clean_prod_en} to show its mouth-watering details", f"holding {clean_prod_en} with a happy, satisfied expression")
+    if is_food: return (f"holding {clean_prod_en} while standing completely still and presenting it deliciously", f"taking a satisfying bite or showing the inside texture of {clean_prod_en}", f"pouring, dipping, or stretching {clean_prod_en} to show its mouth-watering details", f"holding {clean_prod_en} with a happy, satisfied expression")
     elif is_cosmetics: return (f"elegantly holding {clean_prod_en} next to the face", f"swatching or applying a small amount of {clean_prod_en} smoothly on the skin, visibly leaving a rich stroke", f"gently tapping {clean_prod_en} into the skin to show the glowing finish", f"holding {clean_prod_en} confidently with a radiant smile")
     elif is_mom_baby: return (f"caring mother demonstrating {clean_prod_en} safely next to her baby", f"gently touching or interacting with {clean_prod_en} to show its features", f"demonstrating the safe use of {clean_prod_en} with the baby", f"holding {clean_prod_en} securely with a caring smile next to the baby")
     elif is_medicine: return (f"holding {clean_prod_en} cleanly in hand", f"showing {clean_prod_en} up close next to a clear glass of water", f"dropping or demonstrating the use of {clean_prod_en}", f"holding {clean_prod_en} with a healthy, confident smile")
@@ -608,8 +611,8 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return (f"holding the rigid {clean_prod_en} maintaining realistic scale", f"turning on {clean_prod_en} swiftly up close, showing completely transparent and invisible airflow (no sparks)", f"aiming {clean_prod_en} to forcefully blow away dust or leaves with invisible breeze", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
     elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding the rigid {clean_prod_en} maintaining realistic scale", f"positioning {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} steadily with a warm open-palm gesture")
     elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} steadily", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} steadily with a confident gesture")
-    elif is_appliance: return (f"holding the exact reference-matching {clean_prod_en} steadily at realistic scale", f"presenting the exact reference-matching {clean_prod_en} swiftly without any added details or scale distortion", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity and true scale", f"holding {clean_prod_en} steadily with a confident open-palm gesture")
-    else: return (f"holding the rigid {clean_prod_en} at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid surface without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry and true scale", f"holding {clean_prod_en} steadily with a confident open-palm gesture")
+    elif is_appliance: return (f"standing completely still while holding the exact reference-matching {clean_prod_en} steadily at realistic scale", f"presenting the exact reference-matching {clean_prod_en} swiftly without any added details or scale distortion", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity and true scale", f"holding {clean_prod_en} steadily with a confident open-palm gesture")
+    else: return (f"standing perfectly still holding the rigid {clean_prod_en} at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid surface without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry and true scale", f"holding {clean_prod_en} steadily with a confident open-palm gesture")
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
@@ -974,11 +977,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     w_lock = res.get("wardrobe_lock", {})
     locked_character_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"Fictional everyday {detected_demographic_en} (synthetic AI persona), wearing smart-casual coordinated outfit, wearing {forced_footwear}").strip().rstrip('.')
     if is_single_skirt_mode: locked_character_prompt = enforce_single_tube_skirt_syntax(locked_character_prompt)
+    if not is_fashion_wearable: locked_character_prompt += ", standing completely still with zero body rotation"
+    
     final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
 
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     appliance_neg_extra = "hallucinated parts, extra handles, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
     base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}changing background, changing room, different room, changing clothes, changing shoes, different face, different hair, changing outfit, inconsistent wardrobe, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
+    if not is_fashion_wearable:
+        base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
     total_sec = 0.0
     for idx_scn, scn in enumerate(scenes):
@@ -1005,6 +1012,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         micro_expr = sanitize_third_party_ip(scn.get("expression_en", "natural engaging expression")).strip().rstrip('.')
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("action_en") or action_scene_2, flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
+        if not is_fashion_wearable and not is_pas_scn1_no_prod:
+            if not clean_act.lower().startswith("standing"):
+                clean_act = f"standing completely still with zero body rotation, {clean_act}"
 
         scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_appliance=is_strict_appliance, is_long_handle=is_long_handle, is_food=is_food, is_cosmetics=is_cosmetics, is_mom_baby=is_mom_baby, is_medicine=is_medicine, is_mom_baby_hard=is_mom_baby_hard)
 
@@ -1022,7 +1032,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         if is_pas_scn1_no_prod:
             raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT). [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s speaking immediately with fast, decisive frustrated body language and accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         elif not is_fashion_wearable:
-            raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
+            raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         else:
             raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
@@ -1036,7 +1046,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     
     goal_badge = "🌟 <b>Định hướng:</b> Xây Kênh & Follow" if is_viral else "🛒 <b>Định hướng:</b> Chốt đơn TikTok Shop an toàn"
-    cam_mode_badge = "👗 <b>Chế độ Quay (Wearable Fashion):</b> Lấy phom dáng và đường rũ vải làm trung tâm." if is_fashion_wearable else "🎯 <b>Chế độ Quay (Product-Hero Centerpiece):</b> Khóa tỷ lệ thực tế, cấm khổng lồ hóa sản phẩm."
+    cam_mode_badge = "👗 <b>Chế độ Quay (Wearable Fashion):</b> Lấy phom dáng và đường rũ vải làm trung tâm." if is_fashion_wearable else "🎯 <b>Chế độ Quay (Product-Hero Centerpiece):</b> Khóa camera tĩnh (stable shot), ép KOC đứng im (zero rotation), sản phẩm là trọng tâm tuyệt đối."
     
     industry_badges = []
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
@@ -1733,7 +1743,7 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Hành động Đa ngành, Khóa Tỷ lệ, Khóa Người Bảo Hộ):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Hành động Đa ngành, Khóa Tỷ lệ):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
