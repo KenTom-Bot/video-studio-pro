@@ -44,7 +44,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. KHỞI TẠO TỪ ĐIỂN, HẰNG SỐ CỐT LÕI (CHỈ CHẠY 1 LẦN)
+# 2. KHỞI TẠO TỪ ĐIỂN, HẰNG SỐ CỐT LÕI
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -335,7 +335,6 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
-    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -357,7 +356,6 @@ def clean_and_normalize_voiceover(text: str) -> str:
     cleaned = re.sub(r'\ban\s*toàn\s*rất\b', 'rất an toàn', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\b([a-zà-ỹ]+)\s+rất\s+luôn\b', r'cực kỳ \1 luôn', cleaned, flags=re.IGNORECASE)
     
-    # BỘ LỌC CHỐNG LẮP TỪ: Loại bỏ dấu chấm lửng, ngoặc vuông, gạch nối
     cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
     cleaned = re.sub(r'\.{2,}', ',', cleaned)
     cleaned = re.sub(r'[-~*]', '', cleaned)
@@ -444,19 +442,14 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     for pat in patterns: cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
     return cleaned
 
-# BỘ BẢO TỒN HỌA TIẾT & MÀU SẮC (PATTERN PRESERVATION)
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
     c = f"{color_vi} {ai_color_en}".lower().strip()
-    # Nếu trong chuỗi màu/họa tiết có các từ khóa thể hiện vân, sọc, hoa, họa tiết -> Giữ nguyên, KHÔNG ép màu trơn
     if any(k in c for k in ["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"]):
         return f"exact reference-matching pattern and colors ({ai_color_en})"
-    
     if ai_color_en and len(ai_color_en.strip()) > 2:
         return f"exact reference-matching {ai_color_en.strip()}"
-        
     return "exact reference-matching color and pattern"
 
-# BỘ LỌC CHỐNG VĂNG/THẢ ĐỒ VẬT (ANTI-DROP SANITIZER)
 def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False, is_food: bool = False) -> str:
     if not action_text: return ""
     cleaned = action_text
@@ -468,11 +461,9 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
             (r'\btransforming\b', 'showcasing'), (r'\bdeforming\b', 'presenting'), 
             (r'\bstretching\b', 'tracing fingers along'), (r'\bsqueezing\b', 'gripping firmly'), 
             (r'\bopening\s+and\s+closing\b', 'displaying clearly'),
-            # NGĂN CHẶN CÁC ĐỘNG TỪ THẢ RƠI / NÉM
             (r'\bdropping\b', 'holding securely'), (r'\bfalling\b', 'staying firmly in hand'),
             (r'\bthrowing\b', 'holding firmly'), (r'\btossing\b', 'presenting carefully'),
             (r'\bletting\s+go\b', 'holding firmly'),
-            # NGĂN CHẶN DI CHUYỂN TOÀN THÂN
             (r'\b(?:turning|swaying|spinning|walking|stepping|dancing|moving around|tracking)\b', 'standing still')
         ]
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
@@ -529,7 +520,7 @@ def detect_wearable_fashion(text_to_check: str) -> bool:
     if not text_to_check: return False
     t = text_to_check.lower()
     if any(k in t for k in ["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"]): return False
-    fashion_keywords = ["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama"]
+    fashion_keywords = ["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama", "tất", "vớ", "socks", "tights", "stocking"]
     return any(k in t for k in fashion_keywords)
 
 def detect_footwear_or_accessory(text_to_check: str) -> bool:
@@ -539,7 +530,7 @@ def detect_footwear_or_accessory(text_to_check: str) -> bool:
     return any(k in t for k in [
         "giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", 
         "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", 
-        "shoe", "handbag", "backpack", "wallet", "watch", "glasses"
+        "shoe", "handbag", "backpack", "wallet", "watch", "glasses", "tất", "vớ", "socks"
     ])
 
 def detect_long_handle_tool(text_to_check: str) -> bool:
@@ -547,9 +538,14 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
 def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool) -> str:
-    # 🌟 CẬP NHẬT: Cho phép quay linh hoạt ở Cảnh 1 để lột tả rõ nỗi đau
     if is_pas_scene1 and not is_fashion: return "Vertical 9:16 stable dynamic shot framing the character and the specific problem"
     
+    if is_footwear_acc and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]):
+        if scene_idx == 0: return f"Vertical 9:16 stable low-angle full-body shot focusing heavily on the legs and feet displaying {clean_prod_en}"
+        elif scene_idx == 1: return f"Vertical 9:16 stable waist-down tracking shot locked sharply on the feet wearing {clean_prod_en}"
+        elif scene_idx == 2: return f"Vertical 9:16 stable dynamic macro close-up directly on the feet/ankles showing the texture of {clean_prod_en}"
+        else: return f"Vertical 9:16 stable low-angle balanced shot highlighting the feet with {clean_prod_en}"
+
     if is_food or is_medicine:
         if scene_idx == 0: return f"Vertical 9:16 stable warm inviting medium shot, displaying {clean_prod_en}"
         elif scene_idx == 1: return f"Vertical 9:16 stable macro close-up shot focused deeply on the texture/details of {clean_prod_en}"
@@ -614,6 +610,9 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
 def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool):
     p = f"{clean_prod_en} {check_str}".lower()
     
+    if any(k in p for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "tất", "vớ", "giày", "dép"]):
+        return ("stepping forward stylishly showcasing the footwear/socks on feet", "pointing dynamically at the product on the feet", "stretching or tapping the fabric/material on the feet to show elasticity and comfort", "posing confidently with focus on the legs/feet")
+
     if is_food: return (f"holding {clean_prod_en} securely while standing completely still and presenting it deliciously", f"taking a satisfying bite or showing the inside texture of {clean_prod_en}", f"pouring, dipping, or stretching {clean_prod_en} to show its mouth-watering details", f"holding {clean_prod_en} securely with a happy, satisfied expression")
     elif is_cosmetics: return (f"elegantly holding {clean_prod_en} securely next to the face", f"swatching or applying a small amount of {clean_prod_en} smoothly on the skin, visibly leaving a rich stroke", f"gently tapping {clean_prod_en} into the skin to show the glowing finish", f"holding {clean_prod_en} securely with a radiant smile")
     elif is_mom_baby: return (f"caring mother holding {clean_prod_en} securely next to her baby", f"gently touching or interacting with {clean_prod_en} to show its features", f"demonstrating the safe use of {clean_prod_en} with the baby", f"holding {clean_prod_en} securely with a caring smile next to the baby")
@@ -840,7 +839,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Chia sẻ mẹo/kiến thức/câu chuyện, KHÔNG bán hàng, KHÔNG giá)" if is_viral else "TIKTOK SHOP (Chuyển đổi bán hàng, giải quyết nỗi đau, chốt deal)"
-    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG: {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- NẾU LÀ TPCN/DƯỢC PHẨM/MỸ PHẨM: TUYỆT ĐỐI TUÂN THỦ CHÍNH SÁCH Y TẾ. KHÔNG DÙNG TỪ 'chữa bệnh, đặc trị, cam kết khỏi'. CHỈ DÙNG 'hỗ trợ, cải thiện, bảo vệ'.\n- NẾU LÀ MẸ VÀ BÉ: BẮT BUỘC PHẢI CÓ NGƯỜI LỚN (Mẹ/Bố) tương tác cùng em bé, TUYỆT ĐỐI KHÔNG để em bé một mình trong video.\n- 5 kịch bản = 5 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.\n- Diễn viên: {char_rules}"
+    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG: {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- 5 kịch bản = 5 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.\n- Diễn viên: {char_rules}"
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False, forced_footwear="sneakers"):
     is_viral = ("Viral" in mode)
@@ -911,7 +910,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
     
-    # 🌟 LỚP KHÓA MÀU ĐƠN LẬP BẢO TỒN HỌA TIẾT (STRICT VISUAL LOCK) 🌟
     color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
     
     if is_strict_appliance or is_mom_baby_hard: 
@@ -930,7 +928,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng khó chịu như trên thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
 
-    # 🌟 ĐỊNH DẠNG ĐỘNG LỰC HỌC NỖI ĐAU CẢNH 1 (Visual Pain-Point)
     scene_1_action_inst = "speaking actively from 0.0s while physically demonstrating the SPECIFIC physical problem mentioned in the hook (e.g., vigorously scratching a red itchy rash on skin, struggling to pull up slipping socks from shoes, looking into a filthy washing machine drum) - EMPTY HANDS, ZERO PRODUCT" if is_pas_story else f"{action_scene_1} (under 18 words)"
 
     prompt_text = f"""
@@ -1003,7 +1000,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
 
-    # LỚP GIÁP NEGATIVE PROMPT (CHỐNG THẢ RƠI & CHỐNG NHẢY CẢNH)
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     appliance_neg_extra = "hallucinated parts, extra handles, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
@@ -1057,7 +1053,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
         if is_pas_scn1_no_prod:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s speaking actively from 0.0s with fast decisive frustrated body language and accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
+            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         elif not is_fashion_wearable:
             raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         else:
@@ -1077,6 +1073,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     industry_badges = []
     if is_pas_story: industry_badges.append("🎭 <b>Động lực học Nỗi đau (PAS):</b> Cảnh 1 tự động hiển thị trực quan thực trạng vật lý của nỗi đau (ngứa ngáy, lồng giặt bẩn, tuột tất...) kết hợp thoại từ 0.0s.")
+    if is_footwear_accessory and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]): industry_badges.append("🧦 <b>Động lực học Giày/Tất:</b> Máy quay chúi xuống (low-angle) soi trực tiếp bàn chân/cổ chân, KOC tự động xỏ tất/giày vào chân.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
     if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm:</b> Đã kích hoạt hiệu ứng bắt sáng, ép sản phẩm để lại vệt màu trên da/môi chân thực.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
@@ -1772,7 +1769,7 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Hành động Đa ngành, Khóa Tỷ lệ, Khóa Cầm Nắm Thép):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Hành động Đa ngành, Khóa Tỷ lệ, Chống vấp thoại):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
@@ -1827,7 +1824,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khóa Lực Nắm & Tường lửa Văng/Thả)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Bảo tồn họa tiết & Góc quay Giày/Tất)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
