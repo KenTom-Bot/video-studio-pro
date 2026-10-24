@@ -44,7 +44,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. KHỞI TẠO TỪ ĐIỂN, HẰNG SỐ CỐT LÕI (CHỈ CHẠY 1 LẦN)
+# 2. KHỞI TẠO TỪ ĐIỂN, HẰNG SỐ CỐT LÕI
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -69,11 +69,13 @@ COMPACT_CORE_RULES = """
    - Nếu Sản phẩm có họa tiết/nhiều màu: PHẢI GIỮ ĐÚNG HỌA TIẾT, không được biến thành màu trơn.
    - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người, lắc lư hay bước đi. Nhân vật phải ĐỨNG IM (zero body rotation). Chỉ dùng BÀN TAY thao tác. Sản phẩm là TRỌNG TÂM tuyệt đối của khung hình.
    - Nếu là Đồ gia dụng/Công nghệ/Bình sữa: BẮT BUỘC KHOÁ CHẶT THEO ẢNH THAM CHIẾU. Zero morphing!
-3. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
+3. THỰC TRẠNG NỖI ĐAU CẢNH 1 (VISUAL PAIN POINT):
+   - Ở Cảnh 1 (Nêu nỗi đau, không có SP), 'action_en' BẮT BUỘC phải miêu tả HÀNH ĐỘNG VẬT LÝ thực tế của nỗi đau (VD: đang gãi mạnh mảng da nổi mẩn đỏ, đang lúi húi kéo tất bị tuột gót, đang cau mày nhìn lồng máy giặt bẩn) kết hợp với 'speaking actively from 0.0s'. TUYỆT ĐỐI không chỉ ghi chung chung là "frustrated body language".
+4. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
    - Thoại: 100% Tiếng Việt ('mềm rũ', 'bốn', 'nghìn', 'một trăm').
    - TUYỆT ĐỐI CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong lời thoại (voiceover) để tránh lỗi máy AI đọc bị vấp, lắp từ.
    - NẾU LÀ TPCN/THUỐC: Cấm dùng từ "chữa bệnh, đặc trị, cam kết khỏi". Chỉ dùng "hỗ trợ, bảo vệ, bổ sung".
-4. LUẬT MẸ VÀ BÉ:
+5. LUẬT MẸ VÀ BÉ:
    - Tuyệt đối không để em bé một mình. Luôn luôn phải có "A caring mother safely holding/interacting with her baby".
 """
 
@@ -441,7 +443,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     for pat in patterns: cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
     return cleaned
 
-# HÀM MỚI: BỘ BẢO TỒN HỌA TIẾT & MÀU SẮC (PATTERN PRESERVATION)
+# BỘ BẢO TỒN HỌA TIẾT & MÀU SẮC (PATTERN PRESERVATION)
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
     c = f"{color_vi} {ai_color_en}".lower().strip()
     # Nếu trong chuỗi màu/họa tiết có các từ khóa thể hiện vân, sọc, hoa, họa tiết -> Giữ nguyên, KHÔNG ép màu trơn
@@ -539,7 +541,8 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
 def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool) -> str:
-    if is_pas_scene1 and not is_fashion: return "Vertical 9:16 stable eye-level medium shot"
+    # 🌟 CẬP NHẬT: Cho phép quay linh hoạt ở Cảnh 1 để lột tả rõ nỗi đau
+    if is_pas_scene1 and not is_fashion: return "Vertical 9:16 stable dynamic shot framing the character and the specific problem"
     
     if is_food or is_medicine:
         if scene_idx == 0: return f"Vertical 9:16 stable warm inviting medium shot, displaying {clean_prod_en}"
@@ -831,7 +834,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Chia sẻ mẹo/kiến thức/câu chuyện, KHÔNG bán hàng, KHÔNG giá)" if is_viral else "TIKTOK SHOP (Chuyển đổi bán hàng, giải quyết nỗi đau, chốt deal)"
-    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG: {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- NẾU LÀ TPCN/DƯỢC PHẨM/MỸ PHẨM: TUYỆT ĐỐI TUÂN THỦ CHÍNH SÁCH Y TẾ. KHÔNG DÙNG TỪ 'chữa bệnh, đặc trị, cam kết khỏi'. CHỈ DÙNG 'hỗ trợ, cải thiện, bảo vệ'.\n- NẾU LÀ MẸ VÀ BÉ: BẮT BUỘC PHẢI CÓ NGƯỜI LỚN (Mẹ/Bố) tương tác cùng em bé, TUYỆT ĐỐI KHÔNG để em bé một mình trong video.\n- 5 kịch bản = 5 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.\n- Diễn viên: {char_rules}"
+    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG: {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- 5 kịch bản = 5 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.\n- Diễn viên: {char_rules}"
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False, forced_footwear="sneakers"):
     is_viral = ("Viral" in mode)
@@ -902,7 +905,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
     
-    # 🌟 LỚP KHÓA MÀU ĐƠN LẬP BẢO TỒN HỌA TIẾT (STRICT VISUAL LOCK) 🌟
     color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
     
     if is_strict_appliance or is_mom_baby_hard: 
@@ -920,6 +922,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine)
     
     scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng khó chịu như trên thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
+
+    # 🌟 CẬP NHẬT: Định dạng động lực học nỗi đau Cảnh 1 (Visual Pain-Point)
+    scene_1_action_inst = "speaking actively from 0.0s while physically demonstrating the SPECIFIC physical problem mentioned in the hook (e.g., vigorously scratching a red itchy rash on skin, struggling to pull up slipping socks from shoes, looking into a filthy washing machine drum) - EMPTY HANDS, ZERO PRODUCT" if is_pas_story else f"{action_scene_1} (under 18 words)"
 
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
@@ -941,10 +946,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             {{
                 "scene": 1, "aida_stage": "Attention",
                 "setting": "Bối cảnh mở màn tiếng Việt...",
-                "expression_en": "{'frustrated expression' if is_pas_story else 'lively, engaging expression'}",
-                "action_en": "{'speaking actively from 0.0s while showing frustration through fast dynamic body language (empty hands, zero product)' if is_pas_story else action_scene_1} (under 18 words)",
+                "expression_en": "{'frustrated and troubled expression' if is_pas_story else 'lively, engaging expression'}",
+                "action_en": "{scene_1_action_inst} (under 25 words)",
                 "sfx": "Foley thực tế (không nhạc)",
-                "director": "Attention | {'Nêu nỗi đau mở màn' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh'}",
+                "director": "Attention | {'Trực tiếp mô tả hình ảnh nỗi đau vật lý' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh'}",
                 "voiceover": "Thoại mở màn 100% tiếng Việt tự nhiên (18-30 từ)..."
             }},
             {{
@@ -993,8 +998,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     appliance_neg_extra = "hallucinated parts, extra handles, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
-    
-    # BỔ SUNG KHÓA NEGATIVE MÀU SẮC
     color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     
     base_neg_prompt = f"{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}changing background, changing room, different room, changing clothes, changing shoes, different face, different hair, changing outfit, inconsistent wardrobe, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, morphing product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
@@ -1026,6 +1029,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         micro_expr = sanitize_third_party_ip(scn.get("expression_en", "natural engaging expression")).strip().rstrip('.')
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("action_en") or action_scene_2, flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
+        
+        # CHỈ áp dụng standing still cho cảnh có sản phẩm (Cảnh 2,3,4). Cảnh 1 PAS được thả tự do vận động để thể hiện nỗi đau
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing"):
                 clean_act = f"standing completely still with zero body rotation, {clean_act}"
@@ -1044,7 +1049,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
         if is_pas_scn1_no_prod:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT). [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s speaking actively from 0.0s with fast decisive frustrated body language and accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
+            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         elif not is_fashion_wearable:
             raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         else:
@@ -1063,6 +1068,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     cam_mode_badge = "👗 <b>Chế độ Quay (Wearable Fashion):</b> Lấy phom dáng và đường rũ vải làm trung tâm." if is_fashion_wearable else "🎯 <b>Chế độ Quay (Product-Hero Centerpiece):</b> Khóa camera tĩnh (stable shot), ép KOC đứng im (zero rotation), sản phẩm là trọng tâm tuyệt đối."
     
     industry_badges = []
+    if is_pas_story: industry_badges.append("🎭 <b>Động lực học Nỗi đau (PAS):</b> Cảnh 1 tự động hiển thị trực quan thực trạng vật lý của nỗi đau (ngứa ngáy, lồng giặt bẩn, tuột tất...) kết hợp thoại từ 0.0s.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
     if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm:</b> Đã kích hoạt hiệu ứng bắt sáng, ép sản phẩm để lại vệt màu trên da/môi chân thực.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
@@ -1512,7 +1518,6 @@ if st.session_state.get("trigger_main_generation"):
             
             st.session_state["saved_reference_images"] = args["temp_images"]
 
-            # BỘ LỌC GEMINI (BẢO TỒN HỌA TIẾT & LOẠI BỎ MÀU TẠP)
             override_instruction = f"Khóa màu/Họa tiết Hero SKU: '{args['hero_sku_override']}'. NẾU CÓ NHIỀU MÀU TRONG ẢNH, CHỈ GIỮ LẠI ĐÚNG MÀU/HỌA TIẾT NÀY!" if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot. NẾU ẢNH CÓ HỌA TIẾT, BẮT BUỘC PHẢI MÔ TẢ CHI TIẾT HỌA TIẾT. NẾU ẢNH CÓ NHIỀU MÀU, CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU KHÁC!"
             skirt_note_rule = "ĐẶC BIỆT: Ghi chú có yêu cầu 'quần dạng váy 1 ống / quần váy', trong 'product_visual_en' BẮT BUỘC mô tả là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', TUYỆT ĐỐI CẤM dùng từ 'pants' hoặc 'trousers'!" if detect_single_tube_skirt(args["custom_note"]) else ""
 
@@ -1750,7 +1755,7 @@ if all_sc:
                 is_no_prod = scn.get("is_no_product_scene", False)
                 if is_no_prod:
                     st.markdown("<div class='no-product-warning'>🚨 LƯU Ý: Phân cảnh này KHÔNG CÓ SẢN PHẨM. Bạn KHÔNG CẦN dùng ảnh tham chiếu sản phẩm khi tạo ảnh!</div>", unsafe_allow_html=True)
-                    st.markdown("**🖼 Prompt Ảnh Tinh Gọn (KHÔNG SẢN PHẨM):**")
+                    st.markdown("**🖼 Prompt Ảnh Tinh Gọn (KHẮC HỌA NỖI ĐAU):**")
                 else:
                     st.markdown("**🖼 Prompt Ảnh Tinh Gọn (Midjourney / Flux):**")
                 st.code(img_p := scn.get('img_p', ''), language="text")
@@ -1814,7 +1819,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Bảo tồn họa tiết & Khóa Màu Đơn Lập)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Khắc họa Thực trạng Nỗi đau & Chống Vấp Thoại)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
