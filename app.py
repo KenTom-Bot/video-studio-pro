@@ -63,13 +63,14 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT BỐI CẢNH & NHÂN VẬT (MASTER LOCK):
-   - Sinh 1 'master_setting_en' và dùng cho CẢ 4 CẢNH.
-   - Sinh 1 'master_character_en' duy nhất. KHÔNG THAY ĐỔI TRANG PHỤC suốt video.
-2. PRODUCT SCALE & CAMERA RULES:
+   - Sinh 1 'master_setting_en' và dùng cho CẢ 4 CẢNH (không được đổi phòng, đổi cảnh).
+   - Sinh 1 'master_character_en' duy nhất miêu tả từ tóc, mặt, quần áo, đến giày dép. KHÔNG THAY ĐỔI TRANG PHỤC trong suốt video.
+2. PRODUCT SCALE & CAMERA RULES (CHỐNG SẢN PHẨM KHỔNG LỒ):
    - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người, lắc lư hay bước đi. Nhân vật phải ĐỨNG IM (zero body rotation). Chỉ dùng BÀN TAY thao tác. Sản phẩm là TRỌNG TÂM tuyệt đối của khung hình.
-   - Nếu là Đồ gia dụng/Công nghệ/Bình sữa: BẮT BUỘC KHOÁ CHẶT THEO ẢNH. Zero morphing!
-3. VĂN NÓI HÀ NỘI THUẦN VIỆT 100% VÀ TUÂN THỦ CHÍNH SÁCH:
-   - Thoại: 100% Tiếng Việt ('mềm rũ', 'bốn', 'nghìn'). CẤM chèn tiếng Anh.
+   - Nếu là Đồ gia dụng/Công nghệ/Bình sữa: BẮT BUỘC KHOÁ CHẶT THEO ẢNH THAM CHIẾU. Zero morphing!
+3. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
+   - Thoại: 100% Tiếng Việt ('mềm rũ', 'bốn', 'nghìn', 'một trăm').
+   - TUYỆT ĐỐI CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong lời thoại (voiceover) để tránh lỗi máy AI đọc bị vấp, lắp từ. Chữ phải viết ra thành câu liền mạch tự nhiên.
    - NẾU LÀ TPCN/THUỐC: Cấm dùng từ "chữa bệnh, đặc trị, cam kết khỏi". Chỉ dùng "hỗ trợ, bảo vệ, bổ sung".
 4. LUẬT MẸ VÀ BÉ:
    - Tuyệt đối không để em bé một mình. Luôn luôn phải có "A caring mother safely holding/interacting with her baby".
@@ -106,10 +107,7 @@ POLICY_REPLACEMENTS = {
     r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn',
     r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn',
     r'\btrợ\s*giá\b': 'giảm giá sâu có hạn', r'\bphiên\s*live\b': 'đợt ưu đãi này', 
-    r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi',
-    r'\bkhe\s*ngực\b': 'phom dáng', r'\bnâng\s*ngực\b': 'nâng đỡ phom dáng', r'\bchống\s*xệ\s*ngực\b': 'giữ phom săn chắc',
-    r'\bxệ\s*ngực\b': 'mất phom', r'\bvùng\s*kín\b': 'vùng nhạy cảm', r'\bnhũ\s*hoa\b': 'điểm nhạy cảm',
-    r'\blộ\s*nhũ\s*hoa\b': 'lộ viền kém duyên', r'\bgợi\s*cảm\b': 'tinh tế cuốn hút'
+    r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi'
 }
 
 SOUTHERN_TO_HANOI = {
@@ -135,6 +133,7 @@ SOUTHERN_TO_HANOI = {
     r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước',
     r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát',
     r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà',
+    r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc',
     r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác',
     r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru',
     r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một',
@@ -332,6 +331,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
+    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -352,6 +352,12 @@ def clean_and_normalize_voiceover(text: str) -> str:
     cleaned = re.sub(r'\ban\s*toàn\s*rất\s*luôn\b', 'cực kỳ an toàn luôn', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\ban\s*toàn\s*rất\b', 'rất an toàn', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\b([a-zà-ỹ]+)\s+rất\s+luôn\b', r'cực kỳ \1 luôn', cleaned, flags=re.IGNORECASE)
+    
+    # BỘ LỌC CHỐNG LẮP TỪ: Loại bỏ dấu chấm lửng, ngoặc vuông, gạch nối
+    cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
+    cleaned = re.sub(r'\.{2,}', ',', cleaned)
+    cleaned = re.sub(r'[-~*]', '', cleaned)
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
 
 def clean_analysis_text(text) -> str:
@@ -909,7 +915,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine)
     
-    scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng [nhắc lại nỗi đau cụ thể] thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
+    scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng khó chịu như trên thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
 
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu: {hero_color_str})
@@ -919,7 +925,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     GHI CHÚ BẮT BUỘC: '{user_custom_note if user_custom_note else 'none'}'
     KOC: {detected_demographic_en} | {stylist_rules_text}
 
-    TRẢ VỀ JSON GỌN (LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn từ tiếng Anh vào lời thoại):
+    TRẢ VỀ JSON GỌN (LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại để chống vấp máy đọc):
     {{
         "title": "{fixed_title}",
         "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'messy bathroom with wet tile floor' hoặc 'clean modern kitchen'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
@@ -935,7 +941,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{'speaking actively from 0.0s while showing frustration through fast dynamic body language (empty hands, zero product)' if is_pas_story else action_scene_1} (under 18 words)",
                 "sfx": "Foley thực tế (không nhạc)",
                 "director": "Attention | {'Nêu nỗi đau mở màn' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh'}",
-                "voiceover": "Thoại mở màn 100% tiếng Việt tự nhiên (18-30 từ)..."
+                "voiceover": "Thoại mở màn tiếng Việt liền mạch, KHÔNG dùng dấu chấm lửng (tối đa 25 từ)"
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -944,7 +950,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_2} (under 20 words)",
                 "sfx": "Tiếng thao tác thực tế",
                 "director": "Interest | Giữ đúng tỷ lệ sản phẩm + Cầu nối 3 nhánh",
-                "voiceover": "Thoại Cảnh 2 100% tiếng Việt (22-34 từ)..."
+                "voiceover": "Thoại Cảnh 2 liền mạch, KHÔNG dùng dấu chấm lửng (tối đa 25 từ)"
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -953,7 +959,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_3} (under 20 words)",
                 "sfx": "Tiếng trải nghiệm thực tế",
                 "director": "Desire | Thao tác cận cảnh không biến dạng sản phẩm",
-                "voiceover": "Thoại Cảnh 3 100% tiếng Việt (20-34 từ)..."
+                "voiceover": "Thoại Cảnh 3 liền mạch, KHÔNG dùng dấu chấm lửng (tối đa 25 từ)"
             }},
             {{
                 "scene": 4, "aida_stage": "Action",
@@ -1030,7 +1036,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
         if is_pas_scn1_no_prod:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT). [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s speaking immediately with fast, decisive frustrated body language and accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
+            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT). [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s speaking actively from 0.0s with fast decisive frustrated body language and accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         elif not is_fashion_wearable:
             raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. [AUDIO]: Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
         else:
@@ -1060,6 +1066,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"{cam_mode_badge}",
         f"👗 <b>Khóa Diện mạo & Stylist (Master Character Lock):</b> {final_outfit_vi} (Đã chốt chính xác giày dép khớp ngữ cảnh, chống tự đổi quần áo ở các cảnh)",
         f"🎨 <b>Khóa Màu & Hình Khối Sản Phẩm (Product Color Lock):</b> {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} in {locked_color_en}</code>",
+        f"🎙 <b>Lõi Chống Vấp Thoại (Anti-Stutter):</b> Đã dọn sạch 100% ký tự đặc biệt, dấu chấm lửng (...), ngoặc vuông/tròn để AI đọc trôi chảy.",
         f"🔗 <b>Cầu nối Ngữ nghĩa 3 Nhánh:</b> Tự động khớp nối Cảnh 1 & Cảnh 2 theo quy luật",
         f"🛡 <b>Bảo vệ Veo 3 (Anti-Celebrity):</b> Đã gắn nhãn KOC thuần Việt ({detected_demographic_en}) & lọc sạch từ khóa nhạy cảm",
     ]
@@ -1743,7 +1750,7 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Hành động Đa ngành, Khóa Tỷ lệ):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Hành động Đa ngành, Khóa Tỷ lệ, Chống vấp thoại):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
@@ -1798,7 +1805,7 @@ if all_sc:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         try:
-            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Tích hợp Lõi Đa Ngành Hàng & Bộ lọc Chính sách)..."):
+            with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Chống Vấp Thoại Lắp Từ & Khóa Bối Cảnh Toàn Cục)..."):
                 create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                 st.session_state.active_script_id = int(target_id_to_run)
                 success = True
