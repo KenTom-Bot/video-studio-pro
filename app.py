@@ -73,8 +73,8 @@ COMPACT_CORE_RULES = """
 3. THỰC TRẠNG NỖI ĐAU CẢNH 1 (VISUAL PAIN POINT):
    - Cảnh 1 (không SP), BẮT BUỘC miêu tả HÀNH ĐỘNG VẬT LÝ của nỗi đau kết hợp thoại từ 0.0s.
 4. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC (COSMETIC TRANSFORMATION):
-   - BẮT BUỘC test sản phẩm trên ĐÚNG VỊ TRÍ CƠ THỂ: Son lên môi, mặt nạ lên mặt, kem body lên tay.
-   - Hành động test phải tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG (son để lại nét đậm, gel xoa tan biến để lại da căng bóng).
+   - BẮT BUỘC test sản phẩm trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
+   - Hành động test phải tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm (son màu để lại nét đậm, sáp nẻ/dưỡng làm môi căng mọng trong suốt, gel xoa tan biến để lại da căng bóng).
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong thoại để AI đọc mượt.
 """
@@ -538,9 +538,14 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     if not text_to_check: return False
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
+# 🌟 CẬP NHẬT: PHÂN TÍCH GIẢI PHẪU MỸ PHẨM (TÁCH BIỆT SON MÀU & SÁP DƯỠNG)
 def get_cosmetic_target(product_name, check_str):
     p_cos = f"{product_name} {check_str}".lower()
-    if any(k in p_cos for k in ["son", "môi", "lip"]): return "lips", "leaving a highly precise, rich colored stroke exactly where applied"
+    if any(k in p_cos for k in ["môi", "lip", "son"]):
+        if any(k in p_cos for k in ["dưỡng", "nẻ", "sáp", "balm", "chapstick", "mask", "vaseline", "treatment"]):
+            return "lips", "instantly leaving a clear, highly glossy, deeply hydrated and plump finish without altering the natural lip color"
+        else:
+            return "lips", "instantly leaving a highly precise, rich and vibrant colored stroke exactly where applied"
     elif any(k in p_cos for k in ["tóc", "gội", "xả", "hair", "shampoo", "conditioner"]): return "hair", "instantly leaving the hair visibly smooth, silky and shiny"
     elif any(k in p_cos for k in ["nách", "khử mùi", "armpit", "deodorant"]): return "armpit", "instantly absorbing into the skin"
     elif any(k in p_cos for k in ["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail", "móng"]): return "hands/arms/body", "instantly absorbing and leaving a glowing, hydrated finish"
@@ -972,7 +977,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     GHI CHÚ BẮT BUỘC: '{user_custom_note if user_custom_note else 'none'}'
     KOC: {detected_demographic_en} | {stylist_rules_text}
     
-    - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT (bôi son thấy môi lập tức đỏ đậm, thoa kem/mặt nạ thấy da bóng mướt glowing).
+    - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
     TRẢ VỀ JSON GỌN (LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại để chống vấp máy đọc):
     {{
@@ -1140,7 +1145,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_fashion_wearable or is_footwear_accessory: industry_badges.append("🔥 <b>Cơ chế Khóa Lai Cải Tiến (Expanded Hybrid Engine):</b> Tự động lột/cởi sản phẩm ở <b>CẢ CẢNH 2 VÀ CẢNH 3</b> để chuyển sang chế độ cầm trên tay soi cận cảnh & test lực (kéo giãn, bẻ cong) chống ảo giác AI.")
     if is_footwear_accessory and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]): industry_badges.append("🧦 <b>Động lực học Giày/Tất:</b> Máy quay chúi xuống (low-angle) soi trực tiếp bàn chân/cổ chân, KOC tự động xỏ tất/giày vào chân.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
-    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm Cải tiến (Anatomical Targeting):</b> Hệ thống tự động bám sát loại mỹ phẩm để bôi chính xác vị trí giải phẫu (mặt, môi, tay, nách, tóc) và ép AI tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RÀNG (da bóng lên, môi đỏ lên) ngay khi bôi.")
+    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm (Targeted Transformation):</b> Hệ thống tự động phân tách vật lý làm 2 nhóm: Nhóm trang điểm (bôi lên môi lập tức để lại vệt màu đậm nét) và nhóm dưỡng da/sáp nẻ (xoa lên da/môi lập tức tan ra, để lại bề mặt căng mọng, bóng mướt mà KHÔNG làm đổi màu tự nhiên). Test chuẩn vị trí giải phẫu.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
     if is_medicine: industry_badges.append("💊 <b>Động lực học Y tế (Chính sách):</b> Tự động gọt sạch các từ vi phạm ('chữa bệnh', 'cam kết'). Góc quay viên uống rõ nét, an toàn.")
     
@@ -1596,7 +1601,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
-            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem body lên tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
+            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (mặt, môi, tay, nách, tóc). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
             TRẢ VỀ JSON:
             {{
@@ -1839,7 +1844,7 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - m thanh Studio, Chống Vấp Thoại):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
@@ -1898,7 +1903,7 @@ if all_sc:
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Đạo Diễn AI Master 5.0)..."):
+                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Phân nhánh vật lý Mỹ phẩm)..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
