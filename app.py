@@ -64,17 +64,17 @@ COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & LỚP TRANG PHỤC TỘT ĐỘ:
    - Sinh 1 'master_character_en' duy nhất cho TỪNG KỊCH BẢN. 
-   - KHÓA MÀU SẮC (COLOR LOCK): BẮT BUỘC CHỈ ĐỊNH ĐÍCH DANH MÀU SẮC (exact color) và chất liệu cho TỪNG lớp trang phục (áo trong, áo ngoài, quần/váy). Ví dụ: "navy blue silk shirt", "black cotton trousers".
-   - KHÓA LỚP TRANG PHỤC: Không để trống, không dùng từ chung chung. Định danh rõ có áo khoác (jacket/outerwear) hay không. Trang phục này sẽ khóa băng 100% xuyên suốt 4 cảnh.
+   - KHÓA MÀU SẮC: BẮT BUỘC CHỈ ĐỊNH ĐÍCH DANH MÀU SẮC và chất liệu cho TỪNG lớp trang phục (áo trong, áo ngoài, quần/váy). 
+   - KHÓA LỚP TRANG PHỤC: Định danh rõ có áo khoác hay không. Trang phục này sẽ khóa băng 100% xuyên suốt 4 cảnh.
 2. PRODUCT SCALE, CAMERA & TEST RULES:
-   - TÔN TRỌNG TỰ NHIÊN (DYNAMIC GEOMETRY): KOC phải cầm đúng vào vị trí tay cầm/quai xách gốc của sản phẩm (nếu có). 
+   - TÔN TRỌNG TỰ NHIÊN: KOC phải cầm đúng vào vị trí tay cầm/quai xách gốc của sản phẩm (nếu có). 
    - CẦM NẮM TUYỆT ĐỐI (ANTI-DROP): KOC cầm thật chắc sản phẩm, TUYỆT ĐỐI KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
 3. THỰC TRẠNG NỖI ĐAU CẢNH 1 (VISUAL PAIN POINT):
    - Cảnh 1 (không SP), BẮT BUỘC miêu tả HÀNH ĐỘNG VẬT LÝ của nỗi đau kết hợp thoại từ 0.0s.
 4. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC (COSMETIC TRANSFORMATION):
    - BẮT BUỘC test sản phẩm trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
-   - Hành động test phải tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm (son màu để lại nét đậm, sáp nẻ/dưỡng làm môi căng mọng trong suốt, gel xoa tan biến để lại da căng bóng).
+   - Hành động test phải tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm.
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong thoại để AI đọc mượt.
 """
@@ -180,7 +180,7 @@ supabase = init_supabase()
 client = init_gemini_client()
 
 # ==============================================================================
-# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT
+# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT & JSON BÓC TÁCH SÂU
 # ==============================================================================
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
@@ -334,7 +334,6 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
-    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -390,6 +389,20 @@ def format_ocr_prices(ca_data: dict) -> str:
     orig, sale = ca_data.get('original_price_spoken', ''), ca_data.get('sale_price_spoken', '')
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
+
+# 🌟 BỔ SUNG LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR) CHỐNG ĐỨT GÃY
+def extract_scenes(parsed_data):
+    if isinstance(parsed_data, list): return parsed_data
+    if isinstance(parsed_data, dict):
+        for key in ["scenes", "script", "outlines", "video_scenes", "data"]:
+            if key in parsed_data and isinstance(parsed_data[key], list):
+                return parsed_data[key]
+        for k, v in parsed_data.items():
+            if isinstance(v, dict):
+                for key in ["scenes", "script", "outlines", "video_scenes"]:
+                    if key in v and isinstance(v[key], list):
+                        return v[key]
+    return []
 
 # ==============================================================================
 # 5. HỆ THỐNG ĐẠO DIỄN: GÓC MÁY, NHẬN DIỆN ĐA NGÀNH HÀNG & VẬT LÝ ĐỘNG LỰC
@@ -538,7 +551,6 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     if not text_to_check: return False
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
-# 🌟 CẬP NHẬT: PHÂN TÍCH GIẢI PHẪU MỸ PHẨM (TÁCH BIỆT SON MÀU & SÁP DƯỠNG)
 def get_cosmetic_target(product_name, check_str):
     p_cos = f"{product_name} {check_str}".lower()
     if any(k in p_cos for k in ["môi", "lip", "son"]):
@@ -857,7 +869,7 @@ def repair_and_parse_json(text_content: str):
         parsed = ast.literal_eval(py_str)
         return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 and isinstance(parsed[0], dict) else parsed
     except: pass
-    raise Exception("AI sinh JSON lỗi cấu trúc. Vui lòng bấm tạo lại.")
+    raise Exception("Lỗi khi đọc kết quả từ AI. Vui lòng thử lại.")
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
@@ -979,7 +991,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
-    TRẢ VỀ JSON GỌN (LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại để chống vấp máy đọc):
+    TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại:
     {{
         "title": "{fixed_title}",
         "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'messy bathroom with wet tile floor' hoặc 'clean modern kitchen'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
@@ -1028,13 +1040,25 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     }}
     """
     sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, forced_footwear, target_id)
-    res = call_gemini([prompt_text], sys_inst, max_tokens=4096)
-    scenes = res.get("scenes") or res.get("script") or []
+    
+    # 🌟 VÒNG LẶP TỰ PHỤC HỒI CHỐNG ĐỨT GÃY (AUTO-RETRY LOOP)
+    scenes, w_lock, master_setting_en = [], {}, "clean minimalist modern setting"
+    max_retries = 2
+    for attempt in range(max_retries):
+        try:
+            res = call_gemini([prompt_text], sys_inst, max_tokens=4096)
+            scenes = extract_scenes(res)
+            if scenes and isinstance(scenes, list) and len(scenes) > 0:
+                master_setting_en = sanitize_third_party_ip(res.get("master_setting_en", "clean minimalist modern setting")).strip().rstrip('.')
+                w_lock = res.get("wardrobe_lock", {})
+                break
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise Exception(f"Lỗi khi gọi AI: {str(e)}")
+            time.sleep(1.5)
+
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    master_setting_en = sanitize_third_party_ip(res.get("master_setting_en", "clean minimalist modern setting")).strip().rstrip('.')
-    
-    w_lock = res.get("wardrobe_lock", {})
     base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"Fictional everyday {detected_demographic_en} (synthetic AI persona), wearing smart-casual coordinated outfit, wearing {forced_footwear}").strip().rstrip('.')
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
@@ -1145,7 +1169,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_fashion_wearable or is_footwear_accessory: industry_badges.append("🔥 <b>Cơ chế Khóa Lai Cải Tiến (Expanded Hybrid Engine):</b> Tự động lột/cởi sản phẩm ở <b>CẢ CẢNH 2 VÀ CẢNH 3</b> để chuyển sang chế độ cầm trên tay soi cận cảnh & test lực (kéo giãn, bẻ cong) chống ảo giác AI.")
     if is_footwear_accessory and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]): industry_badges.append("🧦 <b>Động lực học Giày/Tất:</b> Máy quay chúi xuống (low-angle) soi trực tiếp bàn chân/cổ chân, KOC tự động xỏ tất/giày vào chân.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
-    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm (Targeted Transformation):</b> Hệ thống tự động phân tách vật lý làm 2 nhóm: Nhóm trang điểm (bôi lên môi lập tức để lại vệt màu đậm nét) và nhóm dưỡng da/sáp nẻ (xoa lên da/môi lập tức tan ra, để lại bề mặt căng mọng, bóng mướt mà KHÔNG làm đổi màu tự nhiên). Test chuẩn vị trí giải phẫu.")
+    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm Cải tiến (Anatomical Targeting):</b> Hệ thống tự động phân tách vật lý làm 2 nhóm: Nhóm trang điểm (bôi lên môi lập tức để lại vệt màu đậm nét) và nhóm dưỡng da/sáp nẻ (xoa lên da/môi lập tức tan ra, để lại bề mặt căng mọng, bóng mướt mà KHÔNG làm đổi màu tự nhiên). Test chuẩn vị trí giải phẫu.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
     if is_medicine: industry_badges.append("💊 <b>Động lực học Y tế (Chính sách):</b> Tự động gọt sạch các từ vi phạm ('chữa bệnh', 'cam kết'). Góc quay viên uống rõ nét, an toàn.")
     
@@ -1188,7 +1212,7 @@ def clone_script(script_id):
     SP: {dna.get('what_and_unique', '')} | GỐC #{script_id}: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
     NHIỆM VỤ: Nhân bản 5 biến thể giữ 90% cấu trúc, đổi 5 bối cảnh đời thực khác nhau. Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
-    TRẢ VỀ JSON:
+    TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
             {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh 1...", "hook": "Hook 1...", "actors": 1 }},
@@ -1200,7 +1224,8 @@ def clone_script(script_id):
     }}
     """
     res = call_gemini([prompt], get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", 1, "Nhân bản", user_custom_note, presentation_format), max_tokens=2500)
-    clones = res.get("outlines", res.get("script_outlines", []))
+    clones = extract_scenes(res)
+    if not clones: clones = res.get("outlines", res.get("script_outlines", []))
     formatted_clones = []
     for idx, cl in enumerate(clones):
         formatted_clones.append({
@@ -1223,7 +1248,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     SP: {dna.get('what_and_unique', '')} | CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
     GHI CHÚ: '{active_note if active_note else "none"}'
     TẠO 5 KỊCH BẢN Ở 5 BỐI CẢNH ĐỜI THỰC KHÁC NHAU.
-    TRẢ VỀ JSON:
+    TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
             {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "hook": "Hook 1...", "actors": 1 }},
@@ -1235,7 +1260,8 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     }}
     """
     res = call_gemini([prompt], get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", generate_char_rules_string(char_profiles), 1, active_format, active_note, active_format), max_tokens=2500)
-    more_scripts = res.get("outlines", res.get("script_outlines", []))
+    more_scripts = extract_scenes(res)
+    if not more_scripts: more_scripts = res.get("outlines", res.get("script_outlines", []))
     for idx, sc in enumerate(more_scripts):
         if "hook" in sc: sc["hook"] = clean_and_normalize_voiceover(sc["hook"])
         sc.update({
@@ -1603,7 +1629,7 @@ if st.session_state.get("trigger_main_generation"):
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
             - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (mặt, môi, tay, nách, tóc). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
-            TRẢ VỀ JSON:
+            TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại:
             {{
                 "content_analysis": {{
                     "self_pronoun": "em",
@@ -1660,12 +1686,23 @@ if st.session_state.get("trigger_main_generation"):
                     payload.extend([f"ACTOR {c['id']} (EXTRACT AGE, GENDER, HAIR ONLY):", types.Part.from_bytes(data=c["file_bytes"]["data"], mime_type=c["file_bytes"]["mime"])])
             payload.append(prompt)
             
-            res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, 1, args["unified_strategy_format"], args["custom_note"], args["unified_strategy_format"]), max_tokens=4096)
-            ca_result = res.get("content_analysis") or {}
-            st.session_state.content_analysis = ca_result
-            outlines = res.get("outlines", res.get("script_outlines", []))
+            # 🌟 CƠ CHẾ TỰ PHỤC HỒI KHI AI ĐỨT GÃY (AUTO-RETRY)
+            ca_result, outlines = {}, []
+            max_retries = 2
+            for attempt in range(max_retries):
+                try:
+                    res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, 1, args["unified_strategy_format"], args["custom_note"], args["unified_strategy_format"]), max_tokens=4096)
+                    ca_result = res.get("content_analysis") or {}
+                    outlines = extract_scenes(res)
+                    if not outlines: outlines = res.get("outlines", res.get("script_outlines", []))
+                    if ca_result and outlines: break
+                except Exception as e:
+                    if attempt == max_retries - 1: raise Exception(f"Lỗi khi gọi AI: {str(e)}")
+                    time.sleep(1.5)
             
-            if not outlines: raise Exception("AI bị ngắt quãng do kết nối mạng. Vui lòng bấm tạo lại.")
+            if not outlines: raise Exception("AI không tạo được danh sách kịch bản. Vui lòng bấm tạo lại.")
+            
+            st.session_state.content_analysis = ca_result
             
             for o in outlines: 
                 if "hook" in o: o["hook"] = clean_and_normalize_voiceover(o["hook"])
@@ -1844,7 +1881,7 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - m thanh Studio, Chống Vấp Thoại):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
@@ -1903,7 +1940,7 @@ if all_sc:
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Phân nhánh vật lý Mỹ phẩm)..."):
+                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Đạo Diễn AI Master 6.0)..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
