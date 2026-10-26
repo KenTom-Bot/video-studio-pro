@@ -334,6 +334,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
+    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -613,6 +614,7 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return "CAMERA FOCUS LOCKED ON PRODUCT AND AIRFLOW TARGET: 100% rigid non-deforming body lock, true-to-life scale. Creates a powerful, completely invisible and transparent airflow (ZERO fire, ZERO sparks, ZERO smoke, ZERO plasma). The invisible breeze realistically blows away dust, leaves, or softly blows hair. Gripping firmly, never dropping."
     elif any(k in p for k in ["hút bụi", "vacuum"]): return "CAMERA FOCUS LOCKED ON VACUUM HEAD AND DUSTBIN: 100% rigid non-deforming body lock, true-to-life scale. The nozzle glides swiftly and firmly, visibly sucking dirt, crumbs, or debris off the surface directly into the transparent dustbin in real-time. Holding securely, never dropping."
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping."
+    
     elif is_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts. The product stays completely rigid while presenter stands perfectly still; hands hold the product naturally (using its actual handle/strap if any), fast decisive interaction, NEVER dropping."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly (using its actual handle/strap if any) and trace surface decisively, never dropping."
 
@@ -977,8 +979,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "title": "{fixed_title}",
         "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'messy bathroom with wet tile floor' hoặc 'clean modern kitchen'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
         "wardrobe_lock": {{
-            "outfit_vi": "Thiết kế 1 set đồ Stylist ĐỘC BẢN phù hợp '{fixed_setting_base}' riêng cho kịch bản #{target_id} này.",
-            "master_character_en": "100% STRICT IDENTITY & WARDROBE LOCK: {detected_demographic_en}, exact [SPECIFY hair color & style, e.g., 'black bob hair'], wearing UNIQUE OUTFIT FOR SCRIPT #{target_id}: exact [SPECIFY exact color and material of top, e.g., 'navy blue silk shirt'] (explicitly state [TUCKED IN or UNTUCKED]), exact [SPECIFY exact color and material of bottom, e.g., 'black tailored pants'], wearing {forced_footwear}, [SPECIFY jewelry]. WARDROBE COLORS AND STYLES MUST NOT CHANGE."
+            "outfit_vi": "Thiết kế 1 set đồ Stylist ĐỘC BẢN phù hợp '{fixed_setting_base}' riêng cho kịch bản #{target_id} này (Ví dụ kịch bản 1 mặc sơ mi lụa, kịch bản 2 mặc blazer, kịch bản 3 mặc váy... để không bị trùng lặp trang phục giữa các kịch bản khác nhau).",
+            "master_character_en": "100% IDENTICAL IDENTITY LOCK ACROSS 4 SCENES: {detected_demographic_en}, exact [hair color & style], wearing UNIQUE OUTFIT FOR THIS SCRIPT #{target_id}: exact [color & material of top/inner/outerwear], exact [explicitly state if shirt is TUCKED IN or UNTUCKED styling], exact [color & material of bottom/pants/skirt], wearing {forced_footwear}, [jewelry]. ZERO WARDROBE CHANGES ACROSS ALL SCENES."
         }},
         "scenes": [
             {{
@@ -1032,8 +1034,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    # 🌟 CẬP NHẬT: Mã khóa Màu sắc trang phục Tuyệt đối cho Midjourney/Veo
-    locked_character_prompt = f"[SUBJECT LOCK: {base_char_prompt}. EXACT SAME face, hairstyle, clothing colors, and outfit layers across all scenes]"
+    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precise wardrobe outfit across all scenes] {base_char_prompt}"
     final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
@@ -1041,9 +1042,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     appliance_neg_extra = "hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
     color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
-    
-    # 🌟 CẬP NHẬT: Tường lửa ngăn lột đồ, ĐỔI MÀU ÁO QUẦN, đổi sơ vin
-    char_neg_extra = "changing clothing colors, changing outfit colors, different shirt color, different pants color, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    char_neg_extra = "changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
@@ -1141,7 +1140,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_fashion_wearable or is_footwear_accessory: industry_badges.append("🔥 <b>Cơ chế Khóa Lai Cải Tiến (Expanded Hybrid Engine):</b> Tự động lột/cởi sản phẩm ở <b>CẢ CẢNH 2 VÀ CẢNH 3</b> để chuyển sang chế độ cầm trên tay soi cận cảnh & test lực (kéo giãn, bẻ cong) chống ảo giác AI.")
     if is_footwear_accessory and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]): industry_badges.append("🧦 <b>Động lực học Giày/Tất:</b> Máy quay chúi xuống (low-angle) soi trực tiếp bàn chân/cổ chân, KOC tự động xỏ tất/giày vào chân.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
-    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm (Targeted Transformation):</b> Ép AI phân tích tên sản phẩm để test CHÍNH XÁC vị trí (mặt, môi, body, tóc). Thao tác test được gắn thêm lệnh vật lý bắt buộc tạo ra SỰ BIẾN ĐỔI THỊ GIÁC NGAY LẬP TỨC (VD: da bóng lên, môi đỏ lên) sau khi bôi.")
+    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm Cải tiến (Anatomical Targeting):</b> Hệ thống tự động bám sát loại mỹ phẩm để bôi chính xác vị trí giải phẫu (mặt, môi, tay, nách, tóc) và ép AI tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RÀNG (da bóng lên, môi đỏ lên) ngay khi bôi.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
     if is_medicine: industry_badges.append("💊 <b>Động lực học Y tế (Chính sách):</b> Tự động gọt sạch các từ vi phạm ('chữa bệnh', 'cam kết'). Góc quay viên uống rõ nét, an toàn.")
     
@@ -1597,7 +1596,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
-            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (mặt, môi, tay, nách, tóc). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
+            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem body lên tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
             TRẢ VỀ JSON:
             {{
@@ -1786,85 +1785,7 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
-    if comp_sc:
-        st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
-        for outline in comp_sc:
-            sc_id = outline["id"]
-            with st.container(border=True):
-                c1, c2, c3 = st.columns([2.5, 1, 1])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
-                if str(sc_id) != str(st.session_state.active_script_id):
-                    if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
-                        st.session_state.active_script_id = int(sc_id)
-                        st.session_state.scroll_to_detail = True
-                        st.rerun()
-                btn_clone_ph = c3.empty()
-                if str(st.session_state.current_cloning_id) == str(sc_id):
-                    if btn_clone_ph.button("🛑 Đang nhân bản... (Bấm để Hủy)", key=f"unhang_c_{sc_id}", type="secondary", use_container_width=True):
-                        st.session_state.current_cloning_id = None; st.rerun()
-                else:
-                    if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
-                        can_run, msg = check_usage_limit(st.session_state.current_email)
-                        if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
-                        else: st.error(msg)
-
-    if pend_sc:
-        st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
-        for outline in pend_sc:
-            sc_id = outline["id"]
-            with st.container(border=True):
-                c1, c2 = st.columns([3, 1.2])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
-                btn_detail_ph = c2.empty()
-                if str(st.session_state.current_processing_id) == str(sc_id):
-                    if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
-                        st.session_state.current_processing_id = None; st.rerun()
-                else:
-                    if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
-                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
-                        if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
-                        else: st.error(msg)
-
-    # --- KHỐI XỬ LÝ CHÍNH ĐƯỢC CHẠY SAU KHI VẼ GIAO DIỆN (NẰM TRONG VÙNG CÁCH LY) ---
-    if st.session_state.current_processing_id is not None:
-        target_id_to_run = st.session_state.current_processing_id
-        success, error_msg = False, ""
-        with ui_action_ph.container():
-            try:
-                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Khóa Màu Tuyệt Đối 100%)..."):
-                    create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
-                    st.session_state.active_script_id = int(target_id_to_run)
-                    success = True
-            except Exception as e: error_msg = str(e)
-            
-        st.session_state.current_processing_id = None
-        if success: 
-            st.toast(f"✅ Đã dựng kịch bản #{target_id_to_run} & tự động lưu cập nhật vào dự án!")
-            st.session_state.scroll_to_detail = True
-            st.rerun()
-        else: st.error(f"❌ Lỗi khi dựng kịch bản: {error_msg}")
-
-    if st.session_state.current_cloning_id is not None:
-        clone_id_to_run = st.session_state.current_cloning_id
-        success, error_msg = False, ""
-        with ui_action_ph.container():
-            try:
-                with st.spinner(f"⏳ Đang nhân bản 5 biến thể cho kịch bản #{clone_id_to_run} & tự động lưu cập nhật..."):
-                    st.session_state.cloned_scripts.extend(clone_script(clone_id_to_run))
-                    auto_save_current_session()
-                    success = True
-            except Exception as e: error_msg = str(e)
-            
-        st.session_state.current_cloning_id = None
-        if success: 
-            st.toast("✅ Đã nhân bản thành công 5 kịch bản voice bám sát gốc!")
-            st.session_state.scroll_to_top = True
-            st.rerun()
-        else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
-    # ---------------------------------------------------------------------------------
-
+    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (NẰM Ở TRÊN CÙNG ĐỂ DỄ THEO DÕI) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
@@ -1927,6 +1848,87 @@ if all_sc:
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
             st.markdown("---")
+
+    # --- KHỐI DANH SÁCH ĐÃ DỰNG ---
+    if comp_sc:
+        st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
+        for outline in comp_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2, c3 = st.columns([2.5, 1, 1])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
+                if str(sc_id) != str(st.session_state.active_script_id):
+                    if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
+                        st.session_state.active_script_id = int(sc_id)
+                        st.session_state.scroll_to_detail = True
+                        st.rerun()
+                btn_clone_ph = c3.empty()
+                if str(st.session_state.current_cloning_id) == str(sc_id):
+                    if btn_clone_ph.button("🛑 Đang nhân bản... (Bấm để Hủy)", key=f"unhang_c_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.current_cloning_id = None; st.rerun()
+                else:
+                    if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email)
+                        if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
+                        else: st.error(msg)
+
+    # --- KHỐI DANH SÁCH CHỜ DỰNG ---
+    if pend_sc:
+        st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
+        for outline in pend_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2 = st.columns([3, 1.2])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
+                btn_detail_ph = c2.empty()
+                if str(st.session_state.current_processing_id) == str(sc_id):
+                    if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.current_processing_id = None; st.rerun()
+                else:
+                    if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
+                        if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
+                        else: st.error(msg)
+
+    # --- KHỐI XỬ LÝ CHÍNH ĐƯỢC CHẠY SAU KHI VẼ GIAO DIỆN (NẰM TRONG VÙNG CÁCH LY) ---
+    if st.session_state.current_processing_id is not None:
+        target_id_to_run = st.session_state.current_processing_id
+        success, error_msg = False, ""
+        with ui_action_ph.container():
+            try:
+                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Đạo Diễn AI Master 5.0)..."):
+                    create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
+                    st.session_state.active_script_id = int(target_id_to_run)
+                    success = True
+            except Exception as e: error_msg = str(e)
+            
+        st.session_state.current_processing_id = None
+        if success: 
+            st.toast(f"✅ Đã dựng kịch bản #{target_id_to_run} & tự động lưu cập nhật vào dự án!")
+            st.session_state.scroll_to_detail = True
+            st.rerun()
+        else: st.error(f"❌ Lỗi khi dựng kịch bản: {error_msg}")
+
+    if st.session_state.current_cloning_id is not None:
+        clone_id_to_run = st.session_state.current_cloning_id
+        success, error_msg = False, ""
+        with ui_action_ph.container():
+            try:
+                with st.spinner(f"⏳ Đang nhân bản 5 biến thể cho kịch bản #{clone_id_to_run} & tự động lưu cập nhật..."):
+                    st.session_state.cloned_scripts.extend(clone_script(clone_id_to_run))
+                    auto_save_current_session()
+                    success = True
+            except Exception as e: error_msg = str(e)
+            
+        st.session_state.current_cloning_id = None
+        if success: 
+            st.toast("✅ Đã nhân bản thành công 5 kịch bản voice bám sát gốc!")
+            st.session_state.scroll_to_top = True
+            st.rerun()
+        else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
+    # ---------------------------------------------------------------------------------
 
     # ==========================================================================
     # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
