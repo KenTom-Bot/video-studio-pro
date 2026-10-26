@@ -63,20 +63,15 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & LỚP TRANG PHỤC TỘT ĐỘ TRONG CÙNG 1 KỊCH BẢN:
-   - Sinh 1 'master_character_en' duy nhất cho TỪNG KỊCH BẢN. Khóa chặt diện mạo 4 cảnh.
-   - KHÓA MÀU SẮC: BẮT BUỘC CHỈ ĐỊNH ĐÍCH DANH MÀU SẮC và chất liệu cho TỪNG lớp trang phục. 
-   - ĐA DẠNG HÓA: 5 kịch bản cùng bối cảnh, KOC phải mặc 5 bộ KHÁC NHAU. Sơ vin hay không sơ vin phải chuẩn xác theo yêu cầu bối cảnh.
-2. PRODUCT SCALE, CAMERA & TEST RULES:
-   - TÔN TRỌNG TỰ NHIÊN: Cầm đúng vào vị trí tay cầm/quai xách gốc của SP. Tuyệt đối KHÔNG thả rơi.
-   - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
+   - Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU cho TỪNG lớp trang phục xuyên suốt 4 cảnh.
+2. PRODUCT SCALE & CAMERA RULES:
+   - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
+   - Nếu không phải thời trang: CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
-   - Hành động test tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm.
+   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
 4. CÔNG THỨC AIDA & NARRATIVE FLOW (QUAN TRỌNG NHẤT):
-   - Cảnh 1 (Attention): CHỈ nêu vấn đề/nỗi đau/Hook. Dừng ngay lập tức! Tuyệt đối không nhắc giải pháp ở đây.
-   - Cảnh 2 (Interest): NGAY LẬP TỨC giải quyết vấn đề bằng TÍNH NĂNG CHÍNH của sản phẩm. Không lan man.
-   - Cảnh 3 (Desire): Nêu cảm giác thực tế khi dùng (sướng, mát, mềm...) và tính năng phụ.
-   - Cảnh 4 (Action): Kêu gọi hành động tự nhiên, không rập khuôn.
+   - LUỒNG THOẠI LOGIC: Cảnh 1 gộp Hook và Vấn đề thành 1 luồng suy nghĩ duy nhất, KHÔNG viết 2 câu rời rạc vô nghĩa. Nếu dùng 2 câu phải có từ nối (vì, nên, dù, nhưng). 
+   - Cảnh 2 đi thẳng vào tính năng giải quyết vấn đề. Cảnh 3 mô tả cảm giác thực tế. Cảnh 4 kêu gọi hành động biến hóa linh hoạt.
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong thoại. Không dùng từ sáo rỗng.
 """
@@ -977,9 +972,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
 
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine)
-    scene_4_cta_data = f"Giá gốc khoảng {soft_orig_price}, nay sale/ưu đãi chỉ còn khoảng {soft_sale_price}" if is_flashsale_script else f"Đang có giá ưu đãi cực sâu"
+    scene_4_cta_data = f"Giá gốc khoảng {soft_orig_price}, nay sale/ưu đãi chỉ còn khoảng {soft_sale_price}" if is_flashsale_script else f"Giá đang có ưu đãi cực sâu"
     
-    # 🌟 CẬP NHẬT: LỖI ẨN SẢN PHẨM CẢNH 1 - CHỈ CÁC KỊCH BẢN KỂ CHUYỆN (PAS/POV) MỚI ẨN. REVIEW/UNBOX THÌ HIỆN BÌNH THƯỜNG.
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     
     if is_pas_scn1_no_prod:
@@ -995,14 +989,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     GHI CHÚ BẮT BUỘC TỪ NGƯỜI DÙNG: '{user_custom_note if user_custom_note else 'none'}'
     KOC: {detected_demographic_en} | {stylist_rules_text}
     
-    - VẬT LÝ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
+    - VẬT LÝ MÁY MÓC: Tuyệt đối giữ nguyên đầu hút/phụ kiện đang có trong ảnh tham chiếu. NẾU ẢNH LÀ MÁY CẦM TAY NGẮN, BẮT BUỘC PHẢI GHI "NO long stick, NO floor brush" để cấm AI tự vẽ thêm cán dài hút sàn.
+    - VẬT LÝ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT (son màu thì đỏ môi, sáp nẻ thì môi căng mọng bóng nước, kem/gel thì da mặt căng bóng glass-skin).
 
-    TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json).
+    TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại:
     {{
         "title": "{fixed_title}",
-        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
+        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'messy bathroom with wet tile floor'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
         "wardrobe_lock": {{
-            "outfit_vi": "Thiết kế 1 set đồ Stylist ĐỘC BẢN phù hợp '{fixed_setting_base}' riêng cho kịch bản #{target_id} này (ĐẶC BIỆT CHÚ Ý: Giày dép BẮT BUỘC là '{forced_footwear}'. TUYỆT ĐỐI CẤM tự miêu tả giày thể thao, giày tây nếu đây là bối cảnh phòng ngủ/nhà ở/bếp).",
+            "outfit_vi": "Thiết kế 1 set đồ Stylist ĐỘC BẢN phù hợp '{fixed_setting_base}' riêng cho kịch bản #{target_id} này (ĐẶC BIỆT CHÚ Ý: Giày dép BẮT BUỘC là '{forced_footwear}'. TUYỆT ĐỐI CẤM tự miêu tả giày thể thao, giày tây nếu đây là bối cảnh phòng ngủ/nhà ở/bếp/ban công).",
             "master_character_en": "100% IDENTICAL IDENTITY LOCK ACROSS 4 SCENES: {detected_demographic_en}, exact [hair color & style], wearing UNIQUE OUTFIT FOR THIS SCRIPT #{target_id}: exact [color & material of top/inner/outerwear], exact [explicitly state if shirt is TUCKED IN or UNTUCKED styling], exact [color & material of bottom/pants/skirt], footwear lock MUST BE exactly {forced_footwear} (NO OTHER SHOES ALLOWED), [jewelry]. ZERO WARDROBE CHANGES ACROSS ALL SCENES."
         }},
         "scenes": [
@@ -1013,7 +1008,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{scene_1_action_inst} (under 25 words)",
                 "sfx": "Foley thực tế (không nhạc)",
                 "director": "Attention | {'Trực tiếp mô tả hình ảnh nỗi đau vật lý (TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM Ở CẢNH NÀY)' if is_pas_scn1_no_prod else 'Đưa sản phẩm ra tiền cảnh'}",
-                "voiceover": "Thoại mở màn (15-25 từ): Đi thẳng vào Hook hấp dẫn và NÊU RÕ NỖI ĐAU/VẤN ĐỀ đang gặp phải. DỪNG LẠI Ở ĐÂY, CHƯA NHẮC ĐẾN SẢN PHẨM."
+                "voiceover": "Thoại mở màn (15-25 từ): Gộp mượt mà Hook và Nỗi đau thành một luồng suy nghĩ logic, có từ nối chuyển ý tự nhiên. TUYỆT ĐỐI KHÔNG ghép 2 câu rời rạc không liên quan. Dừng lại ở vấn đề, chưa nhắc đến sản phẩm."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
@@ -1022,7 +1017,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_2} (under 20 words)",
                 "sfx": "Tiếng thao tác thực tế",
                 "director": "Interest | Giữ đúng tỷ lệ sản phẩm + Cầu nối 3 nhánh",
-                "voiceover": "Thoại Cảnh 2 (20-30 từ): GIẢI QUYẾT VẤN ĐỀ NGAY LẬP TỨC. Giới thiệu sản phẩm là giải pháp hoàn hảo, nêu bật TÍNH NĂNG CHÍNH."
+                "voiceover": "Thoại Cảnh 2 (20-30 từ): GIẢI QUYẾT VẤN ĐỀ NGAY LẬP TỨC. Giới thiệu sản phẩm là giải pháp hoàn hảo, đưa nhiều thông tin thực tế về tính năng chính."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
@@ -1040,14 +1035,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "action_en": "{action_scene_4} (under 18 words)",
                 "sfx": "Tiếng chuông ting nhẹ",
                 "director": "Action | Giữ sản phẩm nổi bật ở tiền cảnh & Chốt deal",
-                "voiceover": "Thoại Cảnh 4 (15-25 từ): Chốt Deal/CTA thật tự nhiên nối tiếp từ cảnh 3. Thay đổi linh hoạt cách nói dựa trên thông tin: {scene_4_cta_data}. Gọn gàng, dứt khoát, KHÔNG dùng mẫu câu rập khuôn."
+                "voiceover": "Thoại Cảnh 4 (15-25 từ): Chốt Deal/CTA thật tự nhiên nối tiếp logic từ cảnh 3. Thay đổi linh hoạt cách nói dựa trên thông tin: {scene_4_cta_data}. Gọn gàng, dứt khoát, KHÔNG dùng mẫu câu rập khuôn."
             }}
         ]
     }}
     """
     sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, forced_footwear, target_id)
     
-    # 🌟 VÒNG LẶP TỰ PHỤC HỒI CHỐNG ĐỨT GÃY JSON (AUTO-RETRY LOOP)
     scenes, w_lock, master_setting_en = [], {}, "clean minimalist modern setting"
     max_retries = 2
     for attempt in range(max_retries):
@@ -1100,7 +1094,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         actual_speech = round(dynamic_sec - 0.8, 1) if raw_speech >= dynamic_sec else raw_speech
         cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
         
-        # 🌟 XỬ LÝ CHUẨN THỜI LƯỢNG CHO GIAO DIỆN
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
@@ -1175,7 +1168,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     
-    # --- 🌟 TẠO TÓM TẮT SIÊU TINH GỌN (CHO GIAO DIỆN) ---
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s | 🎬 <b>Chiến lược:</b> {presentation_format}",
         f"🗣 <b>Xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh:</b> {fixed_setting_base}",
@@ -1185,7 +1177,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         summary_lines.append(f"🎯 <b>Ghi chú riêng:</b> {user_custom_note}")
         
     res["director_summary"] = "<br>".join(summary_lines)
-    # -----------------------------------------------------
     
     st.session_state.generated_details[str(target_id)] = res
     auto_save_current_session()
@@ -1211,11 +1202,11 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh 1...", "hook": "Hook 1...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh 2...", "hook": "Hook 2...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh 3...", "hook": "Hook 3...", "actors": 1 }},
-            {{ "id": {cur_len+4}, "title": "Tên biến thể 4", "setting": "Bối cảnh 4...", "hook": "Hook 4...", "actors": 1 }},
-            {{ "id": {cur_len+5}, "title": "Tên biến thể 5", "setting": "Bối cảnh 5...", "hook": "Hook 5...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh 1...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh 2...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh 3...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+4}, "title": "Tên biến thể 4", "setting": "Bối cảnh 4...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+5}, "title": "Tên biến thể 5", "setting": "Bối cảnh 5...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }}
         ]
     }}
     """
@@ -1247,11 +1238,11 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "hook": "Hook 1...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "hook": "Hook 2...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "hook": "Hook 3...", "actors": 1 }},
-            {{ "id": {cur_len+4}, "title": "Tên kịch bản 4", "setting": "Bối cảnh 4...", "hook": "Hook 4...", "actors": 1 }},
-            {{ "id": {cur_len+5}, "title": "Tên kịch bản 5", "setting": "Bối cảnh 5...", "hook": "Hook 5...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+4}, "title": "Tên kịch bản 4", "setting": "Bối cảnh 4...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+5}, "title": "Tên kịch bản 5", "setting": "Bối cảnh 5...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }}
         ]
     }}
     """
@@ -1666,11 +1657,11 @@ if st.session_state.get("trigger_main_generation"):
                     "prompt_dna_lock": "Visual DNA lock"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "hook": "Câu hook 1...", "actors": 1 }},
-                    {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "hook": "Câu hook 2...", "actors": 1 }},
-                    {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "hook": "Câu hook 3...", "actors": 1 }},
-                    {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh 4...", "hook": "Câu hook 4...", "actors": 1 }},
-                    {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh 5...", "hook": "Câu hook 5...", "actors": 1 }}
+                    {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà (VD: Thấy rẻ tưởng rởm, ai dè đeo lên không hề ngứa rát...)", "actors": 1 }},
+                    {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+                    {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+                    {{ "id": 4, "title": "Tên kịch bản 4", "setting": "Bối cảnh 4...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }},
+                    {{ "id": 5, "title": "Tên kịch bản 5", "setting": "Bối cảnh 5...", "hook": "Viết 1 câu duy nhất hoặc 2 câu chuyển ý mượt mà...", "actors": 1 }}
                 ]
             }}
             """
@@ -1820,7 +1811,6 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
-    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
@@ -1929,13 +1919,12 @@ if all_sc:
                         if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
                         else: st.error(msg)
 
-    # --- KHỐI XỬ LÝ CHÍNH ĐƯỢC CHẠY SAU KHI VẼ GIAO DIỆN (NẰM TRONG VÙNG CÁCH LY) ---
     if st.session_state.current_processing_id is not None:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run} (Lõi AIDA Vi Mô & Lời Thoại)..."):
+                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Tối ưu Lõi Câu Chuyện & Liên Kết Từ)..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
