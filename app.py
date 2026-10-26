@@ -29,7 +29,7 @@ st.markdown("""
     .badge-ready { color: #15803d; font-weight: 700; background: #dcfce7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #bbf7d0; }
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .autosave-badge { color: #0369a1; font-weight: 700; background: #e0f2fe; padding: 4px 10px; border-radius: 6px; font-size: 12px; border: 1px solid #bae6fd; display: inline-block; margin-top: 4px; }
-    .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; color: #1e3a8a; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.03); font-size: 14.5px; }
+    .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; color: #1e3a8a; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 12px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: block; width: 100%; margin-top: 4px; line-height: 1.8; white-space: pre-line; }
     .timing-badge { font-size: 13.5px; font-weight: 700; color: #1e40af; background: #dbeafe; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; display: inline-block; margin-bottom: 6px; }
     div[data-testid="stFileUploader"] section { padding: 4px; min-height: 2rem; border: 1.5px dashed #cbd5e1 !important; background-color: #f8fafc !important; }
@@ -62,20 +62,21 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & LỚP TRANG PHỤC TỘT ĐỘ:
-   - Sinh 1 'master_character_en' duy nhất cho TỪNG KỊCH BẢN. Khóa chặt diện mạo 4 cảnh.
+1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & LỚP TRANG PHỤC TỘT ĐỘ TRONG CÙNG 1 KỊCH BẢN:
+   - Sinh 1 'master_character_en' duy nhất cho TỪNG KỊCH BẢN. 
    - KHÓA MÀU SẮC: BẮT BUỘC CHỈ ĐỊNH ĐÍCH DANH MÀU SẮC và chất liệu cho TỪNG lớp trang phục (áo trong, áo ngoài, quần/váy). 
-   - ĐA DẠNG HÓA KỊCH BẢN: Nếu 5 kịch bản cùng bối cảnh, KOC phải mặc 5 bộ đồ KHÁC NHAU. Sơ vin hay không phải chuẩn theo Bối cảnh.
+   - KHÓA LỚP TRANG PHỤC: Định danh rõ có áo khoác hay không. Trang phục này sẽ khóa băng 100% xuyên suốt 4 cảnh.
 2. PRODUCT SCALE, CAMERA & TEST RULES:
-   - TÔN TRỌNG TỰ NHIÊN: Cầm đúng vào vị trí tay cầm/quai xách gốc của SP. Tuyệt đối KHÔNG thả rơi.
-   - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
+   - TÔN TRỌNG TỰ NHIÊN (DYNAMIC GEOMETRY): KOC phải cầm đúng vào vị trí tay cầm/quai xách gốc của sản phẩm (nếu có). 
+   - CẦM NẮM TUYỆT ĐỐI (ANTI-DROP): KOC cầm thật chắc sản phẩm, TUYỆT ĐỐI KHÔNG thả rơi.
+   - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
 3. THỰC TRẠNG NỖI ĐAU CẢNH 1 (VISUAL PAIN POINT):
    - Cảnh 1 (không SP), BẮT BUỘC miêu tả HÀNH ĐỘNG VẬT LÝ của nỗi đau kết hợp thoại từ 0.0s.
-4. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
-   - Hành động test tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm.
-5. VĂN NÓI HÀ NỘI THUẦN VIỆT:
-   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong thoại.
+4. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC (COSMETIC TRANSFORMATION):
+   - BẮT BUỘC test sản phẩm trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
+   - Hành động test phải tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm.
+5. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
+   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong thoại để AI đọc mượt.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -179,7 +180,7 @@ supabase = init_supabase()
 client = init_gemini_client()
 
 # ==============================================================================
-# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT
+# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT & JSON BÓC TÁCH SÂU
 # ==============================================================================
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
@@ -333,7 +334,6 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
-    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -413,7 +413,7 @@ def detect_food(text_to_check: str) -> bool:
 
 def detect_cosmetics(text_to_check: str) -> bool:
     if not text_to_check: return False
-    keywords = ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách"]
+    keywords = ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách", "sáp", "nẻ", "vaseline", "balm"]
     return any(k in text_to_check.lower() for k in keywords)
 
 def detect_mom_baby(text_to_check: str) -> bool:
@@ -665,7 +665,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     
     is_professional_outdoor = any(k in setting_lower or k in raw_vi_info.lower() for k in ["văn phòng", "công sở", "công ty", "ngoài trời", "đường phố", "sự kiện", "quán", "cửa hàng", "office", "street"])
     is_wet_room = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
-    is_home_cozy = any(k in setting_lower for k in ["phòng ngủ", "phòng khách", "nhà bếp", "bedroom", "living room", "kitchen", "pijama", "đồ ngủ", "giường"])
+    is_home_cozy = any(k in setting_lower for k in ["phòng ngủ", "phòng khách", "nhà bếp", "bedroom", "living room", "kitchen", "pijama", "đồ ngủ", "giường", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
     is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
     
     is_evening = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
@@ -684,7 +684,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     wardrobe_style = ""
     if any(k in setting_lower for k in ["nấu ăn", "bếp", "nấu nướng", "kitchen", "cooking"]):
         wardrobe_style = "Gọn gàng, xắn tay áo, có thể đeo tạp dề (neat casual wear, wearing an apron, UNTUCKED)"
-    elif any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "cleaning", "housework"]):
+    elif any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "cleaning", "housework", "phòng giặt", "máy giặt"]):
         wardrobe_style = "Đồ bộ mặc nhà co giãn thoải mái, năng động (comfortable active loungewear, rolled-up sleeves, UNTUCKED)"
     elif is_gym_sport:
         wardrobe_style = "Đồ thể thao chuyên dụng, ôm dáng (athletic sportswear, gym outfit, UNTUCKED)"
@@ -843,7 +843,7 @@ if st.session_state.scroll_to_detail:
     st.session_state.scroll_to_detail = False
 
 # ==============================================================================
-# 8. HỆ THỐNG GỌI GEMINI API: KHÓA CỨNG GEMINI-3.8-FLASH & LITE
+# 8. HỆ THỐNG GỌI GEMINI API
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -977,7 +977,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine)
     scene_4_vo_guide = f"Bình thường khoảng {soft_orig_price}, nay giảm chỉ còn khoảng {soft_sale_price} thôi, nhưng giá từng thời điểm có thể khác nhau tùy đợt ưu đãi, {audience_pronoun} cứ bấm góc trái kiểm tra tài khoản mình xem nhé!" if is_flashsale_script else f"Nay hãng đang có giá ưu đãi cực sâu, {audience_pronoun} nào mà đang gặp tình trạng khó chịu như trên thì rinh ngay em nó ở giỏ hàng góc trái nhé!"
     
-    scene_1_action_inst = "speaking actively from 0.0s while physically demonstrating the SPECIFIC physical problem mentioned in the hook (e.g., vigorously scratching a red itchy rash on skin, struggling to pull up slipping socks from shoes, looking into a filthy washing machine drum) - EMPTY HANDS, ZERO PRODUCT" if is_pas_story else f"{action_scene_1} (under 18 words)"
+    # 🌟 CẬP NHẬT: KHÓA ZERO PRODUCT CHO MỌI KỊCH BẢN PHI THỜI TRANG Ở CẢNH 1
+    if not is_fashion_wearable:
+        scene_1_action_inst = "speaking actively from 0.0s while physically demonstrating the SPECIFIC physical problem mentioned in the hook (e.g., vigorously scratching a red itchy rash on skin, struggling to pull up slipping socks from shoes, looking into a filthy washing machine drum) - EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME"
+    else:
+        scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT (DÙNG CHO 'voiceover'): {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
@@ -988,7 +992,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     KOC: {detected_demographic_en} | {stylist_rules_text}
     
     - ĐỐI VỚI SẢN PHẨM MÁY MÓC/HÚT BỤI/ĐỒ GIA DỤNG: Yêu cầu mô tả cực kỳ cẩn thận phần ĐẦU HÚT/PHỤ KIỆN (Nozzle/Attachment) trong 'action_en'. Tuyệt đối giữ nguyên đầu hút đang có trong ảnh tham chiếu. NẾU ẢNH LÀ MÁY CẦM TAY NGẮN, BẮT BUỘC PHẢI GHI "NO long stick, NO floor brush" để cấm AI tự vẽ thêm cán dài hút sàn.
-    - VẬT LÝ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT (son màu thì đỏ môi, sáp nẻ thì môi căng mọng bóng nước, kem/gel thì da mặt căng bóng glass-skin).
+    - VẬT LÝ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT (son màu thì đỏ môi, sáp nẻ thì môi căng mọng bóng nước, kem/gel thì da mặt căng bóng glass-skin).
 
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại để chống vấp máy đọc:
     {{
@@ -1005,7 +1009,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "{'frustrated and troubled expression' if is_pas_story else 'lively, engaging expression'}",
                 "action_en": "{scene_1_action_inst} (under 25 words)",
                 "sfx": "Foley thực tế (không nhạc)",
-                "director": "Attention | {'Trực tiếp mô tả hình ảnh nỗi đau vật lý' if is_pas_story else 'Đưa sản phẩm ra tiền cảnh'}",
+                "director": "Attention | Trực tiếp mô tả hình ảnh nỗi đau vật lý (TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM Ở CẢNH NÀY)",
                 "voiceover": "Thoại mở màn 100% tiếng Việt tự nhiên (18-30 từ)..."
             }},
             {{
@@ -1068,9 +1072,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
     anti_morph_neg = "extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
-    
     appliance_neg_extra = "changing nozzle, adding extension stick, swapping brush head, mutating attachment, hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
-    
     color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     char_neg_extra = "changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
@@ -1090,8 +1092,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         actual_speech = round(dynamic_sec - 0.8, 1) if raw_speech >= dynamic_sec else raw_speech
         cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
         
+        # LƯU CHUẨN THỜI LƯỢNG DẠNG STRING "Xs" ĐỂ GIAO DIỆN KHÔNG BỊ LỖI
+        scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
+        total_sec += float(dynamic_sec)
+        
         env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text, scn.get("setting", fixed_setting_base))
-        is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
+        
+        # 🌟 KIỂM TRA ZERO PRODUCT CẢNH 1 (ÁP DỤNG MỌI NGÀNH NGOÀI THỜI TRANG)
+        is_pas_scn1_no_prod = (idx_scn == 0 and not is_fashion_wearable)
+        
         cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, check_str)
         
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
@@ -1131,7 +1140,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en}{dim_tag} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry)."
 
         if is_pas_scn1_no_prod:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
+            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
         elif not is_fashion_wearable and idx_scn in [1, 2]:
             img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
         else:
@@ -1607,7 +1616,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
-            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem body lên tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
+            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (mặt, môi, tay, nách, tóc). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại:
             {{
@@ -1798,13 +1807,15 @@ all_sc = st.session_state.all_scripts + st.session_state.cloned_scripts + st.ses
 if all_sc:
     st.divider()
     
+    # --- VÙNG CÁCH LY CHỐNG BÓNG MA GIAO DIỆN (UI GHOSTING FIX) ---
     ui_action_ph = st.empty()
+    # -------------------------------------------------------------
 
     def is_generated(sc_id): return (str(sc_id) in st.session_state.generated_details or sc_id in st.session_state.generated_details)
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
-    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
+    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (NẰM Ở TRÊN CÙNG ĐỂ DỄ THEO DÕI) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
@@ -1817,7 +1828,16 @@ if all_sc:
         
         director_summary_html = asc.get('director_summary', '')
         if not director_summary_html:
-            total_sec = sum([float(str(s.get('dur', '8s')).replace('s', '')) for s in asc.get("scenes", [])])
+            
+            # XỬ LÝ LỖI FLOAT BỊ 'NONE' HAY '0s' BẰNG TRY-EXCEPT
+            total_sec = 0.0
+            for s in asc.get("scenes", []):
+                d_str = str(s.get('dur', '8s')).replace('s', '').strip()
+                try: 
+                    total_sec += float(d_str)
+                except: 
+                    total_sec += 8.0 # Fallback an toàn nếu AI lỗi
+            
             summary_lines = [
                 f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s",
                 f"🏙 <b>Bối cảnh Master:</b> Khớp chuẩn sự kiện"
@@ -1832,11 +1852,16 @@ if all_sc:
             curr_mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
             is_tts = ("Viral" not in curr_mode)
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
-            dur_int = int(str(scn.get('dur', '8s')).replace('s', ''))
+            
+            # XỬ LÝ LỖI INT PARSING CHO DUR
+            dur_str = str(scn.get('dur', '8s')).replace('s', '').strip()
+            try: dur_int = int(float(dur_str))
+            except: dur_int = 8
+            
             safe_cushion = round(max(0.0, dur_int - speech_sec), 1)
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage')}")
-            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
+            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur', '8s')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting')}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression_en', 'Tự nhiên, rạng rỡ')}*\n\n**🎵 Hiệu ứng âm thanh (SFX & Foley thuần - Không nhạc nền):** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director')}*\n\n**💬 Thoại nhân nói trực tiếp on-camera (100% Giọng Hà Nội chuẩn, dùng 'nghìn', số 4 đọc 'bốn'):** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             
             c_p1, c_p2 = st.columns(2)
@@ -1863,6 +1888,7 @@ if all_sc:
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
             st.markdown("---")
 
+    # --- KHỐI DANH SÁCH ĐÃ DỰNG ---
     if comp_sc:
         st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
         for outline in comp_sc:
@@ -1886,6 +1912,7 @@ if all_sc:
                         if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
                         else: st.error(msg)
 
+    # --- KHỐI DANH SÁCH CHỜ DỰNG ---
     if pend_sc:
         st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
         for outline in pend_sc:
@@ -1910,7 +1937,7 @@ if all_sc:
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run}..."):
+                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Đạo Diễn AI Master Final)..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
@@ -1940,6 +1967,7 @@ if all_sc:
             st.session_state.scroll_to_top = True
             st.rerun()
         else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
+    # ---------------------------------------------------------------------------------
 
     # ==========================================================================
     # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
