@@ -67,7 +67,7 @@ COMPACT_CORE_RULES = """
    - KHÓA MÀU SẮC: BẮT BUỘC CHỈ ĐỊNH ĐÍCH DANH MÀU SẮC và chất liệu cho TỪNG lớp trang phục (áo trong, áo ngoài, quần/váy). 
    - KHÓA LỚP TRANG PHỤC: Định danh rõ có áo khoác hay không. Trang phục này sẽ khóa băng 100% xuyên suốt 4 cảnh.
 2. PRODUCT SCALE, CAMERA & TEST RULES:
-   - TÔN TRỌNG TỰ NHIÊN: KOC phải cầm đúng vào vị trí tay cầm/quai xách gốc của sản phẩm (nếu có). 
+   - CHỐNG BIẾN DẠNG PHỤ KIỆN (ANTI-MORPH): KOC sử dụng ĐÚNG ĐẦU HÚT/PHỤ KIỆN GỐC trong ảnh, TUYỆT ĐỐI không tự ý kéo dài cán máy hay tráo đổi phụ kiện khác.
    - CẦM NẮM TUYỆT ĐỐI (ANTI-DROP): KOC cầm thật chắc sản phẩm, TUYỆT ĐỐI KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
 3. THỰC TRẠNG NỖI ĐAU CẢNH 1 (VISUAL PAIN POINT):
@@ -180,7 +180,7 @@ supabase = init_supabase()
 client = init_gemini_client()
 
 # ==============================================================================
-# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT & JSON BÓC TÁCH SÂU
+# 4. KHAI BÁO TOÀN BỘ HÀM TIỆN ÍCH, XỬ LÝ TEXT
 # ==============================================================================
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
@@ -334,6 +334,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
+    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -390,7 +391,7 @@ def format_ocr_prices(ca_data: dict) -> str:
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
-# 🌟 BỔ SUNG LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR) CHỐNG ĐỨT GÃY
+# 🌟 LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR) - TỰ PHỤC HỒI KHI AI ĐỨT GÃY
 def extract_scenes(parsed_data):
     if isinstance(parsed_data, list): return parsed_data
     if isinstance(parsed_data, dict):
@@ -439,7 +440,7 @@ def detect_strict_rigid_appliance(text_to_check: str) -> bool:
         "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", 
         "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", 
         "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", 
-        "pan", "pot", "tool", "vacuum", "dryer", "blower",
+        "pan", "pot", "tool", "vacuum", "dryer", "blower", "hút bụi",
         "tai nghe", "headphone", "earbud", "earphone", "bluetooth", "điện thoại", "phone", "loa", "speaker", 
         "sạc", "chuột", "bàn phím", "mic"
     ]
@@ -628,8 +629,7 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     elif is_medicine: return "Clean, safe, solid capsule/pill geometry or smooth powder dissolving perfectly in clear water. Holding securely."
     
     elif is_fashion: return "Natural fabric drape in motion; subject steps smoothly, turns 45 degrees, and touches fabric softly (worn on body, zero duplicate item in hands)."
-    elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return "CAMERA FOCUS LOCKED ON PRODUCT AND AIRFLOW TARGET: 100% rigid non-deforming body lock, true-to-life scale. Creates a powerful, completely invisible and transparent airflow (ZERO fire, ZERO sparks, ZERO smoke, ZERO plasma). The invisible breeze realistically blows away dust, leaves, or softly blows hair. Gripping firmly, never dropping."
-    elif any(k in p for k in ["hút bụi", "vacuum"]): return "CAMERA FOCUS LOCKED ON VACUUM HEAD AND DUSTBIN: 100% rigid non-deforming body lock, true-to-life scale. The nozzle glides swiftly and firmly, visibly sucking dirt, crumbs, or debris off the surface directly into the transparent dustbin in real-time. Holding securely, never dropping."
+    elif any(k in p for k in ["hút bụi", "vacuum", "máy sấy", "máy thổi"]): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping."
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping."
     
     elif is_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts. The product stays completely rigid while presenter stands perfectly still; hands hold the product naturally (using its actual handle/strap if any), fast decisive interaction, NEVER dropping."
@@ -654,11 +654,11 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     elif is_medicine: return (f"holding {clean_prod_en} securely in hand", f"showing {clean_prod_en} up close next to a clear glass of water", f"dropping or demonstrating the use of {clean_prod_en}", f"holding {clean_prod_en} securely with a healthy, confident smile")
 
     elif is_fashion_wearable: return ("stepping forward confidently and gesturing expressively while speaking", "holding the product securely in hands, rubbing and stretching the fabric to show its anti-wrinkle or premium texture", "holding the product securely in hands, stretching the fabric firmly or demonstrating its breathable texture up close", "posing confidently with a warm open-palm gesture")
-    elif any(k in p for k in ["máy sấy", "máy thổi", "quạt", "dryer", "blower", "fan"]): return (f"holding the rigid {clean_prod_en} firmly maintaining realistic scale", f"turning on {clean_prod_en} swiftly up close, showing completely transparent and invisible airflow (no sparks)", f"aiming {clean_prod_en} to forcefully blow away dust or leaves with invisible breeze", f"holding {clean_prod_en} securely with a warm open-palm gesture")
-    elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding the rigid {clean_prod_en} firmly maintaining realistic scale", f"positioning {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
-    elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
     
+    elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
+    elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
     elif is_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
+    
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid structure without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry", f"holding {clean_prod_en} securely with a confident open-palm gesture")
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
@@ -989,9 +989,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     GHI CHÚ BẮT BUỘC: '{user_custom_note if user_custom_note else 'none'}'
     KOC: {detected_demographic_en} | {stylist_rules_text}
     
-    - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem tay/body lên tay/cánh tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
+    - ĐỐI VỚI SẢN PHẨM MÁY MÓC/HÚT BỤI/ĐỒ GIA DỤNG: Yêu cầu mô tả cực kỳ cẩn thận phần ĐẦU HÚT/PHỤ KIỆN (Nozzle/Attachment) trong 'action_en'. Tuyệt đối giữ nguyên đầu hút đang có trong ảnh tham chiếu. NẾU ẢNH LÀ MÁY CẦM TAY NGẮN, BẮT BUỘC PHẢI GHI "NO long stick, NO floor brush" để cấm AI tự vẽ thêm cán dài hút sàn.
+    - VẬT LÝ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT (son màu thì đỏ môi, sáp nẻ thì môi căng mọng bóng nước, kem/gel thì da mặt căng bóng glass-skin).
 
-    TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại:
+    TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG GIẢI THÍCH, KHÔNG FORMAT MARKDOWN ````json). LƯU Ý: 'voiceover' 100% Tiếng Việt thuần túy, CẤM chèn dấu chấm lửng (...), dấu gạch ngang (-), ngoặc vuông/tròn vào lời thoại để chống vấp máy đọc:
     {{
         "title": "{fixed_title}",
         "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'messy bathroom with wet tile floor' hoặc 'clean modern kitchen'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
@@ -1069,7 +1070,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
     anti_morph_neg = "extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
-    appliance_neg_extra = "hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
+    
+    # 🌟 CẬP NHẬT TƯỜNG LỬA CHỐNG BIẾN DẠNG ĐẦU HÚT/PHỤ KIỆN
+    appliance_neg_extra = "changing nozzle, adding extension stick, swapping brush head, mutating attachment, hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
+    
     color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     char_neg_extra = "changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
@@ -1088,9 +1092,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         dynamic_sec = min(10, max(4, math.ceil(raw_speech + act_cushion)))
         actual_speech = round(dynamic_sec - 0.8, 1) if raw_speech >= dynamic_sec else raw_speech
         cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
-        
-        scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
-        total_sec += float(dynamic_sec)
         
         env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text, scn.get("setting", fixed_setting_base))
         is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
@@ -1118,8 +1119,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
         color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
         
+        # 🌟 CẬP NHẬT: LỆNH KHÓA CHẶT ĐẦU HÚT CỦA MÁY HÚT BỤI VÀO SẢN PHẨM TRONG ẢNH
         if is_strict_appliance or is_mom_baby_hard: 
-            locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, proportions, and surface details. Zero hallucinated parts."
+            locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, exact original nozzle/attachment, and surface details. Zero hallucinated parts."
         elif is_food or is_cosmetics or is_mom_baby or is_medicine: 
             locked_product_prompt_segment = f"PRODUCT FOCUS: {clean_prod_en}. {color_lock_tag} as the main subject."
         elif (is_fashion_wearable or is_footwear_accessory) and is_testing_scene:
@@ -1169,7 +1171,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_fashion_wearable or is_footwear_accessory: industry_badges.append("🔥 <b>Cơ chế Khóa Lai Cải Tiến (Expanded Hybrid Engine):</b> Tự động lột/cởi sản phẩm ở <b>CẢ CẢNH 2 VÀ CẢNH 3</b> để chuyển sang chế độ cầm trên tay soi cận cảnh & test lực (kéo giãn, bẻ cong) chống ảo giác AI.")
     if is_footwear_accessory and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]): industry_badges.append("🧦 <b>Động lực học Giày/Tất:</b> Máy quay chúi xuống (low-angle) soi trực tiếp bàn chân/cổ chân, KOC tự động xỏ tất/giày vào chân.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
-    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm Cải tiến (Anatomical Targeting):</b> Hệ thống tự động phân tách vật lý làm 2 nhóm: Nhóm trang điểm (bôi lên môi lập tức để lại vệt màu đậm nét) và nhóm dưỡng da/sáp nẻ (xoa lên da/môi lập tức tan ra, để lại bề mặt căng mọng, bóng mướt mà KHÔNG làm đổi màu tự nhiên). Test chuẩn vị trí giải phẫu.")
+    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm (Targeted Transformation):</b> Hệ thống tự động phân tách vật lý làm 2 nhóm: Nhóm trang điểm (bôi lên môi lập tức để lại vệt màu đậm nét) và nhóm dưỡng da/sáp nẻ (xoa lên da/môi lập tức tan ra, để lại bề mặt căng mọng, bóng mướt mà KHÔNG làm đổi màu tự nhiên). Test chuẩn vị trí giải phẫu.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
     if is_medicine: industry_badges.append("💊 <b>Động lực học Y tế (Chính sách):</b> Tự động gọt sạch các từ vi phạm ('chữa bệnh', 'cam kết'). Góc quay viên uống rõ nét, an toàn.")
     
@@ -1181,8 +1183,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"👗 <b>Lõi Đóng Băng Trang Phục & Màu Sắc (Absolute Identity Freeze):</b> {final_outfit_vi} (Đã chỉ định ĐÍCH DANH MÀU SẮC và CHẤT LIỆU cho TỪNG LỚP trang phục. Khóa chặt 100% diện mạo, màu áo/quần/váy xuyên suốt 4 cảnh. Cấm tự đổi màu, lột đồ).",
         f"👟 <b>Khóa Giày Dép Tuyệt Đối Theo Ngữ Cảnh:</b> Tự động bám sát không gian để mix đồ chuẩn logic (Ví dụ: Cấm đi giày tây/sneaker trong phòng ngủ/bếp, tự động chuyển về dép trong nhà/chân trần).",
         f"🎨 <b>Khóa Họa tiết & Màu sắc Sản Phẩm (Pattern/Color Lock):</b> Ép loại bỏ hoàn toàn các màu tạp trong ảnh gốc, bảo tồn 100% họa tiết/màu của: {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} | {locked_color_en}</code>",
-        f"✊ <b>Cơ Chế Động Lực Học Tay Cầm (Dynamic Grip Engine):</b> TỰ ĐỘNG nhận diện đúng kết cấu của ly/cốc. Nếu có quai thì cấm tay cầm hông, có tay cầm thì cấm quai xách. KOC tương tác tự nhiên vào đúng tay cầm gốc.",
+        f"✊ <b>Cơ Chế Động Lực Học Vật Lý Cầm Nắm:</b> AI tự động nhận diện nếu có quai thì cấm tay cầm hông, có tay cầm thì cấm quai xách. KOC tương tác tự nhiên vào đúng tay cầm gốc.",
+        f"🧹 <b>Lõi Cố Định Đầu Hút Nguyên Bản (Nozzle Freeze Engine):</b> Tự động khóa chặt cấu trúc phụ kiện của máy hút bụi/đồ gia dụng. Cấm AI tự ý nối cán dài hay thay đầu cọ (Swapping brush head) khác với ảnh gốc.",
         f"🎙 <b>Lõi Âm thanh Studio (Studio-Quality Close-Mic):</b> Khử 100% tiếng vang phòng (Zero Reverb), cấm tuyệt đối giọng thuyết minh lồng tiếng (No narrator), dọn sạch ký tự đặc biệt chống vấp chữ.",
+        f"🛡 <b>Cơ Chế Tự Phục Hồi JSON (Auto-Healing):</b> Chống sập hệ thống khi AI phản hồi lỗi cấu trúc do xử lý kịch bản quá phức tạp."
     ]
     if industry_badges: summary_lines.extend(industry_badges)
     if is_single_skirt_mode: summary_lines.append("👗 <b>Khóa Váy 1 Ống Rộng (Single Unsplit Skirt Tube Lock):</b> Đã chuyển đổi thành Maxi Skirt, chặn quần 2 ống trong Negative Prompt.")
@@ -1686,7 +1690,7 @@ if st.session_state.get("trigger_main_generation"):
                     payload.extend([f"ACTOR {c['id']} (EXTRACT AGE, GENDER, HAIR ONLY):", types.Part.from_bytes(data=c["file_bytes"]["data"], mime_type=c["file_bytes"]["mime"])])
             payload.append(prompt)
             
-            # 🌟 CƠ CHẾ TỰ PHỤC HỒI KHI AI ĐỨT GÃY (AUTO-RETRY)
+            # 🌟 VÒNG LẶP TỰ PHỤC HỒI CHỐNG ĐỨT GÃY (AUTO-RETRY LOOP)
             ca_result, outlines = {}, []
             max_retries = 2
             for attempt in range(max_retries):
@@ -1881,7 +1885,7 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - m thanh Studio, Chống Vấp Thoại):**")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
