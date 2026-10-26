@@ -64,20 +64,17 @@ COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT KHUÔN MẶT, NGOẠI HÌNH & TRANG PHỤC TỘT ĐỘ TRONG CÙNG 1 KỊCH BẢN:
    - Sinh 1 'master_character_en' duy nhất cho TỪNG KỊCH BẢN. 
-   - ĐA DẠNG HÓA KỊCH BẢN: Nếu 5 kịch bản cùng bối cảnh "văn phòng", thì 5 KOC ở 5 kịch bản phải mặc 5 bộ đồ văn phòng KHÁC NHAU. Bắt buộc phối đồ và kiểu dáng (SƠ VIN hay KHÔNG SƠ VIN) chuẩn theo Hành động/Bối cảnh.
+   - ĐA DẠNG HÓA KỊCH BẢN: Nếu 5 kịch bản cùng bối cảnh "văn phòng", thì 5 KOC ở 5 kịch bản phải mặc 5 bộ đồ KHÁC NHAU. Bắt buộc phối đồ và kiểu dáng (SƠ VIN hay KHÔNG SƠ VIN) chuẩn theo Bối cảnh.
 2. PRODUCT SCALE, CAMERA & TEST RULES:
-   - TÔN TRỌNG TỰ NHIÊN (DYNAMIC GEOMETRY): KOC phải cầm đúng vào vị trí tay cầm/quai xách gốc của sản phẩm (nếu có). 
-   - CẦM NẮM TUYỆT ĐỐI (ANTI-DROP): KOC phải cầm thật chắc sản phẩm, TUYỆT ĐỐI KHÔNG ĐƯỢC thả rơi hay ném đồ vật.
+   - TÔN TRỌNG TỰ NHIÊN (DYNAMIC GEOMETRY): KOC cầm đúng vị trí tay cầm/quai xách gốc của sản phẩm. TUYỆT ĐỐI KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: Tuyệt đối CẤM nhân vật xoay người. Phải ĐỨNG IM (zero body rotation).
 3. THỰC TRẠNG NỖI ĐAU CẢNH 1 (VISUAL PAIN POINT):
    - Cảnh 1 (không SP), BẮT BUỘC miêu tả HÀNH ĐỘNG VẬT LÝ của nỗi đau (VD: gãi da mẩn đỏ, lúi húi kéo tất tuột) kết hợp thoại từ 0.0s.
 4. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC (COSMETIC TRANSFORMATION):
-   - BẮT BUỘC test sản phẩm trên ĐÚNG VỊ TRÍ CƠ THỂ: Son thoa lên môi, mặt nạ/kem thoa lên mặt, kem tay/body thoa lên tay.
-   - Hành động test phải hiển thị RÕ RÀNG SỰ THAY ĐỔI THỊ GIÁC (ví dụ: bôi son xong môi lập tức đỏ rực, thoa kem/mặt nạ xong da lập tức bóng mướt, glowing finish).
+   - BẮT BUỘC test sản phẩm trên ĐÚNG VỊ TRÍ CƠ THỂ ở TẤT CẢ các cảnh test: Son lên môi, mặt nạ/kem lên mặt, kem body lên tay. Cấm bôi lung tung.
+   - Hành động test phải tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG (son để lại nét đậm, gel xoa tan biến để lại da căng bóng).
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT & CHỐNG VẤP THOẠI LẮP TỪ:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), hoặc ký hiệu ([ ]) trong thoại để AI đọc mượt.
-6. LUẬT MẸ VÀ BÉ:
-   - Tuyệt đối không để em bé một mình.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -335,6 +332,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
+    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -401,7 +399,7 @@ def detect_food(text_to_check: str) -> bool:
 
 def detect_cosmetics(text_to_check: str) -> bool:
     if not text_to_check: return False
-    keywords = ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic"]
+    keywords = ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách"]
     return any(k in text_to_check.lower() for k in keywords)
 
 def detect_mom_baby(text_to_check: str) -> bool:
@@ -538,6 +536,15 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     if not text_to_check: return False
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
+# 🌟 HÀM MỚI: PHÂN TÍCH GIẢI PHẪU MỸ PHẨM (RIGHT PLACE, RIGHT PHYSICS)
+def get_cosmetic_target(product_name, check_str):
+    p_cos = f"{product_name} {check_str}".lower()
+    if any(k in p_cos for k in ["son", "môi", "lip"]): return "lips", "leaving a highly precise, rich colored stroke exactly where applied"
+    elif any(k in p_cos for k in ["tóc", "gội", "xả", "hair", "shampoo", "conditioner"]): return "hair", "instantly leaving the hair visibly smooth, silky and shiny"
+    elif any(k in p_cos for k in ["nách", "khử mùi", "armpit", "deodorant"]): return "armpit", "instantly absorbing into the skin"
+    elif any(k in p_cos for k in ["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail", "móng"]): return "hands/arms/body", "instantly absorbing and leaving a glowing, hydrated finish"
+    else: return "facial skin", "instantly absorbing and disappearing, leaving a highly glossy, hydrated, glowing glass-skin finish"
+
 def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwear_acc: bool, is_pas_scene1: bool, clean_prod_en: str, is_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool, check_str: str = "") -> str:
     if is_pas_scene1 and not is_fashion: return "Vertical 9:16 stable dynamic shot framing the character and the specific problem"
     
@@ -554,16 +561,11 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         else: return f"Vertical 9:16 stable balanced eye-level medium shot showing {clean_prod_en}"
         
     elif is_cosmetics:
-        p_cos = f"{clean_prod_en} {check_str}".lower()
-        if any(k in p_cos for k in ["son", "môi", "lip"]): target_part = "lips"
-        elif any(k in p_cos for k in ["tóc", "gội", "xả", "hair", "shampoo", "conditioner"]): target_part = "hair"
-        elif any(k in p_cos for k in ["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail", "móng"]): target_part = "hands/arms"
-        else: target_part = "facial skin"
-
-        if scene_idx == 0: return f"Vertical 9:16 stable elegant medium shot holding {clean_prod_en}"
+        target_part, _ = get_cosmetic_target(clean_prod_en, check_str)
+        if scene_idx == 0: return f"Vertical 9:16 stable elegant medium shot holding {clean_prod_en} near the {target_part}"
         elif scene_idx == 1: return f"Vertical 9:16 stable smooth macro close-up focused precisely on the {target_part} demonstrating the texture of {clean_prod_en}"
-        elif scene_idx == 2: return f"Vertical 9:16 stable close-up beauty shot showing direct application of {clean_prod_en} onto the {target_part}"
-        else: return f"Vertical 9:16 stable radiant medium shot with {clean_prod_en}"
+        elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up beauty shot showing direct application of {clean_prod_en} onto the {target_part}"
+        else: return f"Vertical 9:16 stable radiant medium shot showing the final transformed {target_part} with {clean_prod_en}"
 
     elif is_mom_baby:
         if scene_idx == 0: return f"Vertical 9:16 stable soft warm medium shot holding {clean_prod_en}"
@@ -600,10 +602,8 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     
     if is_food: return "Mouth-watering visual physics; showing steam rising, juicy texture, melting, or smooth pulling/stretching if applicable. Presenter stands completely still; natural hand interaction only, NEVER dropping."
     elif is_cosmetics: 
-        if any(k in p for k in ["son", "môi", "lip"]): return "Cosmetic physics: Smooth pigmented texture; applying directly on the LIPS, instantly leaving a rich, vibrant color stroke. Clear visual transformation (lips become vividly colored). Delicate hand interaction only, gripping firmly; body remains perfectly still."
-        elif any(k in p for k in ["tóc", "gội", "xả", "hair", "shampoo", "conditioner"]): return "Cosmetic physics: Smooth texture; applying directly on the HAIR, instantly leaving the hair visibly silky and shiny. Clear visual transformation. Delicate hand interaction only."
-        elif any(k in p for k in ["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail"]): return "Cosmetic physics: Smooth creamy texture; applying directly on the HAND/ARM skin, instantly absorbing and leaving a highly glossy, hydrated, radiant finish. Clear visual transformation. Delicate hand interaction only."
-        else: return "Cosmetic physics: Smooth creamy/watery texture; applying directly on the FACIAL SKIN (face), instantly absorbing and leaving a deeply hydrated, glowing, flawless glass-skin finish. Clear visual transformation (skin becomes instantly glossy). Delicate hand interaction only, gripping firmly; body remains perfectly still."
+        target_part, effect = get_cosmetic_target(product_name, vo_text)
+        return f"Cosmetic physics: Smooth texture; applying directly on the {target_part.upper()}, {effect}. Clear visual transformation instantly. Delicate hand interaction only, gripping firmly; body remains perfectly still."
     elif is_mom_baby: 
         if is_mom_baby_hard: return "STRICT REFERENCE TRACKING for the baby product. 100% rigid non-deforming geometry, true-to-life scale. Safe and gentle interaction, holding securely, NEVER dropping."
         return "Ultra-soft fabric/material texture; showing gentle elasticity, high liquid absorption, or completely safe smooth surfaces. Holding securely."
@@ -625,16 +625,12 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
 
     if is_food: return (f"holding {clean_prod_en} securely while standing completely still and presenting it deliciously", f"taking a satisfying bite or showing the inside texture of {clean_prod_en}", f"pouring, dipping, or stretching {clean_prod_en} to show its mouth-watering details", f"holding {clean_prod_en} securely with a happy, satisfied expression")
     elif is_cosmetics:
-        if any(k in p for k in ["son", "môi", "lip"]): target_part, effect = "lips", "leaving a rich, vibrant color stroke"
-        elif any(k in p for k in ["tóc", "gội", "xả", "hair", "shampoo", "conditioner"]): target_part, effect = "hair", "leaving hair visibly silky and shiny"
-        elif any(k in p for k in ["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail"]): target_part, effect = "hands or arms", "leaving a smooth, deeply glowing finish"
-        else: target_part, effect = "facial skin", "leaving a flawless, glowing glass-skin finish"
-        
+        target_part, effect = get_cosmetic_target(clean_prod_en, check_str)
         return (
-            f"elegantly holding {clean_prod_en} securely next to the face", 
-            f"applying a small amount of {clean_prod_en} smoothly directly onto the {target_part}, physically showing a clear visual transformation ({effect})", 
-            f"gently tapping or blending {clean_prod_en} into the {target_part} to emphasize the stunning, visibly transformed finish", 
-            f"holding {clean_prod_en} securely with a radiant smile"
+            f"elegantly holding {clean_prod_en} securely near the {target_part}",
+            f"applying a small amount of {clean_prod_en} smoothly directly onto the {target_part}, physically showing a clear visual transformation ({effect})",
+            f"gently rubbing or blending {clean_prod_en} directly into the {target_part}, the product texture visibly absorbs/changes to emphasize the stunning transformed finish",
+            f"holding {clean_prod_en} securely with a radiant smile, showcasing the perfectly treated {target_part}"
         )
     elif is_mom_baby: return (f"caring mother holding {clean_prod_en} securely next to her baby", f"gently touching or interacting with {clean_prod_en} to show its features", f"demonstrating the safe use of {clean_prod_en} with the baby", f"holding {clean_prod_en} securely with a caring smile next to the baby")
     elif is_medicine: return (f"holding {clean_prod_en} securely in hand", f"showing {clean_prod_en} up close next to a clear glass of water", f"dropping or demonstrating the use of {clean_prod_en}", f"holding {clean_prod_en} securely with a healthy, confident smile")
@@ -653,30 +649,35 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     
     is_professional_outdoor = any(k in setting_lower or k in raw_vi_info.lower() for k in ["văn phòng", "công sở", "công ty", "ngoài trời", "đường phố", "sự kiện", "quán", "cửa hàng", "office", "street"])
     is_wet_room = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
-    is_home_cozy = any(k in setting_lower for k in ["phòng ngủ", "phòng khách", "nhà bếp", "bedroom", "living room", "kitchen", "pijama", "đồ ngủ"])
+    is_home_cozy = any(k in setting_lower for k in ["phòng ngủ", "phòng khách", "nhà bếp", "bedroom", "living room", "kitchen", "pijama", "đồ ngủ", "giường"])
+    is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
     
     is_evening = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     is_single_skirt = detect_single_tube_skirt(s_lower)
     
-    if is_professional_outdoor:
-        if gender == "female" and is_evening: footwear = "elegant pointed-toe high heels or smart-casual loafers"
-        else: footwear = "clean minimalist white sneakers or smart-casual loafers"
-    elif is_wet_room:
+    # LỌC GIÀY DÉP TỐI ƯU (FIX LỖI GIÀY TÂY TRONG PHÒNG NGỦ)
+    if is_wet_room:
         footwear = "barefoot or wearing waterproof plastic slippers"
-    elif is_home_cozy and not is_fashion:
-        footwear = "clean minimalist pastel indoor slippers"
+    elif is_home_cozy:
+        footwear = "clean minimalist pastel indoor slippers or barefoot" 
+    elif is_gym_sport:
+        footwear = "athletic running shoes or training sneakers"
+    elif is_professional_outdoor:
+        if gender == "female" and is_evening: footwear = "elegant pointed-toe high heels or smart-casual loafers"
+        else: footwear = "clean minimalist white sneakers, smart-casual loafers, or dress shoes"
     else:
         if is_fashion and is_evening and gender == "female": footwear = "elegant pointed-toe high heels or strappy heeled sandals"
         else: footwear = "clean minimalist white sneakers or smart-casual loafers"
     
+    # BỘ LỌC TRANG PHỤC NGỮ CẢNH (CÓ KHÓA SƠ VIN / BUÔNG ÁO)
     wardrobe_style = ""
     if any(k in setting_lower for k in ["nấu ăn", "bếp", "nấu nướng", "kitchen", "cooking"]):
         wardrobe_style = "Gọn gàng, xắn tay áo, có thể đeo tạp dề (neat casual wear, wearing an apron, UNTUCKED)"
     elif any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "cleaning", "housework"]):
         wardrobe_style = "Đồ bộ mặc nhà co giãn thoải mái, năng động (comfortable active loungewear, rolled-up sleeves, UNTUCKED)"
-    elif any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"]):
+    elif is_gym_sport:
         wardrobe_style = "Đồ thể thao chuyên dụng, ôm dáng (athletic sportswear, gym outfit, UNTUCKED)"
-    elif any(k in setting_lower for k in ["ngủ", "giường", "pijama", "sleep", "bedroom"]):
+    elif is_home_cozy:
         wardrobe_style = "Đồ ngủ lụa hoặc cotton mềm mại (soft silk or cotton pajamas/loungewear, loose UNTUCKED)"
     elif is_professional_outdoor:
         wardrobe_style = "Sơ mi, blazer, quần âu hoặc váy công sở thanh lịch (smart-casual, office wear, neatly TUCKED IN shirt)"
@@ -956,7 +957,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif not is_fashion_wearable and not is_food and not is_cosmetics: clean_prod_en = re.sub(r'\b(?:foldable|collapsible|folding)\b', 'rigid structured', clean_prod_en, flags=re.IGNORECASE)
 
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
-    
     color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
     
     stylist_rules_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str, is_food, is_cosmetics, is_mom_baby, is_medicine)
@@ -1144,7 +1144,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_fashion_wearable or is_footwear_accessory: industry_badges.append("🔥 <b>Cơ chế Khóa Lai Cải Tiến (Expanded Hybrid Engine):</b> Tự động lột/cởi sản phẩm ở <b>CẢ CẢNH 2 VÀ CẢNH 3</b> để chuyển sang chế độ cầm trên tay soi cận cảnh & test lực (kéo giãn, bẻ cong) chống ảo giác AI.")
     if is_footwear_accessory and any(k in clean_prod_en.lower() for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "footwear"]): industry_badges.append("🧦 <b>Động lực học Giày/Tất:</b> Máy quay chúi xuống (low-angle) soi trực tiếp bàn chân/cổ chân, KOC tự động xỏ tất/giày vào chân.")
     if is_food: industry_badges.append("🍔 <b>Động lực học F&B:</b> Khóa kết cấu mọng nước, hơi nóng, cấm ép khối cứng.")
-    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm (Targeted Application):</b> Hệ thống tự động bám sát loại mỹ phẩm để bôi đúng vị trí giải phẫu (mặt, môi, tay, tóc) và ép tạo ra SỰ BIẾN ĐỔI THỊ GIÁC (như da bóng lên, môi đỏ lên) ngay sau khi bôi.")
+    if is_cosmetics: industry_badges.append("💄 <b>Động lực học Mỹ phẩm Cải tiến (Anatomical Targeting):</b> Hệ thống tự động bám sát loại mỹ phẩm để bôi chính xác vị trí giải phẫu (mặt, môi, tay, nách, tóc) và ép AI tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RÀNG (da bóng lên, môi đỏ lên) ngay khi bôi.")
     if is_mom_baby: industry_badges.append("👶 <b>Động lực học Mẹ & Bé (Bảo vệ TikTok):</b> Bắt buộc phải có NGƯỜI LỚN tương tác cùng em bé, tuyệt đối không để bé 1 mình.")
     if is_medicine: industry_badges.append("💊 <b>Động lực học Y tế (Chính sách):</b> Tự động gọt sạch các từ vi phạm ('chữa bệnh', 'cam kết'). Góc quay viên uống rõ nét, an toàn.")
     
@@ -1153,10 +1153,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🗣 <b>Nhân xưng:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh Master (Đồng nhất 4 cảnh):</b> {fixed_setting_base} | {goal_badge}",
         f"{cam_mode_badge}",
         f"👤 <b>Khóa Chéo Kịch Bản (Cross-Script Variation):</b> {final_outfit_vi} (Hệ thống thiết kế ĐỘC BẢN từng bộ đồ cho từng video để tránh trùng lặp. Nhưng trong mỗi video, KOC bị khóa băng 100% diện mạo 4 cảnh).",
-        f"👗 <b>Khóa Thời Trang & Sơ vin (Smart Tucking Logic):</b> Tự động nhận diện bối cảnh và hành động để mix đồ. Khóa chặt 100% trạng thái (Sơ vin hoặc Buông áo) xuyên suốt 4 cảnh, cấm AI tự động thay đổi.",
+        f"👗 <b>Khóa Thời Trang & Giày dép (Smart Wardrobe Logic):</b> Tự động nhận diện bối cảnh để mix đồ (Nấu ăn tự xắn tay đeo tạp dề; Tập luyện mặc đồ thể thao ôm dáng). KHÓA GIÀY DÉP TUYỆT ĐỐI CHUẨN NGỮ CẢNH: Cấm đi giày tây trong phòng ngủ.",
         f"🎨 <b>Khóa Họa tiết & Màu sắc (Pattern/Color Lock):</b> Ép loại bỏ hoàn toàn các màu tạp trong ảnh gốc, bảo tồn 100% họa tiết/màu của: {hero_color_str if hero_color_str else 'Chuẩn ảnh'} -> <code>{clean_prod_en} | {locked_color_en}</code>",
-        f"✊ <b>Cơ Chế Động Lực Học Tay Cầm (Dynamic Grip Engine):</b> Gemini Vision giờ sẽ TỰ ĐỘNG nhận diện đúng kết cấu của ly/cốc. Nếu có quai thì cấm tay cầm hông, có tay cầm thì cấm quai xách. KOC sẽ tương tác vào đúng tay cầm gốc (không ép cầm thân chính nữa).",
-        f"🎙 <b>Lõi m thanh Studio (Studio-Quality Close-Mic):</b> Khử 100% tiếng vang phòng (Zero Reverb), cấm tuyệt đối giọng thuyết minh lồng tiếng (No narrator), dọn sạch ký tự đặc biệt chống vấp chữ.",
+        f"✊ <b>Cơ Chế Động Lực Học Tay Cầm (Dynamic Grip Engine):</b> TỰ ĐỘNG nhận diện đúng kết cấu của ly/cốc. Nếu có quai thì cấm tay cầm hông, có tay cầm thì cấm quai xách. KOC tương tác tự nhiên vào đúng tay cầm gốc.",
+        f"🎙 <b>Lõi Âm thanh Studio (Studio-Quality Close-Mic):</b> Khử 100% tiếng vang phòng (Zero Reverb), cấm tuyệt đối giọng thuyết minh lồng tiếng (No narrator), dọn sạch ký tự đặc biệt chống vấp chữ.",
     ]
     if industry_badges: summary_lines.extend(industry_badges)
     if is_single_skirt_mode: summary_lines.append("👗 <b>Khóa Váy 1 Ống Rộng (Single Unsplit Skirt Tube Lock):</b> Đã chuyển đổi thành Maxi Skirt, chặn quần 2 ống trong Negative Prompt.")
@@ -1599,7 +1599,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
-            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (son lên môi, mặt nạ lên mặt, kem body lên tay). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT (bôi son thấy môi đỏ đậm, thoa kem thấy da bóng mướt glowing).
+            - VẬT LÝ SẢN PHẨM & MỸ PHẨM: Cần miêu tả CHÍNH XÁC loại quai xách (NO side handle...). NẾU LÀ MỸ PHẨM: Bắt buộc test đúng vị trí giải phẫu (mặt, môi, tay, nách, tóc). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
             TRẢ VỀ JSON:
             {{
@@ -1780,18 +1780,62 @@ all_sc = st.session_state.all_scripts + st.session_state.cloned_scripts + st.ses
 if all_sc:
     st.divider()
     
+    # --- VÙNG CÁCH LY CHỐNG BÓNG MA GIAO DIỆN (UI GHOSTING FIX) ---
     ui_action_ph = st.empty()
+    # -------------------------------------------------------------
 
     def is_generated(sc_id): return (str(sc_id) in st.session_state.generated_details or sc_id in st.session_state.generated_details)
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
+    if comp_sc:
+        st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
+        for outline in comp_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2, c3 = st.columns([2.5, 1, 1])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
+                if str(sc_id) != str(st.session_state.active_script_id):
+                    if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
+                        st.session_state.active_script_id = int(sc_id)
+                        st.session_state.scroll_to_detail = True
+                        st.rerun()
+                btn_clone_ph = c3.empty()
+                if str(st.session_state.current_cloning_id) == str(sc_id):
+                    if btn_clone_ph.button("🛑 Đang nhân bản... (Bấm để Hủy)", key=f"unhang_c_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.current_cloning_id = None; st.rerun()
+                else:
+                    if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email)
+                        if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
+                        else: st.error(msg)
+
+    if pend_sc:
+        st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
+        for outline in pend_sc:
+            sc_id = outline["id"]
+            with st.container(border=True):
+                c1, c2 = st.columns([3, 1.2])
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
+                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
+                btn_detail_ph = c2.empty()
+                if str(st.session_state.current_processing_id) == str(sc_id):
+                    if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
+                        st.session_state.current_processing_id = None; st.rerun()
+                else:
+                    if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
+                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
+                        if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
+                        else: st.error(msg)
+
+    # --- KHỐI XỬ LÝ CHÍNH ĐƯỢC CHẠY SAU KHI VẼ GIAO DIỆN (NẰM TRONG VÙNG CÁCH LY) ---
     if st.session_state.current_processing_id is not None:
         target_id_to_run = st.session_state.current_processing_id
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Động Lực Học Mỹ Phẩm)..."):
+                with st.spinner(f"⏳ Đang dựng nhanh kịch bản #{target_id_to_run} (Lõi Đạo Diễn AI Master 4.0)..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
@@ -1821,6 +1865,7 @@ if all_sc:
             st.session_state.scroll_to_top = True
             st.rerun()
         else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
+    # ---------------------------------------------------------------------------------
 
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
@@ -1884,47 +1929,6 @@ if all_sc:
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
             st.markdown("---")
-
-    if comp_sc:
-        st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
-        for outline in comp_sc:
-            sc_id = outline["id"]
-            with st.container(border=True):
-                c1, c2, c3 = st.columns([2.5, 1, 1])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
-                if str(sc_id) != str(st.session_state.active_script_id):
-                    if c2.button("👁 Xem lại", key=f"r_{sc_id}", use_container_width=True, disabled=is_system_busy):
-                        st.session_state.active_script_id = int(sc_id)
-                        st.session_state.scroll_to_detail = True
-                        st.rerun()
-                btn_clone_ph = c3.empty()
-                if str(st.session_state.current_cloning_id) == str(sc_id):
-                    if btn_clone_ph.button("🛑 Đang nhân bản... (Bấm để Hủy)", key=f"unhang_c_{sc_id}", type="secondary", use_container_width=True):
-                        st.session_state.current_cloning_id = None; st.rerun()
-                else:
-                    if btn_clone_ph.button("🚀 Nhân bản", key=f"c_{sc_id}", type="primary", use_container_width=True, disabled=is_system_busy):
-                        can_run, msg = check_usage_limit(st.session_state.current_email)
-                        if can_run: st.session_state.current_cloning_id = sc_id; st.rerun()
-                        else: st.error(msg)
-
-    if pend_sc:
-        st.markdown("### ⏳ **2. Kịch Bản Chờ Dựng**")
-        for outline in pend_sc:
-            sc_id = outline["id"]
-            with st.container(border=True):
-                c1, c2 = st.columns([3, 1.2])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
-                c1.caption(f"⚡ *{clean_and_normalize_voiceover(outline.get('hook', ''))}*")
-                btn_detail_ph = c2.empty()
-                if str(st.session_state.current_processing_id) == str(sc_id):
-                    if btn_detail_ph.button("🛑 Đang dựng... (Bấm để Hủy kẹt)", key=f"unhang_p_{sc_id}", type="secondary", use_container_width=True):
-                        st.session_state.current_processing_id = None; st.rerun()
-                else:
-                    if btn_detail_ph.button("✨ Tạo chi tiết ngay", key=f"cr_{sc_id}", type="secondary", use_container_width=True, disabled=is_system_busy):
-                        can_run, msg = check_usage_limit(st.session_state.current_email, is_detailing=True)
-                        if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
-                        else: st.error(msg)
 
     # ==========================================================================
     # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
