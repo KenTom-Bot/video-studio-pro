@@ -30,9 +30,6 @@ st.markdown("""
     .badge-pending { color: #d97706; font-weight: 700; background: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #fde68a; }
     .autosave-badge { color: #0369a1; font-weight: 700; background: #e0f2fe; padding: 4px 10px; border-radius: 6px; font-size: 12px; border: 1px solid #bae6fd; display: inline-block; margin-top: 4px; }
     .detail-header-box { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; color: #1e3a8a; line-height: 1.7; box-shadow: 0 2px 8px rgba(0,0,0,0.03); font-size: 14.5px; }
-    .full-script-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    .full-script-title { font-size: 17px; font-weight: 800; color: #b45309; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .full-script-content { font-size: 16px; color: #334155; line-height: 1.8; font-weight: 500; font-style: italic; }
     .preview-script { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 12px 16px; margin-top: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 14.5px; color: #334155; font-style: italic; line-height: 1.7; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
     .voiceover-text { color: #15803d; background: #f0fdf4; padding: 12px 14px; border-radius: 8px; font-size: 15.5px; border: 1px solid #bbf7d0; display: block; width: 100%; margin-top: 4px; line-height: 1.8; white-space: pre-line; }
     .timing-badge { font-size: 13.5px; font-weight: 700; color: #1e40af; background: #dbeafe; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; display: inline-block; margin-bottom: 6px; }
@@ -947,6 +944,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_setting_base = outline.get('setting', 'Không gian thực tế phù hợp')
+    # Lấy kịch bản thoại tổng thể đã được tạo từ bước trước
     full_vo_script = outline.get('full_voiceover_script', outline.get('hook', ''))
     
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
@@ -976,6 +974,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_footwear_accessory = detect_footwear_or_accessory(check_str)
     is_fashion_wearable = detect_wearable_fashion(check_str) and intimate_type == "normal" and not is_footwear_accessory
     is_single_skirt_mode = detect_single_tube_skirt(check_str)
+    
+    # ĐIỀU CHỈNH ĐÚNG TÊN BIẾN is_strict_appliance
     is_strict_appliance = detect_strict_rigid_appliance(check_str) and not is_fashion_wearable
     is_long_handle = detect_long_handle_tool(check_str + " " + ai_product_visual_en)
     
@@ -1000,7 +1000,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     footwear_match = re.search(r'Footwear:\s*([^|]+)', stylist_vibe_text)
     forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
 
-    action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type)
+    # Gọi hàm với is_strict_appliance
+    action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type)
     
     is_flashsale_script = any(k in f"{fixed_title} {full_vo_script} {presentation_format}".lower() for k in ["flash sale", "săn deal", "deal hời", "giảm sốc", "ưu đãi sốc", "xả kho"])
     scene_4_cta_data = f"Giá gốc khoảng {soft_orig_price}, nay ưu đãi chỉ còn khoảng {soft_sale_price}" if is_flashsale_script else f"Giá đang có ưu đãi cực sâu"
@@ -1137,6 +1138,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
         is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
         
+        # Gọi hàm với is_strict_appliance
         cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str)
         
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
@@ -1154,10 +1156,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             if not clean_act.lower().startswith("standing"):
                 clean_act = f"standing completely still with zero body rotation, {clean_act}"
 
-        if (is_fashion_wearable or is_footwear_accessory) and is_testing_scene:
-            scene_physics = "Physical demonstration physics: hands firmly gripping the product, showing material details up close, applying force to stretch or bend without deforming its core structure. NEVER dropping."
-        else:
-            scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_appliance=is_strict_appliance, is_long_handle=is_long_handle, is_food=is_food, is_cosmetics=is_cosmetics, is_mom_baby=is_mom_baby, is_medicine=is_medicine, is_mom_baby_hard=is_mom_baby_hard, intimate_type=intimate_type)
+        # Gọi hàm với is_strict_appliance
+        scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_appliance=is_strict_appliance, is_long_handle=is_long_handle, is_food=is_food, is_cosmetics=is_cosmetics, is_mom_baby=is_mom_baby, is_medicine=is_medicine, is_mom_baby_hard=is_mom_baby_hard, intimate_type=intimate_type)
 
         color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
         
