@@ -182,7 +182,7 @@ def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if t
 
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
-    commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('Pic'):
+    commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('?')
     return round((words / (4.8 if is_tiktok_shop else 4.0)) + (commas * (0.08 if is_tiktok_shop else 0.12)) + (periods * (0.12 if is_tiktok_shop else 0.20)), 1)
 
 def is_valid_phone(phone): return phone.strip().isdigit() and phone.strip().startswith('0') and 9 <= len(phone.strip()) <= 11
@@ -923,6 +923,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_setting_base = outline.get('setting', 'Không gian thực tế phù hợp')
+    # Lấy kịch bản thoại tổng thể đã được tạo từ bước trước
     full_vo_script = outline.get('full_voiceover_script', outline.get('hook', ''))
     
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
@@ -972,6 +973,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     dim_tag = f" ({dimensions_str})" if dimensions_str and len(dimensions_str) < 25 else ""
     color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
     
+    # 🌟 GỌI LÕI STYLIST TOÀN DIỆN MỚI
     stylist_vibe_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str, is_food, is_cosmetics, is_mom_baby, is_medicine)
     footwear_match = re.search(r'Footwear:\s*([^|]+)', stylist_vibe_text)
     forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
@@ -983,6 +985,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
+        # 🌟 CẬP NHẬT: ÉP AI PHẢI DỊCH HÀNH ĐỘNG TỪ THOẠI SANG TIẾNG ANH (VISUAL-VOICE SYNC)
         scene_1_action_inst = "CRITICAL: Translate the EXACT physical struggle/pain mentioned in the voiceover (e.g., groping in the dark for a switch, scratching red skin, shivering) into a literal English action description. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
@@ -1106,9 +1109,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         actual_speech = round(dynamic_sec - 0.8, 1) if raw_speech >= dynamic_sec else raw_speech
         cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
         
+        # 🌟 XỬ LÝ CHUẨN THỜI LƯỢNG CHO GIAO DIỆN
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
+        # 🌟 CẬP NHẬT: GỌI LÕI XỬ LÝ MÔI TRƯỜNG ĐỘNG CÓ BẮT TỪ KHÓA BÓNG TỐI
         env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text, scn.get("setting", fixed_setting_base))
         
         is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
@@ -1819,7 +1824,6 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
-    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
