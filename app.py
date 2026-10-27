@@ -479,7 +479,6 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
-# 🌟 CẬP NHẬT LÕI MÔI TRƯỜNG: BỔ SUNG TỪ KHÓA BÓNG TỐI ĐỂ TỰ ĐỘNG CHỈNH ĐÈN
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
@@ -664,6 +663,7 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid structure without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry", f"holding {clean_prod_en} securely with a confident open-palm gesture")
 
+# 🌟 LÕI THỜI TRANG TOÀN DIỆN (HOLISTIC FASHION VIBE ENGINE)
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -681,6 +681,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_single_skirt = detect_single_tube_skirt(s_lower)
     is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     
+    # KẾT HỢP CONCEPT (VIBE) TỔNG THỂ CẢ ÁO QUẦN VÀ GIÀY DÉP VÀO 1 LỆNH
     if is_bedroom:
         vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
     elif is_bathroom:
@@ -975,6 +976,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
 
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine)
+    
+    # 🌟 FIX: Bổ sung định nghĩa is_flashsale_script bị mất
+    is_flashsale_script = any(k in f"{fixed_title} {full_vo_script} {presentation_format}".lower() for k in ["flash sale", "săn deal", "deal hời", "giảm sốc", "ưu đãi sốc", "xả kho"])
     scene_4_cta_data = f"Giá gốc khoảng {soft_orig_price}, nay ưu đãi chỉ còn khoảng {soft_sale_price}" if is_flashsale_script else f"Giá đang có ưu đãi cực sâu"
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
@@ -1623,6 +1627,7 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu/Họa tiết Hero SKU: '{args['hero_sku_override']}'. NẾU CÓ NHIỀU MÀU TRONG ẢNH, CHỈ GIỮ LẠI ĐÚNG MÀU/HỌA TIẾT NÀY!" if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot. NẾU ẢNH CÓ HỌA TIẾT, BẮT BUỘC PHẢI MÔ TẢ CHI TIẾT HỌA TIẾT. NẾU ẢNH CÓ NHIỀU MÀU, CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU KHÁC!"
             skirt_note_rule = "ĐẶC BIỆT: Ghi chú có yêu cầu 'quần dạng váy 1 ống / quần váy', trong 'product_visual_en' BẮT BUỘC mô tả là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', TUYỆT ĐỐI CẤM dùng từ 'pants' hoặc 'trousers'!" if detect_single_tube_skirt(args["custom_note"]) else ""
 
+            # 🌟 LÕI THOẠI NGUYÊN KHỐI TẠI BƯỚC 1
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args["unified_strategy_format"]}'
             HERO SKU: {override_instruction}
@@ -1825,6 +1830,7 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
+    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
@@ -1950,7 +1956,7 @@ if all_sc:
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run}..."):
+                with st.spinner(f"⏳ Đang cắt cảnh & dựng prompt chi tiết cho kịch bản #{target_id_to_run}..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
