@@ -479,15 +479,23 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
+# 🌟 CẬP NHẬT LÕI MÔI TRƯỜNG: BỔ SUNG TỪ KHÓA BÓNG TỐI ĐỂ TỰ ĐỘNG CHỈNH ĐÈN
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
     is_indoor = not any(k in combined_text for k in outdoor_keywords)
-    if any(k in combined_text for k in ["mưa", "ẩm ướt", "nồm"]): return ("rain droplets on window, soft overcast indoor lighting" if is_indoor else "light rain, wet ground, overcast sky"), "subtle rain ambience (no reverb)"
-    elif any(k in combined_text for k in ["nắng", "trưa hè"]): return ("warm sunbeams through window" if is_indoor else "sunny daylight, golden sunbeams"), "subtle breeze ambience (no reverb)"
-    elif any(k in combined_text for k in ["sáng sớm", "buổi sáng", "bình minh"]): return "fresh morning sunlight", "subtle morning ambience (no reverb)"
-    elif any(k in combined_text for k in ["hoàng hôn", "chiều tà", "buổi chiều"]): return "warm amber sunset glow", "subtle evening ambience (no reverb)"
-    elif any(k in combined_text for k in ["ban đêm", "tối muộn", "buổi tối", "đi ngủ"]): return "cozy warm tungsten lamp lighting", "quiet nighttime ambience (no reverb)"
+    
+    if any(k in combined_text for k in ["đêm", "tối", "khuya", "tắt đèn", "mất điện", "đi ngủ", "night", "dark"]): 
+        return "dimly lit, cinematic low light, dark ambience", "quiet nighttime ambience (no reverb)"
+    elif any(k in combined_text for k in ["mưa", "ẩm ướt", "nồm"]): 
+        return ("rain droplets on window, soft overcast indoor lighting" if is_indoor else "light rain, wet ground, overcast sky"), "subtle rain ambience (no reverb)"
+    elif any(k in combined_text for k in ["nắng", "trưa hè"]): 
+        return ("warm sunbeams through window" if is_indoor else "sunny daylight, golden sunbeams"), "subtle breeze ambience (no reverb)"
+    elif any(k in combined_text for k in ["sáng sớm", "buổi sáng", "bình minh"]): 
+        return "fresh morning sunlight", "subtle morning ambience (no reverb)"
+    elif any(k in combined_text for k in ["hoàng hôn", "chiều tà", "buổi chiều"]): 
+        return "warm amber sunset glow", "subtle evening ambience (no reverb)"
+        
     return ("clean natural daylight with soft warm fill light" if is_indoor else "bright commercial daylight"), ""
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
@@ -547,7 +555,6 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     if not text_to_check: return False
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
-# 🌟 PHÂN TÍCH GIẢI PHẪU MỸ PHẨM (TÁCH BIỆT SON MÀU & SÁP DƯỠNG)
 def get_cosmetic_target(product_name, check_str):
     p_cos = f"{product_name} {check_str}".lower()
     if any(k in p_cos for k in ["môi", "lip", "son"]):
@@ -657,7 +664,6 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid structure without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry", f"holding {clean_prod_en} securely with a confident open-palm gesture")
 
-# 🌟 LÕI THỜI TRANG TOÀN DIỆN (HOLISTIC FASHION VIBE ENGINE)
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -675,7 +681,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_single_skirt = detect_single_tube_skirt(s_lower)
     is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     
-    # KẾT HỢP CONCEPT (VIBE) TỔNG THỂ CẢ ÁO QUẦN VÀ GIÀY DÉP VÀO 1 LỆNH
     if is_bedroom:
         vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
     elif is_bathroom:
@@ -966,12 +971,16 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     # 🌟 GỌI LÕI STYLIST TOÀN DIỆN MỚI
     stylist_vibe_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str, is_food, is_cosmetics, is_mom_baby, is_medicine)
+    footwear_match = re.search(r'Footwear:\s*([^|]+)', stylist_vibe_text)
+    forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
 
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine)
+    scene_4_cta_data = f"Giá gốc khoảng {soft_orig_price}, nay ưu đãi chỉ còn khoảng {soft_sale_price}" if is_flashsale_script else f"Giá đang có ưu đãi cực sâu"
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
-        scene_1_action_inst = "speaking actively from 0.0s while physically demonstrating the SPECIFIC physical problem mentioned in the hook (e.g., vigorously scratching a red itchy rash on skin, struggling to pull up slipping socks from shoes, looking into a filthy washing machine drum) - EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME"
+        # 🌟 CẬP NHẬT: ÉP AI PHẢI DỊCH HÀNH ĐỘNG TỪ THOẠI SANG TIẾNG ANH (VISUAL-VOICE SYNC)
+        scene_1_action_inst = "CRITICAL: Translate the EXACT physical struggle/pain mentioned in the voiceover (e.g., groping in the dark for a switch, scratching red skin, shivering) into a literal English action description. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
@@ -986,7 +995,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     NHIỆM VỤ ĐẠO DIỄN:
     1. Dùng "kéo" cắt đoạn thoại trên thành 4 phần hợp lý để điền vào trường "voiceover" của 4 cảnh (TUYỆT ĐỐI KHÔNG VIẾT LẠI THOẠI KHÁC).
-    2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng.
+    2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng. ĐẶC BIỆT LƯU Ý Ở CẢNH 1: MÔ TẢ ĐÚNG HÀNH ĐỘNG ĐÓ BẰNG TIẾNG ANH VÀO 'action_en'.
     - VẬT LÝ MÁY MÓC: Giữ nguyên đầu hút/phụ kiện đang có trong ảnh tham chiếu. NẾU ẢNH LÀ MÁY CẦM TAY NGẮN, BẮT BUỘC PHẢI GHI "NO long stick, NO floor brush" để cấm AI tự vẽ thêm cán dài hút sàn.
     - VẬT LÝ MỸ PHẨM: Test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
 
@@ -1005,7 +1014,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "{'frustrated and troubled expression' if is_pas_story else 'lively, engaging expression'}",
                 "action_en": "{scene_1_action_inst} (under 25 words)",
                 "sfx": "Foley thực tế (không nhạc)",
-                "director": "Attention | {'Trực tiếp mô tả hình ảnh nỗi đau vật lý (TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM Ở CẢNH NÀY)' if is_pas_scn1_no_prod else 'Đưa sản phẩm ra tiền cảnh'}",
+                "director": "Attention | {'Trực tiếp mô tả hình ảnh nỗi đau vật lý KHỚP VỚI LỜI THOẠI (TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM Ở CẢNH NÀY)' if is_pas_scn1_no_prod else 'Đưa sản phẩm ra tiền cảnh'}",
                 "voiceover": "Trích chính xác phần đầu của kịch bản thoại gốc..."
             }},
             {{
@@ -1038,7 +1047,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         ]
     }}
     """
-    sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, "shoes", target_id)
+    sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, forced_footwear, target_id)
     
     # 🌟 VÒNG LẶP TỰ PHỤC HỒI CHỐNG ĐỨT GÃY JSON (AUTO-RETRY LOOP)
     scenes, w_lock, master_setting_en = [], {}, "clean minimalist modern setting"
@@ -1099,6 +1108,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
+        # 🌟 CẬP NHẬT: GỌI LÕI XỬ LÝ MÔI TRƯỜNG ĐỘNG CÓ BẮT TỪ KHÓA BÓNG TỐI
         env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text, scn.get("setting", fixed_setting_base))
         
         is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
@@ -1940,7 +1950,7 @@ if all_sc:
         success, error_msg = False, ""
         with ui_action_ph.container():
             try:
-                with st.spinner(f"⏳ Đang cắt cảnh & dựng prompt chi tiết cho kịch bản #{target_id_to_run}..."):
+                with st.spinner(f"⏳ Đang dựng kịch bản #{target_id_to_run}..."):
                     create_scene_details(target_id_to_run, st.session_state.last_mode, "Điện Ảnh Chân Thực")
                     st.session_state.active_script_id = int(target_id_to_run)
                     success = True
