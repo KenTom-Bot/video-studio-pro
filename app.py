@@ -71,12 +71,12 @@ COMPACT_CORE_RULES = """
    - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
    - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
-4. LÕI THOẠI NGUYÊN KHỐI (MONOLITHIC NARRATIVE):
-   - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Phải viết một ĐOẠN THOẠI TỔNG THỂ duy nhất trước, mang đậm chất KOC review thực chiến: Nhịp độ nhanh, dồn dập, gãi đúng chỗ ngứa khách hàng, đập ngay giải pháp, show lợi ích thực tế, chốt sale khéo léo nhưng dứt khoát. 
-   - Sau khi viết đoạn thoại tổng thể xuất sắc này, hãy CHIA NÓ RA LÀM 4 PHẦN liền mạch để cho vào 4 cảnh.
+4. LÕI THOẠI NGUYÊN KHỐI (MONOLITHIC NARRATIVE) - ĐỈNH CAO KOC:
+   - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Viết một đoạn thoại tổng thể duy nhất cực kỳ mượt mà, cuốn hút như KOC thực chiến tâm sự.
+   - CẤM LẶP TỪ & CẤM DỊCH SÁT NGHĨA (Word-by-word): Tuyệt đối không viết những câu ngớ ngẩn lặp từ như "form hộp đứng form". Cấm dùng các cụm từ máy móc, tối nghĩa như "luồn da", "chần chỉ ô trám cực nét". Hãy chuyển hóa thành ngôn ngữ sang chảnh, dễ hiểu (VD: "form dáng cứng cáp", "dây xích phối da", "da chần trám tinh tế").
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm lặp từ "giảm giá", cấm "ngay tay". Hãy chốt tự nhiên, giục giã (VD: "Deal đang cực hời, múc ngay thôi chị em ơi", "Bấm góc trái màn hình chốt luôn kẻo lỡ size nhé").
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT & TỪ VỰNG:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại. KHÔNG sáo rỗng.
-   - CẤM các từ lủng củng ở cảnh chốt sale (Cấm "ngay tay", cấm lặp từ). Hãy chốt tự nhiên (VD: múc ngay thôi, chốt luôn kẻo lỡ size).
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -348,14 +348,28 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\b14\b', 'mười bốn'), (r'\b24\b', 'hai mươi bốn'), (r'\b34\b', 'ba mươi bốn'),
         (r'\b40\b', 'bốn mươi'), (r'\b44\b', 'bốn mươi bốn'), (r'\b4\b', 'bốn'),
         (r'\bmười\s+(?:tư|tứ)\b', 'mười bốn'), (r'\bhai\s+(?:tư|tứ)\b', 'hai mươi bốn'),
-        (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'), (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'), (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn')
+        (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'), (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'), (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn'),
+        
+        # 🌟 CẬP NHẬT TỪ ĐIỂN CHỐNG SƯỢNG / DỊCH WORD-BY-WORD
+        (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'),
+        (r'\bluồn\s*da\b', 'phối da'),
+        (r'\bchần\s*chỉ\s*ô\s*trám\b', 'chần trám'),
+        (r'\bchần\s*chỉ\s*hình\s*thoi\b', 'chần trám'),
+        (r'\bđứng\s*form\b', 'giữ form'),
+        (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'),
+        (r'\bdáng\s*mảnh\s*chuẩn\s*phong\s*cách\b', 'thiết kế mảnh chuẩn style'),
+        (r'\bcực\s*nét\b', 'cực xịn')
     ]: cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     
     cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
     cleaned = re.sub(r'\.{2,}', ',', cleaned)
     cleaned = re.sub(r'[-~*]', '', cleaned)
+    # Lọc dọn dẹp lỗi cụm từ lặp nhau nếu có
     cleaned = re.sub(r'\bgiảm\s*giá\s*giảm\s*giá\b', 'giảm giá', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bgiá\s*đang\s*giá\b', 'giá đang', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bchốt\s*ngay\s*tay\b', 'chốt ngay', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
 
@@ -439,7 +453,7 @@ def detect_strict_rigid_appliance(text_to_check: str) -> bool:
         "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", 
         "pan", "pot", "tool", "vacuum", "dryer", "blower", "hút bụi",
         "tai nghe", "headphone", "earbud", "earphone", "bluetooth", "điện thoại", "phone", "loa", "speaker", 
-        "sạc", "chuột", "bàn phím", "mic"
+        "sạc", "chuột", "bàn phím", "mic", "túi xách", "túi", "balo", "ví"
     ]
     return any(k in text_to_check.lower() for k in appliance_keywords)
 
@@ -1025,7 +1039,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     footwear_match = re.search(r'Footwear:\s*([^|]+)', stylist_vibe_text)
     forced_footwear = footwear_match.group(1).strip() if footwear_match else "clean minimalist white sneakers"
 
-    # 🌟 GỌI HÀM ĐÃ FIX TÊN BIẾN
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type)
     
     is_flashsale_script = any(k in f"{fixed_title} {full_vo_script} {presentation_format}".lower() for k in ["flash sale", "săn deal", "deal hời", "giảm sốc", "ưu đãi sốc", "xả kho"])
@@ -1184,9 +1197,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             if not clean_act.lower().startswith("standing"):
                 clean_act = f"standing completely still with zero body rotation, {clean_act}"
 
-        # 🌟 GỌI HÀM VẬT LÝ VỚI BIẾN KHÓA CHỮ A & BIẾN APPLIANCE ĐÚNG
         scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_strict_appliance=is_strict_appliance, is_long_handle=is_long_handle, is_food=is_food, is_cosmetics=is_cosmetics, is_mom_baby=is_mom_baby, is_medicine=is_medicine, is_mom_baby_hard=is_mom_baby_hard, intimate_type=intimate_type, is_aline_skirt=is_aline_skirt)
 
+        color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
+        
         if is_strict_appliance or is_mom_baby_hard: 
             locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, exact original nozzle/attachment, and surface details. Zero hallucinated parts."
         elif is_food or is_cosmetics or is_mom_baby or is_medicine: 
@@ -1869,7 +1883,6 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
-    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
