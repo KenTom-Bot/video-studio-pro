@@ -72,7 +72,7 @@ COMPACT_CORE_RULES = """
    - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ. Hành động test tạo ra SỰ THAY ĐỔI THỊ GIÁC RÕ RÀNG khớp với sản phẩm.
+   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
 4. LÕI THOẠI NGUYÊN KHỐI (MONOLITHIC NARRATIVE):
    - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Phải viết một ĐOẠN THOẠI TỔNG THỂ duy nhất trước, mang đậm chất KOC review thực chiến: Nhịp độ nhanh, dồn dập, gãi đúng chỗ ngứa khách hàng, đập ngay giải pháp, show lợi ích thực tế, chốt sale khéo léo nhưng dứt khoát. 
    - Sau khi viết đoạn thoại tổng thể xuất sắc này, hãy CHIA NÓ RA LÀM 4 PHẦN liền mạch để cho vào 4 cảnh.
@@ -979,7 +979,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
     MÔ TẢ TIẾNG ANH: {clean_prod_en}. 
     Kịch bản #{target_id}: '{fixed_title}' | Bối cảnh gốc: '{fixed_setting_base}'
-    KOC: {detected_demographic_en} | {stylist_rules_text}
+    KOC: {detected_demographic_en} | {stylist_vibe_text}
     
     LỜI THOẠI ĐÃ ĐƯỢC PHÊ DUYỆT (BẮT BUỘC DÙNG NGUYÊN VĂN):
     "{full_vo_script}"
@@ -1071,7 +1071,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     appliance_neg_extra = "changing nozzle, adding extension stick, swapping brush head, mutating attachment, hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
     color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     
-    # LỌC NGƯỢC GIÀY DÉP TỪ VIBE ĐỂ BƠM VÀO NEGATIVE PROMPT
     dynamic_footwear_neg = ""
     vibe_lower = stylist_vibe_text.lower()
     if any(k in vibe_lower for k in ["barefoot", "slipper"]): dynamic_footwear_neg = "sneakers, sports shoes, running shoes, leather shoes, dress shoes, high heels, boots, outside shoes, "
@@ -1816,7 +1815,6 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
-    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
@@ -1827,7 +1825,6 @@ if all_sc:
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title', '')).upper()}**")
         
-        # 🌟 GIAO DIỆN MỚI: BẢNG DUYỆT THOẠI TRƯỚC (PRE-READ SCRIPT)
         if "full_voiceover_script" in asc and asc["full_voiceover_script"].strip():
             st.markdown(f"""
             <div class='full-script-box'>
@@ -1900,7 +1897,6 @@ if all_sc:
             with st.container(border=True):
                 c1, c2, c3 = st.columns([2.5, 1, 1])
                 c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
-                # Thay thế Hook bằng Preview Full Voiceover
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
                 
@@ -1926,7 +1922,6 @@ if all_sc:
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
                 c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
-                # 🌟 GIAO DIỆN MỚI: BẢNG DUYỆT THOẠI TRƯỚC (PRE-READ SCRIPT) TẠI LIST
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
                 
