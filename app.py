@@ -182,7 +182,7 @@ def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if t
 
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
-    commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('?')
+    commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('Pic'):
     return round((words / (4.8 if is_tiktok_shop else 4.0)) + (commas * (0.08 if is_tiktok_shop else 0.12)) + (periods * (0.12 if is_tiktok_shop else 0.20)), 1)
 
 def is_valid_phone(phone): return phone.strip().isdigit() and phone.strip().startswith('0') and 9 <= len(phone.strip()) <= 11
@@ -679,8 +679,13 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_single_skirt = detect_single_tube_skirt(s_lower)
     is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     
+    # 🌟 ƯU TIÊN SỐ 1: GHI ĐÈ THEO NGÀNH HÀNG ĐẶC THÙ (PRODUCT OVERRIDE SETTING)
+    if intimate_type == "underwear_bra":
+        vibe = "Intimate Apparel Review (Wearing a premium soft silk robe, cozy bathrobe, or comfortable loose homewear, UNTUCKED, barefoot or fluffy slippers)"
+    elif intimate_type == "camisole":
+        vibe = "Casual Loungewear (Wearing a stylish oversized cardigan layered over the product, comfy shorts, UNTUCKED, barefoot or indoor slippers)"
     # KẾT HỢP CONCEPT (VIBE) TỔNG THỂ CẢ ÁO QUẦN VÀ GIÀY DÉP VÀO 1 LỆNH
-    if is_bedroom:
+    elif is_bedroom:
         vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
     elif is_bathroom:
         vibe = "Bathroom/Washroom (Bathrobe or comfortable home wear, UNTUCKED, barefoot or plastic anti-slip slippers)"
@@ -918,7 +923,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     fixed_title = outline.get('title', 'Kịch bản chi tiết')
     fixed_setting_base = outline.get('setting', 'Không gian thực tế phù hợp')
-    # Lấy kịch bản thoại tổng thể đã được tạo từ bước trước
     full_vo_script = outline.get('full_voiceover_script', outline.get('hook', ''))
     
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
@@ -1815,6 +1819,7 @@ if all_sc:
     comp_sc = [sc for sc in all_sc if is_generated(sc.get("id"))]
     pend_sc = [sc for sc in all_sc if not is_generated(sc.get("id"))]
 
+    # --- 🌟 KHỐI CHI TIẾT KỊCH BẢN (TRÊN CÙNG) 🌟 ---
     if st.session_state.active_script_id is not None:
         if st.button("🔼 Thu gọn kịch bản chi tiết", disabled=is_system_busy):
             st.session_state.active_script_id = None; st.rerun()
@@ -1964,7 +1969,7 @@ if all_sc:
         else: st.error(f"❌ Lỗi khi nhân bản kịch bản: {error_msg}")
 
     # ==========================================================================
-    # KHU VỰC GỌI THÊM 5 KỊCH BẢN MỚI
+    # KHU VỰC GỌI THÊM 3 KỊCH BẢN MỚI
     # ==========================================================================
     st.divider()
     st.markdown("### ➕ **Gọi Thêm 3 Kịch Bản Mới**")
