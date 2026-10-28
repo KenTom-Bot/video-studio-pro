@@ -70,14 +70,15 @@ COMPACT_CORE_RULES = """
    - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, má hồng lên má, mặt nạ lên mặt, kem body lên tay.
-4. LÕI THOẠI NGUYÊN KHỐI & CHỐNG LẶP TỪ CHUYÊN GIA (CRITICAL):
-   - CẤM TUYỆT ĐỐI lặp từ trong cùng 1 câu (VD: Cấm "giá đang giảm giá", cấm "form hộp đứng form"). Dùng từ linh hoạt, sắc sảo như Biên tập viên thời trang: "form dáng cứng cáp", "chất liệu đứng form", "ưu đãi cực hời".
-   - CẤM dịch sát nghĩa máy móc (Cấm "luồn da", "chần chỉ ô trám cực nét"). Thay bằng "xích phối da", "da chần trám tinh xảo".
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm lặp từ "giảm giá", cấm "ngay tay". Chốt tự nhiên: "Đang có deal cực hời, các bác chốt liền tay kẻo lỡ size nhé", "Mức giá quá êm, nhấp ngay góc trái múc luôn nha".
-   - Viết trơn tru, liền mạch, dồn dập, gãi đúng chỗ ngứa.
+   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, má hồng lên má, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
+4. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ (CRITICAL):
+   - NHẬP VAI: Bạn là một KOC/Chiến thần chốt đơn Top 1 TikTok. Lời thoại phải CỰC KỲ TỰ NHIÊN, dồn dập, cuốn hút như đang livestream hoặc tâm sự trực tiếp với hội chị em. TUYỆT ĐỐI KHÔNG VIẾT RỜI RẠC.
+   - TỪ VỰNG TRENDY: Dùng từ ngữ tự nhiên, gần gũi (VD: "chân ái", "em này", "mấy bà", "chị em", "múc ngay", "deal hời", "đỉnh chóp", "cực êm"). 
+   - CẤM VĂN MẪU ROBOT: Tuyệt đối cấm viết kiểu "Sản phẩm này có tính năng...", "Với thiết kế...". Cấm liệt kê khô khan.
+   - CHỐNG LẶP TỪ & CHỐNG SƯỢNG TUYỆT ĐỐI: Không được lặp từ trong cùng một câu (Cấm "giá đang giảm giá", cấm "form váy đứng form"). Cấm dịch word-by-word (Cấm "luồn da", cấm "chần chỉ"). Hãy linh hoạt dùng "form dáng chuẩn", "thiết kế sắc nét", "xích phối da".
+   - CHỐT SALE (CTA) TỰ NHIÊN: Cấm "ngay tay". Cảnh chốt sale phải giục giã, cấp bách tự nhiên: "Deal hôm nay quá êm, mấy bà nhấp góc trái múc luôn kẻo hết màu nha!".
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT:
-   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
+   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại. KHÔNG sáo rỗng.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -348,7 +349,7 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bmười\s+(?:tư|tứ)\b', 'mười bốn'), (r'\bhai\s+(?:tư|tứ)\b', 'hai mươi bốn'),
         (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'), (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'), (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn'),
         
-        # 🌟 TỪ ĐIỂN CHỐNG SƯỢNG / DỊCH WORD-BY-WORD
+        # 🌟 BỘ TỪ ĐIỂN CHỐNG DỊCH WORD-BY-WORD (SƯỢNG TRÂN)
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'),
         (r'\bform\s*dáng\s*đứng\s*form\b', 'lên dáng chuẩn xác'),
         (r'\bluồn\s*da\b', 'phối da'),
@@ -356,27 +357,30 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bchần\s*chỉ\s*hình\s*thoi\b', 'chần trám tinh tế'),
         (r'\bđứng\s*form\b', 'giữ form'),
         (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'),
-        (r'\bdáng\s*mảnh\s*chuẩn\s*phong\s*cách\b', 'thiết kế mảnh chuẩn style'),
+        (r'\bdáng\s*mảnh\s*chuẩn\s*phong\s*cách\b', 'thiết kế chuẩn style'),
         (r'\bcực\s*nét\b', 'cực xịn'),
         (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
         (r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ'),
-        (r'\bchốt\s*ngay\s*tay\b', 'chốt ngay'),
-        (r'\bliền\s*tay\b', 'ngay nhé')
+        (r'\bchốt\s*ngay\s*tay\b', 'chốt liền tay'),
+        (r'\bliền\s*tay\b', 'ngay nhé'),
+        (r'\bvừa\s*vặn\s*vừa\b', 'rất vừa vặn'),
+        (r'\bsang\s*chảnh\s*sang\b', 'cực kỳ sang chảnh'),
+        (r'\bđẹp\s*đẹp\b', 'tuyệt đẹp')
     ]: cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     
     cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
     cleaned = re.sub(r'\.{2,}', ',', cleaned)
     cleaned = re.sub(r'[-~*]', '', cleaned)
     
-    # 🌟 BỘ LỌC CHỐNG VẤP THOẠI (STUTTER/ECHO FILTER)
-    # 1. Chống vấp cụm từ (2-4 từ lặp lại liên tiếp, vd: "sản phẩm sản phẩm", "cực kỳ cực kỳ")
+    # 🌟 LÕI NLP CHỐNG VẤP THOẠI (STUTTER/ECHO FILTER)
+    # 1. Chống lặp cụm từ (2-4 từ lặp liên tiếp, vd: "sản phẩm sản phẩm", "cực kỳ cực kỳ")
     cleaned = re.sub(r'\b(\w+(?:\s+\w+){1,3})\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
-    # 2. Chống vấp từ đơn (chỉ nhắm vào từ nối, đại từ, danh từ cơ bản để không xóa nhầm từ láy tiếng Việt như "luôn luôn", "xa xa")
+    # 2. Chống lặp từ đơn chức năng (tránh xóa nhầm từ láy tiếng Việt như "luôn luôn", "xa xa")
     cleaned = re.sub(r'\b(là|và|thì|mà|có|đang|đã|sẽ|giá|các|những|một|chiếc|cái|em|mình|tôi|bạn|mua|bấm|chốt|nhanh|này|kia|đó|đây)\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
     
     # Lọc dọn dẹp lỗi cụm từ lặp nhau đặc thù khác
     cleaned = re.sub(r'\bgiá\s*đang\s*giá\b', 'giá đang', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bđẹp\s*đẹp\b', 'rất đẹp', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bđang\s*có\s*đang\s*có\b', 'đang có', cleaned, flags=re.IGNORECASE)
     
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
@@ -967,12 +971,12 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Chia sẻ mẹo/kiến thức/câu chuyện, KHÔNG bán hàng, KHÔNG giá)" if is_viral else "TIKTOK SHOP (Chuyển đổi bán hàng, giải quyết nỗi đau, chốt deal)"
-    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG: {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- 3 kịch bản = 3 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.\n- Bắt buộc tạo full_voiceover_script hoàn chỉnh, văn phong mượt mà, KHÔNG rời rạc."
+    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG: {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- 3 kịch bản = 3 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.\n- Bắt buộc tạo full_voiceover_script hoàn chỉnh, CỰC KỲ TỰ NHIÊN, KHÔNG lặp từ."
 
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False, forced_footwear="sneakers", target_id=1):
     is_viral = ("Viral" in mode)
     pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP làm TRỌNG TÂM TIỀN CẢNH giải quyết vấn đề." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM TIỀN CẢNH xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
-    return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG (BẮT BUỘC TUÂN THỦ TUYỆT ĐỐI): {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- LỜI THOẠI PHẢI LIỀN MẠCH. KHÔNG viết các câu rời rạc, lủng củng. Phải có tính kết nối như đang tâm sự."
+    return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n{f'🛑 CHỈ THỊ ƯU TIÊN SỐ 1 TỪ NGƯỜI DÙNG (BẮT BUỘC TUÂN THỦ TUYỆT ĐỐI): {custom_note}' if custom_note else ''}\n{COMPACT_CORE_RULES}\n- LỜI THOẠI PHẢI LIỀN MẠCH, TỰ NHIÊN. KHÔNG lặp từ, KHÔNG lủng củng."
 
 # ==============================================================================
 # 9. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
@@ -1073,12 +1077,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Dùng "kéo" cắt đoạn thoại trên thành 4 phần hợp lý để điền vào trường "voiceover" của 4 cảnh (TUYỆT ĐỐI KHÔNG VIẾT LẠI THOẠI KHÁC).
     2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng. ĐẶC BIỆT LƯU Ý Ở CẢNH 1: MÔ TẢ ĐÚNG HÀNH ĐỘNG ĐÓ BẰNG TIẾNG ANH VÀO 'action_en'.
-    - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. Nếu thoại rủ "đi cafe", bối cảnh BẮT BUỘC là "coffee shop / cafe". Nếu thoại "đi làm", bối cảnh là "office". CẤM set bối cảnh "phòng ngủ (bedroom)" nếu KOC đang nói về việc đi chơi ngoài phố/đi cafe/đi làm.
+    - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. Nếu thoại rủ "đi cafe", bối cảnh BẮT BUỘC là "coffee shop / cafe". CẤM set "bedroom".
 
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "title": "{fixed_title}",
-        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'stylish coffee shop with natural sunlight'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung. CRITICAL: Must strictly match the location mentioned in the voiceover. NO BEDROOM if the voiceover is about going out/cafe.",
+        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'stylish coffee shop with natural sunlight'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung. CRITICAL: NO BEDROOM if the voiceover is about going out/cafe.",
         "wardrobe_lock": {{
             "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN, cực kỳ thời trang. (Ghi rõ: loại áo, độ dài tay áo, có sơ vin không, kết hợp giày gì).",
             "master_character_en": "CRITICAL: Define the EXACT outfit down to the sleeve length and tucking. E.g., 'wearing a fitted short-sleeve mocha brown button-up cropped blazer, paired with [Product], and nude pointed-toe high heels.' MUST NOT contain 'or', 'maybe'. This EXACT string locks the outfit across 4 scenes."
@@ -1287,9 +1291,9 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
         ]
     }}
     """
@@ -1322,9 +1326,9 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
         ]
     }}
     """
