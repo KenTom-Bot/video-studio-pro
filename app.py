@@ -70,12 +70,13 @@ COMPACT_CORE_RULES = """
    - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
-4. LÕI THOẠI NGUYÊN KHỐI (MONOLITHIC NARRATIVE) - ĐỈNH CAO KOC:
-   - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Phải viết một ĐOẠN THOẠI TỔNG THỂ duy nhất trước, mang đậm chất KOC review thực chiến.
-   - CẤM LẶP TỪ & CẤM DỊCH SÁT NGHĨA: Tuyệt đối không viết "form hộp đứng form". Cấm "luồn da", "chần chỉ ô trám cực nét". Hãy dùng "form dáng cứng cáp", "dây xích phối da", "da chần trám tinh tế".
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm lặp từ "giảm giá", cấm "ngay tay". Chốt tự nhiên: "Đang có deal cực hời, múc ngay thôi chị em ơi".
-5. VĂN NÓI HÀ NỘI THUẦN VIỆT & TỪ VỰNG:
+   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, má hồng lên má, mặt nạ lên mặt, kem body lên tay.
+4. LÕI THOẠI NGUYÊN KHỐI & CHỐNG LẶP TỪ CHUYÊN GIA (CRITICAL):
+   - CẤM TUYỆT ĐỐI lặp từ trong cùng 1 câu (VD: Cấm "giá đang giảm giá", cấm "form hộp đứng form"). Dùng từ linh hoạt, sắc sảo như Biên tập viên thời trang: "form dáng cứng cáp", "chất liệu đứng form", "ưu đãi cực hời".
+   - CẤM dịch sát nghĩa máy móc (Cấm "luồn da", "chần chỉ ô trám cực nét"). Thay bằng "xích phối da", "da chần trám tinh xảo".
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm lặp từ "giảm giá", cấm "ngay tay". Chốt tự nhiên: "Đang có deal cực hời, các bác chốt liền tay kẻo lỡ size nhé", "Mức giá quá êm, nhấp ngay góc trái múc luôn nha".
+   - Viết trơn tru, liền mạch, dồn dập, gãi đúng chỗ ngứa.
+5. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 """
 
@@ -149,10 +150,7 @@ SOUTHERN_TO_HANOI = {
     r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật',
     r'\bmắc\s+cỡ\b': 'ngại', r'\bhết\s+sẩy\b': 'tuyệt cú mèo', r'\brẻ\s+bèo\b': 'rẻ thế',
     r'\bquá\s+trời\b': 'rất nhiều', r'\bquá\s+chừng\b': 'rất nhiều', r'\bnè\b': 'này', r'\bnha\b': 'nhé',
-    r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bcoi\b': 'xem', r'\bmua\s+liền\b': 'mua ngay',
-    r'\bliền\s+tay\b': 'luôn nhé', r'\bbữa\s+nay\b': 'hôm nay', r'\bbữa\s+hổm\b': 'hôm trước',
-    r'\bhổm\s+rày\b': 'dạo này', r'\bmấy\s+chế\b': 'các chị em', r'\bmấy\s+bà\b': 'các chị em',
-    r'\bmấy\s+bồ\b': 'các bạn', r'\bưng\s+bụng\b': 'vừa ý'
+    r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bcoi\b': 'xem', r'\bmua\s+liền\b': 'mua ngay'
 }
 
 # ==============================================================================
@@ -394,7 +392,7 @@ def format_analysis_field(field_val) -> str:
     if isinstance(field_val, dict): return "<br>".join([f"<span class='dna-label'>{str(k).replace('_', ' ').title()}:</span> <span class='dna-text'>{clean_analysis_text(v)}</span>" for k, v in field_val.items()])
     if isinstance(field_val, list): return "<br>".join([f"<div class='dna-bullet'>• <span class='dna-text'>{clean_analysis_text(item)}</span></div>" for item in field_val])
     val_str = clean_analysis_text(str(field_val))
-    return "".join([f"<div class='dna-bullet'>• <span class='dna-text'>{line.strip()}</span></div>" for line in val_str.split('<br>') if line.strip()])
+    return "".join([f"<div class='dna-bullet'>• <span class='dna-text'>{line.strip()}</span></div>" for line in val_str.split('<br>') if line.strip())]
 
 def format_product_name_bold(text: str) -> str:
     if not text: return ""
@@ -436,7 +434,7 @@ def detect_food(text_to_check: str) -> bool:
 
 def detect_cosmetics(text_to_check: str) -> bool:
     if not text_to_check: return False
-    keywords = ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách", "sáp", "nẻ", "vaseline", "balm"]
+    keywords = ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách", "sáp", "nẻ", "vaseline", "balm", "má", "blush", "cheek"]
     return any(k in text_to_check.lower() for k in keywords)
 
 def detect_mom_baby(text_to_check: str) -> bool:
@@ -580,9 +578,12 @@ def detect_long_handle_tool(text_to_check: str) -> bool:
     if not text_to_check: return False
     return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
 
+# 🌟 LÕI GIẢI PHẪU MỸ PHẨM ĐÃ ĐƯỢC TỐI ƯU GHI ĐÈ ƯU TIÊN (Cheek > Lips)
 def get_cosmetic_target(product_name, check_str):
     p_cos = f"{product_name} {check_str}".lower()
-    if any(k in p_cos for k in ["môi", "lip", "son"]):
+    if any(k in p_cos for k in ["má", "blush", "cheek"]):
+        return "cheeks", "instantly leaving a soft, natural, and radiant flush of color smoothly blended onto the skin"
+    elif any(k in p_cos for k in ["môi", "lip", "son"]):
         if any(k in p_cos for k in ["dưỡng", "nẻ", "sáp", "balm", "chapstick", "mask", "vaseline", "treatment"]):
             return "lips", "instantly leaving a clear, highly glossy, deeply hydrated and plump finish without altering the natural lip color"
         else:
@@ -1288,7 +1289,7 @@ def clone_script(script_id):
     {{
         "outlines": [
             {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
             {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
         ]
     }}
