@@ -70,7 +70,7 @@ COMPACT_CORE_RULES = """
    - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
+   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay.
 4. LÕI THOẠI NGUYÊN KHỐI (MONOLITHIC NARRATIVE) - ĐỈNH CAO KOC:
    - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Phải viết một ĐOẠN THOẠI TỔNG THỂ duy nhất trước, mang đậm chất KOC review thực chiến.
    - CẤM LẶP TỪ & CẤM DỊCH SÁT NGHĨA: Tuyệt đối không viết "form hộp đứng form". Cấm "luồn da", "chần chỉ ô trám cực nét". Hãy dùng "form dáng cứng cáp", "dây xích phối da", "da chần trám tinh tế".
@@ -332,7 +332,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
-    """Loại bỏ các ký hiệu đặc biệt, dấu chấm lửng để AI đọc mượt mà không vấp, loại bỏ lỗi lặp từ."""
+    """Lưới lọc ngôn ngữ tự nhiên: Chống lặp từ, chống vấp thoại, dịch word-by-word và dọn dẹp ký tự thừa."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
@@ -352,24 +352,34 @@ def clean_and_normalize_voiceover(text: str) -> str:
         
         # 🌟 TỪ ĐIỂN CHỐNG SƯỢNG / DỊCH WORD-BY-WORD
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'),
+        (r'\bform\s*dáng\s*đứng\s*form\b', 'lên dáng chuẩn xác'),
         (r'\bluồn\s*da\b', 'phối da'),
         (r'\bchần\s*chỉ\s*ô\s*trám\b', 'chần trám'),
-        (r'\bchần\s*chỉ\s*hình\s*thoi\b', 'chần trám'),
+        (r'\bchần\s*chỉ\s*hình\s*thoi\b', 'chần trám tinh tế'),
         (r'\bđứng\s*form\b', 'giữ form'),
         (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'),
         (r'\bdáng\s*mảnh\s*chuẩn\s*phong\s*cách\b', 'thiết kế mảnh chuẩn style'),
-        (r'\bcực\s*nét\b', 'cực xịn')
+        (r'\bcực\s*nét\b', 'cực xịn'),
+        (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
+        (r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ'),
+        (r'\bchốt\s*ngay\s*tay\b', 'chốt ngay'),
+        (r'\bliền\s*tay\b', 'ngay nhé')
     ]: cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     
     cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
     cleaned = re.sub(r'\.{2,}', ',', cleaned)
     cleaned = re.sub(r'[-~*]', '', cleaned)
-    # Lọc dọn dẹp lỗi cụm từ lặp nhau nếu có
-    cleaned = re.sub(r'\bgiảm\s*giá\s*giảm\s*giá\b', 'giảm giá', cleaned, flags=re.IGNORECASE)
+    
+    # 🌟 BỘ LỌC CHỐNG VẤP THOẠI (STUTTER/ECHO FILTER)
+    # 1. Chống vấp cụm từ (2-4 từ lặp lại liên tiếp, vd: "sản phẩm sản phẩm", "cực kỳ cực kỳ")
+    cleaned = re.sub(r'\b(\w+(?:\s+\w+){1,3})\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
+    # 2. Chống vấp từ đơn (chỉ nhắm vào từ nối, đại từ, danh từ cơ bản để không xóa nhầm từ láy tiếng Việt như "luôn luôn", "xa xa")
+    cleaned = re.sub(r'\b(là|và|thì|mà|có|đang|đã|sẽ|giá|các|những|một|chiếc|cái|em|mình|tôi|bạn|mua|bấm|chốt|nhanh|này|kia|đó|đây)\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
+    
+    # Lọc dọn dẹp lỗi cụm từ lặp nhau đặc thù khác
     cleaned = re.sub(r'\bgiá\s*đang\s*giá\b', 'giá đang', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bchốt\s*ngay\s*tay\b', 'chốt ngay', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bđẹp\s*đẹp\b', 'rất đẹp', cleaned, flags=re.IGNORECASE)
+    
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
 
@@ -402,7 +412,7 @@ def format_ocr_prices(ca_data: dict) -> str:
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
-# 🌟 LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR) - TỰ PHỤC HỒI KHI AI ĐỨT GÃY
+# 🌟 LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR)
 def extract_scenes(parsed_data):
     if isinstance(parsed_data, list): return parsed_data
     if isinstance(parsed_data, dict):
@@ -495,7 +505,6 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
-# 🌟 CẢM BIẾN MÔI TRƯỜNG ĐỘNG (KÍCH HOẠT ÁNH SÁNG ĐÊM) - Dùng 1 lần cho cả 4 cảnh
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
@@ -728,6 +737,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         vibe = "Intimate Apparel Review (Wearing a premium soft silk robe, cozy bathrobe, or comfortable loose homewear, UNTUCKED, barefoot or fluffy slippers)"
     elif intimate_type == "camisole":
         vibe = "Casual Loungewear (Wearing a stylish oversized cardigan layered over the product, comfy shorts, UNTUCKED, barefoot or indoor slippers)"
+    
     elif is_fashion:
         if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
             if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
@@ -1048,8 +1058,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scene_1_action_inst = "CRITICAL: Translate the EXACT physical struggle/pain mentioned in the voiceover (e.g., groping in the dark for a switch, scratching red skin, shivering) into a literal English action description. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
-        
-    # 🌟 LÕI KHÓA ĐỒNG BỘ ÁNH SÁNG TOÀN CỤC (MASTER LIGHTING LOCK)
+
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base)
 
     prompt_text = f"""
@@ -1116,7 +1125,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     """
     sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, forced_footwear, target_id)
     
-    scenes, w_lock = [], {}
+    scenes, w_lock, master_setting_en = [], {}, "clean minimalist modern setting"
     max_retries = 2
     for attempt in range(max_retries):
         try:
@@ -1158,7 +1167,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     char_neg_extra = f"{dynamic_footwear_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
-    # 🌟 CẬP NHẬT TƯỜNG LỬA CHỐNG THIẾU SÁNG, NGĂN AI TỰ ĐỔ TỐI MÀN HÌNH
     base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
@@ -1182,7 +1190,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
         cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str)
         
-        # 🌟 GỌI BIẾN KHÓA ÁNH SÁNG TOÀN CỤC CHUNG CHO CẢ 4 CẢNH
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
         scn["sfx"] = f"{base_sfx}, {master_env_sfx_en}" if master_env_sfx_en else base_sfx
         
@@ -1281,8 +1288,8 @@ def clone_script(script_id):
     {{
         "outlines": [
             {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
         ]
     }}
     """
