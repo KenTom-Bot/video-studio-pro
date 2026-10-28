@@ -72,11 +72,11 @@ COMPACT_CORE_RULES = """
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
    - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
 4. LÕI THOẠI NGUYÊN KHỐI (MONOLITHIC NARRATIVE) - ĐỈNH CAO KOC:
-   - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Viết một đoạn thoại tổng thể duy nhất cực kỳ mượt mà, cuốn hút như KOC thực chiến tâm sự.
-   - CẤM LẶP TỪ & CẤM DỊCH SÁT NGHĨA (Word-by-word): Tuyệt đối không viết những câu ngớ ngẩn lặp từ như "form hộp đứng form". Cấm dùng các cụm từ máy móc, tối nghĩa như "luồn da", "chần chỉ ô trám cực nét". Hãy chuyển hóa thành ngôn ngữ sang chảnh, dễ hiểu (VD: "form dáng cứng cáp", "dây xích phối da", "da chần trám tinh tế").
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm lặp từ "giảm giá", cấm "ngay tay". Hãy chốt tự nhiên, giục giã (VD: "Deal đang cực hời, múc ngay thôi chị em ơi", "Bấm góc trái màn hình chốt luôn kẻo lỡ size nhé").
-5. VĂN NÓI HÀ NỘI THUẦN VIỆT & TỪ VỰNG:
-   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại. KHÔNG sáo rỗng.
+   - KHÔNG ĐƯỢC VIẾT THOẠI RỜI RẠC. Phải viết một ĐOẠN THOẠI TỔNG THỂ duy nhất trước, mang đậm chất KOC review thực chiến.
+   - CẤM LẶP TỪ & CẤM DỊCH SÁT NGHĨA: Tuyệt đối không viết "form hộp đứng form". Cấm "luồn da", "chần chỉ ô trám cực nét". Hãy dùng "form dáng cứng cáp", "dây xích phối da", "da chần trám tinh tế".
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm lặp từ "giảm giá", cấm "ngay tay". Chốt tự nhiên: "Đang có deal cực hời, múc ngay thôi chị em ơi".
+5. VĂN NÓI HÀ NỘI THUẦN VIỆT:
+   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -350,7 +350,7 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bmười\s+(?:tư|tứ)\b', 'mười bốn'), (r'\bhai\s+(?:tư|tứ)\b', 'hai mươi bốn'),
         (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'), (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'), (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn'),
         
-        # 🌟 CẬP NHẬT TỪ ĐIỂN CHỐNG SƯỢNG / DỊCH WORD-BY-WORD
+        # 🌟 TỪ ĐIỂN CHỐNG SƯỢNG / DỊCH WORD-BY-WORD
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'),
         (r'\bluồn\s*da\b', 'phối da'),
         (r'\bchần\s*chỉ\s*ô\s*trám\b', 'chần trám'),
@@ -495,6 +495,7 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
+# 🌟 CẢM BIẾN MÔI TRƯỜNG ĐỘNG (KÍCH HOẠT ÁNH SÁNG ĐÊM)
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
@@ -727,7 +728,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         vibe = "Intimate Apparel Review (Wearing a premium soft silk robe, cozy bathrobe, or comfortable loose homewear, UNTUCKED, barefoot or fluffy slippers)"
     elif intimate_type == "camisole":
         vibe = "Casual Loungewear (Wearing a stylish oversized cardigan layered over the product, comfy shorts, UNTUCKED, barefoot or indoor slippers)"
-    
     elif is_fashion:
         if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
             if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body, paired with a backless halter top or flowy silk camisole, elegant woven hat, strappy beach sandals)"
@@ -1042,7 +1042,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type)
     
     is_flashsale_script = any(k in f"{fixed_title} {full_vo_script} {presentation_format}".lower() for k in ["flash sale", "săn deal", "deal hời", "giảm sốc", "ưu đãi sốc", "xả kho"])
-    scene_4_cta_data = f"Giá gốc khoảng {soft_orig_price}, nay ưu đãi chỉ còn khoảng {soft_sale_price}" if is_flashsale_script else f"Giá đang có ưu đãi cực sâu"
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
@@ -1050,6 +1049,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
+    # 🌟 LÕI KHÓA ĐỒNG BỘ BỐI CẢNH VÀ THOẠI (VOICE-SETTING SYNC LOCK)
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
     MÔ TẢ TIẾNG ANH: {clean_prod_en}. 
@@ -1062,13 +1062,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Dùng "kéo" cắt đoạn thoại trên thành 4 phần hợp lý để điền vào trường "voiceover" của 4 cảnh (TUYỆT ĐỐI KHÔNG VIẾT LẠI THOẠI KHÁC).
     2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng. ĐẶC BIỆT LƯU Ý Ở CẢNH 1: MÔ TẢ ĐÚNG HÀNH ĐỘNG ĐÓ BẰNG TIẾNG ANH VÀO 'action_en'.
-    - VẬT LÝ MÁY MÓC: Giữ nguyên đầu hút/phụ kiện đang có trong ảnh tham chiếu. NẾU ẢNH LÀ MÁY CẦM TAY NGẮN, BẮT BUỘC PHẢI GHI "NO long stick, NO floor brush" để cấm AI tự vẽ thêm cán dài hút sàn.
-    - VẬT LÝ MỸ PHẨM: Test đúng vị trí giải phẫu (son/sáp nẻ lên môi, mặt nạ lên mặt). Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC RÕ RỆT.
+    - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. Nếu thoại rủ "đi cafe", bối cảnh BẮT BUỘC là "coffee shop / cafe". Nếu thoại "đi làm", bối cảnh là "office". CẤM set bối cảnh "phòng ngủ (bedroom)" nếu KOC đang nói về việc đi chơi ngoài phố/đi cafe/đi làm.
+    - VẬT LÝ MÁY MÓC: Giữ nguyên đầu hút/phụ kiện đang có trong ảnh tham chiếu. NẾU ẢNH LÀ MÁY CẦM TAY NGẮN, BẮT BUỘC PHẢI GHI "NO long stick, NO floor brush" để cấm AI tự vẽ thêm cán dài.
+    - VẬT LÝ MỸ PHẨM: Test đúng vị trí giải phẫu. Thao tác test phải tạo ra SỰ BIẾN ĐỔI THỊ GIÁC.
 
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "title": "{fixed_title}",
-        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'messy bathroom with wet tile floor'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung.",
+        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'stylish coffee shop with natural sunlight'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung. CRITICAL: Must strictly match the location mentioned in the voiceover. NO BEDROOM if the voiceover is about going out/cafe.",
         "wardrobe_lock": {{
             "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN, tone-sur-tone cực kỳ thời trang và ăn nhập hoàn toàn với bối cảnh '{fixed_setting_base}'.",
             "master_character_en": "100% IDENTICAL IDENTITY LOCK: {detected_demographic_en}, exact [hair style/color], wearing UNIQUE HIGH-FASHION OUTFIT matching vibe: [{stylist_vibe_text}]. Must specify exact color and material for [top], [bottom], and [footwear]. ZERO WARDROBE CHANGES."
@@ -1279,9 +1280,9 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh 1...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh 2...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh 3...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
         ]
     }}
     """
@@ -1314,9 +1315,9 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
         ]
     }}
     """
@@ -1730,9 +1731,9 @@ if st.session_state.get("trigger_main_generation"):
                     "prompt_dna_lock": "Visual DNA lock"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
+                    {{ "id": 1, "title": "Tên kịch bản 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
+                    {{ "id": 2, "title": "Tên kịch bản 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
+                    {{ "id": 3, "title": "Tên kịch bản 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
                 ]
             }}
             """
