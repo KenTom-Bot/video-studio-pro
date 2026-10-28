@@ -65,7 +65,7 @@ COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & LỚP TRANG PHỤC TỘT ĐỘ TRONG CÙNG 1 KỊCH BẢN:
    - Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU cho TỪNG lớp trang phục xuyên suốt 4 cảnh.
-   - ĐA DẠNG HÓA: 3 kịch bản cùng bối cảnh, KOC phải mặc 3 bộ KHÁC NHAU. Tỉ lệ phối đồ (sơ vin/thả vạt) phải chuẩn xác.
+   - ĐA DẠNG HÓA: 3 kịch bản cùng bối cảnh, KOC phải mặc 3 bộ KHÁC NHAU. Sơ vin hay không sơ vin phải chuẩn xác.
 2. PRODUCT SCALE & CAMERA RULES:
    - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
    - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
@@ -495,6 +495,7 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
+# 🌟 CẢM BIẾN MÔI TRƯỜNG ĐỘNG (KÍCH HOẠT ÁNH SÁNG ĐÊM) - Dùng 1 lần cho cả 4 cảnh
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
@@ -640,7 +641,6 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
-# 🌟 CẬP NHẬT LÕI VẬT LÝ THỜI TRANG (KHÔNG TRUYỀN SAI BIẾN is_appliance NỮA)
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False, is_strict_appliance: bool = False, is_long_handle: bool = False, is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False, is_mom_baby_hard: bool = False, intimate_type: str = "normal", is_aline_skirt: bool = False) -> str:
     p = f"{product_name} {vo_text}".lower()
     
@@ -706,7 +706,6 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid structure without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry", f"holding {clean_prod_en} securely with a confident open-palm gesture")
 
-# 🌟 CẬP NHẬT LÕI STYLIST MA TRẬN 2.0: TỶ LỆ CHUẨN (ÁO ÔM/SƠ VIN + VÁY/QUẦN)
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -729,8 +728,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         vibe = "Intimate Apparel Review (Wearing a premium soft silk robe, cozy bathrobe, or comfortable loose homewear, UNTUCKED, barefoot or fluffy slippers)"
     elif intimate_type == "camisole":
         vibe = "Casual Loungewear (Wearing a stylish oversized cardigan layered over the product, comfy shorts, UNTUCKED, barefoot or indoor slippers)"
-    
-    # 🌟 GHI ĐÈ ƯU TIÊN SỐ 2: MA TRẬN STYLIST THỜI TRANG CHUẨN XÁC
     elif is_fashion:
         if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
             if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
@@ -1051,8 +1048,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scene_1_action_inst = "CRITICAL: Translate the EXACT physical struggle/pain mentioned in the voiceover (e.g., groping in the dark for a switch, scratching red skin, shivering) into a literal English action description. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
+        
+    # 🌟 LÕI KHÓA ĐỒNG BỘ ÁNH SÁNG TOÀN CỤC (MASTER LIGHTING LOCK)
+    master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base)
 
-    # 🌟 GHI ĐÈ ĐỊNH DẠNG JSON LÕI WARDROBE LOCK
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
     MÔ TẢ TIẾNG ANH: {clean_prod_en}. 
@@ -1117,7 +1116,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     """
     sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, forced_footwear, target_id)
     
-    scenes, w_lock, master_setting_en = [], {}, "clean minimalist modern setting"
+    scenes, w_lock = [], {}
     max_retries = 2
     for attempt in range(max_retries):
         try:
@@ -1134,7 +1133,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    # 🌟 ÉP BUỘC CHUỖI NHẬN DIỆN CHAR PROMPT PHẢI LẤY TỪ MASTER EN CỦA AI ĐÃ KHÓA CHI TIẾT
     base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"Fictional everyday {detected_demographic_en} (synthetic AI persona), wearing high-fashion outfit").strip().rstrip('.')
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
@@ -1158,10 +1156,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif any(k in vibe_lower for k in ["sneaker", "running", "athletic"]): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif any(k in vibe_lower for k in ["heel", "loafer", "dress"]): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    # 🌟 CẬP NHẬT LỆNH NEGATIVE CẤM ĐỔI CHIỀU DÀI TAY ÁO, CHIỀU DÀI VẠT ÁO
     char_neg_extra = f"{dynamic_footwear_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
-    base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
+    # 🌟 CẬP NHẬT TƯỜNG LỬA CHỐNG THIẾU SÁNG, NGĂN AI TỰ ĐỔ TỐI MÀN HÌNH
+    base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
@@ -1180,14 +1178,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
-        env_lighting_en, env_sfx_en = extract_environmental_lighting_and_weather(vo_text, scn.get("setting", fixed_setting_base))
-        
         is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
         
         cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str)
         
+        # 🌟 GỌI BIẾN KHÓA ÁNH SÁNG TOÀN CỤC CHUNG CHO CẢ 4 CẢNH
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
-        scn["sfx"] = f"{base_sfx}, {env_sfx_en}" if env_sfx_en else base_sfx
+        scn["sfx"] = f"{base_sfx}, {master_env_sfx_en}" if master_env_sfx_en else base_sfx
         
         micro_expr = sanitize_third_party_ip(scn.get("expression_en", "natural engaging expression")).strip().rstrip('.')
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("action_en") or action_scene_2, flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
@@ -1220,11 +1217,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en}{dim_tag} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry)."
 
         if is_pas_scn1_no_prod:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
+            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
         elif not is_fashion_wearable and idx_scn in [1, 2]:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
+            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
         else:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
+            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
 
         scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
         scn["img_neg"] = base_neg_prompt
@@ -1233,11 +1230,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct on-camera speech (zero room reverb, zero echo, NO off-screen narrator). Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
         if is_pas_scn1_no_prod:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
+            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
         elif not is_fashion_wearable or ((is_fashion_wearable or is_footwear_accessory) and is_testing_scene):
-            raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
         else:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
         vid_parts = raw_vid.split('[AUDIO]:')
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
@@ -1270,7 +1267,7 @@ def clone_script(script_id):
     cur_len = len(all_combined)
     target_detail = st.session_state.generated_details.get(str(script_id), {})
     user_custom_note = target.get("custom_note") or st.session_state.get("current_input_context", "").strip()
-    presentation_format = target.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề xuất & Mix Đa Dạng")
+    presentation_format = target.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
     
     original_voices = [f"- Cảnh {s.get('scene')}: \"{s.get('voiceover')}\"" for s in target_detail.get("scenes", [])] if "scenes" in target_detail else []
     full_voice_text = "\n".join(original_voices) if original_voices else f"- Hook: \"{target.get('hook', '')}\""
@@ -1283,9 +1280,9 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh 1...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh 2...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh 3...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên biến thể 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên biến thể 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên biến thể 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
         ]
     }}
     """
@@ -1318,9 +1315,9 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh 1...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh 2...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh 3...", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tên kịch bản 1", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tên kịch bản 2", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tên kịch bản 3", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà...", "actors": 1 }}
         ]
     }}
     """
