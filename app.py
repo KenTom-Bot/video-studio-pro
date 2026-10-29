@@ -63,15 +63,15 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & TRANG PHỤC: Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh. 
+1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: AI tự phân tích tệp khách hàng để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
 2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động hình thể rõ ràng (VD: ngứa thì gãi mạnh, hôi thì nhăn mặt bịt mũi, mỏi thì xoa bóp).
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách giơ nách lên bôi. CẤM đưa lăn nách/kem body lên mặt.
+   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động hình thể chân thực (VD: ngứa thì gãi mạnh, hôi thì nhăn mặt bịt mũi, mỏi thì xoa bóp).
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa các SP không phải dưỡng mặt lên mặt.
    - GIA DỤNG/THỜI TRANG: Cấm đưa lên mặt. Tương tác ngang ngực/eo hoặc dưới sàn. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
-   - Mọi cảnh 100% KOC phải ĐANG NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator).
+   - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
 3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ (CRITICAL):
    - NHẬP VAI 3 PHONG CÁCH: Kịch bản 1 (Năng động, dồn dập). Kịch bản 2 (Tâm sự, thủ thỉ, gần gũi). Kịch bản 3 (Chuyên gia, tập trung công năng).
-   - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng một câu (Cấm "giá đang giảm giá", cấm "form hộp đứng form").
+   - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu (Cấm "giá đang giảm giá", cấm "form hộp đứng form").
    - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm "ngay tay". Chốt tự nhiên: "Deal hôm nay quá êm, mấy bà nhấp góc trái múc luôn nha".
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
@@ -413,6 +413,7 @@ def format_ocr_prices(ca_data: dict) -> str:
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
+# 🌟 LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR)
 def extract_scenes(parsed_data):
     if isinstance(parsed_data, list): return parsed_data
     if isinstance(parsed_data, dict):
@@ -529,25 +530,38 @@ def sanitize_veo3_prompt(prompt_text: str) -> str:
     return sanitize_third_party_ip(re.sub(r'\bpointing\s+(?:downward\s+)?(?:to\s+)?(?:corner|cart)\b', 'speaking with welcoming open hands', p, flags=re.IGNORECASE))
 
 def generate_char_rules_string(profiles):
-    if not profiles: return "100% fictional Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
-    return " | ".join([f"Actor {p['id']} ({p['role']}): fictional Vietnamese persona, consistent look across 3 scenes" for p in profiles])
+    if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
+    return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
 
-def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", is_mom_baby=False):
-    if is_mom_baby: return "female", "A caring Vietnamese mother safely holding/interacting with her baby"
-    
+# 🌟 TÁI CẤU TRÚC LÕI NHẬN DẠNG ĐỘ TUỔI VÀ GIỌNG NÓI HÀ NỘI CHUẨN
+def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
     user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
-    extra_physique = f", {ai_body_and_hair_en.strip()}" if ai_body_and_hair_en and len(ai_body_and_hair_en.strip()) > 5 else ", slender figure, jet-black hair, natural fair-warm skin"
-    if not user_roles and ai_persona_en and len(ai_persona_en.strip()) > 6:
-        ai_p_lower = ai_persona_en.lower()
-        gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
-        clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
-        return gender, f"{re.sub(r'^a\s+', '', clean_p, flags=re.IGNORECASE).strip()}{extra_physique}"
-    if not char_profiles or not user_roles: return "female", f"25yo Vietnamese woman{extra_physique}"
-    role_lower = str(char_profiles[0].get("role", "")).lower()
-    if any(k in role_lower for k in ["bố", "ba", "chồng", "bác trai", "nam", "anh", "trai"]): return "male", f"26yo Vietnamese man{extra_physique}"
-    elif any(k in role_lower for k in ["ông", "già", "bác già"]): return "male", "65yo Vietnamese senior man"
-    elif any(k in role_lower for k in ["bà", "bà nội", "bà ngoại"]): return "female", "65yo Vietnamese senior woman"
-    return "female", f"25yo Vietnamese woman{extra_physique}"
+    asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
+    
+    if is_mom_baby: 
+        return "female", f"A caring Vietnamese mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
+    
+    if user_roles:
+        role_lower = user_roles[0].lower()
+        if any(k in role_lower for k in ["trẻ em", "bé", "kid", "child", "boy", "girl"]):
+            gender = "male" if any(k in role_lower for k in ["trai", "boy"]) else "female"
+            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
+        elif any(k in role_lower for k in ["ông", "già", "bác già", "bà", "senior", "old"]):
+            gender = "male" if any(k in role_lower for k in ["ông", "nam", "bác trai"]) else "female"
+            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
+        elif any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"]):
+            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
+        else:
+            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
+            
+    ai_p_lower = ai_persona_en.lower()
+    gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
+    clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
+    if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
+    physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
+    voice = ai_voice_prompt if ai_voice_prompt else f"Native Hanoi Vietnamese adult {gender} voice"
+    
+    return gender, f"{clean_p}{physique}", voice
 
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
     return any(k in f"{strategy_str} {title_str}".lower() for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
@@ -744,6 +758,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         vibe = "Intimate Apparel Review (Wearing a premium soft silk robe, cozy bathrobe, or comfortable loose homewear, UNTUCKED, barefoot or fluffy slippers)"
     elif intimate_type == "camisole":
         vibe = "Casual Loungewear (Wearing a stylish oversized cardigan layered over the product, comfy shorts, UNTUCKED, barefoot or indoor slippers)"
+    
     elif is_fashion:
         if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
             if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
@@ -757,6 +772,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
             if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Wearing the full product perfectly fitted. Top layer: structured blazer draped over shoulders. Footwear: stiletto heels)"
             elif is_beach_resort: vibe = "Beach/Resort (Wearing the full product perfectly fitted, wide-brim woven hat, woven beach sandals)"
             else: vibe = "High-Fashion Lookbook (Wearing the full product perfectly fitted, elegant makeup, premium matching footwear)"
+            
     elif is_bedroom:
         vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
     elif is_bathroom:
@@ -872,7 +888,6 @@ def auto_save_current_session():
 # ==============================================================================
 # 7. HỆ THỐNG GỌI GEMINI API & ĐỊNH NGHĨA HÀM PROMPT
 # ==============================================================================
-# KHÔI PHỤC HÀM GET_SYS_INST_OUTLINES BỊ THIẾU
 def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Chia sẻ mẹo/kiến thức/câu chuyện, KHÔNG bán hàng, KHÔNG giá)" if is_viral else "TIKTOK SHOP (Chuyển đổi bán hàng, giải quyết nỗi đau, chốt deal)"
@@ -880,10 +895,10 @@ def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, ang
 🛑 GHI CHÚ TỪ NGƯỜI DÙNG: {custom_note}
 {COMPACT_CORE_RULES}
 - 3 kịch bản = 3 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.
+- KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng sản phẩm để chọn KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Giọng đọc Hà Nội chuẩn phải khớp với tuổi và giới tính của KOC.
 - Bắt buộc tạo full_voiceover_script hoàn chỉnh, CỰC KỲ TỰ NHIÊN, KHÔNG lặp từ.
 """
 
-# KHÔI PHỤC HÀM GET_SYS_INST_DETAILS BỊ THIẾU
 def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False, forced_footwear="sneakers", target_id=1):
     is_viral = ("Viral" in mode)
     pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP làm TRỌNG TÂM TIỀN CẢNH giải quyết vấn đề." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM TIỀN CẢNH xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
@@ -891,8 +906,9 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 🛑 GHI CHÚ TỪ NGƯỜI DÙNG: {custom_note}
 {COMPACT_CORE_RULES}
 - LỜI THOẠI PHẢI LIỀN MẠCH, TỰ NHIÊN, dồn dập. KHÔNG lặp từ, KHÔNG lủng củng.
-- HÀNH ĐỘNG HÌNH THỂ Ở CẢNH 1: Phải có biểu cảm cơ thể rõ ràng ứng với nỗi đau (gãi ngứa, bịt mũi...).
-- 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH.
+- TƯƠNG TÁC MỸ PHẨM CHUẨN XÁC: Công dụng ở đâu bôi ĐÚNG ở đó. Lăn nách thì KOC giơ nách, má hồng bôi má, son bôi môi. Cấm sờ lên mặt nếu không phải kem mặt/đồ ăn.
+- HÀNH ĐỘNG HÌNH THỂ Ở CẢNH 1: Phải có biểu cảm cơ thể rõ ràng ứng với nỗi đau (gãi ngứa, bịt mũi, vươn vai mỏi...).
+- 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator).
 """
 
 def repair_and_parse_json(text_content: str):
@@ -1049,8 +1065,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_mom_baby_hard = detect_mom_baby_hard_props(check_str)
     is_medicine = detect_medicine(check_str)
     
+    # 🌟 GỌI HÀM PHÂN TÍCH LÝ LỊCH KOC VIỆT NAM ĐA TUỔI
     ai_koc_data = dna.get("koc_demographic_analysis", {})
-    detected_gender, detected_demographic_en = get_demographics_description(char_profiles, ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else "", ai_koc_data.get("body_and_hair_en", "") if isinstance(ai_koc_data, dict) else "", is_mom_baby)
+    ai_persona_en = ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else ""
+    ai_body_hair = ai_koc_data.get("body_and_hair_en", "") if isinstance(ai_koc_data, dict) else ""
+    ai_voice = ai_koc_data.get("voice_prompt", "") if isinstance(ai_koc_data, dict) else ""
+    
+    detected_gender, detected_demographic_en, voice_prompt = get_demographics_description(
+        char_profiles, ai_persona_en, ai_body_hair, ai_voice, is_mom_baby
+    )
 
     base_prod_en = f"{locked_color_en} seamless comfort fabric garment" if intimate_type == "underwear_bra" else (ai_product_visual_en if ai_product_visual_en else f"{raw_prod_name}")
     clean_prod_en = sanitize_third_party_ip(base_prod_en)
@@ -1160,7 +1183,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"Fictional everyday {detected_demographic_en} (synthetic AI persona), wearing high-fashion outfit").strip().rstrip('.')
+    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing high-fashion outfit").strip().rstrip('.')
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
@@ -1253,7 +1276,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["img_neg"] = base_neg_prompt
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
-        studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). Native Hanoi Vietnamese voice: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
+        # 🌟 AUDIO PROMPT SỬ DỤNG GIỌNG NÓI ĐA LỨA TUỔI CHUẨN XÁC TỪ AI
+        studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
         if is_pas_scn1_no_prod:
             raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
@@ -1344,9 +1368,9 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
         ]
     }}
     """
@@ -1717,7 +1741,8 @@ if st.session_state.get("trigger_main_generation"):
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args["unified_strategy_format"]}'
             HERO SKU: {override_instruction}
             {skirt_note_rule}
-            - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
+            - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
+            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng sản phẩm để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Khớp độ tuổi KOC vào 'voice_prompt' để ra giọng Hà Nội chuẩn.
 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json).
             {{
@@ -1728,9 +1753,11 @@ if st.session_state.get("trigger_main_generation"):
                     "is_fixed_location": true,
                     "koc_demographic_analysis": {{
                         "gender": "male hoặc female",
-                        "persona_vi": "Mô tả KOC người Việt",
-                        "persona_en": "25yo Vietnamese woman",
-                        "body_and_hair_en": "slender figure, fair-warm skin, neat jet-black hair"
+                        "age_segment": "child / teen / adult / senior (Phân tích theo sản phẩm)",
+                        "persona_vi": "Mô tả KOC 100% người Việt (VD: Nam thanh niên 25 tuổi, Bà lão 60 tuổi...)",
+                        "persona_en": "CRITICAL: Must start with 'Vietnamese' (e.g., '25yo Vietnamese man', '60yo Vietnamese senior woman')",
+                        "body_and_hair_en": "authentic Vietnamese Southeast Asian facial features, natural jet-black hair",
+                        "voice_prompt": "Native Hanoi Vietnamese [child/adult/senior] [male/female] voice"
                     }},
                     "stylist_coordination_vi": "Set đồ Stylist đồng nhất",
                     "how_to_use": "Thao tác sử dụng thực tế (giữ nguyên hình khối SP)",
@@ -1760,9 +1787,9 @@ if st.session_state.get("trigger_main_generation"):
                     "prompt_dna_lock": "Visual DNA lock"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
+                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
                 ]
             }}
             """
