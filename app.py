@@ -63,22 +63,19 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & LỚP TRANG PHỤC TỘT ĐỘ TRONG CÙNG 1 KỊCH BẢN:
-   - Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU cho TỪNG lớp trang phục xuyên suốt 4 cảnh.
-   - ĐA DẠNG HÓA: 3 kịch bản cùng bối cảnh, KOC phải mặc 3 bộ KHÁC NHAU. Sơ vin hay không sơ vin phải chuẩn xác.
-2. PRODUCT SCALE & CAMERA RULES:
-   - Cầm đúng vào vị trí tay cầm gốc của SP. Tuyệt đối KHÔNG thả rơi.
-   - NẾU KHÔNG PHẢI THỜI TRANG: CẤM nhân vật xoay người. Phải ĐỨNG IM.
+1. ĐỒNG NHẤT KHUÔN MẶT, MÀU SẮC & TRANG PHỤC: Khóa chặt diện mạo, màu sắc đích danh và chất liệu xuyên suốt 4 cảnh. 3 kịch bản cùng bối cảnh = 3 outfit KHÁC NHAU.
+2. KHÔNG GIAN TƯƠNG TÁC (CRITICAL):
+   - TUYỆT ĐỐI CẤM đưa sản phẩm lên sát mặt hoặc bôi lên má/môi NẾU ĐÓ KHÔNG PHẢI LÀ MỸ PHẨM BÔI MẶT HOẶC ĐỒ ĂN.
+   - Các đồ gia dụng, công nghệ, bách hóa, tẩy rửa... BẮT BUỘC phải tương tác ở ngang ngực (chest level), ngang eo (waist level), đặt trên bàn hoặc chà dưới sàn. Tôn trọng công năng thực tế của sản phẩm.
+   - Cầm đúng vào vị trí tay cầm gốc của SP. CẤM thả rơi.
 3. MỸ PHẨM & BIẾN ĐỔI THỊ GIÁC:
-   - BẮT BUỘC test trên ĐÚNG VỊ TRÍ CƠ THỂ: Son/Sáp nẻ lên môi, má hồng lên má, mặt nạ lên mặt, kem body lên tay. Tạo sự thay đổi thị giác rõ ràng.
+   - Test trên ĐÚNG VỊ TRÍ (Son lên môi, má hồng lên má, kem body lên tay).
 4. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ (CRITICAL):
-   - NHẬP VAI: Bạn là một KOC/Chiến thần chốt đơn Top 1 TikTok. Lời thoại phải CỰC KỲ TỰ NHIÊN, dồn dập, cuốn hút như đang livestream hoặc tâm sự trực tiếp với hội chị em. TUYỆT ĐỐI KHÔNG VIẾT RỜI RẠC.
-   - TỪ VỰNG TRENDY: Dùng từ ngữ tự nhiên, gần gũi (VD: "chân ái", "em này", "mấy bà", "chị em", "múc ngay", "deal hời", "đỉnh chóp", "cực êm"). 
-   - CẤM VĂN MẪU ROBOT: Tuyệt đối cấm viết kiểu "Sản phẩm này có tính năng...", "Với thiết kế...". Cấm liệt kê khô khan.
-   - CHỐNG LẶP TỪ & CHỐNG SƯỢNG TUYỆT ĐỐI: Không được lặp từ trong cùng một câu (Cấm "giá đang giảm giá", cấm "form váy đứng form"). Cấm dịch word-by-word (Cấm "luồn da", cấm "chần chỉ"). Hãy linh hoạt dùng "form dáng chuẩn", "thiết kế sắc nét", "xích phối da".
-   - CHỐT SALE (CTA) TỰ NHIÊN: Cấm "ngay tay". Cảnh chốt sale phải giục giã, cấp bách tự nhiên: "Deal hôm nay quá êm, mấy bà nhấp góc trái múc luôn kẻo hết màu nha!".
+   - CẤM TUYỆT ĐỐI lặp từ trong cùng 1 câu (Cấm "giá đang giảm giá", cấm "form hộp đứng form"). Dùng từ linh hoạt: "form dáng cứng cáp", "thiết kế sắc nét".
+   - CẤM dịch sát nghĩa máy móc (Cấm "luồn da", "chần chỉ ô trám cực nét"). Thay bằng "xích phối da", "da chần trám tinh xảo".
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm "ngay tay". Chốt tự nhiên: "Deal hôm nay quá êm, mấy bà nhấp góc trái múc luôn kẻo hết màu nha".
 5. VĂN NÓI HÀ NỘI THUẦN VIỆT:
-   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại. KHÔNG sáo rỗng.
+   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -123,7 +120,12 @@ SOUTHERN_TO_HANOI = {
     r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi',
     r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm',
     r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu',
-    r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bbốn\s+(?:tư|tứ)\b': 'bốn mươi bốn',
+    r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi',
+    r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn',
+    r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn',
+    r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn',
+    r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi',
+    r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn',
     r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn',
     r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn',
     r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn',
@@ -331,25 +333,13 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 def clean_and_normalize_voiceover(text: str) -> str:
-    """Lưới lọc ngôn ngữ tự nhiên: Chống lặp từ, chống vấp thoại, dịch word-by-word và dọn dẹp ký tự thừa."""
     if not text: return ""
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
+    
+    # 1. THAY THẾ TỪ VỰNG & PHƯƠNG NGỮ
     for pattern, rep in [
         (r'\blụa\s+premium\s+everyday\b', 'lụa cao cấp'), (r'\bpremium\s+everyday\b', 'cao cấp'),
-        (r'\bmềm\s*rủ\b', 'mềm rũ'), (r'\bsiêu\s*rủ\b', 'siêu rũ'), (r'\bđộ\s*rủ\b', 'độ rũ'), (r'\brủ\s*xuống\b', 'rũ xuống'),
-        (r'\báp\s*mã\b', 'nay giảm'), (r'\báp\s*voucher\b', 'nay giảm'),
-        (r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b', 'một trăm bốn mươi'), (r'\b1\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
-        (r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b', 'một trăm bốn mươi'), (r'\bmột\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
-        (r'\btrăm\s*(?:tư|tứ)\s*mươi\b', 'trăm bốn mươi'), (r'\btrăm\s*(?:tư|tứ)\b', 'trăm bốn mươi'),
-        (r'\b1\s*trăm\b', 'một trăm'), (r'\b1\s*nghìn\b', 'một nghìn'), (r'\b1\s*triệu\b', 'một triệu'),
-        (r'\b140\s*(?:k|nghìn|ngàn)\b', 'một trăm bốn mươi nghìn'), (r'\b140\b', 'một trăm bốn mươi'),
-        (r'\b14\b', 'mười bốn'), (r'\b24\b', 'hai mươi bốn'), (r'\b34\b', 'ba mươi bốn'),
-        (r'\b40\b', 'bốn mươi'), (r'\b44\b', 'bốn mươi bốn'), (r'\b4\b', 'bốn'),
-        (r'\bmười\s+(?:tư|tứ)\b', 'mười bốn'), (r'\bhai\s+(?:tư|tứ)\b', 'hai mươi bốn'),
-        (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'), (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'), (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn'),
-        
-        # 🌟 BỘ TỪ ĐIỂN CHỐNG DỊCH WORD-BY-WORD (SƯỢNG TRÂN)
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'),
         (r'\bform\s*dáng\s*đứng\s*form\b', 'lên dáng chuẩn xác'),
         (r'\bluồn\s*da\b', 'phối da'),
@@ -362,25 +352,25 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
         (r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ'),
         (r'\bchốt\s*ngay\s*tay\b', 'chốt liền tay'),
-        (r'\bliền\s*tay\b', 'ngay nhé'),
-        (r'\bvừa\s*vặn\s*vừa\b', 'rất vừa vặn'),
-        (r'\bsang\s*chảnh\s*sang\b', 'cực kỳ sang chảnh'),
-        (r'\bđẹp\s*đẹp\b', 'tuyệt đẹp')
+        (r'\bliền\s*tay\b', 'ngay nhé')
     ]: cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     
+    # 2. XÓA KÝ TỰ ĐẶC BIỆT
     cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
     cleaned = re.sub(r'\.{2,}', ',', cleaned)
     cleaned = re.sub(r'[-~*]', '', cleaned)
     
-    # 🌟 LÕI NLP CHỐNG VẤP THOẠI (STUTTER/ECHO FILTER)
-    # 1. Chống lặp cụm từ (2-4 từ lặp liên tiếp, vd: "sản phẩm sản phẩm", "cực kỳ cực kỳ")
+    # 3. LÕI CHỐNG VẤP THOẠI (STUTTER/ECHO FILTER) - Sức mạnh thực sự
+    # Chống lặp cụm từ (2-4 từ lặp lại liên tiếp)
     cleaned = re.sub(r'\b(\w+(?:\s+\w+){1,3})\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
-    # 2. Chống lặp từ đơn chức năng (tránh xóa nhầm từ láy tiếng Việt như "luôn luôn", "xa xa")
-    cleaned = re.sub(r'\b(là|và|thì|mà|có|đang|đã|sẽ|giá|các|những|một|chiếc|cái|em|mình|tôi|bạn|mua|bấm|chốt|nhanh|này|kia|đó|đây)\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
+    # Chống lặp từ đơn chức năng (chỉ nhắm vào từ nối/đại từ để bảo toàn từ láy tiếng Việt)
+    cleaned = re.sub(r'\b(là|và|thì|mà|có|đang|đã|sẽ|giá|các|những|một|chiếc|cái|em|mình|tôi|bạn|mua|bấm|chốt|nhanh|này|kia|đó|đây|quá|rất|cực)\s+\1\b', r'\1', cleaned, flags=re.IGNORECASE)
     
-    # Lọc dọn dẹp lỗi cụm từ lặp nhau đặc thù khác
+    # Lọc dọn dẹp các cụm lặp đặc thù
     cleaned = re.sub(r'\bgiá\s*đang\s*giá\b', 'giá đang', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bgiảm\s*giá\s*giảm\s*giá\b', 'giảm giá', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bđang\s*có\s*đang\s*có\b', 'đang có', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bđẹp\s*đẹp\b', 'rất đẹp', cleaned, flags=re.IGNORECASE)
     
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
@@ -678,7 +668,7 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping."
     
     elif is_strict_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts. The product stays completely rigid while presenter stands perfectly still; hands hold the product naturally (using its actual handle/strap if any), fast decisive interaction, NEVER dropping."
-    else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly (using its actual handle/strap if any) and trace surface decisively, never dropping."
+    else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping."
 
 def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_strict_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool, intimate_type: str = "normal"):
     p = f"{clean_prod_en} {check_str}".lower()
@@ -717,7 +707,12 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     
-    else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at realistic scale toward the lens", f"positioning {clean_prod_en} right in front of the lens, tracing fingers swiftly and decisively along its solid structure without distorting scale", f"demonstrating {clean_prod_en} with fast decisive hand movements while preserving 100% rigid geometry", f"holding {clean_prod_en} securely with a confident open-palm gesture")
+    else: return (
+        f"standing perfectly still holding the rigid {clean_prod_en} firmly at chest level", 
+        f"hands interacting directly with {clean_prod_en} at chest or waist level, keeping it away from the face", 
+        f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry", 
+        f"holding {clean_prod_en} securely at chest level with a confident open-palm gesture"
+    )
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
@@ -1078,6 +1073,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     1. Dùng "kéo" cắt đoạn thoại trên thành 4 phần hợp lý để điền vào trường "voiceover" của 4 cảnh (TUYỆT ĐỐI KHÔNG VIẾT LẠI THOẠI KHÁC).
     2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng. ĐẶC BIỆT LƯU Ý Ở CẢNH 1: MÔ TẢ ĐÚNG HÀNH ĐỘNG ĐÓ BẰNG TIẾNG ANH VÀO 'action_en'.
     - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. Nếu thoại rủ "đi cafe", bối cảnh BẮT BUỘC là "coffee shop / cafe". CẤM set "bedroom".
+    - VỊ TRÍ TƯƠNG TÁC (CRITICAL): Tôn trọng công năng sản phẩm. Đồ gia dụng, công nghệ phải cầm ngang ngực (chest level) hoặc để trên bàn. Nước tẩy rửa dùng dưới sàn/bồn cầu. CẤM đưa các sản phẩm không liên quan (như nước giặt, ốp lưng, máy xay...) lên cọ vào má hay sát mặt. Chỉ mỹ phẩm bôi mặt hoặc đồ ăn mới được đưa lên gần mặt.
 
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
