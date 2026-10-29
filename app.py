@@ -66,8 +66,8 @@ COMPACT_CORE_RULES = """
 1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: AI tự phân tích tệp khách hàng để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
 2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
    - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động hình thể chân thực (VD: ngứa thì gãi mạnh, hôi thì nhăn mặt bịt mũi, mỏi thì xoa bóp).
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa các SP không phải dưỡng mặt lên mặt.
-   - GIA DỤNG/THỜI TRANG: Cấm đưa lên mặt. Tương tác ngang ngực/eo hoặc dưới sàn. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách.
+   - GIA DỤNG/CÔNG NGHỆ/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/eo hoặc dưới sàn. TUYỆT ĐỐI KHÔNG CẦM NHƯ NGHE ĐIỆN THOẠI. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
    - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
 3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ (CRITICAL):
    - NHẬP VAI 3 PHONG CÁCH: Kịch bản 1 (Năng động, dồn dập). Kịch bản 2 (Tâm sự, thủ thỉ, gần gũi). Kịch bản 3 (Chuyên gia, tập trung công năng).
@@ -413,7 +413,6 @@ def format_ocr_prices(ca_data: dict) -> str:
     if orig and sale: return f"<b style='color:#475569;'>Giá gốc:</b> <span style='color:#64748b; text-decoration:line-through; font-weight:700;'>{clean_analysis_text(orig)}</span> &nbsp;|&nbsp; <b style='color:#dc2626;'>Giá giảm:</b> <span style='color:#dc2626; font-weight:800; font-size:15px;'>{clean_analysis_text(sale)}</span>"
     return "<span style='color:#dc2626; font-weight:700;'>Chưa xác định</span>"
 
-# 🌟 LÕI BÓC TÁCH JSON SÂU (DEEP JSON EXTRACTOR)
 def extract_scenes(parsed_data):
     if isinstance(parsed_data, list): return parsed_data
     if isinstance(parsed_data, dict):
@@ -464,7 +463,7 @@ def detect_strict_rigid_appliance(text_to_check: str) -> bool:
         "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", 
         "pan", "pot", "tool", "vacuum", "dryer", "blower", "hút bụi",
         "tai nghe", "headphone", "earbud", "earphone", "bluetooth", "điện thoại", "phone", "loa", "speaker", 
-        "sạc", "chuột", "bàn phím", "mic", "túi xách", "túi", "balo", "ví"
+        "sạc", "chuột", "bàn phím", "mic", "túi xách", "túi", "balo", "ví", "power bank", "sạc dự phòng"
     ]
     return any(k in text_to_check.lower() for k in appliance_keywords)
 
@@ -533,7 +532,6 @@ def generate_char_rules_string(profiles):
     if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
     return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
 
-# 🌟 TÁI CẤU TRÚC LÕI NHẬN DẠNG ĐỘ TUỔI VÀ GIỌNG NÓI HÀ NỘI CHUẨN
 def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
     user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
     asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
@@ -666,6 +664,7 @@ def get_product_centric_camera_shot(scene_idx: int, is_fashion: bool, is_footwea
         elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
+# 🌟 CẬP NHẬT LÕI VẬT LÝ ÉP CẤM SỜ LÊN MẶT 100% CHO APPLIANCES/TECH
 def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion: bool = False, is_strict_appliance: bool = False, is_long_handle: bool = False, is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False, is_mom_baby_hard: bool = False, intimate_type: str = "normal", is_aline_skirt: bool = False) -> str:
     p = f"{product_name} {vo_text}".lower()
     
@@ -689,8 +688,8 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     elif any(k in p for k in ["hút bụi", "vacuum", "máy sấy", "máy thổi"]): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
     
-    elif is_strict_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts. The product stays completely rigid while presenter stands perfectly still; hands hold the product naturally (using its actual handle/strap if any), fast decisive interaction, NEVER dropping. Hands strictly kept away from face."
-    else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. Hands strictly kept away from face."
+    elif is_strict_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts. The product stays completely rigid while presenter stands perfectly still; hands hold the product naturally (using its actual handle/strap if any), fast decisive interaction, NEVER dropping. CRITICAL: Product MUST remain at CHEST LEVEL or resting on a table. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
+    else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
 def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fashion_wearable: bool, is_strict_appliance: bool, is_long_handle: bool, is_food: bool, is_cosmetics: bool, is_mom_baby: bool, is_medicine: bool, intimate_type: str = "normal"):
     p = f"{clean_prod_en} {check_str}".lower()
@@ -727,13 +726,13 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     
     elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
     elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
-    elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
+    elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     
     else: return (
-        f"standing perfectly still holding the rigid {clean_prod_en} firmly at chest level", 
-        f"hands interacting directly with {clean_prod_en} at chest or waist level, keeping it away from the face", 
-        f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry", 
-        f"holding {clean_prod_en} securely at chest level with a confident open-palm gesture"
+        f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", 
+        f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", 
+        f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", 
+        f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level"
     )
 
 def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting_vi: str, gender: str, intimate_type: str, is_fashion: bool, raw_vi_info: str = "", is_food: bool = False, is_cosmetics: bool = False, is_mom_baby: bool = False, is_medicine: bool = False) -> str:
@@ -1065,14 +1064,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_mom_baby_hard = detect_mom_baby_hard_props(check_str)
     is_medicine = detect_medicine(check_str)
     
-    # 🌟 GỌI HÀM PHÂN TÍCH LÝ LỊCH KOC VIỆT NAM ĐA TUỔI
     ai_koc_data = dna.get("koc_demographic_analysis", {})
-    ai_persona_en = ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else ""
-    ai_body_hair = ai_koc_data.get("body_and_hair_en", "") if isinstance(ai_koc_data, dict) else ""
-    ai_voice = ai_koc_data.get("voice_prompt", "") if isinstance(ai_koc_data, dict) else ""
-    
     detected_gender, detected_demographic_en, voice_prompt = get_demographics_description(
-        char_profiles, ai_persona_en, ai_body_hair, ai_voice, is_mom_baby
+        char_profiles, 
+        ai_koc_data.get("persona_en", "") if isinstance(ai_koc_data, dict) else "", 
+        ai_koc_data.get("body_and_hair_en", "") if isinstance(ai_koc_data, dict) else "", 
+        ai_koc_data.get("voice_prompt", "") if isinstance(ai_koc_data, dict) else "",
+        is_mom_baby
     )
 
     base_prod_en = f"{locked_color_en} seamless comfort fabric garment" if intimate_type == "underwear_bra" else (ai_product_visual_en if ai_product_visual_en else f"{raw_prod_name}")
@@ -1208,7 +1206,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     char_neg_extra = f"{dynamic_footwear_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
-    face_touch_neg = "" if (is_cosmetics or is_food) else "touching face, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
+    # 🌟 ÉP CHẶT LỆNH CẤM ĐƯA SẢN PHẨM LÊN MẶT TRONG NEGATIVE PROMPT NẾU KHÔNG PHẢI MỸ PHẨM/ĐỒ ĂN
+    face_touch_neg = "" if (is_cosmetics or is_food) else "holding like a phone, holding to ear, pressing against cheek, touching face, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
     base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}{face_touch_neg}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
@@ -1276,7 +1275,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["img_neg"] = base_neg_prompt
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
-        # 🌟 AUDIO PROMPT SỬ DỤNG GIỌNG NÓI ĐA LỨA TUỔI CHUẨN XÁC TỪ AI
+        # 🌟 AUDIO PROMPT: ĐỒNG BỘ 100% GIỌNG HÀ NỘI CHUẨN ĐA LỨA TUỔI THEO NHÂN VẬT
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
         if is_pas_scn1_no_prod:
@@ -1741,8 +1740,7 @@ if st.session_state.get("trigger_main_generation"):
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args["unified_strategy_format"]}'
             HERO SKU: {override_instruction}
             {skirt_note_rule}
-            - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng sản phẩm để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Khớp độ tuổi KOC vào 'voice_prompt' để ra giọng Hà Nội chuẩn.
+            - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json).
             {{
