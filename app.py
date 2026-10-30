@@ -16,7 +16,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE (CHỐNG LỖI CRASH)
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE 
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -119,8 +119,8 @@ COMPACT_CORE_RULES = """
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
-POLICY_REPLACEMENTS = {r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'đợt ưu đãi này', r'\blivestream\b': 'chương trình ưu đãi'}
-SOUTHERN_TO_HANOI = {r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\bcay\s*the\b': 'cay tê', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\bxả\s*nước\b': 'tráng nước', r'\brửa\s*chén\b': 'rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\btui\b': 'tôi', r'\bthiệt\b': 'thật', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bmua\s+liền\b': 'mua ngay'}
+POLICY_REPLACEMENTS = {r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn', r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn', r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'đợt ưu đãi này', r'\blivestream\b': 'chương trình ưu đãi'}
+SOUTHERN_TO_HANOI = {r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bxài\s*êm\b': 'dùng êm', r'\bmịn\s*mướt\b': 'căng mướt', r'\blột\s*mụn\b': 'hút mụn', r'\bbận\s+đồ\b': 'mặc đồ', r'\bbận\s+áo\b': 'mặc áo', r'\bbận\s+quần\b': 'mặc quần', r'\bbận\s+váy\b': 'mặc váy', r'\bbận\b(?=\s+[a-zà-ỹ]+)': 'mặc', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', r'\bmắc\s+cỡ\b': 'ngại', r'\bhết\s+sẩy\b': 'tuyệt cú mèo', r'\brẻ\s+bèo\b': 'rẻ thế', r'\bquá\s+trời\b': 'rất nhiều', r'\bquá\s+chừng\b': 'rất nhiều', r'\bnè\b': 'này', r'\bnha\b': 'nhé', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bcoi\b': 'xem', r'\bmua\s+liền\b': 'mua ngay'}
 
 # ==============================================================================
 # 3. KẾT NỐI API & DB
@@ -245,7 +245,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 """
 
 # ==============================================================================
-# 5. CÁC HÀM TIỆN ÍCH
+# 5. CÁC HÀM TIỆN ÍCH & XỬ LÝ NLP HOÀN CHỈNH
 # ==============================================================================
 def save_single_account(email, acc_data):
     if not supabase or email == ADMIN_EMAIL: return
@@ -412,23 +412,43 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+|gần\s+)+', '', str(price_text).lower().strip()).strip()
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
+# 🌟 KHÔI PHỤC LÕI XỬ LÝ VI PHẠM CHÍNH SÁCH VÀ PHƯƠNG NGỮ (ĐÃ SỬA LỖI NAME ERROR)
+def normalize_hanoi_dialect(text: str) -> str:
+    if not text: return ""
+    cleaned = text
+    for pattern, rep in SOUTHERN_TO_HANOI.items(): 
+        cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
+    return cleaned
+
+def sanitize_policy_text(text: str) -> str:
+    if not text: return ""
+    cleaned = normalize_hanoi_dialect(text)
+    for pattern, rep in POLICY_REPLACEMENTS.items(): 
+        cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bngàn\b', 'nghìn', cleaned, flags=re.IGNORECASE)
+    return cleaned
+
+def sanitize_third_party_ip(text: str) -> str:
+    if not text: return ""
+    cleaned = text
+    for p in [r'\btiktok\s*(?:shop)?\b', r'\bshopee\b', r'\blazada\b', r'\bfacebook\b', r'\binstagram\b', r'\byoutube\b']: 
+        cleaned = re.sub(p, 'online store', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\blụa\s*titan\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btitan\s*silk\b', 'lustrous satin silk', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\btitan\b', 'lustrous satin', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\b(?:emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b', 'premium everyday', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\b(?:celebrity|celebrities|public\s+figure|famous\s+person|famous\s+model|supermodel|star|idol|influencer|koc|kol|deepfake|real\s+person|real\s+human|authentic\s+person)\b', 'fictional everyday character', cleaned, flags=re.IGNORECASE)
+    for pattern, safe_term in INTIMATE_SAFE_ENGLISH_LEXICON.items(): 
+        cleaned = re.sub(pattern, safe_term, cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bwearing\s+wearing\b', 'wearing', cleaned, flags=re.IGNORECASE)
+    return re.sub(r'\.\.+', '.', cleaned)
+
 def clean_and_normalize_voiceover(text: str) -> str:
     if not text: return ""
+    # GỌI HÀM SANITIZE VỪA ĐƯỢC KHÔI PHỤC Ở TRÊN ĐỂ TRÁNH LỖI NOT DEFINED
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
     for pattern, rep in [
-        (r'\blụa\s+premium\s+everyday\b', 'lụa cao cấp'), (r'\bpremium\s+everyday\b', 'cao cấp'),
-        (r'\bmềm\s*rủ\b', 'mềm rũ'), (r'\bsiêu\s*rủ\b', 'siêu rũ'), (r'\bđộ\s*rủ\b', 'độ rũ'), (r'\brủ\s*xuống\b', 'rũ xuống'),
-        (r'\báp\s*mã\b', 'nay giảm'), (r'\báp\s*voucher\b', 'nay giảm'),
-        (r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b', 'một trăm bốn mươi'), (r'\b1\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
-        (r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b', 'một trăm bốn mươi'), (r'\bmột\s*trăm\s*(?:tư|tứ)\b', 'một trăm bốn mươi'),
-        (r'\btrăm\s*(?:tư|tứ)\s*mươi\b', 'trăm bốn mươi'), (r'\btrăm\s*(?:tư|tứ)\b', 'trăm bốn mươi'),
-        (r'\b1\s*trăm\b', 'một trăm'), (r'\b1\s*nghìn\b', 'một nghìn'), (r'\b1\s*triệu\b', 'một triệu'),
-        (r'\b140\s*(?:k|nghìn|ngàn)\b', 'một trăm bốn mươi nghìn'), (r'\b140\b', 'một trăm bốn mươi'),
-        (r'\b14\b', 'mười bốn'), (r'\b24\b', 'hai mươi bốn'), (r'\b34\b', 'ba mươi bốn'),
-        (r'\b40\b', 'bốn mươi'), (r'\b44\b', 'bốn mươi bốn'), (r'\b4\b', 'bốn'),
-        (r'\bmười\s+(?:tư|tứ)\b', 'mười bốn'), (r'\bhai\s+(?:tư|tứ)\b', 'hai mươi bốn'),
-        (r'\bba\s+(?:tư|tứ)\b', 'ba mươi bốn'), (r'\b(?:tư|tứ)\s+mươi\b', 'bốn mươi'), (r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b', r'\1 mươi bốn'),
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'), (r'\bform\s*dáng\s*đứng\s*form\b', 'lên dáng chuẩn xác'),
         (r'\bluồn\s*da\b', 'phối da'), (r'\bchần\s*chỉ\s*ô\s*trám\b', 'chần trám'), (r'\bchần\s*chỉ\s*hình\s*thoi\b', 'chần trám tinh tế'),
         (r'\bđứng\s*form\b', 'giữ form'), (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'), (r'\bdáng\s*mảnh\s*chuẩn\s*phong\s*cách\b', 'thiết kế chuẩn style'),
@@ -512,14 +532,6 @@ def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in [
         "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", "pan", "pot", "tool", "vacuum", "dryer", "blower", "hút bụi", "tai nghe", "headphone", "earbud", "earphone", "bluetooth", "điện thoại", "phone", "loa", "speaker", "sạc", "chuột", "bàn phím", "mic", "túi xách", "túi", "balo", "ví", "power bank", "sạc dự phòng"
     ])
-
-def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
-    c = f"{color_vi} {ai_color_en}".lower().strip()
-    if any(k in c for k in ["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"]):
-        return f"exact reference-matching pattern and colors ({ai_color_en})"
-    if ai_color_en and len(ai_color_en.strip()) > 2:
-        return f"exact reference-matching {ai_color_en.strip()}"
-    return "exact reference-matching color and pattern"
 
 def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False, is_food: bool = False) -> str:
     cleaned = action_text
@@ -1510,14 +1522,14 @@ if st.session_state.get("trigger_main_generation"):
                     "sale_price_spoken": "giá sale bằng chữ",
                     "hero_sku_color": "Màu sắc/Họa tiết Hero SKU tiếng Việt",
                     "hero_sku_color_en": "Exact English color and pattern",
-                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap. If image has a side handle -> write 'with side handle, NO top strap'.",
+                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap.",
                     "what_and_unique": "[Tên SP]: [Điểm độc bản USP]",
                     "product_dimensions": "Kích thước"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
+                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }}
                 ]
             }}
             """
