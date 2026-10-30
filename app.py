@@ -20,6 +20,51 @@ from datetime import datetime, timedelta, date
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
+# KHỞI TẠO STATE NGAY ĐẦU TIÊN
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
+default_states = {
+    "is_logged_in": False,
+    "current_email": "",
+    "licensed_accounts": {},
+    "all_scripts": [],
+    "cloned_scripts": [],
+    "expanded_scripts": [],
+    "generated_details": {},
+    "content_analysis": None,
+    "active_script_id": None,
+    "current_input_context": "",
+    "current_product_data_saved": None,
+    "current_product_data": None,
+    "reset_key": 0,
+    "scroll_to_top": False,
+    "scroll_to_detail": False,
+    "trigger_main_generation": False,
+    "trigger_more_generation": False,
+    "temp_main_args": {},
+    "temp_more_args": {},
+    "active_project_title": f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}",
+    "last_mode": "🛒 TikTok Shop & Bán Hàng",
+    "last_style": "Điện Ảnh Chân Thực",
+    "last_narrator": "On-camera",
+    "last_presentation_format": "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng",
+    "target_duration_instruction": "",
+    "character_profiles": [],
+    "current_project_id": None,
+    "saved_reference_images": [],
+    "show_all_projects": False,
+    "show_all_admin_accounts": False,
+    "current_processing_id": None,
+    "current_cloning_id": None,
+    "is_analyzed": False,
+    "last_autosave_time": ""
+}
+
+for k, v in default_states.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
+
 st.markdown("""
 <style>
     .header-container { text-align: center; padding: 1.2rem; background: radial-gradient(circle, rgba(255,75,75,0.08) 0%, rgba(255,255,255,0) 70%); border-radius: 16px; margin-bottom: 1rem; }
@@ -115,58 +160,19 @@ def load_licensed_accounts():
     except Exception: pass
     return accs
 
-# ==============================================================================
-# 4. KHỞI TẠO STATE CHỐNG KEY ERROR TUYỆT ĐỐI
-# ==============================================================================
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
-
-default_states = {
-    "is_logged_in": False,
-    "current_email": "",
-    "licensed_accounts": {},
-    "all_scripts": [],
-    "cloned_scripts": [],
-    "expanded_scripts": [],
-    "generated_details": {},
-    "content_analysis": None,
-    "active_script_id": None,
-    "current_input_context": "",
-    "current_product_data_saved": None,
-    "current_product_data": None,
-    "reset_key": 0,
-    "scroll_to_top": False,
-    "scroll_to_detail": False,
-    "trigger_main_generation": False,
-    "trigger_more_generation": False,
-    "temp_main_args": {},
-    "temp_more_args": {},
-    "active_project_title": f"Chiến dịch {datetime.now().strftime('%d/%m/%Y')}",
-    "last_mode": "🛒 TikTok Shop & Bán Hàng",
-    "last_style": "Điện Ảnh Chân Thực",
-    "last_narrator": "On-camera",
-    "last_presentation_format": "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng",
-    "target_duration_instruction": "",
-    "character_profiles": [],
-    "current_project_id": None,
-    "saved_reference_images": [],
-    "show_all_projects": False,
-    "show_all_admin_accounts": False,
-    "current_processing_id": None,
-    "current_cloning_id": None,
-    "is_analyzed": False,
-    "last_autosave_time": ""
-}
-
-for k, v in default_states.items():
-    if k not in st.session_state:
-        st.session_state[k] = v
-
 if not st.session_state.get("licensed_accounts"):
     st.session_state.licensed_accounts = load_licensed_accounts()
 
+# 🌟 KHÔI PHỤC BIẾN IS_SYSTEM_BUSY TRÁNH NAME ERROR TẠI ĐÂY
+is_system_busy = (
+    st.session_state.get("current_processing_id") is not None or 
+    st.session_state.get("current_cloning_id") is not None or
+    st.session_state.get("trigger_main_generation") is True or
+    st.session_state.get("trigger_more_generation") is True
+)
+
 # ==============================================================================
-# 5. CÁC HÀM TIỆN ÍCH & DB
+# 5. CÁC HÀM TIỆN ÍCH & LOGIC
 # ==============================================================================
 def save_single_account(email, acc_data):
     if not supabase or email == ADMIN_EMAIL: return
@@ -253,6 +259,27 @@ def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
     except Exception: return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 def clean_html(raw_html: str) -> str: return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip()) if raw_html else ""
+
+def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt", custom_color: str = "#16a34a"):
+    b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
+    html_id = f"btn_{uuid.uuid4().hex[:8]}"
+    html_code = f"""
+    <button id="{html_id}" style="background:{custom_color}; color:white; border:none; padding:7px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer; width:100%; transition: 0.2s;">{button_label}</button>
+    <script>
+    document.getElementById("{html_id}").addEventListener("click", function() {{
+        const text = decodeURIComponent(escape(atob("{b64}")));
+        navigator.clipboard.writeText(text).then(() => {{
+            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
+            setTimeout(() => {{ document.getElementById("{html_id}").innerText = "{button_label}"; }}, 2000);
+        }}).catch(() => {{
+            const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
+        }});
+    }});
+    </script>
+    """
+    components.html(html_code, height=42)
 
 def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
     raw = str(ca_data.get("what_and_unique", "")).strip() if isinstance(ca_data, dict) else ""
@@ -1443,9 +1470,9 @@ if st.session_state.get("trigger_main_generation"):
                     "is_fixed_location": true,
                     "koc_demographic_analysis": {{
                         "gender": "male hoặc female",
-                        "age_segment": "child / teen / adult / senior",
-                        "persona_vi": "Mô tả KOC 100% người Việt (VD: Nam thanh niên 25 tuổi)",
-                        "persona_en": "CRITICAL: Must start with 'Vietnamese' (e.g., '25yo Vietnamese man')",
+                        "age_segment": "child / teen / adult / senior (Phân tích theo sản phẩm)",
+                        "persona_vi": "Mô tả KOC 100% người Việt (VD: Nam thanh niên 25 tuổi, Bà lão 60 tuổi...)",
+                        "persona_en": "CRITICAL: Must start with 'Vietnamese' (e.g., '25yo Vietnamese man', '60yo Vietnamese senior woman')",
                         "body_and_hair_en": "authentic Vietnamese Southeast Asian facial features, natural jet-black hair",
                         "voice_prompt": "Native Hanoi Vietnamese [child/adult/senior] [male/female] voice"
                     }},
@@ -1461,9 +1488,9 @@ if st.session_state.get("trigger_main_generation"):
                     "product_dimensions": "Kích thước"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }}
+                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }}
                 ]
             }}
             """
