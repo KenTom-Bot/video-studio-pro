@@ -16,11 +16,10 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & CSS TOÀN CỤC
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE (CHỐNG LỖI CRASH)
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
-# KHỞI TẠO STATE NGAY ĐẦU TIÊN
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 
@@ -163,7 +162,6 @@ def load_licensed_accounts():
 if not st.session_state.get("licensed_accounts"):
     st.session_state.licensed_accounts = load_licensed_accounts()
 
-# 🌟 KHÔI PHỤC BIẾN IS_SYSTEM_BUSY TRÁNH NAME ERROR TẠI ĐÂY
 is_system_busy = (
     st.session_state.get("current_processing_id") is not None or 
     st.session_state.get("current_cloning_id") is not None or
@@ -172,7 +170,82 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 5. CÁC HÀM TIỆN ÍCH & LOGIC
+# 4. GỌI GEMINI API & SỬA LỖI JSON
+# ==============================================================================
+def repair_and_parse_json(text_content: str):
+    if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
+    cleaned = re.sub(r'```(?:json)?', '', text_content).strip()
+    try: return json.loads(cleaned, strict=False)
+    except: pass
+    match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
+    if match:
+        try: return json.loads(match.group(0), strict=False)
+        except: pass
+    candidate = cleaned
+    fb = candidate.find('{')
+    if fb != -1: candidate = candidate[fb:]
+    if len(re.findall(r'(?<!\\)"', candidate)) % 2 != 0: candidate += '"'
+    open_curly, open_square = candidate.count('{') - candidate.count('}'), candidate.count('[') - candidate.count(']')
+    candidate += (']' * max(0, open_square)) + ('}' * max(0, open_curly))
+    try: return json.loads(candidate, strict=False)
+    except: pass
+    try:
+        py_str = candidate.replace('true', 'True').replace('false', 'False').replace('null', 'None')
+        parsed = ast.literal_eval(py_str)
+        return parsed[0] if isinstance(parsed, list) and len(parsed) > 0 and isinstance(parsed[0], dict) else parsed
+    except: pass
+    raise Exception("Lỗi khi đọc kết quả từ AI. Vui lòng thử lại.")
+
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+    if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
+    models_to_try = ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
+    last_exception = None
+    for model_name in models_to_try:
+        for attempt in range(3):
+            try:
+                res = client.models.generate_content(
+                    model=model_name, contents=contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=sys_inst, response_mime_type="application/json",
+                        temperature=0.65, max_output_tokens=max_tokens
+                    )
+                )
+                return repair_and_parse_json(res.text)
+            except Exception as e:
+                last_exception = e
+                err_str = str(e).lower()
+                if "404" in err_str or "not_found" in err_str: break
+                if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
+                    time.sleep((attempt + 1) * 1.2); continue
+                time.sleep(0.6)
+    if last_exception:
+        if "503" in str(last_exception) or "unavailable" in str(last_exception).lower(): raise Exception("Google API bận tạm thời (503). Vui lòng đợi 5s rồi bấm lại.")
+        raise last_exception
+
+def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
+    is_viral = ("Viral" in mode)
+    goal = "VIRAL (Chia sẻ mẹo/kiến thức/câu chuyện, KHÔNG bán hàng, KHÔNG giá)" if is_viral else "TIKTOK SHOP (Chuyển đổi bán hàng, giải quyết nỗi đau, chốt deal)"
+    return f"""ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}
+🛑 GHI CHÚ TỪ NGƯỜI DÙNG: {custom_note}
+{COMPACT_CORE_RULES}
+- 3 kịch bản = 3 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.
+- KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng sản phẩm để chọn KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Giọng đọc Hà Nội chuẩn phải khớp với tuổi và giới tính của KOC.
+- Bắt buộc tạo full_voiceover_script hoàn chỉnh, CỰC KỲ TỰ NHIÊN, KHÔNG lặp từ.
+"""
+
+def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False, forced_footwear="sneakers", target_id=1):
+    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP làm TRỌNG TÂM TIỀN CẢNH giải quyết vấn đề." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM TIỀN CẢNH xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
+    return f"""ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}
+🛑 GHI CHÚ TỪ NGƯỜI DÙNG: {custom_note}
+{COMPACT_CORE_RULES}
+- LỜI THOẠI PHẢI LIỀN MẠCH, TỰ NHIÊN, dồn dập. KHÔNG lặp từ, KHÔNG lủng củng.
+- TƯƠNG TÁC MỸ PHẨM CHUẨN XÁC: Công dụng ở đâu bôi ĐÚNG ở đó. Lăn nách thì KOC giơ nách, má hồng bôi má, son bôi môi. Cấm sờ lên mặt nếu không phải kem mặt/đồ ăn.
+- HÀNH ĐỘNG HÌNH THỂ Ở CẢNH 1: Phải có biểu cảm cơ thể rõ ràng ứng với nỗi đau (gãi ngứa, bịt mũi, vươn vai mỏi...).
+- 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator).
+"""
+
+# ==============================================================================
+# 5. CÁC HÀM TIỆN ÍCH
 # ==============================================================================
 def save_single_account(email, acc_data):
     if not supabase or email == ADMIN_EMAIL: return
@@ -259,27 +332,6 @@ def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
     except Exception: return uploaded_file.getvalue(), (uploaded_file.type or "image/jpeg")
 
 def clean_html(raw_html: str) -> str: return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip()) if raw_html else ""
-
-def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt", custom_color: str = "#16a34a"):
-    b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
-    html_id = f"btn_{uuid.uuid4().hex[:8]}"
-    html_code = f"""
-    <button id="{html_id}" style="background:{custom_color}; color:white; border:none; padding:7px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer; width:100%; transition: 0.2s;">{button_label}</button>
-    <script>
-    document.getElementById("{html_id}").addEventListener("click", function() {{
-        const text = decodeURIComponent(escape(atob("{b64}")));
-        navigator.clipboard.writeText(text).then(() => {{
-            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
-            setTimeout(() => {{ document.getElementById("{html_id}").innerText = "{button_label}"; }}, 2000);
-        }}).catch(() => {{
-            const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
-            document.execCommand('copy'); document.body.removeChild(ta);
-            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
-        }});
-    }});
-    </script>
-    """
-    components.html(html_code, height=42)
 
 def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
     raw = str(ca_data.get("what_and_unique", "")).strip() if isinstance(ca_data, dict) else ""
@@ -442,7 +494,7 @@ def extract_scenes(parsed_data):
     return []
 
 # ==============================================================================
-# 6. HỆ THỐNG ĐẠO DIỄN: GÓC MÁY & ĐỘNG LỰC HỌC
+# 6. ĐẠO DIỄN: GÓC MÁY & ĐỘNG LỰC HỌC
 # ==============================================================================
 def detect_food(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "nước", "sữa", "trà", "cafe", "món ăn", "thực phẩm", "food", "snack", "drink", "cake", "noodle", "trái cây", "thịt", "hải sản", "cơm", "bún", "phở"])
 def detect_cosmetics(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách", "sáp", "nẻ", "vaseline", "balm", "má", "blush", "cheek"])
@@ -703,32 +755,7 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
     return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
 
 # ==============================================================================
-# 7. ĐỊNH NGHĨA HÀM PROMPT GEMINI API 
-# ==============================================================================
-def get_sys_inst_outlines(mode, style, narrator_mode, char_rules, num_chars, angle, custom_note="", presentation_format=""):
-    is_viral = ("Viral" in mode)
-    goal = "VIRAL (Chia sẻ mẹo/kiến thức/câu chuyện, KHÔNG bán hàng, KHÔNG giá)" if is_viral else "TIKTOK SHOP (Chuyển đổi bán hàng, giải quyết nỗi đau, chốt deal)"
-    return f"""ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {presentation_format or angle}
-🛑 GHI CHÚ TỪ NGƯỜI DÙNG: {custom_note}
-{COMPACT_CORE_RULES}
-- 3 kịch bản = 3 bối cảnh đời thực khác nhau khớp sản phẩm & sự kiện.
-- KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng sản phẩm để chọn KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Giọng đọc Hà Nội chuẩn phải khớp với tuổi và giới tính của KOC.
-- Bắt buộc tạo full_voiceover_script hoàn chỉnh, CỰC KỲ TỰ NHIÊN, KHÔNG lặp từ.
-"""
-
-def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instruction, num_chars, character_profiles, custom_note="", presentation_format="", self_pronoun="em", audience_pronoun="các chị em", setting_archetype="", is_fixed_location=True, is_pas_story=False, forced_footwear="sneakers", target_id=1):
-    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP làm TRỌNG TÂM TIỀN CẢNH giải quyết vấn đề." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM TIỀN CẢNH xuyên suốt 4 cảnh, Cảnh 2 nối mượt từ Cảnh 1."
-    return f"""ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}
-🛑 GHI CHÚ TỪ NGƯỜI DÙNG: {custom_note}
-{COMPACT_CORE_RULES}
-- LỜI THOẠI PHẢI LIỀN MẠCH, TỰ NHIÊN, dồn dập. KHÔNG lặp từ, KHÔNG lủng củng.
-- TƯƠNG TÁC MỸ PHẨM CHUẨN XÁC: Công dụng ở đâu bôi ĐÚNG ở đó. Lăn nách thì KOC giơ nách, má hồng bôi má, son bôi môi. Cấm sờ lên mặt nếu không phải kem mặt/đồ ăn.
-- HÀNH ĐỘNG HÌNH THỂ Ở CẢNH 1: Phải có biểu cảm cơ thể rõ ràng ứng với nỗi đau (gãi ngứa, bịt mũi, vươn vai mỏi...).
-- 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator).
-"""
-
-# ==============================================================================
-# 8. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
+# 7. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", [])
@@ -1483,14 +1510,14 @@ if st.session_state.get("trigger_main_generation"):
                     "sale_price_spoken": "giá sale bằng chữ",
                     "hero_sku_color": "Màu sắc/Họa tiết Hero SKU tiếng Việt",
                     "hero_sku_color_en": "Exact English color and pattern",
-                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap.",
+                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap. If image has a side handle -> write 'with side handle, NO top strap'.",
                     "what_and_unique": "[Tên SP]: [Điểm độc bản USP]",
                     "product_dimensions": "Kích thước"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }}
+                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
                 ]
             }}
             """
