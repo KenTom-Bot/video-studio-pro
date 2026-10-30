@@ -16,7 +16,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE AN TOÀN
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE (CHỐNG MỌI LỖI CRASH)
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -170,7 +170,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API & SỬA LỖI JSON
+# 4. HÀM GỌI GEMINI API & SỬA LỖI JSON
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -245,7 +245,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 """
 
 # ==============================================================================
-# 5. CÁC HÀM TIỆN ÍCH CƠ BẢN
+# 5. CÁC HÀM TIỆN ÍCH CHUNG
 # ==============================================================================
 def save_single_account(email, acc_data):
     if not supabase or email == ADMIN_EMAIL: return
@@ -333,6 +333,28 @@ def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
 
 def clean_html(raw_html: str) -> str: return "\n".join(line.strip() for line in raw_html.strip().splitlines() if line.strip()) if raw_html else ""
 
+# 🌟 KHÔI PHỤC HÀM TẠO NÚT COPY ĐỂ TRÁNH LỖI NAME ERROR KHI HIỂN THỊ
+def safe_copy_button(text_to_copy: str, button_label: str = "📋 Sao Chép Prompt", custom_color: str = "#16a34a"):
+    b64 = base64.b64encode(text_to_copy.encode('utf-8')).decode('utf-8')
+    html_id = f"btn_{uuid.uuid4().hex[:8]}"
+    html_code = f"""
+    <button id="{html_id}" style="background:{custom_color}; color:white; border:none; padding:7px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer; width:100%; transition: 0.2s;">{button_label}</button>
+    <script>
+    document.getElementById("{html_id}").addEventListener("click", function() {{
+        const text = decodeURIComponent(escape(atob("{b64}")));
+        navigator.clipboard.writeText(text).then(() => {{
+            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
+            setTimeout(() => {{ document.getElementById("{html_id}").innerText = "{button_label}"; }}, 2000);
+        }}).catch(() => {{
+            const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            document.getElementById("{html_id}").innerText = "✅ Đã sao chép!";
+        }});
+    }});
+    </script>
+    """
+    components.html(html_code, height=42)
+
 def extract_bold_product_title(ca_data: dict, fallback_topic: str = "") -> str:
     raw = str(ca_data.get("what_and_unique", "")).strip() if isinstance(ca_data, dict) else ""
     if not raw and fallback_topic: raw = fallback_topic.strip()
@@ -413,7 +435,7 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP & XỬ LÝ LỖI (ĐÃ ĐƯỢC KHÔI PHỤC HOÀN TOÀN)
+# 6. KHỐI HÀM NLP (LÀM SẠCH VĂN BẢN VÀ CHỐNG VẤP THOẠI)
 # ==============================================================================
 def normalize_hanoi_dialect(text: str) -> str:
     if not text: return ""
@@ -515,7 +537,7 @@ def extract_scenes(parsed_data):
     return []
 
 # ==============================================================================
-# 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & MÀU SẮC (ĐÃ ĐƯỢC KHÔI PHỤC HÀM MÀU SẮC)
+# 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & MÀU SẮC ĐỘNG
 # ==============================================================================
 def detect_food(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "nước", "sữa", "trà", "cafe", "món ăn", "thực phẩm", "food", "snack", "drink", "cake", "noodle", "trái cây", "thịt", "hải sản", "cơm", "bún", "phở"])
 def detect_cosmetics(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách", "sáp", "nẻ", "vaseline", "balm", "má", "blush", "cheek"])
@@ -534,7 +556,6 @@ def detect_strict_rigid_appliance(text_to_check: str) -> bool:
         "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", "pan", "pot", "tool", "vacuum", "dryer", "blower", "hút bụi", "tai nghe", "headphone", "earbud", "earphone", "bluetooth", "điện thoại", "phone", "loa", "speaker", "sạc", "chuột", "bàn phím", "mic", "túi xách", "túi", "balo", "ví", "power bank", "sạc dự phòng"
     ])
 
-# 🌟 KHÔI PHỤC HÀM XỬ LÝ MÀU SẮC ĐỂ TRÁNH LỖI NOT DEFINED Ở GIAO DIỆN
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
     c = f"{color_vi} {ai_color_en}".lower().strip()
     if any(k in c for k in ["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"]):
@@ -1481,7 +1502,7 @@ if st.session_state.get("trigger_main_generation"):
         try:
             char_inputs = []
             if args.get("avatar_file") or args.get("role_input"):
-                char_inputs.append({"id": 1, "role": args["role_input"], "file_bytes": args["avatar_file"]})
+                char_inputs.append({"id": 1, "role": args.get("role_input", ""), "file_bytes": args.get("avatar_file")})
             
             st.session_state.character_profiles = [{"id": c["id"], "role": c["role"]} for c in char_inputs] if char_inputs else [{"id": 1, "role": ""}]
             char_rules = generate_char_rules_string(st.session_state.get("character_profiles", []))
@@ -1519,9 +1540,9 @@ if st.session_state.get("trigger_main_generation"):
                     "is_fixed_location": true,
                     "koc_demographic_analysis": {{
                         "gender": "male hoặc female",
-                        "age_segment": "child / teen / adult / senior (Phân tích theo sản phẩm)",
-                        "persona_vi": "Mô tả KOC 100% người Việt (VD: Nam thanh niên 25 tuổi, Bà lão 60 tuổi...)",
-                        "persona_en": "CRITICAL: Must start with 'Vietnamese' (e.g., '25yo Vietnamese man', '60yo Vietnamese senior woman')",
+                        "age_segment": "child / teen / adult / senior",
+                        "persona_vi": "Mô tả KOC 100% người Việt (VD: Nam thanh niên 25 tuổi)",
+                        "persona_en": "CRITICAL: Must start with 'Vietnamese' (e.g., '25yo Vietnamese man')",
                         "body_and_hair_en": "authentic Vietnamese Southeast Asian facial features, natural jet-black hair",
                         "voice_prompt": "Native Hanoi Vietnamese [child/adult/senior] [male/female] voice"
                     }},
@@ -1532,14 +1553,14 @@ if st.session_state.get("trigger_main_generation"):
                     "sale_price_spoken": "giá sale bằng chữ",
                     "hero_sku_color": "Màu sắc/Họa tiết Hero SKU tiếng Việt",
                     "hero_sku_color_en": "Exact English color and pattern",
-                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap. If image has a side handle -> write 'with side handle, NO top strap'.",
+                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap.",
                     "what_and_unique": "[Tên SP]: [Điểm độc bản USP]",
                     "product_dimensions": "Kích thước"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
+                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }}
                 ]
             }}
             """
