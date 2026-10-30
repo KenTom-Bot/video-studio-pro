@@ -16,7 +16,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE 
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE AN TOÀN
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -119,7 +119,7 @@ COMPACT_CORE_RULES = """
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
-POLICY_REPLACEMENTS = {r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn', r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn', r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'đợt ưu đãi này', r'\blivestream\b': 'chương trình ưu đãi'}
+POLICY_REPLACEMENTS = {r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'đợt ưu đãi này', r'\blivestream\b': 'chương trình ưu đãi'}
 SOUTHERN_TO_HANOI = {r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bxài\s*êm\b': 'dùng êm', r'\bmịn\s*mướt\b': 'căng mướt', r'\blột\s*mụn\b': 'hút mụn', r'\bbận\s+đồ\b': 'mặc đồ', r'\bbận\s+áo\b': 'mặc áo', r'\bbận\s+quần\b': 'mặc quần', r'\bbận\s+váy\b': 'mặc váy', r'\bbận\b(?=\s+[a-zà-ỹ]+)': 'mặc', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', r'\bmắc\s+cỡ\b': 'ngại', r'\bhết\s+sẩy\b': 'tuyệt cú mèo', r'\brẻ\s+bèo\b': 'rẻ thế', r'\bquá\s+trời\b': 'rất nhiều', r'\bquá\s+chừng\b': 'rất nhiều', r'\bnè\b': 'này', r'\bnha\b': 'nhé', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bcoi\b': 'xem', r'\bmua\s+liền\b': 'mua ngay'}
 
 # ==============================================================================
@@ -245,7 +245,7 @@ def get_sys_inst_details(mode, style, narrator_mode, char_rules, duration_instru
 """
 
 # ==============================================================================
-# 5. CÁC HÀM TIỆN ÍCH & XỬ LÝ NLP HOÀN CHỈNH
+# 5. CÁC HÀM TIỆN ÍCH CƠ BẢN
 # ==============================================================================
 def save_single_account(email, acc_data):
     if not supabase or email == ADMIN_EMAIL: return
@@ -412,7 +412,9 @@ def convert_to_soft_price_range(price_text: str, is_orig: bool = False, exact_ra
     p_lower = re.sub(r'^(?:khoảng\s+|hơn\s+|tầm\s+|gần\s+)+', '', str(price_text).lower().strip()).strip()
     return f"gần {p_lower}" if is_orig else f"hơn {p_lower}"
 
-# 🌟 KHÔI PHỤC LÕI XỬ LÝ VI PHẠM CHÍNH SÁCH VÀ PHƯƠNG NGỮ (ĐÃ SỬA LỖI NAME ERROR)
+# ==============================================================================
+# 6. KHỐI HÀM NLP & XỬ LÝ LỖI (ĐÃ ĐƯỢC KHÔI PHỤC HOÀN TOÀN)
+# ==============================================================================
 def normalize_hanoi_dialect(text: str) -> str:
     if not text: return ""
     cleaned = text
@@ -445,7 +447,6 @@ def sanitize_third_party_ip(text: str) -> str:
 
 def clean_and_normalize_voiceover(text: str) -> str:
     if not text: return ""
-    # GỌI HÀM SANITIZE VỪA ĐƯỢC KHÔI PHỤC Ở TRÊN ĐỂ TRÁNH LỖI NOT DEFINED
     cleaned = sanitize_policy_text(text)
     cleaned = extract_and_convert_prices_in_text(cleaned)
     for pattern, rep in [
@@ -514,7 +515,7 @@ def extract_scenes(parsed_data):
     return []
 
 # ==============================================================================
-# 6. ĐẠO DIỄN: GÓC MÁY & ĐỘNG LỰC HỌC
+# 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & MÀU SẮC (ĐÃ ĐƯỢC KHÔI PHỤC HÀM MÀU SẮC)
 # ==============================================================================
 def detect_food(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "nước", "sữa", "trà", "cafe", "món ăn", "thực phẩm", "food", "snack", "drink", "cake", "noodle", "trái cây", "thịt", "hải sản", "cơm", "bún", "phở"])
 def detect_cosmetics(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "cream", "lipstick", "lip", "makeup", "skincare", "cosmetic", "khử mùi", "nách", "sáp", "nẻ", "vaseline", "balm", "má", "blush", "cheek"])
@@ -532,6 +533,15 @@ def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in [
         "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "basket", "rack", "organizer", "bin", "box", "hamper", "shelf", "holder", "pan", "pot", "tool", "vacuum", "dryer", "blower", "hút bụi", "tai nghe", "headphone", "earbud", "earphone", "bluetooth", "điện thoại", "phone", "loa", "speaker", "sạc", "chuột", "bàn phím", "mic", "túi xách", "túi", "balo", "ví", "power bank", "sạc dự phòng"
     ])
+
+# 🌟 KHÔI PHỤC HÀM XỬ LÝ MÀU SẮC ĐỂ TRÁNH LỖI NOT DEFINED Ở GIAO DIỆN
+def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
+    c = f"{color_vi} {ai_color_en}".lower().strip()
+    if any(k in c for k in ["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"]):
+        return f"exact reference-matching pattern and colors ({ai_color_en})"
+    if ai_color_en and len(ai_color_en.strip()) > 2:
+        return f"exact reference-matching {ai_color_en.strip()}"
+    return "exact reference-matching color and pattern"
 
 def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False, is_food: bool = False) -> str:
     cleaned = action_text
@@ -767,7 +777,7 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
     return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
 
 # ==============================================================================
-# 7. LOGIC KỊCH BẢN CHÍNH (CREATE DETAILS, CLONE, EXPAND)
+# 8. LOGIC GỌI LÕI ĐỂ XỬ LÝ (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
 def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     all_combined = st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", [])
@@ -1522,14 +1532,14 @@ if st.session_state.get("trigger_main_generation"):
                     "sale_price_spoken": "giá sale bằng chữ",
                     "hero_sku_color": "Màu sắc/Họa tiết Hero SKU tiếng Việt",
                     "hero_sku_color_en": "Exact English color and pattern",
-                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap.",
+                    "product_visual_en": "Concise English description (max 20 words). CRITICAL GEOMETRY LOCK: Explicitly describe handle/strap. If image has a side handle -> write 'with side handle, NO top strap'.",
                     "what_and_unique": "[Tên SP]: [Điểm độc bản USP]",
                     "product_dimensions": "Kích thước"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch...", "actors": 1 }}
+                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, áp dụng chuẩn AIDA và Non-Robotic rules...", "actors": 1 }}
                 ]
             }}
             """
