@@ -1283,9 +1283,9 @@ with st.sidebar:
         if supabase:
             try:
                 if is_admin_user:
-                    res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").order("created_at", desc=True).limit(50).execute()
+                    res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").order("created_at", desc=True).limit(5000).execute()
                 else:
-                    res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").eq("user_email", st.session_state.get("current_email", "")).order("created_at", desc=True).limit(30).execute()
+                    res = supabase.table("saved_projects").select("id, project_title, user_email, created_at").eq("user_email", st.session_state.get("current_email", "")).order("created_at", desc=True).limit(3000).execute()
                 all_projects = res.data or []
             except: all_projects = []
 
