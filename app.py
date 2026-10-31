@@ -16,7 +16,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE 
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -109,12 +109,12 @@ COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH xuyên suốt 4 cảnh.
 2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động hình thể chân thực (VD: ngứa thì gãi, hôi thì nhăn mặt bịt mũi, mỏi thì xoa bóp).
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa lên mặt nếu ko phải kem mặt.
-   - GIA DỤNG/THỜI TRANG: Cấm đưa lên mặt. Tương tác ngang ngực/eo hoặc dưới sàn. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
-   - 100% KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
+   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động chân thực (VD: gãi tay/cổ, xoa bóp eo, vươn vai).
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má. CẤM đưa lên mặt nếu ko phải kem mặt.
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): TUYỆT ĐỐI CẤM SỜ LÊN MẶT (No face touching). BẮT BUỘC dùng cả 2 tay thao tác với sản phẩm ngang ngực hoặc trên bàn.
+   - 100% KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội khớp độ tuổi KOC.
 3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình như đang livestream. Cấm lặp từ (Cấm "giá đang giảm giá"). Cấm dịch word-by-word.
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ, cấm dịch word-by-word.
    - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng các từ "trên live", "phiên live", "đang live".
    - CẤM ĐỌC GIÁ CỤ THỂ (CRITICAL): TUYỆT ĐỐI KHÔNG đọc chính xác con số. CHỈ dùng khoảng ước lượng ("hơn trăm cành", "đang sale cực sâu").
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT: CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
@@ -413,7 +413,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP (LÀM SẠCH VĂN BẢN VÀ CHỐNG VẤP THOẠI)
+# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ
 # ==============================================================================
 def normalize_hanoi_dialect(text: str) -> str:
     if not text: return ""
@@ -440,6 +440,7 @@ def sanitize_third_party_ip(text: str) -> str:
     cleaned = re.sub(r'\b(?:emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b', 'premium everyday', cleaned, flags=re.IGNORECASE)
     for pattern, safe_term in INTIMATE_SAFE_ENGLISH_LEXICON.items(): 
         cleaned = re.sub(pattern, safe_term, cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bwearing\s+wearing\b', 'wearing', cleaned, flags=re.IGNORECASE)
     return re.sub(r'\.\.+', '.', cleaned)
 
 def clean_and_normalize_voiceover(text: str) -> str:
@@ -501,6 +502,19 @@ def extract_scenes(parsed_data):
                     if key in v and isinstance(v[key], list): return v[key]
     return []
 
+# 🌟 BỘ LỌC CƯỠNG CHẾ CẤM SỜ MẶT MẠNH MẼ NHẤT
+def force_no_face_touching(text_en: str) -> str:
+    if not text_en: return ""
+    cleaned = text_en
+    patterns = [
+        r'\b(?:touching|rubbing|scratching|pointing to|holding near|bringing to|pressing against|resting on|caressing)\s+(?:face|cheek|cheeks|chin|nose|eye|eyes|ear|ears|head|hair|lips|mouth|neck)\b',
+        r'\bhands?\s+on\s+(?:face|cheeks|head|chin)\b',
+        r'\b(?:bringing|holding|lifting)\s+(?:object|product|it)\s+(?:to|near|close to|against)\s+(?:face|cheek|ear|head)\b'
+    ]
+    for pat in patterns:
+        cleaned = re.sub(pat, 'operating product with both hands', cleaned, flags=re.IGNORECASE)
+    return cleaned
+
 # ==============================================================================
 # 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & ĐỒNG NHẤT KHUÔN MẶT
 # ==============================================================================
@@ -518,7 +532,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in [
-        "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng"
+        "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ"
     ])
 
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
@@ -714,7 +728,6 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
-# 🌟 KHÔI PHỤC HÀM XÂY DỰNG TRANG PHỤC STYLIST BỊ THIẾU
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -840,7 +853,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
-        scene_1_action_inst = "CRITICAL: Translate EXACT physical struggle/pain (e.g. scratching itchy skin, pinching nose) into explicit body language. EMPTY HANDS, ZERO PRODUCT IN FRAME."
+        scene_1_action_inst = "CRITICAL: Translate EXACT physical struggle/pain (e.g. rubbing sore neck/shoulder, scratching arm). ZERO FACE TOUCHING. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
@@ -857,7 +870,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (set_en) KHỚP với thoại. CẤM set "bedroom" nếu ra ngoài.
-    3. CẤM đưa sản phẩm lên mặt nếu không phải là mỹ phẩm mặt/đồ ăn.
+    3. QUY TẮC BÀN TAY & KHUÔN MẶT (CRITICAL): 
+       - MỸ PHẨM/ĐỒ ĂN: Công dụng ở đâu dùng ở đó (son bôi môi, má hồng bôi má, kem bôi mặt).
+       - CÁC NGÀNH HÀNG KHÁC: TUYỆT ĐỐI CẤM đưa tay sờ lên mặt, cằm, má, vuốt tóc hay đưa sản phẩm kề sát mặt. Mọi tương tác cầm nắm, sử dụng sản phẩm BẮT BUỘC ở ngang ngực (chest level) hoặc trên mặt bàn bằng 2 tay.
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
@@ -865,10 +880,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
         "wardrobe_en": "CRITICAL: EXACT outfit down to sleeve length and tucking.",
         "scenes": [
-            {{ "set": "Bối cảnh VN...", "exp": "lively, engaging expression", "act": "{scene_1_action_inst} (under 25 words)", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "{action_scene_2} (under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "{action_scene_3} (under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
+            {{ "set": "Bối cảnh VN...", "exp": "lively, engaging expression", "act": "{scene_1_action_inst} (ZERO face touching, under 25 words)", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "{action_scene_2} (ZERO face touching, under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "{action_scene_3} (ZERO face touching, under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
     """
@@ -918,9 +933,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     char_neg_extra = f"{dynamic_footwear_neg}caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
-    face_touch_neg = "" if (is_cosmetics or is_food) else "holding like a phone, holding to ear, pressing against cheek, touching face, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
+    face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
-    base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}{face_touch_neg}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
+    base_neg_prompt = f"{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
@@ -949,6 +964,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         micro_expr = sanitize_third_party_ip(scn.get("exp", scn.get("expression_en", "natural engaging expression"))).strip().rstrip('.')
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("act", scn.get("action_en", action_scene_2)), flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
+        
+        # LỌC CƯỠNG CHẾ VẬT LÝ PYTHON CHỐNG SỜ MẶT
+        if not is_cosmetics and not is_food:
+            if is_pas_scn1_no_prod:
+                pass # Cảnh 1 diễn nỗi đau được phép dùng tay xoa bóp (không có sản phẩm)
+            else:
+                clean_act = force_no_face_touching(clean_act)
+                micro_expr = force_no_face_touching(micro_expr)
+                clean_act = f"{clean_act.rstrip('.')}, both hands actively manipulating the product at chest level (hands never touch face)"
         
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing"):
