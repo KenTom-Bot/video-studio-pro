@@ -16,7 +16,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE 
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -110,7 +110,7 @@ COMPACT_CORE_RULES = """
 1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH xuyên suốt 4 cảnh.
 2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
    - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động chân thực (VD: gãi tay/cổ, xoa bóp eo, vươn vai).
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má. CẤM đưa lên mặt nếu ko phải kem mặt.
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa lên mặt nếu ko phải kem mặt.
    - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): TUYỆT ĐỐI CẤM SỜ LÊN MẶT (No face touching). BẮT BUỘC dùng cả 2 tay thao tác với sản phẩm ngang ngực hoặc trên bàn.
    - 100% KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội khớp độ tuổi KOC.
 3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ:
@@ -502,7 +502,6 @@ def extract_scenes(parsed_data):
                     if key in v and isinstance(v[key], list): return v[key]
     return []
 
-# 🌟 BỘ LỌC CƯỠNG CHẾ CẤM SỜ MẶT MẠNH MẼ NHẤT
 def force_no_face_touching(text_en: str) -> str:
     if not text_en: return ""
     cleaned = text_en
@@ -728,53 +727,6 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
-def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
-    s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
-    setting_lower = setting_vi.lower()
-    is_bedroom = any(k in setting_lower for k in ["phòng ngủ", "giường", "bedroom", "pijama", "đồ ngủ", "ngủ", "thức dậy"])
-    is_bathroom = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
-    is_kitchen = any(k in setting_lower for k in ["bếp", "nấu", "kitchen", "cooking", "ăn"])
-    is_chore = any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
-    is_living_room = any(k in setting_lower for k in ["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"]) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
-    is_office = any(k in setting_lower for k in ["văn phòng", "công sở", "công ty", "họp", "office", "workplace"])
-    is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
-    is_event_party = any(k in setting_lower for k in ["tiệc", "sự kiện", "đám cưới", "party", "event"])
-    is_beach_resort = any(k in setting_lower for k in ["biển", "resort", "du lịch", "beach", "vacation"])
-    is_single_skirt = detect_single_tube_skirt(s_lower)
-    is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
-    
-    if intimate_type == "underwear_bra": vibe = "Premium Fabric Review (Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional)"
-    elif intimate_type == "camisole": vibe = "Modest Casual Review (Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage)"
-    elif is_fashion:
-        if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
-            if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
-            elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the lower body. Top: tailored long-sleeve silk blouse, fully TUCKED IN. Footwear: pointed-toe leather high heels)"
-            else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the lower body. Top: fitted short-sleeve knit top or chic cropped tee. Footwear: clean minimalist white sneakers or leather loafers)"
-        elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie"]):
-            if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the upper body. Bottom: breezy wide-leg linen pants or denim shorts. Footwear: woven sandals)"
-            elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the upper body. Bottom: tailored wide-leg trousers or straight pencil skirt. Footwear: pointed-toe heels)"
-            else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the upper body. Bottom: fashionable high-waisted straight jeans or pleated midi skirt. Footwear: clean white sneakers)"
-        else:
-            if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Wearing the full product perfectly fitted. Top layer: structured blazer draped over shoulders. Footwear: stiletto heels)"
-            elif is_beach_resort: vibe = "Beach/Resort (Wearing the full product perfectly fitted, wide-brim woven hat, woven beach sandals)"
-            else: vibe = "High-Fashion Lookbook (Wearing the full product perfectly fitted, elegant makeup, premium matching footwear)"
-    elif is_bedroom: vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
-    elif is_bathroom: vibe = "Bathroom/Washroom (Bathrobe or comfortable home wear, UNTUCKED, barefoot or plastic anti-slip slippers)"
-    elif is_kitchen or is_chore: vibe = "Active Home/Chores (Neat comfy loungewear, rolled-up sleeves, UNTUCKED, casual indoor slippers)"
-    elif is_living_room: vibe = "Relaxed Living Room (Smart-casual loungewear or comfy chic sweater/t-shirt, UNTUCKED, minimalist indoor slippers)"
-    elif is_gym_sport: vibe = "Athletic/Gym (Form-fitting activewear, leggings/joggers, UNTUCKED, athletic running shoes)"
-    elif is_office: vibe = "Professional Office (Elegant blouse, tailored trousers or pencil skirt, neatly TUCKED IN, pointed-toe heels or smart loafers)" if gender == "female" else "Professional Office (Crisp button-down shirt, tailored trousers, neatly TUCKED IN, leather dress shoes or smart loafers)"
-    elif is_event_party or is_evening_fashion: vibe = "Elegant Evening (Glamorous evening dress or chic formal outfit, strappy heeled sandals or stilettos)" if gender == "female" else "Elegant Evening (Tailored suit or sharp blazer, polished dress shoes)"
-    else: vibe = "Trendy Streetwear/Cafe (Stylish layered outfit, fashionable jeans or skirt, UNTUCKED or French tuck, clean white sneakers or ankle boots)" if gender == "female" else "Trendy Streetwear/Cafe (Smart-casual layered outfit, overshirt or stylish tee, clean denim or chinos, UNTUCKED, minimalist white sneakers)"
-
-    contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
-    if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
-    elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
-    elif is_medicine: contrast_note = "Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
-        
-    skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
-    return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
-
 # ==============================================================================
 # 8. LOGIC GỌI LÕI ĐỂ XỬ LÝ (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
@@ -935,9 +887,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
-    base_neg_prompt = f"{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
+    # 🌟 Gỡ bỏ "multiple characters" khỏi lệnh cấm nếu có người phụ ở bối cảnh
+    base_neg_prompt_core = f"{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
-        base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
+        base_neg_prompt_core += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
     total_sec = 0.0
     for idx_scn, scn in enumerate(scenes):
@@ -965,10 +918,18 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("act", scn.get("action_en", action_scene_2)), flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
         
-        # LỌC CƯỠNG CHẾ VẬT LÝ PYTHON CHỐNG SỜ MẶT
+        # 🌟 CƠ CHẾ ĐẠO DIỄN BỐI CẢNH CHIỀU SÂU (DEPTH OF FIELD) CHO NGƯỜI PHỤ
+        family_bg_prompt = ""
+        current_neg_prompt = base_neg_prompt_core
+        if idx_scn == 0 and is_pas_scn1_no_prod:
+            vo_lower = vo_text.lower()
+            if any(k in vo_lower for k in ["trẻ", "bé", "con nít", "già", "ông", "bà", "gia đình"]):
+                family_bg_prompt = " [BACKGROUND: softly blurred silhouettes of an elderly person and a child in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
+                current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "") # Cho phép có nhiều người trong khung hình
+
         if not is_cosmetics and not is_food:
             if is_pas_scn1_no_prod:
-                pass # Cảnh 1 diễn nỗi đau được phép dùng tay xoa bóp (không có sản phẩm)
+                pass 
             else:
                 clean_act = force_no_face_touching(clean_act)
                 micro_expr = force_no_face_touching(micro_expr)
@@ -1000,20 +961,22 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en}{dim_tag} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry)."
 
         if is_pas_scn1_no_prod:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
+            prefix = f"{family_bg_prompt}" if family_bg_prompt else ""
+            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}.{prefix} Subject: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
         elif not is_fashion_wearable and idx_scn in [1, 2]:
             img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
         else:
             img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
 
         scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
-        scn["img_neg"] = base_neg_prompt
+        scn["img_neg"] = current_neg_prompt
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
         if is_pas_scn1_no_prod:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
+            prefix = f"{family_bg_prompt}" if family_bg_prompt else ""
+            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}.{prefix} [SUBJECT]: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
         elif not is_fashion_wearable or ((is_fashion_wearable or is_footwear_accessory) and (idx_scn in [1, 2])):
             raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
         else:
@@ -1022,7 +985,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         vid_parts = raw_vid.split('[AUDIO]:')
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
         else: scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
-        scn["vid_neg"] = base_neg_prompt
+        scn["vid_neg"] = current_neg_prompt
         scn["is_no_product_scene"] = is_pas_scn1_no_prod
         
     res["scenes"] = scenes
