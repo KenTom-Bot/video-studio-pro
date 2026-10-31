@@ -94,25 +94,37 @@ st.markdown("""
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
 
-UNIFIED_STRATEGY_FORMAT_OPTS = ["🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng", "📦 Review & Bóc Hộp Soi Chi Tiết", "👶 Trải Nghiệm Thực Tế Đời Sống", "⚡ Flash Sale & Deal Hời", "🎭 Giải Quyết Nỗi Đau (PAS)"]
+UNIFIED_STRATEGY_FORMAT_OPTS = [
+    "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng",
+    "📦 Review & Bóc Hộp Soi Chi Tiết (Freshly Unboxed)",
+    "👶 Trải Nghiệm Thực Tế Đời Sống (Lifestyle POV)",
+    "⚡ Flash Sale & Deal Hời (Bóc Hộp + Trải Nghiệm)",
+    "🎭 Giải Quyết Nỗi Đau (PAS Thực Chiến)",
+    "🔍 Review Thực Chiến & Test Công Năng",
+    "💡 Chia Sẻ Mẹo Hay & Kiến Thức Hữu Ích",
+    "😂 Tình Huống Hài Hước & Đời Thường"
+]
 
 COMPACT_CORE_RULES = """
-🛑 QUY TẮC CỐT LÕI (BẮT BUỘC):
-1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Cấm tạo người nước ngoài.
-2. HÀNH ĐỘNG & TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Nỗi đau): BẮT BUỘC biểu cảm/hành động chân thực (ngứa gãi, hôi bịt mũi).
-   - MỸ PHẨM: Công dụng ở đâu bôi ĐÚNG ở đó! CẤM đưa lên mặt nếu ko phải kem mặt.
-   - GIA DỤNG/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/bàn. KHÔNG thả rơi.
-   - 100% KOC nói TRỰC TIẾP vào ống kính.
-3. LÕI THOẠI (CHỐNG LIVESTREAM & LÀM MỜ GIÁ):
-   - Dồn dập, tự nhiên. Cấm lặp từ, cấm dịch word-by-word.
-   - TUYỆT ĐỐI CẤM dùng từ "trên live", "phiên live". Dùng "trong video này", "hôm nay".
-   - TUYỆT ĐỐI KHÔNG đọc giá cụ thể. CHỈ dùng khoảng ("hơn trăm cành", "đang sale cực sâu").
-4. VĂN NÓI HÀ NỘI THUẦN VIỆT: CẤM dấu chấm lửng (...), ký hiệu ([ ]) trong thoại.
+🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
+1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
+2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
+   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động hình thể chân thực (VD: ngứa thì gãi, hôi thì nhăn mặt bịt mũi, mỏi thì xoa bóp).
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa lên mặt nếu ko phải kem mặt.
+   - GIA DỤNG/THỜI TRANG: Cấm đưa lên mặt. Tương tác ngang ngực/eo hoặc dưới sàn. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
+   - 100% KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
+3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ:
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình như đang livestream. Cấm lặp từ (Cấm "giá đang giảm giá"). Cấm dịch word-by-word.
+   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng các từ "trên live", "phiên live", "đang live".
+   - CẤM ĐỌC GIÁ CỤ THỂ (CRITICAL): TUYỆT ĐỐI KHÔNG đọc chính xác con số. CHỈ dùng khoảng ước lượng ("hơn trăm cành", "đang sale cực sâu").
+4. VĂN NÓI HÀ NỘI THUẦN VIỆT: CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
-POLICY_REPLACEMENTS = {r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale'}
+POLICY_REPLACEMENTS = {
+    r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', 
+    r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale'
+}
 SOUTHERN_TO_HANOI = {r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', r'\bmắc\s+cỡ\b': 'ngại', r'\bhết\s+sẩy\b': 'tuyệt cú mèo', r'\brẻ\s+bèo\b': 'rẻ thế', r'\bquá\s+trời\b': 'rất nhiều', r'\bquá\s+chừng\b': 'rất nhiều', r'\bnè\b': 'này', r'\bnha\b': 'nhé', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bcoi\b': 'xem', r'\bmua\s+liền\b': 'mua ngay'}
 
 # ==============================================================================
@@ -163,7 +175,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API 
+# 4. HÀM GỌI GEMINI API
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -418,6 +430,7 @@ def sanitize_policy_text(text: str) -> str:
     cleaned = re.sub(r'\bngàn\b', 'nghìn', cleaned, flags=re.IGNORECASE)
     return cleaned
 
+# ĐÃ KHẮC PHỤC LỖI THIẾU THAM SỐ TRONG HÀM RE.SUB Ở DƯỚI ĐÂY
 def sanitize_third_party_ip(text: str) -> str:
     if not text: return ""
     cleaned = text
@@ -428,7 +441,8 @@ def sanitize_third_party_ip(text: str) -> str:
     cleaned = re.sub(r'\b(?:emoon|disney|marvel|spider-?man|spiderman|nike|adidas|gucci|chanel|dior|lv|louis\s+vuitton|zara|uniqlo|apple|samsung|xiaomi|dyson|philips|vaseline|lego|barbie)\b', 'premium everyday', cleaned, flags=re.IGNORECASE)
     for pattern, safe_term in INTIMATE_SAFE_ENGLISH_LEXICON.items(): 
         cleaned = re.sub(pattern, safe_term, cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bwearing\s+wearing\b', 'wearing', flags=re.IGNORECASE)
+    # FIX LỖI "MISSING STRING ARGUMENT": TRUYỀN THÊM BIẾN `cleaned` VÀO RE.SUB
+    cleaned = re.sub(r'\bwearing\s+wearing\b', 'wearing', cleaned, flags=re.IGNORECASE)
     return re.sub(r'\.\.+', '.', cleaned)
 
 def clean_and_normalize_voiceover(text: str) -> str:
@@ -490,36 +504,6 @@ def extract_scenes(parsed_data):
                     if key in v and isinstance(v[key], list): return v[key]
     return []
 
-# 🌟 KHÔI PHỤC HÀM XÁC ĐỊNH ĐỘ TUỔI VÀ GIỚI TÍNH CỦA KOC ĐỂ TRÁNH LỖI NAME ERROR
-def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
-    user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
-    asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
-    
-    if is_mom_baby: 
-        return "female", f"A caring Vietnamese mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
-    
-    if user_roles:
-        role_lower = user_roles[0].lower()
-        if any(k in role_lower for k in ["trẻ em", "bé", "kid", "child", "boy", "girl"]):
-            gender = "male" if any(k in role_lower for k in ["trai", "boy"]) else "female"
-            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
-        elif any(k in role_lower for k in ["ông", "già", "bác già", "bà", "senior", "old"]):
-            gender = "male" if any(k in role_lower for k in ["ông", "nam", "bác trai"]) else "female"
-            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
-        elif any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"]):
-            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
-        else:
-            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
-            
-    ai_p_lower = ai_persona_en.lower()
-    gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
-    clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
-    if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
-    physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
-    voice = ai_voice_prompt if ai_voice_prompt else f"Native Hanoi Vietnamese adult {gender} voice"
-    
-    return gender, f"{clean_p}{physique}", voice
-
 # ==============================================================================
 # 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & MÀU SẮC ĐỘNG
 # ==============================================================================
@@ -572,6 +556,35 @@ def sanitize_veo3_prompt(prompt_text: str) -> str:
 def generate_char_rules_string(profiles):
     if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
     return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
+
+def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
+    user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
+    asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
+    
+    if is_mom_baby: 
+        return "female", f"A caring Vietnamese mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
+    
+    if user_roles:
+        role_lower = user_roles[0].lower()
+        if any(k in role_lower for k in ["trẻ em", "bé", "kid", "child", "boy", "girl"]):
+            gender = "male" if any(k in role_lower for k in ["trai", "boy"]) else "female"
+            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
+        elif any(k in role_lower for k in ["ông", "già", "bác già", "bà", "senior", "old"]):
+            gender = "male" if any(k in role_lower for k in ["ông", "nam", "bác trai"]) else "female"
+            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
+        elif any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"]):
+            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
+        else:
+            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
+            
+    ai_p_lower = ai_persona_en.lower()
+    gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
+    clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
+    if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
+    physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
+    voice = ai_voice_prompt if ai_voice_prompt else f"Native Hanoi Vietnamese adult {gender} voice"
+    
+    return gender, f"{clean_p}{physique}", voice
 
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
     return any(k in f"{strategy_str} {title_str}".lower() for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
