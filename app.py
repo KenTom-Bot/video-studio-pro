@@ -89,7 +89,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI
+# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI (ĐÃ UPDATE LÕI NLP ĐỈNH CAO)
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -113,10 +113,12 @@ COMPACT_CORE_RULES = """
    - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa lên mặt nếu ko phải kem mặt.
    - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): TUYỆT ĐỐI CẤM SỜ LÊN MẶT (No face touching). BẮT BUỘC dùng cả 2 tay thao tác với sản phẩm ngang ngực hoặc trên bàn.
    - 100% KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội khớp độ tuổi KOC.
-3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ, cấm dịch word-by-word.
-   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng các từ "trên live", "phiên live", "đang live".
-   - CẤM ĐỌC GIÁ CỤ THỂ (CRITICAL): TUYỆT ĐỐI KHÔNG đọc chính xác con số. CHỈ dùng khoảng ước lượng ("hơn trăm cành", "đang sale cực sâu").
+3. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ (CRITICAL):
+   - NHỊP ĐIỆU TÂM TÌNH: Viết thoại dân dã, tự nhiên, nhịp 3-3 hoặc 4-4 dễ đọc dễ lấy hơi. Mộc mạc như người thật nói chuyện.
+   - KHÔNG DÙNG TỪ NGỮ GÂY CẢM GIÁC BẨN/TIÊU CỰC: TUYỆT ĐỐI CẤM dùng các từ như "dơ dáy", "hôi thối", "bẩn thỉu". Phải dùng từ nói giảm nói tránh để giữ sự tinh tế (VD: "ám ảnh", "bất tiện", "nơm nớp lo", "kém sắc").
+   - KHÔNG NHỒI NHÉT TỪ KHÓA SALE: CẤM viết cụm từ gượng gạo kiểu "ưu đãi cực hời giảm sâu" hay "giảm giá đang giảm giá". Chỉ dùng 1 cụm chốt mộc mạc (VD: "deal đang mượt", "nhỉnh hơn trăm cành", "chốt liền tay").
+   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng "trên live", "phiên live". Dùng "trong video này".
+   - CẤM ĐỌC GIÁ CỤ THỂ: TUYỆT ĐỐI KHÔNG đọc chính xác con số (VD: 250k). CHỈ dùng khoảng ước lượng.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT: CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 """
 
@@ -450,10 +452,14 @@ def clean_and_normalize_voiceover(text: str) -> str:
     for pattern, rep in [
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'), (r'\bform\s*dáng\s*đứng\s*form\b', 'lên dáng chuẩn xác'),
         (r'\bđứng\s*form\b', 'giữ form'), (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'),
-        (r'\bcực\s*nét\b', 'cực xịn'), (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
+        (r'\bcực\s*nét\b', 'cực xịn'), 
+        (r'\bưu\s*đãi\s*cực\s*hời\s*giảm\s*sâu\b', 'deal cực mượt'), # Cắt lặp từ chốt sale gượng gạo
+        (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
         (r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ'), (r'\bchốt\s*ngay\s*tay\b', 'chốt liền tay'),
         (r'\bliền\s*tay\b', 'ngay nhé'), (r'\bvừa\s*vặn\s*vừa\b', 'rất vừa vặn'),
-        (r'\bsang\s*chảnh\s*sang\b', 'cực kỳ sang chảnh'), (r'\bđẹp\s*đẹp\b', 'tuyệt đẹp')
+        (r'\bsang\s*chảnh\s*sang\b', 'cực kỳ sang chảnh'), (r'\bđẹp\s*đẹp\b', 'tuyệt đẹp'),
+        (r'\bdơ\s*dáy\b', 'kém sạch'), (r'\blem\s*nhem\s*dơ\s*dáy\b', 'lem màu mệt mỏi'), # Chặn các từ bẩn
+        (r'\bhôi\s*thối\b', 'có mùi khó chịu')
     ]: cleaned = re.sub(pattern, rep, cleaned, flags=re.IGNORECASE)
     
     cleaned = re.sub(r'[\(\)\[\]\{\}]', '', cleaned)
@@ -727,6 +733,53 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
+def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
+    s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
+    setting_lower = setting_vi.lower()
+    is_bedroom = any(k in setting_lower for k in ["phòng ngủ", "giường", "bedroom", "pijama", "đồ ngủ", "ngủ", "thức dậy"])
+    is_bathroom = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
+    is_kitchen = any(k in setting_lower for k in ["bếp", "nấu", "kitchen", "cooking", "ăn"])
+    is_chore = any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
+    is_living_room = any(k in setting_lower for k in ["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"]) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
+    is_office = any(k in setting_lower for k in ["văn phòng", "công sở", "công ty", "họp", "office", "workplace"])
+    is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
+    is_event_party = any(k in setting_lower for k in ["tiệc", "sự kiện", "đám cưới", "party", "event"])
+    is_beach_resort = any(k in setting_lower for k in ["biển", "resort", "du lịch", "beach", "vacation"])
+    is_single_skirt = detect_single_tube_skirt(s_lower)
+    is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
+    
+    if intimate_type == "underwear_bra": vibe = "Premium Fabric Review (Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional)"
+    elif intimate_type == "camisole": vibe = "Modest Casual Review (Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage)"
+    elif is_fashion:
+        if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
+            if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
+            elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the lower body. Top: tailored long-sleeve silk blouse, fully TUCKED IN. Footwear: pointed-toe leather high heels)"
+            else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the lower body. Top: fitted short-sleeve knit top or chic cropped tee. Footwear: clean minimalist white sneakers or leather loafers)"
+        elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie"]):
+            if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the upper body. Bottom: breezy wide-leg linen pants or denim shorts. Footwear: woven sandals)"
+            elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the upper body. Bottom: tailored wide-leg trousers or straight pencil skirt. Footwear: pointed-toe heels)"
+            else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the upper body. Bottom: fashionable high-waisted straight jeans or pleated midi skirt. Footwear: clean white sneakers)"
+        else:
+            if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Wearing the full product perfectly fitted. Top layer: structured blazer draped over shoulders. Footwear: stiletto heels)"
+            elif is_beach_resort: vibe = "Beach/Resort (Wearing the full product perfectly fitted, wide-brim woven hat, woven beach sandals)"
+            else: vibe = "High-Fashion Lookbook (Wearing the full product perfectly fitted, elegant makeup, premium matching footwear)"
+    elif is_bedroom: vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
+    elif is_bathroom: vibe = "Bathroom/Washroom (Bathrobe or comfortable home wear, UNTUCKED, barefoot or plastic anti-slip slippers)"
+    elif is_kitchen or is_chore: vibe = "Active Home/Chores (Neat comfy loungewear, rolled-up sleeves, UNTUCKED, casual indoor slippers)"
+    elif is_living_room: vibe = "Relaxed Living Room (Smart-casual loungewear or comfy chic sweater/t-shirt, UNTUCKED, minimalist indoor slippers)"
+    elif is_gym_sport: vibe = "Athletic/Gym (Form-fitting activewear, leggings/joggers, UNTUCKED, athletic running shoes)"
+    elif is_office: vibe = "Professional Office (Elegant blouse, tailored trousers or pencil skirt, neatly TUCKED IN, pointed-toe heels or smart loafers)" if gender == "female" else "Professional Office (Crisp button-down shirt, tailored trousers, neatly TUCKED IN, leather dress shoes or smart loafers)"
+    elif is_event_party or is_evening_fashion: vibe = "Elegant Evening (Glamorous evening dress or chic formal outfit, strappy heeled sandals or stilettos)" if gender == "female" else "Elegant Evening (Tailored suit or sharp blazer, polished dress shoes)"
+    else: vibe = "Trendy Streetwear/Cafe (Stylish layered outfit, fashionable jeans or skirt, UNTUCKED or French tuck, clean white sneakers or ankle boots)" if gender == "female" else "Trendy Streetwear/Cafe (Smart-casual layered outfit, overshirt or stylish tee, clean denim or chinos, UNTUCKED, minimalist white sneakers)"
+
+    contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
+    if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
+    elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
+    elif is_medicine: contrast_note = "Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
+        
+    skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
+    return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
+
 # ==============================================================================
 # 8. LOGIC GỌI LÕI ĐỂ XỬ LÝ (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
@@ -887,7 +940,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
-    # 🌟 Gỡ bỏ "multiple characters" khỏi lệnh cấm nếu có người phụ ở bối cảnh
     base_neg_prompt_core = f"{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt_core += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
@@ -918,14 +970,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("act", scn.get("action_en", action_scene_2)), flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
         
-        # 🌟 CƠ CHẾ ĐẠO DIỄN BỐI CẢNH CHIỀU SÂU (DEPTH OF FIELD) CHO NGƯỜI PHỤ
         family_bg_prompt = ""
         current_neg_prompt = base_neg_prompt_core
         if idx_scn == 0 and is_pas_scn1_no_prod:
             vo_lower = vo_text.lower()
             if any(k in vo_lower for k in ["trẻ", "bé", "con nít", "già", "ông", "bà", "gia đình"]):
                 family_bg_prompt = " [BACKGROUND: softly blurred silhouettes of an elderly person and a child in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
-                current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "") # Cho phép có nhiều người trong khung hình
+                current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "") 
 
         if not is_cosmetics and not is_food:
             if is_pas_scn1_no_prod:
@@ -1336,7 +1387,7 @@ if not st.session_state.get("is_logged_in", False):
 # ==============================================================================
 # 10. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
 user_allowed_modules = st.session_state.get("licensed_accounts", {}).get(st.session_state.get("current_email", ""), {}).get("roles", ALL_MODULES) or ALL_MODULES
 mode = st.selectbox("🎯 Thể loại:", user_allowed_modules, key=f"mode_sel_{st.session_state.get('reset_key', 0)}", disabled=is_system_busy)
