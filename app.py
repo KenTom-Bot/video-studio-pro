@@ -98,16 +98,16 @@ UNIFIED_STRATEGY_FORMAT_OPTS = ["🌟 AI Tự Động Phân Tích, Đề Xuất 
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC):
-1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Cấm tạo người nước ngoài.
+1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Cấm tạo người nước ngoài. Khóa chặt diện mạo, màu sắc xuyên suốt 4 cảnh.
 2. HÀNH ĐỘNG & TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Nỗi đau): BẮT BUỘC biểu cảm/hành động chân thực (ngứa gãi, hôi bịt mũi).
+   - Cảnh 1 (Nỗi đau): BẮT BUỘC biểu cảm/hành động chân thực (ngứa gãi, hôi bịt mũi, đau lưng xoa bóp).
    - MỸ PHẨM: Công dụng ở đâu bôi ĐÚNG ở đó! CẤM đưa lên mặt nếu ko phải kem mặt.
    - GIA DỤNG/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/bàn. KHÔNG thả rơi.
    - 100% KOC nói TRỰC TIẾP vào ống kính.
 3. LÕI THOẠI (CHỐNG LIVESTREAM & LÀM MỜ GIÁ):
    - Dồn dập, tự nhiên. Cấm lặp từ, cấm dịch word-by-word.
-   - TUYỆT ĐỐI CẤM dùng từ "trên live", "phiên live". Dùng "trong video này", "hôm nay".
-   - TUYỆT ĐỐI KHÔNG đọc giá cụ thể. CHỈ dùng khoảng ("hơn trăm cành", "đang sale cực sâu").
+   - TUYỆT ĐỐI CẤM dùng từ "trên live", "phiên live", "livestream". Dùng "trong video này", "hôm nay".
+   - TUYỆT ĐỐI KHÔNG đọc giá cụ thể (vd: 216k). CHỈ dùng khoảng ("hơn trăm cành", "vài chục cành", "đang sale cực sâu").
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT: CẤM dấu chấm lửng (...), ký hiệu ([ ]) trong thoại.
 """
 
@@ -163,7 +163,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API
+# 4. GỌI GEMINI API 
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -213,6 +213,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
                 time.sleep(0.6)
     if last_exception: raise last_exception
 
+# SỬA LẠI HÀM CẤP PROMPT (GIẢM THAM SỐ) ĐỂ KHỚP VỚI CÁCH GỌI
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Mẹo/kiến thức, KHÔNG bán hàng)" if is_viral else "TIKTOK SHOP (Bán hàng, chốt deal)"
@@ -461,7 +462,6 @@ def clean_analysis_text(text) -> str:
     res = re.sub(r'^(?:SẢN PHẨM LÀ GÌ\s*&?\s*(?:CÓ GÌ ĐẶC BIỆT)?|SẢN PHẨM DÀNH CHO AI|TẠI SAO NÊN MUA|DÙNG Ở ĐÂU\s*&?\s*(?:TIỆN LỢI LÀ GÌ)?|CÁCH SỬ DỤNG|THAO TÁC.*|MỤC ĐÍCH|ĐỐI TƯỢNG|LÝ DO MUA)\s*:\s*', '', str(text).strip(), flags=re.IGNORECASE).strip()
     return clean_and_normalize_voiceover(res)
 
-# 🌟 ĐÃ KHÔI PHỤC HÀM FORMAT TÊN SẢN PHẨM
 def format_product_name_bold(text: str) -> str:
     if not text: return ""
     clean = clean_analysis_text(text)
@@ -543,6 +543,35 @@ def sanitize_veo3_prompt(prompt_text: str) -> str:
 def generate_char_rules_string(profiles):
     if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
     return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
+
+def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
+    user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
+    asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
+    
+    if is_mom_baby: 
+        return "female", f"A caring Vietnamese mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
+    
+    if user_roles:
+        role_lower = user_roles[0].lower()
+        if any(k in role_lower for k in ["trẻ em", "bé", "kid", "child", "boy", "girl"]):
+            gender = "male" if any(k in role_lower for k in ["trai", "boy"]) else "female"
+            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
+        elif any(k in role_lower for k in ["ông", "già", "bác già", "bà", "senior", "old"]):
+            gender = "male" if any(k in role_lower for k in ["ông", "nam", "bác trai"]) else "female"
+            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
+        elif any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"]):
+            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
+        else:
+            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
+            
+    ai_p_lower = ai_persona_en.lower()
+    gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
+    clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
+    if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
+    physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
+    voice = ai_voice_prompt if ai_voice_prompt else f"Native Hanoi Vietnamese adult {gender} voice"
+    
+    return gender, f"{clean_p}{physique}", voice
 
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
     return any(k in f"{strategy_str} {title_str}".lower() for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
