@@ -16,7 +16,7 @@ from PIL import Image
 from datetime import datetime, timedelta, date
 
 # ==============================================================================
-# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE 
+# 1. CẤU HÌNH GIAO DIỆN & KHỞI TẠO BIẾN STATE (CHỐNG MỌI LỖI CRASH)
 # ==============================================================================
 st.set_page_config(page_title="Đạo Diễn AI - Hệ Thống Kịch Bản Pro", page_icon="🎬", layout="wide")
 
@@ -163,7 +163,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API & CÁC LỆNH SYSTEM INSTRUCTIONS ĐÃ ĐỒNG BỘ THAM SỐ
+# 4. GỌI GEMINI API 
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -213,13 +213,11 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
                 time.sleep(0.6)
     if last_exception: raise last_exception
 
-# HÀM NÀY ĐƯỢC CHUẨN HÓA VỀ ĐÚNG 3 THAM SỐ, VÀ TẤT CẢ NƠI GỌI ĐỀU TRUYỀN 3 THAM SỐ
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Mẹo/kiến thức, KHÔNG bán hàng)" if is_viral else "TIKTOK SHOP (Bán hàng, chốt deal)"
     return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
-# HÀM NÀY ĐƯỢC CHUẨN HÓA VỀ ĐÚNG 5 THAM SỐ, VÀ TẤT CẢ NƠI GỌI ĐỀU TRUYỀN 5 THAM SỐ
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
     pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
     return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
@@ -492,6 +490,36 @@ def extract_scenes(parsed_data):
                     if key in v and isinstance(v[key], list): return v[key]
     return []
 
+# 🌟 KHÔI PHỤC HÀM XÁC ĐỊNH ĐỘ TUỔI VÀ GIỚI TÍNH CỦA KOC ĐỂ TRÁNH LỖI NAME ERROR
+def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
+    user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
+    asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
+    
+    if is_mom_baby: 
+        return "female", f"A caring Vietnamese mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
+    
+    if user_roles:
+        role_lower = user_roles[0].lower()
+        if any(k in role_lower for k in ["trẻ em", "bé", "kid", "child", "boy", "girl"]):
+            gender = "male" if any(k in role_lower for k in ["trai", "boy"]) else "female"
+            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
+        elif any(k in role_lower for k in ["ông", "già", "bác già", "bà", "senior", "old"]):
+            gender = "male" if any(k in role_lower for k in ["ông", "nam", "bác trai"]) else "female"
+            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
+        elif any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"]):
+            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
+        else:
+            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
+            
+    ai_p_lower = ai_persona_en.lower()
+    gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
+    clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
+    if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
+    physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
+    voice = ai_voice_prompt if ai_voice_prompt else f"Native Hanoi Vietnamese adult {gender} voice"
+    
+    return gender, f"{clean_p}{physique}", voice
+
 # ==============================================================================
 # 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & MÀU SẮC ĐỘNG
 # ==============================================================================
@@ -676,6 +704,53 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
+def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
+    s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
+    setting_lower = setting_vi.lower()
+    is_bedroom = any(k in setting_lower for k in ["phòng ngủ", "giường", "bedroom", "pijama", "đồ ngủ", "ngủ", "thức dậy"])
+    is_bathroom = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
+    is_kitchen = any(k in setting_lower for k in ["bếp", "nấu", "kitchen", "cooking", "ăn"])
+    is_chore = any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
+    is_living_room = any(k in setting_lower for k in ["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"]) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
+    is_office = any(k in setting_lower for k in ["văn phòng", "công sở", "công ty", "họp", "office", "workplace"])
+    is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
+    is_event_party = any(k in setting_lower for k in ["tiệc", "sự kiện", "đám cưới", "party", "event"])
+    is_beach_resort = any(k in setting_lower for k in ["biển", "resort", "du lịch", "beach", "vacation"])
+    is_single_skirt = detect_single_tube_skirt(s_lower)
+    is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
+    
+    if intimate_type == "underwear_bra": vibe = "Premium Fabric Review (Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional)"
+    elif intimate_type == "camisole": vibe = "Modest Casual Review (Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage)"
+    elif is_fashion:
+        if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
+            if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
+            elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the lower body. Top: tailored long-sleeve silk blouse, fully TUCKED IN. Footwear: pointed-toe leather high heels)"
+            else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the lower body. Top: fitted short-sleeve knit top or chic cropped tee. Footwear: clean minimalist white sneakers or leather loafers)"
+        elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie"]):
+            if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the upper body. Bottom: breezy wide-leg linen pants or denim shorts. Footwear: woven sandals)"
+            elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the upper body. Bottom: tailored wide-leg trousers or straight pencil skirt. Footwear: pointed-toe heels)"
+            else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the upper body. Bottom: fashionable high-waisted straight jeans or pleated midi skirt. Footwear: clean white sneakers)"
+        else:
+            if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Wearing the full product perfectly fitted. Top layer: structured blazer draped over shoulders. Footwear: stiletto heels)"
+            elif is_beach_resort: vibe = "Beach/Resort (Wearing the full product perfectly fitted, wide-brim woven hat, woven beach sandals)"
+            else: vibe = "High-Fashion Lookbook (Wearing the full product perfectly fitted, elegant makeup, premium matching footwear)"
+    elif is_bedroom: vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, UNTUCKED, barefoot or fluffy indoor slippers)"
+    elif is_bathroom: vibe = "Bathroom/Washroom (Bathrobe or comfortable home wear, UNTUCKED, barefoot or plastic anti-slip slippers)"
+    elif is_kitchen or is_chore: vibe = "Active Home/Chores (Neat comfy loungewear, rolled-up sleeves, UNTUCKED, casual indoor slippers)"
+    elif is_living_room: vibe = "Relaxed Living Room (Smart-casual loungewear or comfy chic sweater/t-shirt, UNTUCKED, minimalist indoor slippers)"
+    elif is_gym_sport: vibe = "Athletic/Gym (Form-fitting activewear, leggings/joggers, UNTUCKED, athletic running shoes)"
+    elif is_office: vibe = "Professional Office (Elegant blouse, tailored trousers or pencil skirt, neatly TUCKED IN, pointed-toe heels or smart loafers)" if gender == "female" else "Professional Office (Crisp button-down shirt, tailored trousers, neatly TUCKED IN, leather dress shoes or smart loafers)"
+    elif is_event_party or is_evening_fashion: vibe = "Elegant Evening (Glamorous evening dress or chic formal outfit, strappy heeled sandals or stilettos)" if gender == "female" else "Elegant Evening (Tailored suit or sharp blazer, polished dress shoes)"
+    else: vibe = "Trendy Streetwear/Cafe (Stylish layered outfit, fashionable jeans or skirt, UNTUCKED or French tuck, clean white sneakers or ankle boots)" if gender == "female" else "Trendy Streetwear/Cafe (Smart-casual layered outfit, overshirt or stylish tee, clean denim or chinos, UNTUCKED, minimalist white sneakers)"
+
+    contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
+    if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
+    elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
+    elif is_medicine: contrast_note = "Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
+        
+    skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
+    return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
+
 # ==============================================================================
 # 8. LOGIC GỌI LÕI ĐỂ XỬ LÝ (CREATE DETAILS, CLONE, EXPAND)
 # ==============================================================================
@@ -786,7 +861,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         ]
     }}
     """
-    sys_inst = get_sys_inst_details(current_active_mode, presentation_format, user_custom_note, self_pronoun, audience_pronoun, is_pas_story)
+    sys_inst = get_sys_inst_details(current_active_mode, user_custom_note, self_pronoun, audience_pronoun, is_pas_story)
     
     scenes, w_lock_en, w_lock_vi, master_setting_en = [], "", "", "clean minimalist modern setting"
     max_retries = 2
