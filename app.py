@@ -89,7 +89,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI
+# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI (BẢO TOÀN VẬT LÝ TUYỆT ĐỐI)
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -107,18 +107,14 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐỒNG NHẤT NHÂN DẠNG KOC: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG (CRITICAL - QUAN TRỌNG NHẤT):
-   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ PHẢI XUẤT HIỆN. Nếu thoại nói về trẻ em, người già, BẮT BUỘC hình ảnh phải có bé/người già đang dùng sản phẩm.
-   - Cảnh 2 & 3 (Test công năng/Soi chi tiết): BẮT BUỘC KOC (người review) trực tiếp cầm sản phẩm trên tay để bẻ, test, bóp...
-3. QUY TẮC BÀN TAY & TƯƠNG TÁC (CHỐNG SỜ MẶT):
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó (son bôi môi, má hồng bôi má).
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ/THỜI TRANG): CẤM KOC SỜ TAY LÊN MẶT. BẮT BUỘC test sản phẩm ngang ngực (chest level) bằng CẢ 2 TAY.
+1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG (CRITICAL):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH (bé/người già). CẤM làm sai lệch BỐI CẢNH MASTER đã chọn ban đầu. 
+   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU (Material) như nguyên bản.
+3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu").
-   - KHÔNG DÙNG TỪ NGỮ GÂY GỢN TIÊU CỰC: TUYỆT ĐỐI CẤM "dơ dáy", "hôi thối", "bẩn thỉu". Dùng từ nói giảm (VD: "kém sạch", "ám ảnh", "nơm nớp lo").
-   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng "trên live", "phiên live".
-   - CẤM ĐỌC GIÁ CỤ THỂ: TUYỆT ĐỐI KHÔNG đọc chính xác con số (VD: 215k). CHỈ dùng khoảng ước lượng.
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -536,7 +532,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     return any(k in text_to_check.lower() for k in [
-        "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ"
+        "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp"
     ])
 
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
@@ -708,7 +704,7 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
         return "Natural fabric drape in motion; subject models the garment WORN ON BODY. Fabric testing (stretching/touching) is done strictly WHILE WEARING IT. Zero duplicate items in hands. Hands kept strictly away from face."
     elif any(k in p for k in ["hút bụi", "vacuum", "máy sấy", "máy thổi"]): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
-    elif is_strict_appliance: return "STRICT REFERENCE TRACKING: The appliance maintains 100% exact shape, true-to-life scale, proportions, and surface details identical to the reference image. Zero morphing, zero hallucinated parts. The product stays completely rigid while presenter stands perfectly still; hands hold the product naturally (using its actual handle/strap if any), fast decisive interaction, NEVER dropping. CRITICAL: Product MUST remain at CHEST LEVEL or resting on a table. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
+    elif is_strict_appliance: return "GEOMETRY ENFORCEMENT: The product MUST strictly maintain its solid, rigid structural integrity (e.g. solid steel, rigid plastic, geared joints). Zero folding/collapsing glitch. Zero morphing. Presenter interacts decisively with both hands holding the edges/base, NEVER covering the main body of the product."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type):
@@ -732,7 +728,6 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
-# 🌟 KHÔI PHỤC HÀM STYLIST QUAN TRỌNG TẠI ĐÂY
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -935,7 +930,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif any(k in vibe_lower for k in ["sneaker", "running", "athletic"]): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif any(k in vibe_lower for k in ["heel", "loafer", "dress"]): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    char_neg_extra = f"{dynamic_footwear_neg}caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    char_neg_extra = f"{dynamic_footwear_neg}caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
@@ -992,7 +987,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 family_bg_prompt = " [BACKGROUND: softly blurred silhouettes of an elderly person and a child in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
                 current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "")
 
-        # 🌟 LỌC CƯỠNG CHẾ VẬT LÝ PYTHON CHỐNG SỜ MẶT
+        # 🌟 LỌC CƯỠNG CHẾ VẬT LÝ PYTHON CHỐNG SỜ MẶT VÀ BẢO TOÀN HÌNH HỌC
         if not is_cosmetics and not is_food:
             if is_pas_scn1_no_prod:
                 pass 
@@ -1000,7 +995,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 clean_act = force_no_face_touching(clean_act)
                 micro_expr = force_no_face_touching(micro_expr)
                 if "chest level" not in clean_act.lower():
-                    clean_act = f"{clean_act.rstrip('.')}, both hands actively manipulating the product at chest level (hands never touch face)"
+                    clean_act = f"{clean_act.rstrip('.')}, both hands actively holding the edges/base of the product at chest level (hands never touch face, never covering the product)"
         
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing") and not "actively using" in clean_act.lower():
@@ -1013,7 +1008,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
         
         if is_strict_appliance or is_mom_baby_hard: 
-            locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, exact original nozzle/attachment, and surface details. Zero hallucinated parts."
+            locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape (solid rigid structure), exact original nozzle/attachment, and surface details. Zero hallucinated parts."
         elif is_food or is_cosmetics or is_mom_baby or is_medicine: 
             locked_product_prompt_segment = f"PRODUCT FOCUS: {clean_prod_en}. {color_lock_tag} as the main subject."
         elif is_footwear_accessory and (idx_scn in [1, 2]):
@@ -1029,6 +1024,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
+        # 🌟 KHÓA CHẶT BỐI CẢNH MASTER Ở CẢNH 1 VÀ TẤT CẢ CÁC CẢNH SAU ĐÓ
         if idx_scn == 0 and target_subject:
             if is_pas_scn1_no_prod:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} Subject: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
@@ -1075,7 +1071,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     auto_save_current_session()
 
-# 🌟 TRUYỀN FULL DNA CONTEXT VÀO NHÂN BẢN
 def clone_script(script_id):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     all_combined = st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", [])
@@ -1123,7 +1118,6 @@ def clone_script(script_id):
         })
     return formatted_clones
 
-# 🌟 TRUYỀN FULL DNA CONTEXT VÀO GỌI THÊM
 def generate_more_scripts(unified_strategy_format, char_profiles, extra_note=""):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     cur_len = len(st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", []))
