@@ -114,8 +114,11 @@ COMPACT_CORE_RULES = """
    - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU như nguyên bản.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
    - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
-4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy", "bẩn thỉu"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
+4. LÕI THOẠI KOC THỰC CHIẾN, CẢM XÚC & TỪ VỰNG DÂN DÃ (CRITICAL):
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc.
+   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: CẤM tuyệt đối viết "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Hãy thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy".
+   - CẤM LẶP TỪ & CTA GIẢ TRÂN: Cấm "chốt ngay dưới giỏ hàng để nhận ưu đãi", cấm "ưu đãi cực hời giảm sâu". Viết mộc mạc: "nhỉnh mấy chục cành, các bác rinh ở góc trái nhé".
+   - CẤM TỪ TIÊU CỰC: Cấm "dơ dáy", "bẩn thỉu". Dùng "kém sạch", "ám ảnh".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -411,7 +414,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM & LỌC TỪ BẨN)
+# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM & LỌC TỪ BẨN & TỪ KỸ THUẬT)
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -454,9 +457,18 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bform\s*hộp\s*đứng\s*form\b', 'form hộp cứng cáp'), (r'\bform\s*dáng\s*đứng\s*form\b', 'lên dáng chuẩn xác'),
         (r'\bđứng\s*form\b', 'giữ form'), (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'),
         (r'\bcực\s*nét\b', 'cực xịn'), 
+        
+        # CHỐN TỪ VỰNG KỸ THUẬT VÀ LẶP TỪ
+        (r'\bđế\s*tròn\s*váy\s*tay\b', 'đế tròn đầm tay'),
+        (r'\bkhóa\s*cữ\s*chắc\s*chắn\b', 'khớp nối chắc nịch'),
+        (r'\bkhóa\s*cữ\b', 'khớp nối'),
+        (r'\bbảo\s*vệ\s*đốt\s*sống\s*cổ\b', 'đỡ mỏi vai gáy'),
+        (r'\bchốt\s*ngay\s*dưới\s*giỏ\s*hàng\b', 'chốt liền tay ở góc trái'),
+        (r'\bnhận\s*ưu\s*đãi\s*hôm\s*nay\b', 'đang có deal cực hời'),
         (r'\bưu\s*đãi\s*cực\s*hời\s*giảm\s*sâu\b', 'deal cực mượt'), 
         (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
         (r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ'), (r'\bchốt\s*ngay\s*tay\b', 'chốt liền tay'),
+        
         (r'\bliền\s*tay\b', 'ngay nhé'), (r'\bvừa\s*vặn\s*vừa\b', 'rất vừa vặn'),
         (r'\bsang\s*chảnh\s*sang\b', 'cực kỳ sang chảnh'), (r'\bđẹp\s*đẹp\b', 'tuyệt đẹp'),
         (r'\bdơ\s*dáy\b', 'kém sạch'), (r'\blem\s*nhem\s*dơ\s*dáy\b', 'lem màu mệt mỏi'), 
@@ -549,7 +561,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     return cleaned
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm", "cọ"], text_to_check)
+    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
 
 def detect_lighting_product(text_to_check: str) -> bool:
     return match_kw(["đèn", "đèn pin", "đèn led", "đèn ngủ", "chiếu sáng", "bóng đèn", "light", "flashlight", "lamp"], text_to_check)
@@ -742,7 +754,6 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
-# 🌟 TRẢ VỀ OPTION TRANG PHỤC SIÊU CHI TIẾT (LOẠI CỔ & TAY ÁO)
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -883,7 +894,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
-        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific pain point. If it mentions neck/shoulder/back/arm pain, explicitly describe the KOC vigorously rubbing or massaging that EXACT body part with a clear pained facial expression. ZERO FACE TOUCHING. EMPTY HANDS, ZERO PRODUCT IN FRAME."
+        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. If it mentions pain, explicitly describe the KOC vividly expressing that emotion/pain with their face and body (e.g. vigorously massaging that EXACT body part with a pained facial expression). ZERO FACE TOUCHING unless it's a face issue. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
@@ -900,9 +911,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
-    2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc ĐẾN AI (trẻ em, người già, chồng, vợ) thì mô tả đối tượng đó. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CHỈ CÓ KOC tự diễn cảm xúc hình thể khớp thoại (VD: nhăn mặt xoa vai). CẤM tự ý bịa thêm người nếu thoại không nhắc.
-       - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm. BẮT BUỘC mô tả "interacting firmly with both hands at chest level".
+    2. LÕI CẢM XÚC & BỐI CẢNH (CRITICAL): 
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải thể hiện được CẢM XÚC/NỖI ĐAU mà thoại nhắc đến. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CHỈ CÓ KOC tự diễn cảm xúc hình thể khớp thoại (VD: nhăn mặt xoa bóp gáy, nhăn nhó vì rơi điện thoại vào mặt). CẤM tự ý bịa thêm người nếu thoại không nhắc.
+       - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm.
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
@@ -1697,7 +1708,7 @@ if all_sc:
         active_id = st.session_state.get("active_script_id")
         asc = st.session_state.get("generated_details", {}).get(str(active_id), st.session_state.get("generated_details", {}).get(active_id, {}))
         
-        # 🌟 NEO UX SCROLL CHÍNH XÁC (Sửa lỗi giật màn hình)
+        # 🌟 NEO UX SCROLL CHÍNH XÁC
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         if st.session_state.get("scroll_to_detail", False): 
             components.html("""
@@ -1705,7 +1716,7 @@ if all_sc:
                 setTimeout(() => { 
                     const el = window.parent.document.getElementById('detailed-view-anchor'); 
                     if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } 
-                }, 500);
+                }, 600);
             </script>""", height=0)
             st.session_state.scroll_to_detail = False
 
