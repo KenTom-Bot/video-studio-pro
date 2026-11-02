@@ -109,14 +109,13 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
-   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH.
-   - CẢNH BÁO TỪ ĐỒNG ÂM: TUYỆT ĐỐI KHÔNG nhầm lẫn từ xưng hô ("mấy bà", "các mẹ") thành người già/mẹ bỉm sữa. TUYỆT ĐỐI KHÔNG nhầm từ mô tả ("bé mèo", "nhỏ bé") thành trẻ em. Chỉ xuất hiện nhân vật phụ khi họ THỰC SỰ LÀ NGƯỜI DÙNG SẢN PHẨM trong câu chuyện.
-   - NẾU KHÔNG CÓ NHÂN VẬT PHỤ SỬ DỤNG, KOC phải tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN BỊ ĐAU (nếu có).
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL - QUAN TRỌNG NHẤT):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
+   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU như nguyên bản.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm, KHÔNG được che mặt chính của sản phẩm. 
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ chốt sale. Cấm từ tiêu cực (Cấm "dơ dáy", "bẩn thỉu"). Cấm nhắc tới livestream.
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy", "bẩn thỉu"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -412,7 +411,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ
+# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM & LỌC TỪ BẨN)
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -550,7 +549,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     return cleaned
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
+    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
 
 def detect_lighting_product(text_to_check: str) -> bool:
     return match_kw(["đèn", "đèn pin", "đèn led", "đèn ngủ", "chiếu sáng", "bóng đèn", "light", "flashlight", "lamp"], text_to_check)
@@ -577,7 +576,6 @@ def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str, 
     combined = f"{vo_text} {setting_text}".lower()
     is_indoor = not match_kw(["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden"], combined)
     
-    # ÉP SÁNG RÕ CHO TẤT CẢ CÁC TRƯỜNG HỢP CÒN LẠI
     if match_kw(["ngủ", "phòng ngủ", "giường", "sleep"], combined):
         return "soft, warm, inviting bright morning light, well-lit room (STRICTLY NO DARK AMBIENCE)", "calm room ambience"
     
@@ -904,14 +902,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): CẢNH BÁO: Phân biệt rõ thành ngữ xưng hô ("mấy bà", "bé mèo", "các mẹ") với nhân vật thật. Nếu thoại CHỈ LÀ XƯNG HÔ hoặc ẨN DỤ, KOC đứng 1 mình tự diễn (VD: trượt chân, nhăn mặt, xoa vai). CHỈ THÊM trẻ em/người già nếu thoại THỰC SỰ nói về việc HỌ ĐANG SỬ DỤNG.
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc ĐẾN AI (trẻ em, người già, chồng, vợ) thì mô tả đối tượng đó. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CHỈ CÓ KOC tự diễn cảm xúc hình thể khớp thoại (VD: nhăn mặt xoa vai). CẤM tự ý bịa thêm người nếu thoại không nhắc.
        - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm. BẮT BUỘC mô tả "interacting firmly with both hands at chest level".
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
         "set_en": "Master setting EN (e.g., 'stylish coffee shop').",
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
-        "wardrobe_en": "CRITICAL: EXACT outfit down to sleeve length and tucking.",
+        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT TỪNG MÓN ĐỒ (áo trong, áo ngoài, quần/váy, giày/dép). Ví dụ: 'wearing a white cotton t-shirt, blue denim pants, and white sneakers'.",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại (VD: pained expression, frowning, warm smile...)", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
             {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
@@ -945,8 +943,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    # 🌟 KHÓA CHẶT TRANG PHỤC VÀ KHUÔN MẶT BẰNG LỆNH CƯỠNG CHẾ
-    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precise wardrobe outfit across all scenes. Presenter speaking directly to the lens] {base_char_prompt}"
+    # 🌟 KHÓA CHẶT TRANG PHỤC VÀ KHUÔN MẶT BẰNG LỆNH CƯỠNG CHẾ (BÊ NGUYÊN CÂU TẢ ĐỒ VÀO)
+    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precisely wearing the exact same {w_en_clean} across all scenes. Presenter speaking directly to the lens] {base_char_prompt}"
     final_outfit_vi = w_lock_vi or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
@@ -969,6 +967,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
+    # 🌟 CẤM CẢNH TỐI MỜ (TRỪ KHI LÀ ĐÈN PIN)
     lighting_neg = "" if is_lighting_product else "dark, moody, dimly lit, poorly lit, shadows, underexposed, low light, "
     
     base_neg_prompt_core = f"{lighting_neg}{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
@@ -1006,8 +1005,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         family_bg_prompt = ""
         current_neg_prompt = base_neg_prompt_core
         
-        # 🌟 CƠ CHẾ ĐỒNG BỘ THỊ GIÁC (RADAR TỪ VỰNG TINH CHỈNH V53)
-        if idx_scn == 0:
+        if idx_scn == 0 and is_pas_scn1_no_prod:
             vo_lower = vo_text.lower()
             needs_child = match_kw(["trẻ em", "trẻ nhỏ", "em bé", "con nít", "trẻ sơ sinh", "trẻ con", "bạn nhỏ", "con nhỏ"], vo_lower)
             needs_senior = match_kw(["người già", "ông bà", "cao tuổi", "bố mẹ già", "bà cụ", "ông cụ", "người lớn tuổi"], vo_lower)
@@ -1759,17 +1757,6 @@ if all_sc:
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
             st.markdown("---")
             
-        if st.session_state.get("scroll_to_detail", False): 
-            components.html("""
-            <script>
-                setTimeout(() => { 
-                    const el = window.parent.document.getElementById('detailed-view-anchor'); 
-                    if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } 
-                    else { window.parent.scrollTo({top: 500, behavior: 'smooth'}); } 
-                }, 400);
-            </script>""", height=0)
-            st.session_state.scroll_to_detail = False
-
     if comp_sc:
         st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
         for outline in comp_sc:
@@ -1814,6 +1801,17 @@ if all_sc:
                         can_run, msg = check_usage_limit(st.session_state.get("current_email", ""), is_detailing=True)
                         if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
                         else: st.error(msg)
+
+    # Đưa thẻ Neo xuống dưới cùng để scroll không bị giật
+    if st.session_state.get("scroll_to_detail", False): 
+        components.html("""
+        <script>
+            setTimeout(() => { 
+                const el = window.parent.document.getElementById('detailed-view-anchor'); 
+                if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } 
+            }, 600);
+        </script>""", height=0)
+        st.session_state.scroll_to_detail = False
 
     if st.session_state.get("current_processing_id") is not None:
         target_id_to_run = st.session_state.get("current_processing_id")
