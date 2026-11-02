@@ -89,7 +89,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI 
+# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI (CẬP NHẬT TRỰC QUAN HÓA THÔNG MINH)
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -107,19 +107,18 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH xuyên suốt 4 cảnh.
-2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động chân thực (VD: gãi tay/cổ, xoa bóp eo, vươn vai).
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách. CẤM đưa lên mặt nếu ko phải kem mặt.
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): TUYỆT ĐỐI CẤM SỜ LÊN MẶT (No face touching). BẮT BUỘC dùng cả 2 tay thao tác với sản phẩm ngang ngực hoặc trên bàn.
-   - 100% KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội khớp độ tuổi KOC.
-3. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ (CRITICAL):
-   - NHỊP ĐIỆU TÂM TÌNH: Viết thoại dân dã, tự nhiên, nhịp 3-3 hoặc 4-4 dễ đọc dễ lấy hơi. Mộc mạc như người thật nói chuyện.
-   - KHÔNG DÙNG TỪ NGỮ GÂY CẢM GIÁC BẨN/TIÊU CỰC: TUYỆT ĐỐI CẤM dùng các từ như "dơ dáy", "hôi thối", "bẩn thỉu". Phải dùng từ nói giảm nói tránh để giữ sự tinh tế (VD: "ám ảnh", "bất tiện", "nơm nớp lo", "kém sắc").
-   - KHÔNG NHỒI NHÉT TỪ KHÓA SALE: CẤM viết cụm từ gượng gạo kiểu "ưu đãi cực hời giảm sâu" hay "giảm giá đang giảm giá". Chỉ dùng 1 cụm chốt mộc mạc (VD: "deal đang mượt", "nhỉnh hơn trăm cành", "chốt liền tay").
-   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng "trên live", "phiên live". Dùng "trong video này".
-   - CẤM ĐỌC GIÁ CỤ THỂ: TUYỆT ĐỐI KHÔNG đọc chính xác con số (VD: 250k). CHỈ dùng khoảng ước lượng.
-4. VĂN NÓI HÀ NỘI THUẦN VIỆT: CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
+1. ĐỒNG NHẤT NHÂN DẠNG KOC: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH xuyên suốt 4 cảnh.
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG (CRITICAL - QUAN TRỌNG NHẤT):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ PHẢI XUẤT HIỆN. Nếu thoại nói về trẻ em, người già, BẮT BUỘC hình ảnh phải có bé/người già đang dùng sản phẩm.
+   - Cảnh 2 & 3 (Test công năng/Soi chi tiết): BẮT BUỘC KOC (người review) trực tiếp cầm sản phẩm trên tay để bẻ, test, bóp...
+3. QUY TẮC BÀN TAY & TƯƠNG TÁC (CHỐNG SỜ MẶT):
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó (son bôi môi, má hồng bôi má).
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ/THỜI TRANG): CẤM KOC SỜ TAY LÊN MẶT. BẮT BUỘC test sản phẩm ngang ngực (chest level) bằng CẢ 2 TAY.
+4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu").
+   - KHÔNG DÙNG TỪ NGỮ GÂY GỢN TIÊU CỰC: TUYỆT ĐỐI CẤM "dơ dáy", "hôi thối", "bẩn thỉu". Dùng từ nói giảm (VD: "kém sạch", "ám ảnh", "nơm nớp lo").
+   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng "trên live", "phiên live".
+   - CẤM ĐỌC GIÁ CỤ THỂ: TUYỆT ĐỐI KHÔNG đọc chính xác con số (VD: 215k). CHỈ dùng khoảng ước lượng.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -233,7 +232,7 @@ def get_sys_inst_outlines(mode, angle, custom_note=""):
     return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
-    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau (KHÔNG có SP) -> Cảnh 2,3,4 có SP." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
+    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau -> Cảnh 2,3,4 KOC cầm SP test chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
     return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 # ==============================================================================
@@ -415,7 +414,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ
+# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ ĐÃ HOÀN THIỆN
 # ==============================================================================
 def normalize_hanoi_dialect(text: str) -> str:
     if not text: return ""
@@ -864,6 +863,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base)
 
+    # 🌟 ÉP GEMINI PHẢI ĐỌC HIỂU ĐỐI TƯỢNG VÀ PHÂN VAI VÀO ACT
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
@@ -874,10 +874,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
-    2. ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (set_en) KHỚP với thoại. CẤM set "bedroom" nếu ra ngoài.
-    3. QUY TẮC BÀN TAY & KHUÔN MẶT (CRITICAL): 
-       - MỸ PHẨM/ĐỒ ĂN: Công dụng ở đâu dùng ở đó (son bôi môi, má hồng bôi má, kem bôi mặt).
-       - CÁC NGÀNH HÀNG KHÁC: TUYỆT ĐỐI CẤM đưa tay sờ lên mặt, cằm, má, vuốt tóc hay đưa sản phẩm kề sát mặt. Mọi tương tác cầm nắm, sử dụng sản phẩm BẮT BUỘC ở ngang ngực (chest level) hoặc trên mặt bàn bằng 2 tay.
+    2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc "trẻ em" (bé, con nít) hoặc "người già" (ông bà, ba mẹ), thì trường "act" phải mô tả: "A Vietnamese [child/elderly] actively using the product...". KOC (bạn) lùi về làm nền.
+       - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm. BẮT BUỘC mô tả "interacting firmly with both hands at chest level".
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
@@ -885,9 +884,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
         "wardrobe_en": "CRITICAL: EXACT outfit down to sleeve length and tucking.",
         "scenes": [
-            {{ "set": "Bối cảnh VN...", "exp": "lively, engaging expression", "act": "{scene_1_action_inst} (ZERO face touching, under 25 words)", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "{action_scene_2} (ZERO face touching, under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "{action_scene_3} (ZERO face touching, under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "lively, engaging expression", "act": "Mô tả hình thể chi tiết, tuân thủ nguyên tắc trực quan hóa Cảnh 1 (under 25 words)", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
             {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
@@ -970,13 +969,19 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("act", scn.get("action_en", action_scene_2)), flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
         
-        family_bg_prompt = ""
         current_neg_prompt = base_neg_prompt_core
-        if idx_scn == 0 and is_pas_scn1_no_prod:
-            vo_lower = vo_text.lower()
-            if any(k in vo_lower for k in ["trẻ", "bé", "con nít", "già", "ông", "bà", "gia đình"]):
-                family_bg_prompt = " [BACKGROUND: softly blurred silhouettes of an elderly person and a child in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
-                current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "") 
+        
+        # 🌟 CƠ CHẾ ĐỒNG BỘ THỊ GIÁC (VISUAL TARGET MATCHING) CHO CẢNH 1
+        target_subject = ""
+        vo_lower = vo_text.lower()
+        needs_child = any(k in vo_lower for k in ["bé", "trẻ", "con", "nít", "sơ sinh"])
+        needs_senior = any(k in vo_lower for k in ["già", "ông", "bà", "cao tuổi", "bố mẹ già"])
+        needs_family = any(k in vo_lower for k in ["gia đình", "cả nhà"])
+        
+        if needs_child and needs_senior: target_subject = "a Vietnamese elderly person and a happy child"
+        elif needs_child: target_subject = "a happy Vietnamese child"
+        elif needs_senior: target_subject = "a Vietnamese elderly person"
+        elif needs_family: target_subject = "a happy Vietnamese family"
 
         if not is_cosmetics and not is_food:
             if is_pas_scn1_no_prod:
@@ -984,17 +989,17 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             else:
                 clean_act = force_no_face_touching(clean_act)
                 micro_expr = force_no_face_touching(micro_expr)
-                clean_act = f"{clean_act.rstrip('.')}, both hands actively manipulating the product at chest level (hands never touch face)"
+                if "chest level" not in clean_act.lower():
+                    clean_act = f"{clean_act.rstrip('.')}, both hands actively manipulating the product at chest level (hands never touch face)"
         
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
-            if not clean_act.lower().startswith("standing"):
+            if not clean_act.lower().startswith("standing") and not "actively using" in clean_act.lower():
                 clean_act = f"standing completely still with zero body rotation, speaking directly to camera, {clean_act}"
         else:
-            if not clean_act.lower().startswith("standing") and not clean_act.lower().startswith("stepping"):
+            if not clean_act.lower().startswith("standing") and not clean_act.lower().startswith("stepping") and not "actively using" in clean_act.lower():
                 clean_act = f"speaking directly to camera, {clean_act}"
 
         scene_physics = get_universal_physics_rules(clean_prod_en, vo_text, is_fashion=is_fashion_wearable, is_strict_appliance=is_strict_appliance, is_long_handle=is_long_handle, is_food=is_food, is_cosmetics=is_cosmetics, is_mom_baby=is_mom_baby, is_medicine=is_medicine, is_mom_baby_hard=is_mom_baby_hard, intimate_type=intimate_type, is_aline_skirt=is_aline_skirt)
-
         color_lock_tag = f"[STRICT VISUAL LOCK: The product MUST strictly maintain {locked_color_en}, preserving exact original patterns/textures from reference, completely ignoring other colored variants]"
         
         if is_strict_appliance or is_mom_baby_hard: 
@@ -1010,32 +1015,34 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 locked_product_prompt_segment = f"FASHION SHOWCASE: wearing {clean_prod_en}. {color_lock_tag} directly on body."
         else:
             locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en}{dim_tag} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry)."
-
-        if is_pas_scn1_no_prod:
-            prefix = f"{family_bg_prompt}" if family_bg_prompt else ""
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}.{prefix} Subject: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
-        elif not is_fashion_wearable and idx_scn in [1, 2]:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
-        else:
-            img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
-
-        scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
-        scn["img_neg"] = current_neg_prompt
-        clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
-
+            
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
-        if is_pas_scn1_no_prod:
-            prefix = f"{family_bg_prompt}" if family_bg_prompt else ""
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}.{prefix} [SUBJECT]: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
-        elif not is_fashion_wearable or ((is_fashion_wearable or is_footwear_accessory) and (idx_scn in [1, 2])):
-            raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+        # 🌟 ÁP DỤNG ĐỒNG BỘ THỊ GIÁC CHO CẢNH 1
+        if idx_scn == 0 and target_subject:
+            current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "")
+            if is_pas_scn1_no_prod:
+                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [BACKGROUND]: {locked_character_prompt} watching warmly, {micro_expr}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject}, {clean_act} (ZERO PRODUCT). [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
+            else:
+                prod_use_segment = f"PRODUCT IN USE: {target_subject} actively wearing/using {clean_prod_en}. {color_lock_tag}."
+                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{prod_use_segment}]. [BACKGROUND]: {locked_character_prompt} watching warmly, {micro_expr}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject} actively using {clean_prod_en}. [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
         else:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            if is_pas_scn1_no_prod:
+                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
+            elif not is_fashion_wearable and idx_scn in [1, 2]:
+                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
+                raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            else:
+                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
         vid_parts = raw_vid.split('[AUDIO]:')
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
         else: scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
+        scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
         scn["vid_neg"] = current_neg_prompt
         scn["is_no_product_scene"] = is_pas_scn1_no_prod
         
@@ -1059,7 +1066,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     auto_save_current_session()
 
-# 🌟 TRUYỀN FULL DNA CONTEXT VÀO NHÂN BẢN
 def clone_script(script_id):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     all_combined = st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", [])
@@ -1107,7 +1113,6 @@ def clone_script(script_id):
         })
     return formatted_clones
 
-# 🌟 TRUYỀN FULL DNA CONTEXT VÀO GỌI THÊM
 def generate_more_scripts(unified_strategy_format, char_profiles, extra_note=""):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     cur_len = len(st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", []))
