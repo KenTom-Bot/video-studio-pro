@@ -89,7 +89,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI (BẢO TOÀN VẬT LÝ TUYỆT ĐỐI)
+# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -107,14 +107,18 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG (CRITICAL):
-   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH (bé/người già). CẤM làm sai lệch BỐI CẢNH MASTER đã chọn ban đầu. 
-   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU (Material) như nguyên bản.
-3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
+1. ĐỒNG NHẤT NHÂN DẠNG KOC: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH xuyên suốt 4 cảnh.
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG (CRITICAL - QUAN TRỌNG NHẤT):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ PHẢI XUẤT HIỆN. Nếu thoại nói về trẻ em, người già, BẮT BUỘC hình ảnh phải có bé/người già đang dùng sản phẩm.
+   - Cảnh 2 & 3 (Test công năng/Soi chi tiết): BẮT BUỘC KOC (người review) trực tiếp cầm sản phẩm trên tay để bẻ, test, bóp...
+3. QUY TẮC BÀN TAY & TƯƠNG TÁC (CHỐNG SỜ MẶT):
+   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó (son bôi môi, má hồng bôi má).
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ/THỜI TRANG): CẤM KOC SỜ TAY LÊN MẶT. BẮT BUỘC test sản phẩm ngang ngực (chest level) bằng CẢ 2 TAY.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu").
+   - KHÔNG DÙNG TỪ NGỮ GÂY GỢN TIÊU CỰC: TUYỆT ĐỐI CẤM "dơ dáy", "hôi thối", "bẩn thỉu". Dùng từ nói giảm (VD: "kém sạch", "ám ảnh", "nơm nớp lo").
+   - CẤM NHẮC TỚI LIVESTREAM: TUYỆT ĐỐI CẤM dùng "trên live", "phiên live".
+   - CẤM ĐỌC GIÁ CỤ THỂ: TUYỆT ĐỐI KHÔNG đọc chính xác con số (VD: 215k). CHỈ dùng khoảng ước lượng.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -410,8 +414,14 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ
+# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM BẰNG EXACT MATCH KW)
 # ==============================================================================
+def match_kw(kw_list, text):
+    if not text: return False
+    # Cách ly từ bằng khoảng trắng để tránh dính "má" vào "thoải mái"
+    t = " " + re.sub(r'[^\w\s]', ' ', text.lower()) + " "
+    return any(f" {k.lower()} " in t for k in kw_list)
+
 def normalize_hanoi_dialect(text: str) -> str:
     if not text: return ""
     cleaned = text
@@ -518,12 +528,24 @@ def force_no_face_touching(text_en: str) -> str:
 # ==============================================================================
 # 7. KHỐI HÀM VẬT LÝ, GÓC MÁY & ĐỒNG NHẤT KHUÔN MẶT
 # ==============================================================================
-def detect_food(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["đồ ăn", "thức ăn", "bánh", "kẹo", "nước", "sữa", "trà", "cafe", "món ăn", "thực phẩm", "food", "snack"])
-def detect_cosmetics(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["kem dưỡng", "son", "môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "khử mùi", "nách", "má", "blush", "cheek"])
-def detect_mom_baby(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["bỉm", "tã", "sữa bột", "đồ chơi trẻ em", "bình sữa", "ti giả", "xe đẩy", "nôi", "mẹ và bé"])
-def detect_mom_baby_hard_props(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["bình sữa", "xe đẩy", "đồ chơi", "nôi"])
-def detect_medicine(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["viên uống", "thuốc", "thực phẩm chức năng", "vitamin", "collagen", "giảm cân", "tpcn"])
-def detect_single_tube_skirt(text_to_check: str) -> bool: return any(k in text_to_check.lower() for k in ["1 ống", "một ống", "quần váy", "váy 1 ống", "dạng váy", "quần giả váy", "single tube"])
+def detect_food(text_to_check: str) -> bool: 
+    return match_kw(["đồ ăn", "thức ăn", "bánh", "kẹo", "nước giải khát", "sữa", "sữa chua", "trà", "cafe", "cà phê", "món ăn", "thực phẩm", "food", "snack"], text_to_check)
+
+def detect_cosmetics(text_to_check: str) -> bool: 
+    return match_kw(["kem dưỡng", "son", "son môi", "dưỡng môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "khử mùi", "lăn nách", "má hồng", "skincare", "makeup"], text_to_check)
+
+def detect_mom_baby(text_to_check: str) -> bool: 
+    return match_kw(["bỉm", "tã", "sữa bột", "đồ chơi trẻ em", "bình sữa", "ti giả", "xe đẩy", "nôi", "mẹ và bé", "sơ sinh"], text_to_check)
+
+def detect_mom_baby_hard_props(text_to_check: str) -> bool: 
+    return match_kw(["bình sữa", "xe đẩy", "đồ chơi", "nôi"], text_to_check)
+
+def detect_medicine(text_to_check: str) -> bool: 
+    return match_kw(["viên uống", "thuốc", "thực phẩm chức năng", "vitamin", "collagen", "giảm cân", "tpcn"], text_to_check)
+
+def detect_single_tube_skirt(text_to_check: str) -> bool: 
+    return match_kw(["1 ống", "một ống", "quần váy", "váy 1 ống", "dạng váy", "quần giả váy", "single tube"], text_to_check)
+
 def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     cleaned = text_en
     for pat in [r'\bwide-?leg\s+(?:silk\s+)?(?:skirt-?pants|pants|trousers)\b', r'\bskirt-?pants\b', r'\bsilk\s+(?:pants|trousers)\b', r'\bflowing\s+(?:pants|trousers)\b', r'\bloose\s+(?:pants|trousers)\b', r'\bpants\b', r'\btrousers\b']: 
@@ -531,13 +553,11 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     return cleaned
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    return any(k in text_to_check.lower() for k in [
-        "cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp"
-    ])
+    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
 
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
     c = f"{color_vi} {ai_color_en}".lower().strip()
-    if any(k in c for k in ["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"]):
+    if match_kw(["họa tiết", "hoa", "sọc", "pattern", "floral", "plaid", "stripe", "checkered", "print", "gradient"], c):
         return f"exact reference-matching pattern and colors ({ai_color_en})"
     if ai_color_en and len(ai_color_en.strip()) > 2:
         return f"exact reference-matching {ai_color_en.strip()}"
@@ -552,12 +572,12 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
 
 def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
     combined = f"{vo_text} {setting_text}".lower()
-    is_indoor = not any(k in combined for k in ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden"])
-    if any(k in combined for k in ["đêm", "tối", "khuya", "tắt đèn", "mất điện", "đi ngủ", "night", "dark"]): return "dimly lit, cinematic low light, dark ambience", "quiet nighttime ambience (no reverb)"
-    elif any(k in combined for k in ["mưa", "ẩm ướt", "nồm"]): return ("rain droplets on window, soft overcast indoor lighting" if is_indoor else "light rain, wet ground, overcast sky"), "subtle rain ambience (no reverb)"
-    elif any(k in combined for k in ["nắng", "trưa hè"]): return ("warm sunbeams through window" if is_indoor else "sunny daylight, golden sunbeams"), "subtle breeze ambience (no reverb)"
-    elif any(k in combined for k in ["sáng sớm", "buổi sáng", "bình minh"]): return "fresh morning sunlight", "subtle morning ambience (no reverb)"
-    elif any(k in combined for k in ["hoàng hôn", "chiều tà", "buổi chiều"]): return "warm amber sunset glow", "subtle evening ambience (no reverb)"
+    is_indoor = not match_kw(["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden"], combined)
+    if match_kw(["đêm", "tối", "khuya", "tắt đèn", "mất điện", "đi ngủ", "night", "dark"], combined): return "dimly lit, cinematic low light, dark ambience", "quiet nighttime ambience (no reverb)"
+    elif match_kw(["mưa", "ẩm ướt", "nồm"], combined): return ("rain droplets on window, soft overcast indoor lighting" if is_indoor else "light rain, wet ground, overcast sky"), "subtle rain ambience (no reverb)"
+    elif match_kw(["nắng", "trưa hè"], combined): return ("warm sunbeams through window" if is_indoor else "sunny daylight, golden sunbeams"), "subtle breeze ambience (no reverb)"
+    elif match_kw(["sáng sớm", "buổi sáng", "bình minh"], combined): return "fresh morning sunlight", "subtle morning ambience (no reverb)"
+    elif match_kw(["hoàng hôn", "chiều tà", "buổi chiều"], combined): return "warm amber sunset glow", "subtle evening ambience (no reverb)"
     return ("clean natural daylight with soft warm fill light" if is_indoor else "bright commercial daylight"), ""
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
@@ -577,19 +597,19 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     
     if user_roles:
         role_lower = user_roles[0].lower()
-        if any(k in role_lower for k in ["trẻ em", "bé", "kid", "child", "boy", "girl"]):
-            gender = "male" if any(k in role_lower for k in ["trai", "boy"]) else "female"
+        if match_kw(["trẻ em", "bé", "kid", "child", "boy", "girl"], role_lower):
+            gender = "male" if match_kw(["trai", "boy"], role_lower) else "female"
             return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
-        elif any(k in role_lower for k in ["ông", "già", "bác già", "bà", "senior", "old"]):
-            gender = "male" if any(k in role_lower for k in ["ông", "nam", "bác trai"]) else "female"
+        elif match_kw(["ông", "già", "bác già", "bà", "senior", "old"], role_lower):
+            gender = "male" if match_kw(["ông", "nam", "bác trai"], role_lower) else "female"
             return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
-        elif any(k in role_lower for k in ["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"]):
+        elif match_kw(["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"], role_lower):
             return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
         else:
             return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
             
     ai_p_lower = ai_persona_en.lower()
-    gender = "male" if any(k in ai_p_lower for k in ["man", "male", "boy", "father", "gentleman", "anh", "nam"]) else "female"
+    gender = "male" if match_kw(["man", "male", "boy", "father", "gentleman", "anh", "nam"], ai_p_lower) else "female"
     clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
     if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
     physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
@@ -598,36 +618,31 @@ def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_ha
     return gender, f"{clean_p}{physique}", voice
 
 def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool:
-    return any(k in f"{strategy_str} {title_str}".lower() for k in ["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"])
+    return match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"], f"{strategy_str} {title_str}")
 
 def detect_intimate_apparel(text_to_check: str) -> str:
-    t = text_to_check.lower()
-    if any(k in t for k in ["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"]): return "underwear_bra"
-    if any(k in t for k in ["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"]): return "camisole"
+    if match_kw(["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"], text_to_check): return "underwear_bra"
+    if match_kw(["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"], text_to_check): return "camisole"
     return "normal"
 
 def detect_wearable_fashion(text_to_check: str) -> bool:
-    t = text_to_check.lower()
-    if any(k in t for k in ["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"]): return False
-    return any(k in t for k in ["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama", "tất", "vớ", "socks", "tights", "stocking"])
+    if match_kw(["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"], text_to_check): return False
+    return match_kw(["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama", "tất", "vớ", "socks", "tights", "stocking"], text_to_check)
 
 def detect_footwear_or_accessory(text_to_check: str) -> bool:
-    t = text_to_check.lower()
-    if any(k in t for k in ["giỏ", "rổ", "thùng", "hộp", "kệ", "basket", "hamper", "organizer", "bin"]): return False
-    return any(k in t for k in ["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", "shoe", "handbag", "backpack", "wallet", "watch", "glasses", "tất", "vớ", "socks"])
+    if match_kw(["giỏ", "rổ", "thùng", "hộp", "kệ", "basket", "hamper", "organizer", "bin"], text_to_check): return False
+    return match_kw(["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", "shoe", "handbag", "backpack", "wallet", "watch", "glasses", "tất", "vớ", "socks"], text_to_check)
 
 def detect_long_handle_tool(text_to_check: str) -> bool:
-    return any(k in text_to_check.lower() for k in ["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"])
+    return match_kw(["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"], text_to_check)
 
 def get_cosmetic_target(product_name, check_str):
     p_cos = f"{product_name} {check_str}".lower()
-    if any(k in p_cos for k in ["má", "blush", "cheek"]): return "cheeks", "instantly leaving a soft, natural, and radiant flush of color smoothly blended onto the skin"
-    elif any(k in p_cos for k in ["môi", "lip", "son"]):
-        if any(k in p_cos for k in ["dưỡng", "nẻ", "sáp", "balm", "chapstick", "mask", "vaseline", "treatment"]): return "lips", "instantly leaving a clear, highly glossy, deeply hydrated and plump finish without altering the natural lip color"
-        else: return "lips", "instantly leaving a highly precise, rich and vibrant colored stroke exactly where applied"
-    elif any(k in p_cos for k in ["tóc", "gội", "xả", "hair", "shampoo", "conditioner"]): return "hair", "instantly leaving the hair visibly smooth, silky and shiny"
-    elif any(k in p_cos for k in ["nách", "khử mùi", "armpit", "deodorant"]): return "armpit", "instantly absorbing into the skin"
-    elif any(k in p_cos for k in ["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail", "móng"]): return "hands/arms/body", "instantly absorbing and leaving a glowing, hydrated finish"
+    if match_kw(["má hồng", "phấn má", "blush"], p_cos): return "cheeks", "instantly leaving a soft, natural, and radiant flush of color smoothly blended onto the skin"
+    elif match_kw(["son", "son môi", "dưỡng môi", "nẻ", "sáp", "balm", "chapstick"], p_cos): return "lips", "instantly leaving a highly precise, rich and vibrant colored stroke exactly where applied"
+    elif match_kw(["tóc", "gội", "xả", "hair", "shampoo", "conditioner"], p_cos): return "hair", "instantly leaving the hair visibly smooth, silky and shiny"
+    elif match_kw(["nách", "khử mùi", "lăn nách", "armpit", "deodorant"], p_cos): return "armpit", "instantly absorbing into the skin"
+    elif match_kw(["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail", "móng"], p_cos): return "hands/arms/body", "instantly absorbing and leaving a glowing, hydrated finish"
     else: return "facial skin", "instantly absorbing and disappearing, leaving a highly glossy, hydrated, glowing glass-skin finish"
 
 def get_product_centric_camera_shot(scene_idx, is_fashion, is_footwear_acc, is_pas_scene1, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str):
@@ -689,7 +704,6 @@ def get_product_centric_camera_shot(scene_idx, is_fashion, is_footwear_acc, is_p
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
 def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, is_mom_baby_hard, intimate_type, is_aline_skirt):
-    p = f"{product_name} {vo_text}".lower()
     if intimate_type != "normal": return "Soft breathable fabric physics: hands strictly stretching and releasing the elastic textile smoothly, showing its seamless texture. STRICTLY HAND INTERACTION ONLY. The product is NEVER worn on the body. Presenter is fully clothed."
     elif is_food: return "Mouth-watering visual physics; showing steam rising, juicy texture, melting, or smooth pulling/stretching if applicable. Presenter stands completely still; natural hand interaction only, NEVER dropping."
     elif is_cosmetics: 
@@ -702,20 +716,19 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
     elif is_fashion:
         if is_aline_skirt: return "Structured garment physics: the A-line skirt holds its firm, clean geometric shape without billowing, flaring, or pleating in motion. Subject models the garment WORN ON BODY. Fabric testing is done strictly WHILE WEARING IT. Hands kept strictly away from face."
         return "Natural fabric drape in motion; subject models the garment WORN ON BODY. Fabric testing (stretching/touching) is done strictly WHILE WEARING IT. Zero duplicate items in hands. Hands kept strictly away from face."
-    elif any(k in p for k in ["hút bụi", "vacuum", "máy sấy", "máy thổi"]): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
-    elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
+    elif match_kw(["hút bụi", "vacuum", "máy sấy", "máy thổi"], f"{product_name} {vo_text}"): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
+    elif is_long_handle or match_kw(["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"], f"{product_name} {vo_text}"): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
     elif is_strict_appliance: return "GEOMETRY ENFORCEMENT: The product MUST strictly maintain its solid, rigid structural integrity (e.g. solid steel, rigid plastic, geared joints). Zero folding/collapsing glitch. Zero morphing. Presenter interacts decisively with both hands holding the edges/base, NEVER covering the main body of the product."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type):
-    p = f"{clean_prod_en} {check_str}".lower()
     if intimate_type != "normal": return (
         f"standing professionally in a modest oversized sweater, holding {clean_prod_en} securely in hands to show its premium texture",
         f"tight macro close-up focused strictly on hands pulling and stretching the highly elastic fabric of {clean_prod_en} to demonstrate extreme resilience",
         f"tight close-up of hands pressing into the breathable seamless surface of {clean_prod_en} resting flat on a wooden table",
         f"holding {clean_prod_en} neatly folded like a small towel in hands with a warm welcoming smile, fully dressed"
     )
-    elif any(k in p for k in ["sock", "shoe", "boot", "sandal", "sneaker", "tights", "tất", "vớ", "giày", "dép"]): return ("stepping forward stylishly showcasing the footwear/socks on feet", "holding the product securely in hands, tracing fingers along the seams and material to show premium quality", "holding the product securely in hands, bending the sole or stretching the material firmly", "posing confidently with focus on the legs/feet")
+    elif match_kw(["sock", "shoe", "boot", "sandal", "sneaker", "tights", "tất", "vớ", "giày", "dép"], f"{clean_prod_en} {check_str}"): return ("stepping forward stylishly showcasing the footwear/socks on feet", "holding the product securely in hands, tracing fingers along the seams and material to show premium quality", "holding the product securely in hands, bending the sole or stretching the material firmly", "posing confidently with focus on the legs/feet")
     elif is_food: return (f"holding {clean_prod_en} securely while standing completely still and presenting it deliciously", f"taking a satisfying bite or showing the inside texture of {clean_prod_en}", f"pouring, dipping, or stretching {clean_prod_en} to show its mouth-watering details", f"holding {clean_prod_en} securely with a happy, satisfied expression")
     elif is_cosmetics:
         target_part, effect = get_cosmetic_target(clean_prod_en, check_str)
@@ -723,7 +736,7 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_mom_baby: return (f"caring mother holding {clean_prod_en} securely next to her baby", f"gently touching or interacting with {clean_prod_en} to show its features", f"demonstrating the safe use of {clean_prod_en} with the baby", f"holding {clean_prod_en} securely with a caring smile next to the baby")
     elif is_medicine: return (f"holding {clean_prod_en} securely in hand", f"showing {clean_prod_en} up close next to a clear glass of water", f"dropping or demonstrating the use of {clean_prod_en}", f"holding {clean_prod_en} securely with a healthy, confident smile")
     elif is_fashion_wearable: return ("stepping forward confidently, modeling the outfit", "close-up on hands touching and smoothing the fabric of the outfit worn on body to show its premium texture", "close-up on hands gently stretching the fabric of the outfit worn on body to demonstrate elasticity and breathability", "posing elegantly (hands strictly kept away from face) and gesturing warmly while modeling the outfit")
-    elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
+    elif match_kw(["hút bụi", "vacuum"], f"{clean_prod_en} {check_str}"): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
     elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
@@ -731,26 +744,26 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
-    is_bedroom = any(k in setting_lower for k in ["phòng ngủ", "giường", "bedroom", "pijama", "đồ ngủ", "ngủ", "thức dậy"])
-    is_bathroom = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
-    is_kitchen = any(k in setting_lower for k in ["bếp", "nấu", "kitchen", "cooking", "ăn"])
-    is_chore = any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
-    is_living_room = any(k in setting_lower for k in ["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"]) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
-    is_office = any(k in setting_lower for k in ["văn phòng", "công sở", "công ty", "họp", "office", "workplace"])
-    is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
-    is_event_party = any(k in setting_lower for k in ["tiệc", "sự kiện", "đám cưới", "party", "event"])
-    is_beach_resort = any(k in setting_lower for k in ["biển", "resort", "du lịch", "beach", "vacation"])
+    is_bedroom = match_kw(["phòng ngủ", "giường", "bedroom", "pijama", "đồ ngủ", "ngủ", "thức dậy"], setting_lower)
+    is_bathroom = match_kw(["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"], setting_lower)
+    is_kitchen = match_kw(["bếp", "nấu", "kitchen", "cooking", "ăn"], setting_lower)
+    is_chore = match_kw(["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"], setting_lower)
+    is_living_room = match_kw(["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"], setting_lower) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
+    is_office = match_kw(["văn phòng", "công sở", "công ty", "họp", "office", "workplace"], setting_lower)
+    is_gym_sport = match_kw(["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"], setting_lower)
+    is_event_party = match_kw(["tiệc", "sự kiện", "đám cưới", "party", "event"], setting_lower)
+    is_beach_resort = match_kw(["biển", "resort", "du lịch", "beach", "vacation"], setting_lower)
     is_single_skirt = detect_single_tube_skirt(s_lower)
-    is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
+    is_evening_fashion = match_kw(["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"], s_lower)
     
     if intimate_type == "underwear_bra": vibe = "Premium Fabric Review (Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional)"
     elif intimate_type == "camisole": vibe = "Modest Casual Review (Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage)"
     elif is_fashion:
-        if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
+        if match_kw(["chân váy", "quần", "skirt", "pants", "jeans", "shorts"], s_lower):
             if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the lower body. Top: fitted sleeveless silk camisole or halter top, fully TUCKED IN. Footwear: strappy flat beach sandals)"
             elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the lower body. Top: tailored long-sleeve silk blouse, fully TUCKED IN. Footwear: pointed-toe leather high heels)"
             else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the lower body. Top: fitted short-sleeve knit top or chic cropped tee. Footwear: clean minimalist white sneakers or leather loafers)"
-        elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie"]):
+        elif match_kw(["áo", "shirt", "top", "jacket", "sweater", "hoodie"], s_lower):
             if is_beach_resort: vibe = "Beach/Resort (Wearing the product perfectly fitted on the upper body. Bottom: breezy wide-leg linen pants or denim shorts. Footwear: woven sandals)"
             elif is_office: vibe = "Professional Office (Wearing the product perfectly fitted on the upper body. Bottom: tailored wide-leg trousers or straight pencil skirt. Footwear: pointed-toe heels)"
             else: vibe = "Trendy Streetwear (Wearing the product perfectly fitted on the upper body. Bottom: fashionable high-waisted straight jeans or pleated midi skirt. Footwear: clean white sneakers)"
@@ -767,7 +780,7 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
     elif is_event_party or is_evening_fashion: vibe = "Elegant Evening (Glamorous evening dress or chic formal outfit, strappy heeled sandals or stilettos)" if gender == "female" else "Elegant Evening (Tailored suit or sharp blazer, polished dress shoes)"
     else: vibe = "Trendy Streetwear/Cafe (Stylish layered outfit, fashionable jeans or skirt, UNTUCKED or French tuck, clean white sneakers or ankle boots)" if gender == "female" else "Trendy Streetwear/Cafe (Smart-casual layered outfit, overshirt or stylish tee, clean denim or chinos, UNTUCKED, minimalist white sneakers)"
 
-    contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
+    contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if match_kw(["trắng", "white", "kem"], h_lower) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
     if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
     elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
     elif is_medicine: contrast_note = "Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
@@ -813,7 +826,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_fashion_wearable = detect_wearable_fashion(check_str) and intimate_type == "normal" and not is_footwear_accessory
     
     is_single_skirt_mode = detect_single_tube_skirt(check_str)
-    is_aline_skirt = any(k in check_str.lower() for k in ["chữ a", "a-line", "a line", "chân váy a"])
+    is_aline_skirt = match_kw(["chữ a", "a-line", "a line", "chân váy a"], check_str)
     
     is_strict_appliance = detect_strict_rigid_appliance(check_str) and not is_fashion_wearable
     is_long_handle = detect_long_handle_tool(check_str + " " + ai_product_visual_en)
@@ -926,9 +939,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     dynamic_footwear_neg = ""
     vibe_lower = stylist_vibe_text.lower()
-    if any(k in vibe_lower for k in ["barefoot", "slipper"]): dynamic_footwear_neg = "sneakers, sports shoes, running shoes, leather shoes, dress shoes, high heels, boots, outside shoes, "
-    elif any(k in vibe_lower for k in ["sneaker", "running", "athletic"]): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
-    elif any(k in vibe_lower for k in ["heel", "loafer", "dress"]): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
+    if match_kw(["barefoot", "slipper"], vibe_lower): dynamic_footwear_neg = "sneakers, sports shoes, running shoes, leather shoes, dress shoes, high heels, boots, outside shoes, "
+    elif match_kw(["sneaker", "running", "athletic"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
+    elif match_kw(["heel", "loafer", "dress"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
     char_neg_extra = f"{dynamic_footwear_neg}caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
@@ -940,7 +953,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     total_sec = 0.0
     
-    # 🌟 VÒNG LẶP CHÍNH DỰNG CẢNH (ĐÃ KIỂM ĐỊNH LỖI)
+    # 🌟 VÒNG LẶP CHÍNH DỰNG CẢNH (ĐÃ KIỂM ĐỊNH LỖI NGHIÊM NGẶT)
     for idx_scn, scn in enumerate(scenes):
         vo_text = clean_and_normalize_voiceover(scn.get("vo", scn.get("voiceover", "")))
         scn["voiceover"] = vo_text
@@ -974,9 +987,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         # 🌟 CƠ CHẾ ĐỒNG BỘ THỊ GIÁC (VISUAL TARGET MATCHING) CHO CẢNH 1
         if idx_scn == 0 and is_pas_scn1_no_prod:
             vo_lower = vo_text.lower()
-            needs_child = any(k in vo_lower for k in ["bé", "trẻ", "con", "nít", "sơ sinh"])
-            needs_senior = any(k in vo_lower for k in ["già", "ông", "bà", "cao tuổi", "bố mẹ già"])
-            needs_family = any(k in vo_lower for k in ["gia đình", "cả nhà"])
+            needs_child = match_kw(["bé", "trẻ", "con", "nít", "sơ sinh"], vo_lower)
+            needs_senior = match_kw(["già", "ông", "bà", "cao tuổi", "bố mẹ già"], vo_lower)
+            needs_family = match_kw(["gia đình", "cả nhà"], vo_lower)
             
             if needs_child and needs_senior: target_subject = "a Vietnamese elderly person and a happy child"
             elif needs_child: target_subject = "a happy Vietnamese child"
