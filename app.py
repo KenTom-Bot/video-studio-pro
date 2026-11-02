@@ -113,11 +113,11 @@ COMPACT_CORE_RULES = """
    - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
    - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry), CHẤT LIỆU và CHÍNH XÁC MÀU SẮC như nguyên bản. Tuyệt đối không biến dạng thành đồ vật thông thường (generic object).
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát, giữ góc nhìn (Angle) cố định để hiển thị trọn vẹn chi tiết.
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết không gian 3D của sản phẩm.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC, CHUẨN GIỌNG BẮC BỘ (CRITICAL):
    - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. TUYỆT ĐỐI CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé" để gọi sản phẩm).
    - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc.
-   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Thay bằng ngôn từ dân dã, dễ hiểu.
+   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy".
    - CẤM LẶP TỪ & CTA GIẢ TRÂN: Cấm "chốt ngay dưới giỏ hàng", cấm "ưu đãi cực hời giảm sâu". Viết mộc mạc: "nhỉnh mấy chục cành, các bác sắm ở góc trái nhé".
 """
 
@@ -563,7 +563,6 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
         cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
     return cleaned
 
-# 🌟 BỔ SUNG TỪ KHÓA MÓC/MẮC VÀO DANH SÁCH THIẾT BỊ CỨNG ĐỂ KHÓA HÌNH HỌC
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
     return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "mắc", "móc treo", "hanger", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm", "cọ"], text_to_check)
 
@@ -720,7 +719,7 @@ def get_product_centric_camera_shot(scene_idx, is_fashion, is_footwear_acc, is_p
         elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
-# 🌟 CẬP NHẬT LÕI VẬT LÝ ĐỂ CHỐNG TỐI GIẢN HÓA VÀ KHÓA GÓC XOAY
+# 🌟 LÕI CƯỠNG CHẾ THỂ TÍCH 3D & BẢO TOÀN GÓC XOAY (BẢN 61.0)
 def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, is_mom_baby_hard, intimate_type, is_aline_skirt):
     if intimate_type != "normal": return "Soft breathable fabric physics: hands strictly stretching and releasing the elastic textile smoothly, showing its seamless texture. STRICTLY HAND INTERACTION ONLY. The product is NEVER worn on the body. Presenter is fully clothed."
     elif is_food: return "Mouth-watering visual physics; showing steam rising, juicy texture, melting, or smooth pulling/stretching if applicable. Presenter stands completely still; natural hand interaction only, NEVER dropping."
@@ -736,7 +735,7 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
         return "Natural fabric drape in motion; subject models the garment WORN ON BODY. Fabric testing (stretching/touching) is done strictly WHILE WEARING IT. Zero duplicate items in hands. Hands kept strictly away from face."
     elif match_kw(["hút bụi", "vacuum", "máy sấy", "máy thổi"], f"{product_name} {vo_text}"): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
     elif is_long_handle or match_kw(["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"], f"{product_name} {vo_text}"): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
-    elif is_strict_appliance: return "ABSOLUTE 3D RIGIDITY & STRUCTURAL LOCK: The product MUST strictly maintain its complex multi-part solid structure from the reference. ZERO simplification. It DOES NOT morph into a generic/standard version. Components DO NOT bend, shift, multiply, disappear, or merge. Presenter holds it steadily at a FIXED ANGLE to perfectly display all original details, NO extreme 3D rotation that hides its shape. Interaction is decisive, NEVER covering the main body."
+    elif is_strict_appliance: return "ABSOLUTE 3D VOLUMETRIC RIGIDITY: The product MUST strictly maintain its complex multi-part solid structure from all visible angles. ZERO simplification. It DOES NOT morph into a generic object. Components DO NOT bend, shift, or merge. If slightly rotated, the side/profile structure perfectly aligns with the original 3D mesh. Presenter holds it steadily, interaction is decisive, NEVER covering the main body."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type):
@@ -756,7 +755,7 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_fashion_wearable: return ("stepping forward confidently, modeling the outfit", "close-up on hands touching and smoothing the fabric of the outfit worn on body to show its premium texture", "close-up on hands gently stretching the fabric of the outfit worn on body to demonstrate elasticity and breathability", "posing elegantly (hands strictly kept away from face) and gesturing warmly while modeling the outfit")
     elif match_kw(["hút bụi", "vacuum"], f"{clean_prod_en} {check_str}"): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
     elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
-    elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at a fixed angle to maintain scale and structure", f"presenting {clean_prod_en} swiftly without rotating it", f"demonstrating {clean_prod_en} with fast, decisive hand interaction at a steady angle while keeping 100% structural fidelity. STRICTLY NO lifting to face", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
+    elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly to perfectly display its 3D structure", f"presenting {clean_prod_en} clearly without hiding any components", f"demonstrating {clean_prod_en} with fast, decisive hand interaction, maintaining strict 3D volumetric consistency at all times. STRICTLY NO lifting to face", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
@@ -977,8 +976,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
     
-    # 🌟 CẬP NHẬT LỆNH CẤM BIẾN DẠNG TỐI GIẢN HÓA VẬT THỂ
-    anti_morph_neg = "morphing object, object changing shape, structural shifting, changing number of items, unstable object, parts merging, simplifying structural complexity, losing original details, turning into a generic object, flattening 3D structure, losing hooks/branches, extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
+    # 🌟 CẬP NHẬT LỆNH CẤM LÀM BẸP, MẤT CHI TIẾT KHI XOAY (ANTI-FLATTENING)
+    anti_morph_neg = "morphing object, object changing shape, structural shifting, changing number of items, unstable object, parts merging, simplifying structural complexity, losing original details, turning into a generic object, flattening 3D structure, losing volume, losing hooks/branches, extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
     
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     if is_aline_skirt: 
@@ -1201,6 +1200,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
+    # 🌟 ÉP LẤY NHIỀU ẢNH (PHÂN TÍCH ĐA CHIỀU 3D) TRONG PROMPT LLM
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1559,7 +1559,7 @@ if not st.session_state.get("is_analyzed", False):
 if st.session_state.get("trigger_main_generation"):
     st.session_state.trigger_main_generation = False
     args = st.session_state.get("temp_main_args", {})
-    with st.spinner("⏳ Đạo diễn AI đang phân tích sản phẩm (Super Lite Token) ..."):
+    with st.spinner("⏳ Đạo diễn AI đang phân tích đa chiều sản phẩm (Super Lite Token) ..."):
         try:
             char_inputs = []
             if args.get("avatar_file") or args.get("role_input"):
@@ -1585,6 +1585,7 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
+            # 🌟 YÊU CẦU AI PHÂN TÍCH ĐA CHIỀU 3D TỪ NHIỀU ẢNH (BẢN 61)
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
@@ -1603,7 +1604,7 @@ if st.session_state.get("trigger_main_generation"):
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
                     "c_en": "ONLY the exact dominant color of the product (e.g., 'black', 'white', 'pink', 'silver', 'wood'). NO extra words.",
-                    "vis_en": "Mô tả SP tiếng Anh max 20 words. CRITICAL GEOMETRY LOCK: Mô tả rõ quai/tay cầm gốc.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CRITICAL 3D GEOMETRY LOCK.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
@@ -1614,7 +1615,7 @@ if st.session_state.get("trigger_main_generation"):
                 ]
             }}
             """
-            payload = ["PRODUCT IMAGES (EXTRACT RIGID 3D STRUCTURE, EXACT HANDLES/STRAPS, TRUE COLOR, AND OCR PRICES - IGNORE HUMAN MODELS):"]
+            payload = ["PRODUCT IMAGES (EXTRACT RIGID 3D STRUCTURE FROM ALL ANGLES, EXACT HANDLES/STRAPS, TRUE COLOR, AND OCR PRICES - IGNORE HUMAN MODELS):"]
             for cb, cm in args.get("temp_images", []):
                 payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
             for c in char_inputs:
@@ -1734,7 +1735,6 @@ if all_sc:
         active_id = st.session_state.get("active_script_id")
         asc = st.session_state.get("generated_details", {}).get(str(active_id), st.session_state.get("generated_details", {}).get(active_id, {}))
         
-        # 🌟 NEO UX SCROLL CHÍNH XÁC
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         if st.session_state.get("scroll_to_detail", False): 
             components.html("""
