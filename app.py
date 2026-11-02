@@ -109,13 +109,14 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL - QUAN TRỌNG NHẤT):
-   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH (bé/người già). Nếu thoại nói về ĐAU ĐỚN CƠ THỂ, BẮT BUỘC KOC phải nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ (VD: đau cổ xoa cổ, mỏi vai xoa vai). CẤM làm sai lệch BỐI CẢNH MASTER.
-   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU (Material) như nguyên bản.
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH.
+   - CẢNH BÁO TỪ ĐỒNG ÂM: TUYỆT ĐỐI KHÔNG nhầm lẫn từ xưng hô ("mấy bà", "các mẹ") thành người già/mẹ bỉm sữa. TUYỆT ĐỐI KHÔNG nhầm từ mô tả ("bé mèo", "nhỏ bé") thành trẻ em. Chỉ xuất hiện nhân vật phụ khi họ THỰC SỰ LÀ NGƯỜI DÙNG SẢN PHẨM trong câu chuyện.
+   - NẾU KHÔNG CÓ NHÂN VẬT PHỤ SỬ DỤNG, KOC phải tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN BỊ ĐAU (nếu có).
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm, KHÔNG được che mặt chính của sản phẩm. 
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm lặp từ chốt sale. Cấm từ tiêu cực (Cấm "dơ dáy", "bẩn thỉu"). Cấm nhắc tới livestream.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -411,7 +412,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM & LỌC TỪ BẨN)
+# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -549,7 +550,10 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     return cleaned
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
+    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
+
+def detect_lighting_product(text_to_check: str) -> bool:
+    return match_kw(["đèn", "đèn pin", "đèn led", "đèn ngủ", "chiếu sáng", "bóng đèn", "light", "flashlight", "lamp"], text_to_check)
 
 def translate_and_lock_color_en(color_vi: str, ai_color_en: str = "") -> str:
     c = f"{color_vi} {ai_color_en}".lower().strip()
@@ -566,15 +570,18 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
             cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
-def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
+def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str, is_lighting_product: bool = False):
+    if is_lighting_product:
+        return "cinematic low light, dark ambience, highly contrasting focused beam to highlight illumination", "quiet nighttime ambience"
+    
     combined = f"{vo_text} {setting_text}".lower()
     is_indoor = not match_kw(["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden"], combined)
-    if match_kw(["đêm", "tối", "khuya", "tắt đèn", "mất điện", "đi ngủ", "night", "dark"], combined): return "dimly lit, cinematic low light, dark ambience", "quiet nighttime ambience (no reverb)"
-    elif match_kw(["mưa", "ẩm ướt", "nồm"], combined): return ("rain droplets on window, soft overcast indoor lighting" if is_indoor else "light rain, wet ground, overcast sky"), "subtle rain ambience (no reverb)"
-    elif match_kw(["nắng", "trưa hè"], combined): return ("warm sunbeams through window" if is_indoor else "sunny daylight, golden sunbeams"), "subtle breeze ambience (no reverb)"
-    elif match_kw(["sáng sớm", "buổi sáng", "bình minh"], combined): return "fresh morning sunlight", "subtle morning ambience (no reverb)"
-    elif match_kw(["hoàng hôn", "chiều tà", "buổi chiều"], combined): return "warm amber sunset glow", "subtle evening ambience (no reverb)"
-    return ("clean natural daylight with soft warm fill light" if is_indoor else "bright commercial daylight"), ""
+    
+    # ÉP SÁNG RÕ CHO TẤT CẢ CÁC TRƯỜNG HỢP CÒN LẠI
+    if match_kw(["ngủ", "phòng ngủ", "giường", "sleep"], combined):
+        return "soft, warm, inviting bright morning light, well-lit room (STRICTLY NO DARK AMBIENCE)", "calm room ambience"
+    
+    return ("bright, clear, well-lit commercial daylight, highly illuminated (STRICTLY NO DARK AMBIENCE)" if is_indoor else "bright sunny commercial daylight, vibrant and clear (STRICTLY NO DARK AMBIENCE)"), ""
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
     p = re.sub(r'\bgesturing\s+(?:warmly\s+)?(?:toward\s+)?corner\b', 'sharing recommendations with an open-palm gesture', prompt_text, flags=re.IGNORECASE)
@@ -737,7 +744,7 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
-# 🌟 TRẢ VỀ OPTION TRANG PHỤC NGẪU NHIÊN ĐỂ KHÔNG BỊ TRÙNG LẶP GIỮA CÁC KỊCH BẢN
+# 🌟 TRẢ VỀ OPTION TRANG PHỤC & ÉP TƯƠNG PHẢN ĐỂ SẢN PHẨM SÁNG RÕ
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -758,7 +765,7 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
     elif is_fashion:
         if match_kw(["chân váy", "quần", "skirt", "pants", "jeans", "shorts"], s_lower):
             if is_beach_resort: vibes = ["Beach/Resort (Top: fitted sleeveless silk camisole TUCKED IN, strappy flat sandals)", "Beach/Resort (Top: crochet halter top, woven beach sandals)", "Beach/Resort (Top: off-shoulder linen blouse, bare feet)"]
-            elif is_office: vibes = ["Professional Office (Top: tailored long-sleeve silk blouse TUCKED IN, pointed-toe heels)", "Professional Office (Top: crisp white button-down shirt TUCKED IN, leather loafers)", "Professional Office (Top: fitted knit turtleneck TUCKED IN, smart pumps)"]
+            elif is_office: vibes = ["Professional Office (Top: tailored long-sleeve silk blouse TUCKED IN, pointed-toe leather high heels)", "Professional Office (Top: crisp white button-down shirt TUCKED IN, leather loafers)", "Professional Office (Top: fitted knit turtleneck TUCKED IN, smart pumps)"]
             else: vibes = ["Trendy Streetwear (Top: fitted short-sleeve knit top, clean white sneakers)", "Trendy Streetwear (Top: chic cropped tee, leather ankle boots)", "Trendy Streetwear (Top: oversized graphic t-shirt French tucked, chunky sneakers)"]
         elif match_kw(["áo", "shirt", "top", "jacket", "sweater", "hoodie"], s_lower):
             if is_beach_resort: vibes = ["Beach/Resort (Bottom: breezy wide-leg linen pants, woven sandals)", "Beach/Resort (Bottom: distressed denim shorts, bare feet)", "Beach/Resort (Bottom: flowy floral maxi skirt, flat sandals)"]
@@ -785,7 +792,17 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
 
     vibe = random.choice(vibes)
     
-    contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if match_kw(["trắng", "white", "kem"], h_lower) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
+    # Ép tương phản quang học
+    is_dark_prod = match_kw(["đen", "xám", "tối", "nâu", "black", "dark", "grey", "brown", "navy"], h_lower)
+    is_light_prod = match_kw(["trắng", "sáng", "kem", "bạc", "white", "light", "cream", "silver"], h_lower)
+    
+    if is_dark_prod:
+        contrast_note = "Trang phục màu TRẮNG/BEIGE/PASTEL SÁNG để tạo độ tương phản cực mạnh với SP màu tối (CRITICAL CONTRAST LOCK: Light colored clothes vs Dark product)"
+    elif is_light_prod:
+        contrast_note = "Trang phục màu TỐI (Navy/Đen/Đỏ đô) để làm nổi bật SP màu sáng (CRITICAL CONTRAST LOCK: Dark colored clothes vs Light product)"
+    else:
+        contrast_note = "Trang phục thanh lịch, màu sắc TƯƠNG PHẢN RÕ RỆT với màu sản phẩm để tôn lên SP"
+        
     if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
     elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
     elif is_medicine: contrast_note = "Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
@@ -873,7 +890,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
-    master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base)
+    is_lighting_product = detect_lighting_product(check_str)
+    master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, is_lighting_product)
 
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
@@ -886,7 +904,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc "trẻ em" (bé, con nít) hoặc "người già" (ông bà, ba mẹ), thì trường "act" phải mô tả: "A Vietnamese [child/elderly] actively using the product...". KOC lùi về làm nền. NẾU KHÔNG CÓ TRẺ EM/NGƯỜI GIÀ, KOC PHẢI DIỄN CẢM XÚC ĐAU ĐỚN HÌNH THỂ KHỚP VỚI THOẠI. CẤM làm sai lệch BỐI CẢNH MASTER.
+       - Cảnh 1 (Mở đầu): CẢNH BÁO: Phân biệt rõ thành ngữ xưng hô ("mấy bà", "bé mèo", "các mẹ") với nhân vật thật. Nếu thoại CHỈ LÀ XƯNG HÔ hoặc ẨN DỤ, KOC đứng 1 mình tự diễn (VD: trượt chân, nhăn mặt, xoa vai). CHỈ THÊM trẻ em/người già nếu thoại THỰC SỰ nói về việc HỌ ĐANG SỬ DỤNG.
        - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm. BẮT BUỘC mô tả "interacting firmly with both hands at chest level".
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
@@ -951,7 +969,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
-    base_neg_prompt_core = f"{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
+    lighting_neg = "" if is_lighting_product else "dark, moody, dimly lit, poorly lit, shadows, underexposed, low light, "
+    
+    base_neg_prompt_core = f"{lighting_neg}{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt_core += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
@@ -986,20 +1006,26 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         family_bg_prompt = ""
         current_neg_prompt = base_neg_prompt_core
         
-        # 🌟 CƠ CHẾ ĐỒNG BỘ THỊ GIÁC ĐƯỢC CHẠY CHÍNH XÁC
+        # 🌟 CƠ CHẾ ĐỒNG BỘ THỊ GIÁC (RADAR TỪ VỰNG TINH CHỈNH V53)
         if idx_scn == 0:
             vo_lower = vo_text.lower()
-            needs_child = match_kw(["bé", "trẻ", "con", "nít", "sơ sinh"], vo_lower)
-            needs_senior = match_kw(["già", "ông", "bà", "cao tuổi", "bố mẹ già"], vo_lower)
+            needs_child = match_kw(["trẻ em", "trẻ nhỏ", "em bé", "con nít", "trẻ sơ sinh", "trẻ con", "bạn nhỏ", "con nhỏ"], vo_lower)
+            needs_senior = match_kw(["người già", "ông bà", "cao tuổi", "bố mẹ già", "bà cụ", "ông cụ", "người lớn tuổi"], vo_lower)
+            needs_husband = match_kw(["chồng", "ông xã", "anh nhà", "nam giới", "đàn ông", "phái mạnh"], vo_lower)
+            needs_wife = match_kw(["vợ", "bà xã", "chị em", "phụ nữ", "mẹ bỉm", "các mẹ", "chị nhà"], vo_lower)
             needs_family = match_kw(["gia đình", "cả nhà"], vo_lower)
             
-            if needs_child and needs_senior: target_subject = "a Vietnamese elderly person and a happy child"
-            elif needs_child: target_subject = "a happy Vietnamese child"
-            elif needs_senior: target_subject = "a Vietnamese elderly person"
+            targets = []
+            if needs_senior: targets.append("a Vietnamese elderly person")
+            if needs_husband and detected_gender == "female": targets.append("a Vietnamese man")
+            elif needs_wife and detected_gender == "male": targets.append("a Vietnamese woman")
+            if needs_child: targets.append("a happy Vietnamese child")
+            
+            if targets: target_subject = " and ".join(targets)
             elif needs_family: target_subject = "a happy Vietnamese family"
 
             if target_subject:
-                family_bg_prompt = " [BACKGROUND: softly blurred silhouettes of an elderly person and a child in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
+                family_bg_prompt = f" [BACKGROUND: softly blurred silhouettes of {target_subject} in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
                 current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "")
 
         if not is_cosmetics and not is_food:
@@ -1040,7 +1066,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
         if idx_scn == 0 and target_subject:
             if is_pas_scn1_no_prod:
-                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} [FOREGROUND ACTION]: {target_subject}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [BACKGROUND]: {locked_character_prompt} watching warmly, {micro_expr}"
+                img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} Subject: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
                 raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} [FOREGROUND ACTION]: {target_subject}, {clean_act} (ZERO PRODUCT). [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
             else:
                 prod_use_segment = f"PRODUCT IN USE: {target_subject} actively wearing/using {clean_prod_en}. {color_lock_tag}."
@@ -1135,7 +1161,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     cur_len = len(st.session_state.get("all_scripts", []) + st.session_state.get("cloned_scripts", []) + st.session_state.get("expanded_scripts", []))
     active_note = extra_note.strip() if extra_note.strip() else st.session_state.get("current_input_context", "").strip()
-    active_format = unified_strategy_format if unified_strategy_format else st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề xuất & Mix Đa Dạng")
+    active_format = unified_strategy_format if unified_strategy_format else st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
     
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
@@ -1538,8 +1564,8 @@ if st.session_state.get("trigger_main_generation"):
                     "pro_a": "Đại từ gọi (VD: các chị em)",
                     "koc_g": "male hoặc female",
                     "koc_a": "child / teen / adult / senior",
-                    "p_orig": <Giá 250000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
-                    "p_sale": <Giá 150000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
+                    "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
+                    "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
                     "c_en": "Exact English color pattern",
                     "vis_en": "Mô tả SP tiếng Anh max 20 words. CRITICAL GEOMETRY LOCK: Mô tả rõ quai/tay cầm gốc.",
