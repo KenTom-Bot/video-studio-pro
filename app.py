@@ -109,13 +109,16 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL - QUAN TRỌNG NHẤT):
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
    - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
    - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU như nguyên bản.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
    - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
-4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy", "bẩn thỉu"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
+4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC, CHUẨN GIỌNG BẮC BỘ (CRITICAL):
+   - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. TUYỆT ĐỐI CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé" để gọi sản phẩm).
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc.
+   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy".
+   - CẤM LẶP TỪ & CTA GIẢ TRÂN: Cấm "chốt ngay dưới giỏ hàng", cấm "ưu đãi cực hời giảm sâu". Viết mộc mạc: "nhỉnh mấy chục cành, các bác sắm ở góc trái nhé".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -411,7 +414,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM, CẤM TỪ KỸ THUẬT & TRẺ HOÁ KOC)
+# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM, CẤM TỪ KỸ THUẬT & ÉP GIỌNG BẮC BỘ)
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -465,6 +468,14 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bưu\s*đãi\s*cực\s*hời\s*giảm\s*sâu\b', 'deal cực mượt'), 
         (r'\bđang\s*giảm\s*giá\s*sâu\s*có\s*hạn\b', 'đang có deal cực hời'),
         (r'\bchốt\s*đơn\s*ngay\s*tay\b', 'chốt ngay kẻo lỡ'), (r'\bchốt\s*ngay\s*tay\b', 'chốt liền tay'),
+        
+        # CHUYỂN TỪ MIỀN NAM SANG HÀ NỘI
+        (r'\bmấy\s*bà\b', 'các bác'),
+        (r'\brinh\s*ngay\b', 'sắm ngay'),
+        (r'\brinh\b', 'sắm'),
+        (r'\b(một|1)\s*bé\b', r'\1 em'),
+        (r'\bnha\b(?=\s|$)', 'nhé'),
+        (r'\b(siêu\s*)?hạt\s*dẻ\b', 'cực kỳ hợp lý'),
         
         (r'\bliền\s*tay\b', 'ngay nhé'), (r'\bvừa\s*vặn\s*vừa\b', 'rất vừa vặn'),
         (r'\bsang\s*chảnh\s*sang\b', 'cực kỳ sang chảnh'), (r'\bđẹp\s*đẹp\b', 'tuyệt đẹp'),
@@ -540,7 +551,7 @@ def detect_cosmetics(text_to_check: str) -> bool:
     return match_kw(["kem dưỡng", "son", "son môi", "dưỡng môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "khử mùi", "lăn nách", "má hồng", "skincare", "makeup"], text_to_check)
 
 def detect_mom_baby(text_to_check: str) -> bool: 
-    return match_kw(["bỉm", "tã", "sữa bột", "đồ chơi trẻ em", "bình sữa", "ti giả", "xe đẩy", "nôi", "mẹ và bé", "sơ sinh"], text_to_check)
+    return match_kw(["bỉm", "tã", "sữa bột", "đồ chơi trẻ em", "bình sữa", "ti giả", "xe đẩy", "nôi", "m mẹ và bé", "sơ sinh"], text_to_check)
 
 def detect_mom_baby_hard_props(text_to_check: str) -> bool: 
     return match_kw(["bình sữa", "xe đẩy", "đồ chơi", "nôi"], text_to_check)
@@ -598,33 +609,33 @@ def generate_char_rules_string(profiles):
     if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
     return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
 
-# 🌟 FIX: ÉP ĐỘ TUOỈ THANH NIÊN (YOUNG ADULT) THAY VÌ TEEN
+# 🌟 FIX: ÉP ĐỘ TUOỈ THANH NIÊN (YOUNG ADULT) THAY VÌ TEEN VÀ KHÓA GIỌNG HÀ NỘI
 def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
     user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
     asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
     
     if is_mom_baby: 
-        return "female", f"A caring Vietnamese young adult mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
+        return "female", f"A caring Vietnamese young adult mother ({asian_features}) safely holding/interacting with her baby", "STRICTLY Native standard Hanoi Northern Vietnamese warm young adult female voice"
     
     if user_roles:
         role_lower = user_roles[0].lower()
         if match_kw(["trẻ em", "bé", "kid", "child", "boy", "girl"], role_lower):
             gender = "male" if match_kw(["trai", "boy"], role_lower) else "female"
-            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese child {gender} voice"
+            return gender, f"Vietnamese child, {user_roles[0]}, {asian_features}", f"STRICTLY Native standard Hanoi Northern Vietnamese child {gender} voice"
         elif match_kw(["ông", "già", "bác già", "bà", "senior", "old"], role_lower):
             gender = "male" if match_kw(["ông", "nam", "bác trai"], role_lower) else "female"
-            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"Native Hanoi Vietnamese senior {gender} voice"
+            return gender, f"Vietnamese senior, {user_roles[0]}, {asian_features}", f"STRICTLY Native standard Hanoi Northern Vietnamese senior {gender} voice"
         elif match_kw(["bố", "ba", "chồng", "nam", "anh", "trai", "man", "male"], role_lower):
-            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult male voice"
+            return "male", f"Vietnamese man, {user_roles[0]}, {asian_features}", "STRICTLY Native standard Hanoi Northern Vietnamese adult male voice"
         else:
-            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "Native Hanoi Vietnamese adult female voice"
+            return "female", f"Vietnamese woman, {user_roles[0]}, {asian_features}", "STRICTLY Native standard Hanoi Northern Vietnamese adult female voice"
             
     ai_p_lower = ai_persona_en.lower()
     gender = "male" if match_kw(["man", "male", "boy", "father", "gentleman", "anh", "nam"], ai_p_lower) else "female"
     clean_p = re.sub(r'\b(?:authentic|real|famous|celebrity|popular|influencer|koc|model|fictional|everyday|western|caucasian)\b', '', ai_persona_en, flags=re.IGNORECASE).strip()
     if "vietnamese" not in clean_p.lower(): clean_p = f"Vietnamese {clean_p}"
     physique = f", {ai_body_and_hair_en}" if ai_body_and_hair_en else f", {asian_features}"
-    voice = ai_voice_prompt if ai_voice_prompt else f"Native Hanoi Vietnamese adult {gender} voice"
+    voice = ai_voice_prompt if ai_voice_prompt else f"STRICTLY Native standard Hanoi Northern Vietnamese adult {gender} voice"
     
     return gender, f"{clean_p}{physique}", voice
 
@@ -867,7 +878,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     koc_g = dna.get("koc_g", "female")
     
-    # 🌟 ÉP ĐỘ TUỔI KOC VỀ THANH NIÊN NẾU KHÔNG PHẢI EM BÉ/NGƯỜI GIÀ
     koc_a = dna.get("koc_a", "adult")
     koc_a_clean = "young adult" if koc_a not in ["child", "senior"] else koc_a
     
@@ -875,7 +885,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         char_profiles, 
         f"Vietnamese {koc_a_clean} {koc_g}", 
         "", 
-        f"Native Hanoi Vietnamese {koc_a_clean} {koc_g} voice",
+        f"STRICTLY Native standard Hanoi Northern Vietnamese {koc_a_clean} {koc_g} voice",
         is_mom_baby
     )
 
@@ -1174,7 +1184,6 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
-    # 🌟 ÉP ĐỘ TUỔI MẶC ĐỊNH LÀ YOUNG ADULT TRONG PROMPT LLM
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1708,7 +1717,6 @@ if all_sc:
         active_id = st.session_state.get("active_script_id")
         asc = st.session_state.get("generated_details", {}).get(str(active_id), st.session_state.get("generated_details", {}).get(active_id, {}))
         
-        # 🌟 NEO UX SCROLL CHÍNH XÁC
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
         if st.session_state.get("scroll_to_detail", False): 
             components.html("""
