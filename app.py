@@ -109,7 +109,7 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL - QUAN TRỌNG NHẤT):
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
    - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
    - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU như nguyên bản.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
@@ -549,7 +549,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     return cleaned
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
+    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm", "cọ"], text_to_check)
 
 def detect_lighting_product(text_to_check: str) -> bool:
     return match_kw(["đèn", "đèn pin", "đèn led", "đèn ngủ", "chiếu sáng", "bóng đèn", "light", "flashlight", "lamp"], text_to_check)
@@ -719,7 +719,7 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
         return "Natural fabric drape in motion; subject models the garment WORN ON BODY. Fabric testing (stretching/touching) is done strictly WHILE WEARING IT. Zero duplicate items in hands. Hands kept strictly away from face."
     elif match_kw(["hút bụi", "vacuum", "máy sấy", "máy thổi"], f"{product_name} {vo_text}"): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
     elif is_long_handle or match_kw(["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"], f"{product_name} {vo_text}"): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
-    elif is_strict_appliance: return "GEOMETRY ENFORCEMENT: The product MUST strictly maintain its solid, rigid structural integrity (e.g. solid steel, rigid plastic, geared joints). Zero folding/collapsing glitch. Zero morphing. Presenter interacts decisively with both hands holding the edges/base, NEVER covering the main body of the product."
+    elif is_strict_appliance: return "ABSOLUTE RIGIDITY: The product MUST strictly maintain its solid structural integrity. Components DO NOT bend, shift, multiply, or merge. Zero folding/collapsing glitch. Zero morphing. Presenter interacts decisively with both hands holding the edges/base, NEVER covering the main body."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type):
@@ -742,7 +742,7 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly at realistic scale", f"presenting {clean_prod_en} swiftly", f"demonstrating {clean_prod_en} with fast, decisive hand interaction while keeping 100% fidelity. STRICTLY NO lifting to face/ear", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
     else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
 
-# 🌟 TRẢ VỀ OPTION TRANG PHỤC & ÉP TƯƠNG PHẢN ĐỂ SẢN PHẨM SÁNG RÕ
+# 🌟 TRẢ VỀ OPTION TRANG PHỤC SIÊU CHI TIẾT (LOẠI CỔ & TAY ÁO)
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -758,13 +758,13 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
     is_single_skirt = detect_single_tube_skirt(s_lower)
     is_evening_fashion = match_kw(["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"], s_lower)
     
-    if intimate_type == "underwear_bra": vibes = ["Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional", "Wearing a chic modest turtleneck sweater, fully covered, professional review style", "Wearing a loose comfortable button-up cotton shirt completely buttoned, zero skin exposure"]
-    elif intimate_type == "camisole": vibes = ["Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage", "Wearing a modest long-sleeve blouse buttoned to the top, professional", "Wearing a cozy oversized hoodie, fully covered casual style"]
+    if intimate_type == "underwear_bra": vibes = ["Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional", "Wearing a chic modest long-sleeve turtleneck sweater, fully covered, professional review style", "Wearing a loose comfortable long-sleeve button-up cotton shirt completely buttoned, zero skin exposure"]
+    elif intimate_type == "camisole": vibes = ["Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage", "Wearing a modest long-sleeve blouse buttoned to the top, professional", "Wearing a cozy oversized long-sleeve hoodie, fully covered casual style"]
     elif is_fashion:
         if match_kw(["chân váy", "quần", "skirt", "pants", "jeans", "shorts"], s_lower):
             if is_beach_resort: vibes = ["Beach/Resort (Top: fitted sleeveless silk camisole TUCKED IN, strappy flat sandals)", "Beach/Resort (Top: crochet halter top, woven beach sandals)", "Beach/Resort (Top: off-shoulder linen blouse, bare feet)"]
-            elif is_office: vibes = ["Professional Office (Top: tailored long-sleeve silk blouse TUCKED IN, pointed-toe leather high heels)", "Professional Office (Top: crisp white button-down shirt TUCKED IN, leather loafers)", "Professional Office (Top: fitted knit turtleneck TUCKED IN, smart pumps)"]
-            else: vibes = ["Trendy Streetwear (Top: fitted short-sleeve knit top, clean white sneakers)", "Trendy Streetwear (Top: chic cropped tee, leather ankle boots)", "Trendy Streetwear (Top: oversized graphic t-shirt French tucked, chunky sneakers)"]
+            elif is_office: vibes = ["Professional Office (Top: tailored long-sleeve silk blouse TUCKED IN, pointed-toe leather high heels)", "Professional Office (Top: crisp white long-sleeve button-down shirt TUCKED IN, leather loafers)", "Professional Office (Top: fitted long-sleeve knit turtleneck TUCKED IN, smart pumps)"]
+            else: vibes = ["Trendy Streetwear (Top: fitted short-sleeve knit round-neck t-shirt, clean white sneakers)", "Trendy Streetwear (Top: chic short-sleeve cropped tee, leather ankle boots)", "Trendy Streetwear (Top: oversized short-sleeve graphic t-shirt French tucked, chunky sneakers)"]
         elif match_kw(["áo", "shirt", "top", "jacket", "sweater", "hoodie"], s_lower):
             if is_beach_resort: vibes = ["Beach/Resort (Bottom: breezy wide-leg linen pants, woven sandals)", "Beach/Resort (Bottom: distressed denim shorts, bare feet)", "Beach/Resort (Bottom: flowy floral maxi skirt, flat sandals)"]
             elif is_office: vibes = ["Professional Office (Bottom: tailored wide-leg trousers, pointed-toe heels)", "Professional Office (Bottom: straight pencil skirt, smart loafers)", "Professional Office (Bottom: high-waisted pleated slacks, low heels)"]
@@ -773,37 +773,36 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
             if is_event_party or is_evening_fashion: vibes = ["Elegant Evening (Structured blazer draped over shoulders, stiletto heels)", "Elegant Evening (Minimalist elegant jewelry, strappy heeled sandals)", "Elegant Evening (Classic evening look, elegant clutch, pumps)"]
             elif is_beach_resort: vibes = ["Beach/Resort (Wide-brim woven hat, woven beach sandals)", "Beach/Resort (Sunglasses on head, barefoot on sand)", "Beach/Resort (Layered over a swimsuit, beach tote, flip flops)"]
             else: vibes = ["High-Fashion Lookbook (Elegant makeup, premium matching footwear)", "High-Fashion Lookbook (Chic sunglasses, designer bag, ankle boots)", "High-Fashion Lookbook (Sleek hair, minimalist accessories, leather loafers)"]
-    elif is_bedroom: vibes = ["Cozy Bedroom (Soft silk sleepwear, UNTUCKED, barefoot)", "Cozy Bedroom (Loose comfortable cotton pajamas, fluffy indoor slippers)", "Cozy Bedroom (Oversized comfortable home t-shirt and shorts, bare feet)"]
-    elif is_bathroom: vibes = ["Bathroom/Washroom (White fluffy bathrobe, barefoot)", "Bathroom/Washroom (Comfortable soft home wear, plastic anti-slip slippers)", "Bathroom/Washroom (Neat towel wrapped hair, silk robe, barefoot)"]
-    elif is_kitchen or is_chore: vibes = ["Active Home/Chores (Neat comfy loungewear, rolled-up sleeves, UNTUCKED, casual indoor slippers)", "Active Home/Chores (Casual t-shirt and jeans, protective apron, rubber slippers)", "Active Home/Chores (Comfortable stretchy home clothes, hair tied up neatly, bare feet)"]
-    elif is_living_room: vibes = ["Relaxed Living Room (Smart-casual loungewear, UNTUCKED, minimalist indoor slippers)", "Relaxed Living Room (Comfy chic oversized sweater, bare feet)", "Relaxed Living Room (Casual neat t-shirt and soft pants, cozy socks)"]
-    elif is_gym_sport: vibes = ["Athletic/Gym (Form-fitting activewear, athletic running shoes)", "Athletic/Gym (Sporty tank top and leggings, training sneakers)", "Athletic/Gym (Breathable workout t-shirt and joggers, sports shoes)"]
+    elif is_bedroom: vibes = ["Cozy Bedroom (Long-sleeve button-up silk sleepwear set, UNTUCKED, barefoot)", "Cozy Bedroom (Short-sleeve round-neck cotton pajama top and shorts, fluffy indoor slippers)", "Cozy Bedroom (Oversized short-sleeve round-neck home t-shirt, bare feet)"]
+    elif is_bathroom: vibes = ["Bathroom/Washroom (White fluffy long-sleeve bathrobe tied at waist, barefoot)", "Bathroom/Washroom (Short-sleeve v-neck soft home t-shirt and shorts, plastic anti-slip slippers)", "Bathroom/Washroom (Neat towel wrapped hair, long-sleeve silk robe, barefoot)"]
+    elif is_kitchen or is_chore: vibes = ["Active Home/Chores (Short-sleeve round-neck casual t-shirt and jeans, casual indoor slippers)", "Active Home/Chores (Long-sleeve button-up casual shirt with rolled-up sleeves, protective apron, rubber slippers)", "Active Home/Chores (Short-sleeve v-neck stretchy home t-shirt and shorts, hair tied up neatly, bare feet)"]
+    elif is_living_room: vibes = ["Relaxed Living Room (Smart-casual long-sleeve button-up shirt, UNTUCKED, minimalist indoor slippers)", "Relaxed Living Room (Comfy chic long-sleeve oversized knit sweater, bare feet)", "Relaxed Living Room (Short-sleeve round-neck neat t-shirt and soft sweatpants, cozy socks)"]
+    elif is_gym_sport: vibes = ["Athletic/Gym (Sleeveless sporty tank top and form-fitting leggings, athletic running shoes)", "Athletic/Gym (Short-sleeve breathable workout t-shirt and shorts, training sneakers)", "Athletic/Gym (Long-sleeve athletic zip-up jacket and joggers, sports shoes)"]
     elif is_office: 
-        if gender == "female": vibes = ["Professional Office (Elegant blouse, tailored trousers, TUCKED IN, pointed-toe heels)", "Professional Office (Smart blazer over a silk camisole, pencil skirt, loafers)", "Professional Office (Chic button-down shirt, wide-leg slacks, low heels)"]
-        else: vibes = ["Professional Office (Crisp button-down shirt, tailored trousers, TUCKED IN, leather dress shoes)", "Professional Office (Smart-casual polo shirt, chinos, smart loafers)", "Professional Office (Tailored suit jacket without tie, dress pants, oxfords)"]
+        if gender == "female": vibes = ["Professional Office (Long-sleeve button-up elegant blouse, tailored trousers, TUCKED IN, pointed-toe heels)", "Professional Office (Smart blazer over a silk v-neck camisole, pencil skirt, loafers)", "Professional Office (Short-sleeve button-down chic shirt, wide-leg slacks, low heels)"]
+        else: vibes = ["Professional Office (Long-sleeve crisp button-down shirt, tailored trousers, TUCKED IN, leather dress shoes)", "Professional Office (Short-sleeve collared polo shirt, chinos, smart loafers)", "Professional Office (Tailored suit jacket without tie, long-sleeve shirt, dress pants, oxfords)"]
     elif is_event_party or is_evening_fashion: 
-        if gender == "female": vibes = ["Elegant Evening (Glamorous evening dress, strappy heeled sandals)", "Elegant Evening (Chic formal outfit, elegant jewelry, stilettos)", "Elegant Evening (Sophisticated cocktail dress, clutch, pumps)"]
-        else: vibes = ["Elegant Evening (Tailored suit, polished dress shoes)", "Elegant Evening (Sharp blazer over crisp shirt, dress pants, oxfords)", "Elegant Evening (Tuxedo or formal evening wear, leather shoes)"]
+        if gender == "female": vibes = ["Elegant Evening (Sleeveless glamorous evening dress, strappy heeled sandals)", "Elegant Evening (Long-sleeve chic formal outfit, elegant jewelry, stilettos)", "Elegant Evening (Off-shoulder sophisticated cocktail dress, clutch, pumps)"]
+        else: vibes = ["Elegant Evening (Tailored suit, long-sleeve shirt, polished dress shoes)", "Elegant Evening (Sharp blazer over long-sleeve crisp shirt, dress pants, oxfords)", "Elegant Evening (Tuxedo or formal evening wear, leather shoes)"]
     else: 
-        if gender == "female": vibes = ["Trendy Streetwear/Cafe (Stylish layered outfit, fashionable jeans, UNTUCKED, clean white sneakers)", "Trendy Streetwear/Cafe (Chic knit top, pleated skirt, French tuck, ankle boots)", "Trendy Streetwear/Cafe (Smart-casual overshirt, wide-leg pants, flat loafers)"]
-        else: vibes = ["Trendy Streetwear/Cafe (Smart-casual layered outfit, clean denim, UNTUCKED, minimalist white sneakers)", "Trendy Streetwear/Cafe (Stylish overshirt, chinos, leather boots)", "Trendy Streetwear/Cafe (Casual neat t-shirt, cargo pants, chunky sneakers)"]
+        if gender == "female": vibes = ["Trendy Streetwear (Long-sleeve denim jacket over short-sleeve round-neck tee, fashionable jeans, clean white sneakers)", "Trendy Streetwear (Short-sleeve chic knit top, pleated skirt, French tuck, ankle boots)", "Trendy Streetwear (Long-sleeve smart-casual overshirt, wide-leg pants, flat loafers)"]
+        else: vibes = ["Trendy Streetwear (Long-sleeve flannel overshirt over short-sleeve tee, clean denim, UNTUCKED, minimalist white sneakers)", "Trendy Streetwear (Short-sleeve collared shirt, chinos, leather boots)", "Trendy Streetwear (Short-sleeve round-neck casual neat t-shirt, cargo pants, chunky sneakers)"]
 
     vibe = random.choice(vibes)
     
-    # Ép tương phản quang học
     is_dark_prod = match_kw(["đen", "xám", "tối", "nâu", "black", "dark", "grey", "brown", "navy"], h_lower)
     is_light_prod = match_kw(["trắng", "sáng", "kem", "bạc", "white", "light", "cream", "silver"], h_lower)
     
     if is_dark_prod:
-        contrast_note = "Trang phục màu TRẮNG/BEIGE/PASTEL SÁNG để tạo độ tương phản cực mạnh với SP màu tối (CRITICAL CONTRAST LOCK: Light colored clothes vs Dark product)"
+        contrast_note = "Trang phục phải có màu SÁNG/TRẮNG/PASTEL (Light/White/Pastel colored top) để tạo độ tương phản cực mạnh với SP màu tối (CRITICAL CONTRAST LOCK: Light clothes vs Dark product)"
     elif is_light_prod:
-        contrast_note = "Trang phục màu TỐI (Navy/Đen/Đỏ đô) để làm nổi bật SP màu sáng (CRITICAL CONTRAST LOCK: Dark colored clothes vs Light product)"
+        contrast_note = "Trang phục phải có màu TỐI (Dark Navy/Black/Deep Red top) để làm nổi bật SP màu sáng (CRITICAL CONTRAST LOCK: Dark clothes vs Light product)"
     else:
         contrast_note = "Trang phục thanh lịch, màu sắc TƯƠNG PHẢN RÕ RỆT với màu sản phẩm để tôn lên SP"
         
-    if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
-    elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
-    elif is_medicine: contrast_note = "Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
+    if is_cosmetics: contrast_note += ". Trang điểm tinh tế, tóc tai gọn gàng (clean elegant makeup, neat hair)"
+    elif is_mom_baby: contrast_note += ". Trang phục màu pastel ấm áp (cozy soft pastel clothes)"
+    elif is_medicine: contrast_note += ". Trang phục tạo cảm giác chuyên gia an toàn, uy tín (smart, neat)"
         
     skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
     return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
@@ -909,7 +908,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {{
         "set_en": "Master setting EN (e.g., 'stylish coffee shop').",
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
-        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT TỪNG MÓN ĐỒ (áo trong, áo ngoài, quần/váy, giày/dép). Ví dụ: 'wearing a white cotton t-shirt, blue denim pants, and white sneakers'.",
+        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại (VD: pained expression, frowning, warm smile...)", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
             {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
@@ -943,14 +942,16 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    # 🌟 KHÓA CHẶT TRANG PHỤC VÀ KHUÔN MẶT BẰNG LỆNH CƯỠNG CHẾ (BÊ NGUYÊN CÂU TẢ ĐỒ VÀO)
-    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precisely wearing the exact same {w_en_clean} across all scenes. Presenter speaking directly to the lens] {base_char_prompt}"
+    # 🌟 KHÓA CHẶT TRANG PHỤC & CỔ ÁO (STATIC WARDROBE LOCK)
+    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color. STATIC WARDROBE LOCK: precisely wearing the exact same {w_en_clean}. Zero clothing changes, identical neckline and sleeves across all frames. Presenter speaking directly to the lens] {base_char_prompt}"
     final_outfit_vi = w_lock_vi or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
-    anti_morph_neg = "extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
-    skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     
+    # 🌟 CHỐNG BIẾN DẠNG, DÍNH VẬT THỂ (ANTI-MORPHING) CỰC GẮT
+    anti_morph_neg = "morphing object, object changing shape, structural shifting, changing number of items, unstable object, parts merging, extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
+    
+    skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
     if is_aline_skirt: 
         skirt_neg_extra += "flared skirt, pleated skirt, ruffled skirt, billowing fabric, bell-shaped skirt, circular skirt, flowy wide skirt, gathering, "
         
@@ -967,7 +968,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
-    # 🌟 CẤM CẢNH TỐI MỜ (TRỪ KHI LÀ ĐÈN PIN)
     lighting_neg = "" if is_lighting_product else "dark, moody, dimly lit, poorly lit, shadows, underexposed, low light, "
     
     base_neg_prompt_core = f"{lighting_neg}{face_touch_neg}{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
@@ -1697,7 +1697,18 @@ if all_sc:
         active_id = st.session_state.get("active_script_id")
         asc = st.session_state.get("generated_details", {}).get(str(active_id), st.session_state.get("generated_details", {}).get(active_id, {}))
         
+        # 🌟 NEO UX SCROLL CHÍNH XÁC (Sửa lỗi giật màn hình)
         st.markdown("<div id='detailed-view-anchor'></div>", unsafe_allow_html=True)
+        if st.session_state.get("scroll_to_detail", False): 
+            components.html("""
+            <script>
+                setTimeout(() => { 
+                    const el = window.parent.document.getElementById('detailed-view-anchor'); 
+                    if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } 
+                }, 500);
+            </script>""", height=0)
+            st.session_state.scroll_to_detail = False
+
         st.markdown(f"### 🎬 **KỊCH BẢN CHI TIẾT: {str(asc.get('title', '')).upper()}**")
         
         director_summary_html = asc.get('director_summary', '')
@@ -1756,7 +1767,7 @@ if all_sc:
                 st.code(neg_val, language="text")
                 safe_copy_button(neg_val, f"📋 Sao Chép Negative Prompt Cảnh {idx}", custom_color="#475569")
             st.markdown("---")
-            
+
     if comp_sc:
         st.markdown("### 🎬 **1. Kịch Bản ĐÃ Dựng Chi Tiết**")
         for outline in comp_sc:
@@ -1801,17 +1812,6 @@ if all_sc:
                         can_run, msg = check_usage_limit(st.session_state.get("current_email", ""), is_detailing=True)
                         if can_run: st.session_state.current_processing_id = sc_id; st.rerun()
                         else: st.error(msg)
-
-    # Đưa thẻ Neo xuống dưới cùng để scroll không bị giật
-    if st.session_state.get("scroll_to_detail", False): 
-        components.html("""
-        <script>
-            setTimeout(() => { 
-                const el = window.parent.document.getElementById('detailed-view-anchor'); 
-                if (el) { el.scrollIntoView({behavior: 'smooth', block: 'start'}); } 
-            }, 600);
-        </script>""", height=0)
-        st.session_state.scroll_to_detail = False
 
     if st.session_state.get("current_processing_id") is not None:
         target_id_to_run = st.session_state.get("current_processing_id")
