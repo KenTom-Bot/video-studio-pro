@@ -414,7 +414,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ ĐÃ HOÀN THIỆN
+# 6. KHỐI HÀM NLP CẤP CAO VÀ CƯỠNG CHẾ VẬT LÝ
 # ==============================================================================
 def normalize_hanoi_dialect(text: str) -> str:
     if not text: return ""
@@ -863,7 +863,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base)
 
-    # 🌟 ÉP GEMINI PHẢI ĐỌC HIỂU ĐỐI TƯỢNG VÀ PHÂN VAI VÀO ACT
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
@@ -884,9 +883,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
         "wardrobe_en": "CRITICAL: EXACT outfit down to sleeve length and tucking.",
         "scenes": [
-            {{ "set": "Bối cảnh VN...", "exp": "lively, engaging expression", "act": "Mô tả hình thể chi tiết, tuân thủ nguyên tắc trực quan hóa Cảnh 1 (under 25 words)", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "lively, engaging expression", "act": "{scene_1_action_inst} (ZERO face touching, under 25 words)", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "{action_scene_2} (ZERO face touching, under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "{action_scene_3} (ZERO face touching, under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
             {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
@@ -969,19 +968,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("act", scn.get("action_en", action_scene_2)), flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
         
+        family_bg_prompt = ""
         current_neg_prompt = base_neg_prompt_core
-        
-        # 🌟 CƠ CHẾ ĐỒNG BỘ THỊ GIÁC (VISUAL TARGET MATCHING) CHO CẢNH 1
-        target_subject = ""
-        vo_lower = vo_text.lower()
-        needs_child = any(k in vo_lower for k in ["bé", "trẻ", "con", "nít", "sơ sinh"])
-        needs_senior = any(k in vo_lower for k in ["già", "ông", "bà", "cao tuổi", "bố mẹ già"])
-        needs_family = any(k in vo_lower for k in ["gia đình", "cả nhà"])
-        
-        if needs_child and needs_senior: target_subject = "a Vietnamese elderly person and a happy child"
-        elif needs_child: target_subject = "a happy Vietnamese child"
-        elif needs_senior: target_subject = "a Vietnamese elderly person"
-        elif needs_family: target_subject = "a happy Vietnamese family"
+        if idx_scn == 0 and is_pas_scn1_no_prod:
+            vo_lower = vo_text.lower()
+            if any(k in vo_lower for k in ["trẻ", "bé", "con nít", "già", "ông", "bà", "gia đình"]):
+                family_bg_prompt = " [BACKGROUND: softly blurred silhouettes of an elderly person and a child in the deep background, beautiful cinematic bokeh, completely out of focus]. [FOREGROUND]: "
+                current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "") 
 
         if not is_cosmetics and not is_food:
             if is_pas_scn1_no_prod:
@@ -1016,9 +1009,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         else:
             locked_product_prompt_segment = f"HERO PRODUCT CENTERPIECE: {clean_prod_en}{dim_tag} occupying foreground center focus. {color_lock_tag} (100% rigid non-deforming geometry)."
             
+        clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
-        # 🌟 ÁP DỤNG ĐỒNG BỘ THỊ GIÁC CHO CẢNH 1
         if idx_scn == 0 and target_subject:
             current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "")
             if is_pas_scn1_no_prod:
