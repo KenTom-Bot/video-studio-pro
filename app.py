@@ -109,16 +109,13 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
+2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL - QUAN TRỌNG NHẤT):
    - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
    - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry) và CHẤT LIỆU như nguyên bản.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
    - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát.
-4. LÕI THOẠI KOC THỰC CHIẾN, CẢM XÚC & TỪ VỰNG DÂN DÃ (CRITICAL):
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc.
-   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: CẤM tuyệt đối viết "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Hãy thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy".
-   - CẤM LẶP TỪ & CTA GIẢ TRÂN: Cấm "chốt ngay dưới giỏ hàng để nhận ưu đãi", cấm "ưu đãi cực hời giảm sâu". Viết mộc mạc: "nhỉnh mấy chục cành, các bác rinh ở góc trái nhé".
-   - CẤM TỪ TIÊU CỰC: Cấm "dơ dáy", "bẩn thỉu". Dùng "kém sạch", "ám ảnh".
+4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC & CHỐNG LẶP TỪ:
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc. Cấm lặp từ chốt sale (Cấm "ưu đãi cực hời giảm sâu"). Cấm từ tiêu cực (Cấm "dơ dáy", "bẩn thỉu"). Cấm nhắc tới livestream. Không đọc giá cụ thể.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -414,7 +411,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM & LỌC TỪ BẨN & TỪ KỸ THUẬT)
+# 6. KHỐI HÀM NLP CẤP CAO (FIX TỪ ĐỒNG ÂM, CẤM TỪ KỸ THUẬT & TRẺ HOÁ KOC)
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -458,7 +455,7 @@ def clean_and_normalize_voiceover(text: str) -> str:
         (r'\bđứng\s*form\b', 'giữ form'), (r'\bchuẩn\s*form\b', 'lên dáng chuẩn'),
         (r'\bcực\s*nét\b', 'cực xịn'), 
         
-        # CHỐN TỪ VỰNG KỸ THUẬT VÀ LẶP TỪ
+        # CHỐNG TỪ VỰNG KỸ THUẬT VÀ LẶP TỪ
         (r'\bđế\s*tròn\s*váy\s*tay\b', 'đế tròn đầm tay'),
         (r'\bkhóa\s*cữ\s*chắc\s*chắn\b', 'khớp nối chắc nịch'),
         (r'\bkhóa\s*cữ\b', 'khớp nối'),
@@ -561,7 +558,7 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
     return cleaned
 
 def detect_strict_rigid_appliance(text_to_check: str) -> bool:
-    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm"], text_to_check)
+    return match_kw(["cốc", "ly", "bình", "tumbler", "cup", "bottle", "mug", "giỏ", "rổ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "khay", "nồi", "chảo", "dao", "thớt", "máy xay", "bếp", "ghế", "bàn", "đèn", "quạt", "máy sấy", "bàn là", "bàn ủi", "hút bụi", "tai nghe", "điện thoại", "loa", "sạc", "chuột", "bàn phím", "ví", "power bank", "sạc dự phòng", "giá đỡ", "máy", "thiết bị", "kẹp", "gối", "đệm", "nệm", "cọ"], text_to_check)
 
 def detect_lighting_product(text_to_check: str) -> bool:
     return match_kw(["đèn", "đèn pin", "đèn led", "đèn ngủ", "chiếu sáng", "bóng đèn", "light", "flashlight", "lamp"], text_to_check)
@@ -601,12 +598,13 @@ def generate_char_rules_string(profiles):
     if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
     return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
 
+# 🌟 FIX: ÉP ĐỘ TUOỈ THANH NIÊN (YOUNG ADULT) THAY VÌ TEEN
 def get_demographics_description(char_profiles, ai_persona_en="", ai_body_and_hair_en="", ai_voice_prompt="", is_mom_baby=False):
     user_roles = [str(p.get("role", "")).strip() for p in (char_profiles or []) if str(p.get("role", "")).strip()]
     asian_features = "authentic Vietnamese Southeast Asian facial features, natural jet-black hair"
     
     if is_mom_baby: 
-        return "female", f"A caring Vietnamese mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
+        return "female", f"A caring Vietnamese young adult mother ({asian_features}) safely holding/interacting with her baby", "Native Hanoi Vietnamese warm young adult female voice"
     
     if user_roles:
         role_lower = user_roles[0].lower()
@@ -868,12 +866,16 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_medicine = detect_medicine(check_str)
     
     koc_g = dna.get("koc_g", "female")
+    
+    # 🌟 ÉP ĐỘ TUỔI KOC VỀ THANH NIÊN NẾU KHÔNG PHẢI EM BÉ/NGƯỜI GIÀ
     koc_a = dna.get("koc_a", "adult")
+    koc_a_clean = "young adult" if koc_a not in ["child", "senior"] else koc_a
+    
     detected_gender, detected_demographic_en, voice_prompt = get_demographics_description(
         char_profiles, 
-        f"Vietnamese {koc_a} {koc_g}", 
+        f"Vietnamese {koc_a_clean} {koc_g}", 
         "", 
-        f"Native Hanoi Vietnamese {koc_a} {koc_g} voice",
+        f"Native Hanoi Vietnamese {koc_a_clean} {koc_g} voice",
         is_mom_baby
     )
 
@@ -894,7 +896,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
-        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. If it mentions pain, explicitly describe the KOC vividly expressing that emotion/pain with their face and body (e.g. vigorously massaging that EXACT body part with a pained facial expression). ZERO FACE TOUCHING unless it's a face issue. EMPTY HANDS, ZERO PRODUCT IN FRAME."
+        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. If it mentions pain, explicitly describe the KOC vigorously rubbing or massaging that EXACT body part with a clear pained facial expression. ZERO FACE TOUCHING. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
@@ -911,9 +913,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
-    2. LÕI CẢM XÚC & BỐI CẢNH (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải thể hiện được CẢM XÚC/NỖI ĐAU mà thoại nhắc đến. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CHỈ CÓ KOC tự diễn cảm xúc hình thể khớp thoại (VD: nhăn mặt xoa bóp gáy, nhăn nhó vì rơi điện thoại vào mặt). CẤM tự ý bịa thêm người nếu thoại không nhắc.
-       - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm.
+    2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc ĐẾN AI (trẻ em, người già, chồng, vợ) thì mô tả đối tượng đó. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CHỈ CÓ KOC tự diễn cảm xúc hình thể khớp thoại (VD: nhăn mặt xoa vai). CẤM tự ý bịa thêm người nếu thoại không nhắc.
+       - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm. BẮT BUỘC mô tả "interacting firmly with both hands at chest level".
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
@@ -953,16 +955,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    # 🌟 KHÓA CHẶT TRANG PHỤC & CỔ ÁO (STATIC WARDROBE LOCK)
     locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color. STATIC WARDROBE LOCK: precisely wearing the exact same {w_en_clean}. Zero clothing changes, identical neckline and sleeves across all frames. Presenter speaking directly to the lens] {base_char_prompt}"
     final_outfit_vi = w_lock_vi or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
-    
-    # 🌟 CHỐNG BIẾN DẠNG, DÍNH VẬT THỂ (ANTI-MORPHING) CỰC GẮT
     anti_morph_neg = "morphing object, object changing shape, structural shifting, changing number of items, unstable object, parts merging, extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
-    
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
+    
     if is_aline_skirt: 
         skirt_neg_extra += "flared skirt, pleated skirt, ruffled skirt, billowing fabric, bell-shaped skirt, circular skirt, flowy wide skirt, gathering, "
         
@@ -1175,6 +1174,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
+    # 🌟 ÉP ĐỘ TUỔI MẶC ĐỊNH LÀ YOUNG ADULT TRONG PROMPT LLM
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1564,7 +1564,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/teen/adult/senior).
+            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior (Mặc định chọn 'adult'. Chỉ chọn 'child/senior' nếu SP đặc thù)).
             
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON SIÊU NÉN:
             {{
@@ -1572,7 +1572,7 @@ if st.session_state.get("trigger_main_generation"):
                     "pro_s": "Đại từ xưng (VD: em)",
                     "pro_a": "Đại từ gọi (VD: các chị em)",
                     "koc_g": "male hoặc female",
-                    "koc_a": "child / teen / adult / senior",
+                    "koc_a": "child / adult / senior",
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
@@ -1651,7 +1651,7 @@ if isinstance(ca, dict):
     with col_row1_left:
         koc_g = ca.get('koc_g', 'female')
         koc_a = ca.get('koc_a', 'adult')
-        age_map = {"child": "Trẻ em", "teen": "Thiếu niên", "adult": "Thanh niên", "senior": "Người cao tuổi"}
+        age_map = {"child": "Trẻ em", "teen": "Thanh niên", "adult": "Thanh niên", "young adult": "Thanh niên", "senior": "Người cao tuổi"}
         gender_map = {"male": "Nam", "female": "Nữ"}
         
         user_specified_actors = [p['role'] for p in st.session_state.get('character_profiles', []) if str(p.get('role', '')).strip()]
