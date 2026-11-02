@@ -1,6 +1,4 @@
 
-ban-rut-gon-ok.txt
-100%
 import streamlit as st
 import streamlit.components.v1 as components
 from google import genai
@@ -1877,4 +1875,3 @@ if st.session_state.get("trigger_more_generation"):
             st.rerun()
         except Exception as e:
             st.error(f"❌ Lỗi: {e}")
-Đang hiển thị ban-rut-gon-ok.txt.
