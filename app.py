@@ -202,46 +202,35 @@ def repair_and_parse_json(text_content: str):
     except: pass
     raise Exception("Lỗi khi đọc kết quả từ AI. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
-    if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
-    
-    try:
-        raw_models = client.models.list()
-        available_models = [m.name.replace('models/', '') for m in raw_models if 'generateContent' in getattr(m, 'supported_actions', [])]
-        if not available_models:
-            available_models = [m.name.replace('models/', '') for m in client.models.list()]
-    except Exception:
-        available_models = []
-        
-    flash_models = [m for m in available_models if 'flash' in m.lower()]
-    models_to_try = flash_models if flash_models else (available_models if available_models else ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-pro"])
-    
-    last_exception = None
-    for model_name in models_to_try:
-        for attempt in range(2):
-            try:
-                res = client.models.generate_content(
-                    model=model_name, contents=contents,
-                    config=types.GenerateContentConfig(
-                        system_instruction=sys_inst, response_mime_type="application/json",
-                        temperature=0.65, max_output_tokens=max_tokens
-                    )
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2500):
+if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
+
+models_to_try = ["gemini-1.5-flash"]
+last_exception = None
+for model_name in models_to_try:
+    for attempt in range(2):
+        try:
+            res = client.models.generate_content(
+                model=model_name, contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=sys_inst, response_mime_type="application/json",
+                    temperature=0.65, max_output_tokens=max_tokens
                 )
-                return repair_and_parse_json(res.text)
-            except Exception as e:
-                last_exception = e
-                err_str = str(e).lower()
-                if "404" in err_str or "not_found" in err_str: 
-                    break 
-                if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
-                    time.sleep((attempt + 1) * 1.2); continue
-                time.sleep(0.6)
-                
-    if last_exception:
-        err_msg = str(last_exception)
-        if available_models:
-            raise Exception(f"Lỗi: {err_msg}. Các model API của bạn đang hỗ trợ là: {', '.join(available_models[:5])}")
-        raise last_exception
+            )
+            if not res.text:
+               raise ValueError("AI trả về phản hồi rỗng.")
+            return repair_and_parse_json(res.text)
+        except Exception as e:
+            last_exception = e
+            err_str = str(e).lower()
+            if "404" in err_str or "not_found" in err_str: 
+                break 
+            if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
+                time.sleep((attempt + 1) * 2.0); continue
+            break # Thoát ngay nếu gặp lỗi không xác định để tránh treo app
+            
+if last_exception:
+    raise Exception(f"Lỗi hệ thống AI: {str(last_exception)}")
 
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
