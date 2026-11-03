@@ -204,7 +204,7 @@ def repair_and_parse_json(text_content: str):
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
-    models_to_try = ["gemini-1.5-pro-latest", "gemini-1.5-flash-latest"]
+    models_to_try = ["gemini-1.5-flash-002", "gemini-1.5-flash"]
     last_exception = None
     for model_name in models_to_try:
         for attempt in range(3):
