@@ -176,7 +176,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API
+# 4. GỌI GEMINI API - ĐÃ KHÓA CỨNG GEMINI-1.5-FLASH
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -204,10 +204,11 @@ def repair_and_parse_json(text_content: str):
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
-    models_to_try = ["gemini-1.5-flash-002", "gemini-1.5-flash"]
+    # Khóa cứng 1 model duy nhất để tránh lỗi 404 NOT FOUND trên v1beta của AI Studio
+    models_to_try = ["gemini-1.5-flash"]
     last_exception = None
     for model_name in models_to_try:
-        for attempt in range(3):
+        for attempt in range(2):
             try:
                 res = client.models.generate_content(
                     model=model_name, contents=contents,
@@ -220,7 +221,7 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
             except Exception as e:
                 last_exception = e
                 err_str = str(e).lower()
-                if "404" in err_str or "not_found" in err_str: break
+                if "404" in err_str or "not_found" in err_str: break # Thoát vòng lặp attempt nếu lỗi 404
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
                     time.sleep((attempt + 1) * 1.2); continue
                 time.sleep(0.6)
@@ -719,7 +720,6 @@ def get_product_centric_camera_shot(scene_idx, is_fashion, is_footwear_acc, is_p
         elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
-# 🌟 LÕI CƯỠNG CHẾ THỂ TÍCH 3D & BẢO TOÀN GÓC XOAY (BẢN 61.0)
 def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, is_mom_baby_hard, intimate_type, is_aline_skirt):
     if intimate_type != "normal": return "Soft breathable fabric physics: hands strictly stretching and releasing the elastic textile smoothly, showing its seamless texture. STRICTLY HAND INTERACTION ONLY. The product is NEVER worn on the body. Presenter is fully clothed."
     elif is_food: return "Mouth-watering visual physics; showing steam rising, juicy texture, melting, or smooth pulling/stretching if applicable. Presenter stands completely still; natural hand interaction only, NEVER dropping."
@@ -975,11 +975,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     final_outfit_vi = w_lock_vi or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
-    
-    # 🌟 CẬP NHẬT LỆNH CẤM LÀM BẸP, MẤT CHI TIẾT KHI XOAY (ANTI-FLATTENING)
     anti_morph_neg = "morphing object, object changing shape, structural shifting, changing number of items, unstable object, parts merging, simplifying structural complexity, losing original details, turning into a generic object, flattening 3D structure, losing volume, losing hooks/branches, extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
-    
     skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
+    
     if is_aline_skirt: 
         skirt_neg_extra += "flared skirt, pleated skirt, ruffled skirt, billowing fabric, bell-shaped skirt, circular skirt, flowy wide skirt, gathering, "
         
@@ -1200,7 +1198,6 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
-    # 🌟 ÉP LẤY NHIỀU ẢNH (PHÂN TÍCH ĐA CHIỀU 3D) TRONG PROMPT LLM
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1585,7 +1582,6 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
-            # 🌟 YÊU CẦU AI PHÂN TÍCH ĐA CHIỀU 3D TỪ NHIỀU ẢNH (BẢN 61)
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
