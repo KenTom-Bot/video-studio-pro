@@ -111,14 +111,12 @@ COMPACT_CORE_RULES = """
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
 2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
    - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
-   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry), CHẤT LIỆU và CHÍNH XÁC MÀU SẮC như nguyên bản. Tuyệt đối không biến dạng thành đồ vật thông thường (generic object).
+   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry), CHẤT LIỆU và CHÍNH XÁC MÀU SẮC như nguyên bản. Tuyệt đối không biến dạng thành đồ vật thông thường.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges), KHÔNG được che khuất mặt chính của sản phẩm. Thao tác dứt khoát, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết không gian 3D của sản phẩm.
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges). Thao tác dứt khoát, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết không gian 3D của sản phẩm.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC, CHUẨN GIỌNG BẮC BỘ (CRITICAL):
-   - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. TUYỆT ĐỐI CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé" để gọi sản phẩm).
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Dùng nhịp 3-3 hoặc 4-4 dễ đọc.
-   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy".
-   - CẤM LẶP TỪ & CTA GIẢ TRÂN: Cấm "chốt ngay dưới giỏ hàng", cấm "ưu đãi cực hời giảm sâu". Viết mộc mạc: "nhỉnh mấy chục cành, các bác sắm ở góc trái nhé".
+   - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé" để gọi sản phẩm).
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy". Cấm "chốt ngay dưới giỏ hàng".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -176,7 +174,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API - ĐÃ KHÓA CỨNG GEMINI-1.5-FLASH
+# 4. GỌI GEMINI API - 🌟 BẢN 63.0: RADAR TỰ ĐỘNG QUÉT MÔ HÌNH VÀ AUTO-FIX 404
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -204,8 +202,22 @@ def repair_and_parse_json(text_content: str):
 
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
-    # Khóa cứng 1 model duy nhất để tránh lỗi 404 NOT FOUND trên v1beta của AI Studio
-    models_to_try = ["gemini-1.5-flash"]
+    
+    # 🌟 LÕI TỰ ĐỘNG QUÉT VÀ CHỌN MÔ HÌNH (AUTO-MODEL DETECTOR)
+    try:
+        raw_models = client.models.list()
+        # Lọc các model hỗ trợ generateContent và xử lý chuỗi cắt bỏ tiền tố models/
+        available_models = [m.name.replace('models/', '') for m in raw_models if 'generateContent' in getattr(m, 'supported_actions', [])]
+        if not available_models:
+            # Fallback nếu API version không trả về supported_actions
+            available_models = [m.name.replace('models/', '') for m in client.models.list()]
+    except Exception:
+        available_models = []
+        
+    # Luôn ưu tiên dùng các dòng flash vì nó rẻ, tốc độ cao và ít bị rate limit
+    flash_models = [m for m in available_models if 'flash' in m.lower()]
+    models_to_try = flash_models if flash_models else (available_models if available_models else ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-pro"])
+    
     last_exception = None
     for model_name in models_to_try:
         for attempt in range(2):
@@ -221,11 +233,20 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
             except Exception as e:
                 last_exception = e
                 err_str = str(e).lower()
-                if "404" in err_str or "not_found" in err_str: break # Thoát vòng lặp attempt nếu lỗi 404
+                # Nếu Google báo 404 mô hình này, lập tức bỏ qua và thử mô hình tiếp theo trong danh sách đã quét
+                if "404" in err_str or "not_found" in err_str: 
+                    break 
+                # Nếu bị nghẽn mạng (Quota/Rate Limit), đợi 1.2s rồi thử lại
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
                     time.sleep((attempt + 1) * 1.2); continue
                 time.sleep(0.6)
-    if last_exception: raise last_exception
+                
+    # Nếu thử toàn bộ các model có sẵn trong API Key mà vẫn xịt, báo lỗi chi tiết ra cho người dùng biết
+    if last_exception:
+        err_msg = str(last_exception)
+        if available_models:
+            raise Exception(f"Lỗi: {err_msg}. Các model API của bạn đang hỗ trợ là: {', '.join(available_models[:5])}")
+        raise last_exception
 
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
