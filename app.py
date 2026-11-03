@@ -176,7 +176,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API
+# 4. GỌI GEMINI API - 🌟 LÕI KẾT NỐI BỌC LÓT (KHÔNG THỂ LỖI 404)
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -205,16 +205,16 @@ def repair_and_parse_json(text_content: str):
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2500):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
     
-    try:
-        raw_models = client.models.list()
-        available_models = [m.name.replace('models/', '') for m in raw_models if 'generateContent' in getattr(m, 'supported_actions', [])]
-        if not available_models:
-            available_models = [m.name.replace('models/', '') for m in client.models.list()]
-    except Exception:
-        available_models = []
-        
-    flash_models = [m for m in available_models if 'flash' in m.lower()]
-    models_to_try = flash_models if flash_models else (available_models if available_models else ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-pro"])
+    # 🌟 Danh sách bọc lót toàn diện mọi phiên bản API của Google
+    models_to_try = [
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash-002",
+        "gemini-1.5-flash-001",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro"
+    ]
     
     last_exception = None
     for model_name in models_to_try:
@@ -227,23 +227,23 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2
                         temperature=0.65, max_output_tokens=max_tokens
                     )
                 )
-                if not res.text:
+                if not res or not res.text:
                     raise ValueError("AI trả về phản hồi rỗng.")
                 return repair_and_parse_json(res.text)
             except Exception as e:
                 last_exception = e
                 err_str = str(e).lower()
-                if "404" in err_str or "not_found" in err_str: 
+                # Nếu API Key không hỗ trợ model này (404), LẬP TỨC trượt sang model tiếp theo
+                if "404" in err_str or "not_found" in err_str or "not found" in err_str: 
                     break 
-                if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
-                    time.sleep((attempt + 1) * 2.0); continue
-                break
+                # Nếu Google quá tải (503, 429), chờ 2 giây rồi thử lại chính model đó
+                if "503" in err_str or "unavailable" in err_str or "429" in err_str or "exhausted" in err_str:
+                    time.sleep((attempt + 1) * 2.0)
+                    continue
+                break # Nếu lỗi không xác định (Parse JSON), cũng chuyển sang model khác
                 
     if last_exception:
-        err_msg = str(last_exception)
-        if available_models:
-            raise Exception(f"Lỗi: {err_msg}. Các model API của bạn đang hỗ trợ là: {', '.join(available_models[:5])}")
-        raise last_exception
+        raise Exception(f"Hệ thống đã thử quét mọi mô hình nhưng đều thất bại. Vui lòng thử lại. Lỗi: {str(last_exception)}")
 
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
@@ -433,7 +433,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO (FIX LỖI MÀU TRUE COLOR)
+# 6. KHỐI HÀM NLP CẤP CAO 
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -815,8 +815,8 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     )
     elif is_strict_appliance: return (
         f"standing completely still while holding {clean_prod_en} firmly to perfectly display its 3D structure", 
-        f"aggressively testing the extreme durability of {clean_prod_en} by pressing, bending, or locking its rigid joints heavily with both hands", 
-        f"demonstrating high-speed, intense real-world usage of {clean_prod_en} with fast decisive hand movements. STRICTLY NO lifting to face", 
+        f"presenting {clean_prod_en} clearly without hiding any components", 
+        f"demonstrating {clean_prod_en} with fast, decisive hand interaction, maintaining strict 3D volumetric consistency at all times. STRICTLY NO lifting to face", 
         f"holding {clean_prod_en} firmly with a confident open-palm gesture"
     )
     else: return (
@@ -909,7 +909,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     fixed_setting_base = outline.get('set', outline.get('setting', 'Không gian thực tế phù hợp'))
     
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
-    presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề định & Mix Đa Dạng")
+    presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
     is_pas_story = is_pas_storytelling_strategy(presentation_format, fixed_title)
     dna = st.session_state.get("content_analysis", {})
     
@@ -954,7 +954,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         is_mom_baby
     )
 
-    # 🌟 FIX TONE MÀU: BỎ TỪ STRIKING, DÙNG EXACT CHO MÀU SẮC CHUẨN
     color_prefix = f"exact {raw_color_en}" if raw_color_en else ""
     if ai_product_visual_en:
         base_prod_en = f"{color_prefix} {ai_product_visual_en}".strip()
@@ -1021,7 +1020,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     max_retries = 2
     for attempt in range(max_retries):
         try:
-            res = call_gemini([prompt_text], sys_inst, max_tokens=4096)
+            res = call_gemini([prompt_text], sys_inst, max_tokens=2500)
             scenes = extract_scenes(res)
             if scenes and isinstance(scenes, list) and len(scenes) > 0:
                 master_setting_en = sanitize_third_party_ip(res.get("set_en", "clean minimalist modern setting")).strip().rstrip('.')
@@ -1052,7 +1051,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
     appliance_neg_extra = "changing nozzle, adding extension stick, swapping brush head, mutating attachment, hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
     
-    # 🌟 FIX: BỔ SUNG LỆNH CHỐNG SAI LỆCH TONE MÀU VÀ TĂNG ĐỘ BÃO HÒA
     is_dark_prod = match_kw(["đen", "xám", "tối", "nâu", "black", "dark", "grey", "brown", "navy"], hero_color_str.lower() + " " + raw_color_en.lower())
     is_light_prod = match_kw(["trắng", "sáng", "kem", "bạc", "white", "light", "cream", "silver"], hero_color_str.lower() + " " + raw_color_en.lower())
     
@@ -1245,7 +1243,13 @@ def clone_script(script_id):
     }}
     """
     sys_inst = get_sys_inst_outlines(mode, presentation_format, user_custom_note)
-    res = call_gemini([prompt], sys_inst, max_tokens=2500)
+    
+    payload = ["NHÌN KỸ ẢNH SP GỐC ĐỂ VIẾT THOẠI KHỚP THỰC TẾ (KHÔNG BỊA TÍNH NĂNG):"]
+    for cb, cm in st.session_state.get("saved_reference_images", []):
+        payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
+    payload.append(prompt)
+    res = call_gemini(payload, sys_inst, max_tokens=2500)
+    
     clones = extract_scenes(res)
     formatted_clones = []
     for idx, cl in enumerate(clones):
@@ -1287,7 +1291,13 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     }}
     """
     sys_inst = get_sys_inst_outlines(mode, active_format, active_note)
-    res = call_gemini([prompt], sys_inst, max_tokens=2500)
+    
+    payload = ["NHÌN KỸ ẢNH SP GỐC ĐỂ VIẾT THOẠI KHỚP THỰC TẾ (KHÔNG BỊA TÍNH NĂNG):"]
+    for cb, cm in st.session_state.get("saved_reference_images", []):
+        payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
+    payload.append(prompt)
+    res = call_gemini(payload, sys_inst, max_tokens=2500)
+    
     more_scripts = extract_scenes(res)
     for idx, sc in enumerate(more_scripts):
         sc.update({
@@ -1652,7 +1662,6 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
-            # 🌟 YÊU CẦU GEMINI PHÂN TÍCH SẮC ĐỘ MÀU CHÍNH XÁC (MATTE, PASTEL, MUTED...)
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
