@@ -579,7 +579,6 @@ def enforce_single_tube_skirt_syntax(text_en: str) -> str:
         cleaned = re.sub(pat, 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', cleaned, flags=re.IGNORECASE)
     return cleaned
 
-# 🌟 BẢN 69.0: LÕI NHẬN DIỆN ĐỒ ĐẶT BÀN / NỘI THẤT (CHỐNG CẦM LƠ LỬNG)
 def detect_surface_furniture(text_to_check: str) -> bool:
     return match_kw(["kệ", "tủ", "bàn", "ghế", "giá sách", "thùng", "kệ để bàn", "ngăn kéo", "giá đỡ", "táp", "shelf", "rack", "cabinet", "desk", "organizer", "drawer", "bin"], text_to_check)
 
@@ -669,6 +668,10 @@ def detect_footwear_or_accessory(text_to_check: str) -> bool:
     if detect_surface_furniture(text_to_check): return False
     return match_kw(["giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", "shoe", "handbag", "backpack", "wallet", "watch", "glasses", "tất", "vớ", "socks"], text_to_check)
 
+# 🌟 BẢN 70.0: KHÔI PHỤC HÀM NHẬN DIỆN CHỔI CÁN DÀI BỊ THIẾU
+def detect_long_handle_tool(text_to_check: str) -> bool:
+    return match_kw(["cây lau", "chổi", "cây chà", "bàn chải cán dài", "mop", "broom", "long-handled", "long handle"], text_to_check)
+
 def get_cosmetic_target(product_name, check_str):
     p_cos = f"{product_name} {check_str}".lower()
     if match_kw(["má hồng", "phấn má", "blush"], p_cos): return "cheeks", "instantly leaving a soft, natural, and radiant flush of color smoothly blended onto the skin"
@@ -678,7 +681,6 @@ def get_cosmetic_target(product_name, check_str):
     elif match_kw(["tay", "body", "cơ thể", "hand", "lotion", "toàn thân", "nail", "móng"], p_cos): return "hands/arms/body", "instantly absorbing and leaving a glowing, hydrated finish"
     else: return "facial skin", "instantly absorbing and disappearing, leaving a highly glossy, hydrated, glowing glass-skin finish"
 
-# 🌟 BẢN 69.0: GÓC MÁY QUAY MỚI CHO ĐỒ NỘI THẤT/KỆ BÀN
 def get_product_centric_camera_shot(scene_idx, is_fashion, is_footwear_acc, is_pas_scene1, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str, is_surface_furniture=False):
     if is_pas_scene1 and not is_fashion: return "Vertical 9:16 stable dynamic shot framing the character and the specific problem"
     
@@ -743,7 +745,6 @@ def get_product_centric_camera_shot(scene_idx, is_fashion, is_footwear_acc, is_p
         elif scene_idx == 2: return f"Vertical 9:16 stable tight close-up action shot on {clean_prod_en} in real-time use, maintaining accurate real-world scale"
         else: return f"Vertical 9:16 stable balanced medium shot with {clean_prod_en} displayed with realistic scale"
 
-# 🌟 BẢN 69.0: LUẬT VẬT LÝ ÉP ĐỒ NỘI THẤT NẰM TRÊN BÀN
 def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, is_mom_baby_hard, intimate_type, is_aline_skirt, is_surface_furniture=False):
     if is_surface_furniture: return "ABSOLUTE GRAVITY & SURFACE LOCK: The product MUST strictly rest firmly on a flat surface (desk/table/floor). IT IS NEVER HELD IN MID-AIR. Character interacts with it by placing items inside or touching its structure while it remains completely stationary on the surface. Zero 3D morphing, exact structural integrity."
     elif intimate_type != "normal": return "Soft breathable fabric physics: hands strictly stretching and releasing the elastic textile smoothly, showing its seamless texture. STRICTLY HAND INTERACTION ONLY. The product is NEVER worn on the body. Presenter is fully clothed."
@@ -763,7 +764,6 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
     elif is_strict_appliance: return "ABSOLUTE 3D VOLUMETRIC RIGIDITY: The product MUST strictly maintain its complex multi-part solid structure from all visible angles. ZERO simplification. It DOES NOT morph into a generic object. Components DO NOT bend, shift, or merge. If slightly rotated, the side/profile structure perfectly aligns with the original 3D mesh. Presenter holds it steadily, interaction is decisive, NEVER covering the main body."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
-# 🌟 BẢN 69.0: HÀNH ĐỘNG MỚI DÀNH RIÊNG CHO ĐỒ NỘI THẤT/KỆ BÀN
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, is_surface_furniture=False):
     if is_surface_furniture: return (
         f"standing or sitting naturally next to {clean_prod_en} which is PLACED FIRMLY ON A DESK/SURFACE",
@@ -941,8 +941,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     check_str = f"{raw_prod_name} {fixed_title} {full_vo_script} {user_custom_note} {dna.get('usp', '')}"
     intimate_type = detect_intimate_apparel(check_str)
     is_footwear_accessory = detect_footwear_or_accessory(check_str)
-    
-    # 🌟 KIỂM TRA ĐỒ NỘI THẤT/ĐỂ BÀN
     is_surface_furniture = detect_surface_furniture(check_str)
     is_fashion_wearable = detect_wearable_fashion(check_str) and intimate_type == "normal" and not is_footwear_accessory
     
@@ -993,7 +991,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     stylist_vibe_text = build_multi_industry_stylist_rules(clean_prod_en, hero_color_str, fixed_setting_base, detected_gender, intimate_type, is_fashion_wearable, check_str, is_food, is_cosmetics, is_mom_baby, is_medicine)
     
-    # 🌟 GỬI QUY TẮC ĐỒ ĐỂ BÀN CHO HÀM MẪU HÀNH ĐỘNG
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, is_surface_furniture)
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
@@ -1041,7 +1038,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     max_retries = 2
     for attempt in range(max_retries):
         try:
-            res = call_gemini([prompt_text], sys_inst, max_tokens=4096)
+            res = call_gemini([prompt_text], sys_inst, max_tokens=2500)
             scenes = extract_scenes(res)
             if scenes and isinstance(scenes, list) and len(scenes) > 0:
                 master_setting_en = sanitize_third_party_ip(res.get("set_en", "clean minimalist modern setting")).strip().rstrip('.')
