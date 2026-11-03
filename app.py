@@ -90,7 +90,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI
+# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI (FIXED CHO THỜI TRANG VÀ CHỐNG NHÁI MẶT)
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -108,16 +108,17 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
+1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. KHUÔN MẶT VÀ BỐI CẢNH PHẢI ĐƯỢC TẠO MỚI HOÀN TOÀN, TUYỆT ĐỐI KHÔNG sao chép từ ảnh gốc.
 2. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
    - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH.
-   - Cảnh 2 (Test Vật Lý Cường Độ Cao): CẤM CHỈ CẦM ĐỨNG IM. BẮT BUỘC KOC phải TEST BẠO LỰC/MẠNH MẼ (kéo giãn hết cỡ, bẻ cong, đập mạnh, chà xát) để chứng minh độ bền.
-   - Cảnh 3 (Sử Dụng Thực Tế): BẮT BUỘC KOC đang SỬ DỤNG SP TRONG THỰC TẾ VỚI TỐC ĐỘ CAO (vd: lau nhà thoăn thoắt, gõ phím liên tục, thái đồ ăn).
+   - Cảnh 2 & 3 (Test Vật Lý & Sử Dụng): 
+     + NẾU LÀ QUẦN ÁO/THỜI TRANG: BẮT BUỘC KOC MẶC LÊN NGƯỜI (worn on body) để test co giãn, sờ chất vải. Tuyệt đối không cầm trên tay.
+     + NẾU LÀ SẢN PHẨM KHÁC: BẮT BUỘC KOC cầm trên tay, TEST BẠO LỰC/MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO (lau nhà, gõ phím). CẤM CHỈ CẦM ĐỨNG IM.
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm. Thao tác dứt khoát, mạnh mẽ, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết 3D.
+   - CẤM KOC SỜ LÊN MẶT (Trừ mỹ phẩm). Tay KOC CHỈ cầm ở viền/đế sản phẩm. Thao tác dứt khoát, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết 3D.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC, CHUẨN GIỌNG BẮC BỘ (CRITICAL):
    - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé").
-   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Cấm "chốt ngay dưới giỏ hàng".
+   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm từ kỹ thuật khó hiểu. Cấm "chốt ngay dưới giỏ hàng".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -175,7 +176,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API - TỰ ĐỘNG QUÉT MÔ HÌNH VÀ AUTO-FIX 404
+# 4. GỌI GEMINI API
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -248,7 +249,7 @@ def get_sys_inst_outlines(mode, angle, custom_note=""):
     return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
-    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau rõ nét qua hình thể -> Cảnh 2,3,4 KOC cầm SP test chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
+    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau rõ nét qua hình thể -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
     return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 # ==============================================================================
@@ -653,13 +654,14 @@ def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool
     return match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"], f"{strategy_str} {title_str}")
 
 def detect_intimate_apparel(text_to_check: str) -> str:
-    if match_kw(["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "vá ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"], text_to_check): return "underwear_bra"
+    if match_kw(["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"], text_to_check): return "underwear_bra"
     if match_kw(["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"], text_to_check): return "camisole"
     return "normal"
 
+# 🌟 BỔ SUNG TỪ KHÓA BỘ NỈ VÀ ĐỒ BỘ VÀO DANH SÁCH THỜI TRANG ĐỂ BẮT BUỘC MẶC LÊN NGƯỜI
 def detect_wearable_fashion(text_to_check: str) -> bool:
     if match_kw(["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"], text_to_check): return False
-    return match_kw(["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "cardigan", "polo", "chân váy", "pijama", "tất", "vớ", "socks", "tights", "stocking"], text_to_check)
+    return match_kw(["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "đồ nỉ", "quần nỉ", "áo nỉ", "bộ nỉ", "thời trang", "outfit", "suit", "cardigan", "polo", "chân váy", "pijama", "tất", "vớ", "socks", "tights", "stocking"], text_to_check)
 
 def detect_footwear_or_accessory(text_to_check: str) -> bool:
     if match_kw(["giỏ", "rổ", "thùng", "hộp", "kệ", "basket", "hamper", "organizer", "bin"], text_to_check): return False
@@ -753,7 +755,6 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
     elif is_strict_appliance: return "ABSOLUTE 3D VOLUMETRIC RIGIDITY: The product MUST strictly maintain its complex multi-part solid structure from all visible angles. ZERO simplification. It DOES NOT morph into a generic object. Components DO NOT bend, shift, or merge. If slightly rotated, the side/profile structure perfectly aligns with the original 3D mesh. Presenter holds it steadily, interaction is decisive, NEVER covering the main body."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
-# 🌟 FIX: ĐỔI HÀNH ĐỘNG SANG TEST THỰC CHIẾN CƯỜNG ĐỘ CAO (BẢN 64.0)
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type):
     if intimate_type != "normal": return (
         f"standing professionally in a modest oversized sweater, holding {clean_prod_en} securely in hands to show its premium texture",
@@ -813,8 +814,8 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     )
     elif is_strict_appliance: return (
         f"standing completely still while holding {clean_prod_en} firmly to perfectly display its 3D structure", 
-        f"aggressively testing the extreme durability of {clean_prod_en} by pressing, bending, or locking its rigid joints heavily with both hands", 
-        f"demonstrating high-speed, intense real-world usage of {clean_prod_en} with fast decisive hand movements. STRICTLY NO lifting to face", 
+        f"presenting {clean_prod_en} clearly without hiding any components", 
+        f"demonstrating {clean_prod_en} with fast, decisive hand interaction, maintaining strict 3D volumetric consistency at all times. STRICTLY NO lifting to face", 
         f"holding {clean_prod_en} firmly with a confident open-palm gesture"
     )
     else: return (
@@ -985,6 +986,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_lighting_product = detect_lighting_product(check_str)
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, is_lighting_product)
 
+    # 🌟 CẬP NHẬT LỆNH ĐẠO DIỄN: ÉP MẶC QUẦN ÁO LÊN NGƯỜI, CẤM CẦM TRÊN TAY NẾU LÀ THỜI TRANG
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
@@ -996,9 +998,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc ĐẾN AI (trẻ em, người già, chồng, vợ) thì mô tả đối tượng đó. CẤM tự ý bịa thêm người nếu thoại không nhắc.
-       - Cảnh 2 (Test Vật Lý): CẤM CHỈ CẦM ĐỨNG IM. BẮT BUỘC KOC phải TEST MẠNH MẼ/BẠO LỰC (kéo giãn, bẻ cong, đập mạnh, chà xát) để chứng minh độ bền.
-       - Cảnh 3 (Sử Dụng Thực Tế): BẮT BUỘC KOC đang SỬ DỤNG THỰC TẾ với TỐC ĐỘ CAO (lau nhà, gõ phím, thái đồ ăn).
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong thoại Cảnh 1. CẤM tự ý bịa thêm người nếu thoại không nhắc.
+       - Cảnh 2 & 3: NẾU SẢN PHẨM LÀ QUẦN ÁO/THỜI TRANG, BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test vải, tuyệt đối không cầm nguyên khối trên tay. NẾU LÀ SẢN PHẨM KHÁC, BẮT BUỘC cầm trên tay test mạnh mẽ/bạo lực.
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
@@ -1007,8 +1008,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Mô tả hành động TEST VẬT LÝ MẠNH MẼ/BẠO LỰC để chứng minh độ bền, KHÔNG cầm đứng im, dưới 20 words)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Mô tả hành động ĐANG SỬ DỤNG THỰC TẾ với tốc độ nhanh/chuyên nghiệp, KHÔNG nhìn camera, dưới 20 words)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Đồ khác thì cầm trên tay test mạnh mẽ)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Đồ khác thì sử dụng thực tế tốc độ cao)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
             {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
@@ -1038,7 +1039,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color. STATIC WARDROBE LOCK: precisely wearing the exact same {w_en_clean}. Zero clothing changes, identical neckline and sleeves across all frames. Presenter speaking directly to the lens] {base_char_prompt}"
+    # 🌟 KHÓA CHẶT LUẬT: KHUÔN MẶT MỚI & BỐI CẢNH MỚI 100%
+    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color across frames (BUT COMPLETELY DIFFERENT FROM THE REFERENCE IMAGE). STATIC WARDROBE LOCK: precisely wearing the exact same {w_en_clean}. Presenter speaking directly to the lens] {base_char_prompt}"
     final_outfit_vi = w_lock_vi or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
@@ -1065,7 +1067,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif match_kw(["sneaker", "running", "athletic"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif match_kw(["heel", "loafer", "dress"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    char_neg_extra = f"{dynamic_footwear_neg}caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    # 🌟 CẬP NHẬT LỆNH CẤM NHÁI MẶT TỪ ẢNH GỐC
+    char_neg_extra = f"{dynamic_footwear_neg}referencing original face, copying original person, matching original background, same environment as reference, caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
@@ -1649,6 +1652,7 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
+            # 🌟 CẬP NHẬT LỆNH CẤM BÓC TÁCH MẶT NGƯỜI TỪ ẢNH GỐC
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
@@ -1667,7 +1671,7 @@ if st.session_state.get("trigger_main_generation"):
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
                     "c_en": "ONLY the exact dominant color of the product (e.g., 'black', 'white', 'pink', 'silver', 'wood'). NO extra words.",
-                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CRITICAL 3D GEOMETRY LOCK.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
@@ -1678,7 +1682,7 @@ if st.session_state.get("trigger_main_generation"):
                 ]
             }}
             """
-            payload = ["PRODUCT IMAGES (EXTRACT RIGID 3D STRUCTURE FROM ALL ANGLES, EXACT HANDLES/STRAPS, TRUE COLOR, AND OCR PRICES - IGNORE HUMAN MODELS):"]
+            payload = ["PRODUCT IMAGES (EXTRACT RIGID 3D STRUCTURE FROM ALL ANGLES, EXACT HANDLES/STRAPS, TRUE COLOR, AND OCR PRICES. STRICTLY IGNORE AND EXCLUDE ANY HUMAN FACES, BODIES, OR BACKGROUNDS PRESENT IN THE IMAGE):"]
             for cb, cm in args.get("temp_images", []):
                 payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
             for c in char_inputs:
