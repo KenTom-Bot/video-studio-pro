@@ -90,7 +90,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI (FIXED CHO THỜI TRANG VÀ CHỐNG NHÁI MẶT)
+# 2. TỪ ĐIỂN & QUY TẮC CỐT LÕI
 # ==============================================================================
 ALL_MODULES = ["🛒 TikTok Shop & Bán Hàng", "🌟 Viral & Xây Kênh"]
 ADMIN_EMAIL = "binhnguyenmedia.vn@gmail.com"
@@ -202,7 +202,7 @@ def repair_and_parse_json(text_content: str):
     except: pass
     raise Exception("Lỗi khi đọc kết quả từ AI. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2500):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
     
     try:
@@ -227,6 +227,8 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
                         temperature=0.65, max_output_tokens=max_tokens
                     )
                 )
+                if not res.text:
+                    raise ValueError("AI trả về phản hồi rỗng.")
                 return repair_and_parse_json(res.text)
             except Exception as e:
                 last_exception = e
@@ -234,8 +236,8 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
                 if "404" in err_str or "not_found" in err_str: 
                     break 
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
-                    time.sleep((attempt + 1) * 1.2); continue
-                time.sleep(0.6)
+                    time.sleep((attempt + 1) * 2.0); continue
+                break
                 
     if last_exception:
         err_msg = str(last_exception)
@@ -431,7 +433,7 @@ def convert_to_soft_price_range(price_num: int, is_orig: bool = False) -> str:
         else: return f"hơn {number_to_vietnamese_words(math.floor(val / 1000000) * 1000000).replace(' đồng', '')}"
 
 # ==============================================================================
-# 6. KHỐI HÀM NLP CẤP CAO 
+# 6. KHỐI HÀM NLP CẤP CAO (FIX LỖI MÀU TRUE COLOR)
 # ==============================================================================
 def match_kw(kw_list, text):
     if not text: return False
@@ -658,7 +660,6 @@ def detect_intimate_apparel(text_to_check: str) -> str:
     if match_kw(["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"], text_to_check): return "camisole"
     return "normal"
 
-# 🌟 BỔ SUNG TỪ KHÓA BỘ NỈ VÀ ĐỒ BỘ VÀO DANH SÁCH THỜI TRANG ĐỂ BẮT BUỘC MẶC LÊN NGƯỜI
 def detect_wearable_fashion(text_to_check: str) -> bool:
     if match_kw(["giỏ", "kệ", "hộp", "thùng", "tủ", "móc", "chậu", "cây lau", "bàn chải", "máy giặt", "túi đựng", "rổ", "khay", "basket", "rack", "organizer", "bin", "box", "hamper"], text_to_check): return False
     return match_kw(["áo", "quần", "váy", "đầm", "hoodie", "sweater", "blazer", "jacket", "shirt", "pants", "jeans", "shorts", "t-shirt", "set đồ", "bộ đồ", "đồ nỉ", "quần nỉ", "áo nỉ", "bộ nỉ", "thời trang", "outfit", "suit", "cardigan", "polo", "chân váy", "pijama", "tất", "vớ", "socks", "tights", "stocking"], text_to_check)
@@ -814,8 +815,8 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
     )
     elif is_strict_appliance: return (
         f"standing completely still while holding {clean_prod_en} firmly to perfectly display its 3D structure", 
-        f"presenting {clean_prod_en} clearly without hiding any components", 
-        f"demonstrating {clean_prod_en} with fast, decisive hand interaction, maintaining strict 3D volumetric consistency at all times. STRICTLY NO lifting to face", 
+        f"aggressively testing the extreme durability of {clean_prod_en} by pressing, bending, or locking its rigid joints heavily with both hands", 
+        f"demonstrating high-speed, intense real-world usage of {clean_prod_en} with fast decisive hand movements. STRICTLY NO lifting to face", 
         f"holding {clean_prod_en} firmly with a confident open-palm gesture"
     )
     else: return (
@@ -908,7 +909,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     fixed_setting_base = outline.get('set', outline.get('setting', 'Không gian thực tế phù hợp'))
     
     user_custom_note = outline.get("custom_note") or st.session_state.get("current_input_context", "").strip()
-    presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
+    presentation_format = outline.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề định & Mix Đa Dạng")
     is_pas_story = is_pas_storytelling_strategy(presentation_format, fixed_title)
     dna = st.session_state.get("content_analysis", {})
     
@@ -953,7 +954,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         is_mom_baby
     )
 
-    color_prefix = f"striking {raw_color_en} colored" if raw_color_en else ""
+    # 🌟 FIX TONE MÀU: BỎ TỪ STRIKING, DÙNG EXACT CHO MÀU SẮC CHUẨN
+    color_prefix = f"exact {raw_color_en}" if raw_color_en else ""
     if ai_product_visual_en:
         base_prod_en = f"{color_prefix} {ai_product_visual_en}".strip()
     else:
@@ -986,7 +988,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_lighting_product = detect_lighting_product(check_str)
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, is_lighting_product)
 
-    # 🌟 CẬP NHẬT LỆNH ĐẠO DIỄN: ÉP MẶC QUẦN ÁO LÊN NGƯỜI, CẤM CẦM TRÊN TAY NẾU LÀ THỜI TRANG
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
@@ -1039,7 +1040,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    # 🌟 KHÓA CHẶT LUẬT: KHUÔN MẶT MỚI & BỐI CẢNH MỚI 100%
     locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color across frames (BUT COMPLETELY DIFFERENT FROM THE REFERENCE IMAGE). STATIC WARDROBE LOCK: precisely wearing the exact same {w_en_clean}. Presenter speaking directly to the lens] {base_char_prompt}"
     final_outfit_vi = w_lock_vi or "Trang phục Stylist đồng bộ 4 cảnh"
 
@@ -1052,10 +1052,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
     appliance_neg_extra = "changing nozzle, adding extension stick, swapping brush head, mutating attachment, hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
     
+    # 🌟 FIX: BỔ SUNG LỆNH CHỐNG SAI LỆCH TONE MÀU VÀ TĂNG ĐỘ BÃO HÒA
     is_dark_prod = match_kw(["đen", "xám", "tối", "nâu", "black", "dark", "grey", "brown", "navy"], hero_color_str.lower() + " " + raw_color_en.lower())
     is_light_prod = match_kw(["trắng", "sáng", "kem", "bạc", "white", "light", "cream", "silver"], hero_color_str.lower() + " " + raw_color_en.lower())
     
-    color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
+    color_neg_extra = "oversaturated product color, altered hue, generic color, wrong product shade, brightened product, unnatural color bleeding, multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     if is_dark_prod:
         color_neg_extra += "white product, light-colored product, pale product, "
     elif is_light_prod:
@@ -1067,7 +1068,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif match_kw(["sneaker", "running", "athletic"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif match_kw(["heel", "loafer", "dress"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    # 🌟 CẬP NHẬT LỆNH CẤM NHÁI MẶT TỪ ẢNH GỐC
     char_neg_extra = f"{dynamic_footwear_neg}referencing original face, copying original person, matching original background, same environment as reference, caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
@@ -1652,7 +1652,7 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
-            # 🌟 CẬP NHẬT LỆNH CẤM BÓC TÁCH MẶT NGƯỜI TỪ ẢNH GỐC
+            # 🌟 YÊU CẦU GEMINI PHÂN TÍCH SẮC ĐỘ MÀU CHÍNH XÁC (MATTE, PASTEL, MUTED...)
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
@@ -1670,7 +1670,7 @@ if st.session_state.get("trigger_main_generation"):
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
-                    "c_en": "ONLY the exact dominant color of the product (e.g., 'black', 'white', 'pink', 'silver', 'wood'). NO extra words.",
+                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue', 'glossy dark navy'). NO generic colors.",
                     "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
