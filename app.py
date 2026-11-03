@@ -109,14 +109,15 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. Khóa chặt diện mạo, quần áo, MÀU SẮC ĐÍCH DANH và ĐẶC BIỆT LÀ BỐI CẢNH MASTER xuyên suốt 4 cảnh.
-2. TRỰC QUAN HÓA THEO ĐỐI TƯỢNG & CẢM XÚC (CRITICAL):
-   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI (trẻ em, người già, chồng, vợ) THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CẤM TỰ Ý THÊM NGƯỜI VÀO. NẾU THOẠI NÓI VỀ ĐAU ĐỚN CƠ THỂ, KOC tự diễn nhăn mặt khó chịu và xoa bóp ĐÚNG BỘ PHẬN ĐÓ.
-   - Cảnh 2 & 3 (Test công năng): BẮT BUỘC KOC trực tiếp cầm sản phẩm trên tay. SẢN PHẨM PHẢI GIỮ NGUYÊN HÌNH KHỐI (Geometry), CHẤT LIỆU và CHÍNH XÁC MÀU SẮC như nguyên bản. Tuyệt đối không biến dạng thành đồ vật thông thường.
+2. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI THÌ NGƯỜI ĐÓ XUẤT HIỆN Ở TIỀN CẢNH.
+   - Cảnh 2 (Test Vật Lý Cường Độ Cao): CẤM CHỈ CẦM ĐỨNG IM. BẮT BUỘC KOC phải TEST BẠO LỰC/MẠNH MẼ (kéo giãn hết cỡ, bẻ cong, đập mạnh, chà xát) để chứng minh độ bền.
+   - Cảnh 3 (Sử Dụng Thực Tế): BẮT BUỘC KOC đang SỬ DỤNG SP TRONG THỰC TẾ VỚI TỐC ĐỘ CAO (vd: lau nhà thoăn thoắt, gõ phím liên tục, thái đồ ăn).
 3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT SẢN PHẨM:
-   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm (holding by the edges). Thao tác dứt khoát, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết không gian 3D của sản phẩm.
+   - CÁC SẢN PHẨM KHÁC (GIA DỤNG/CÔNG NGHỆ): CẤM KOC SỜ LÊN MẶT. Tay KOC CHỈ cầm ở viền/đế sản phẩm. Thao tác dứt khoát, mạnh mẽ, giữ góc nhìn (Angle) ổn định để hiển thị trọn vẹn chi tiết 3D.
 4. LÕI THOẠI KOC THỰC CHIẾN, MỘC MẠC, CHUẨN GIỌNG BẮC BỘ (CRITICAL):
-   - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé" để gọi sản phẩm).
-   - TỰ NHIÊN 100%: Dồn dập, tâm tình. Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Thay bằng ngôn từ dân dã, dễ hiểu: "đế tròn đầm tay", "khớp nối chắc nịch", "đỡ mỏi vai gáy". Cấm "chốt ngay dưới giỏ hàng".
+   - VĂN PHONG 100% MIỀN BẮC (HÀ NỘI): Xưng 'em/mình' - Gọi 'các bác/chị em/mọi người'. CẤM dùng từ miền Nam ("mấy bà", "nha", "rinh", "xài", "nghen", "bé").
+   - CẤM TỪ VỰNG KỸ THUẬT/VÔ NGHĨA: Cấm "đế tròn váy tay", "khóa cữ", "bảo vệ đốt sống cổ". Cấm "chốt ngay dưới giỏ hàng".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -174,7 +175,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API - 🌟 BẢN 63.0: RADAR TỰ ĐỘNG QUÉT MÔ HÌNH VÀ AUTO-FIX 404
+# 4. GỌI GEMINI API - TỰ ĐỘNG QUÉT MÔ HÌNH VÀ AUTO-FIX 404
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -203,18 +204,14 @@ def repair_and_parse_json(text_content: str):
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
     
-    # 🌟 LÕI TỰ ĐỘNG QUÉT VÀ CHỌN MÔ HÌNH (AUTO-MODEL DETECTOR)
     try:
         raw_models = client.models.list()
-        # Lọc các model hỗ trợ generateContent và xử lý chuỗi cắt bỏ tiền tố models/
         available_models = [m.name.replace('models/', '') for m in raw_models if 'generateContent' in getattr(m, 'supported_actions', [])]
         if not available_models:
-            # Fallback nếu API version không trả về supported_actions
             available_models = [m.name.replace('models/', '') for m in client.models.list()]
     except Exception:
         available_models = []
         
-    # Luôn ưu tiên dùng các dòng flash vì nó rẻ, tốc độ cao và ít bị rate limit
     flash_models = [m for m in available_models if 'flash' in m.lower()]
     models_to_try = flash_models if flash_models else (available_models if available_models else ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-pro"])
     
@@ -233,15 +230,12 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4
             except Exception as e:
                 last_exception = e
                 err_str = str(e).lower()
-                # Nếu Google báo 404 mô hình này, lập tức bỏ qua và thử mô hình tiếp theo trong danh sách đã quét
                 if "404" in err_str or "not_found" in err_str: 
                     break 
-                # Nếu bị nghẽn mạng (Quota/Rate Limit), đợi 1.2s rồi thử lại
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "resource_exhausted" in err_str:
                     time.sleep((attempt + 1) * 1.2); continue
                 time.sleep(0.6)
                 
-    # Nếu thử toàn bộ các model có sẵn trong API Key mà vẫn xịt, báo lỗi chi tiết ra cho người dùng biết
     if last_exception:
         err_msg = str(last_exception)
         if available_models:
@@ -659,7 +653,7 @@ def is_pas_storytelling_strategy(strategy_str: str, title_str: str = "") -> bool
     return match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "pov", "tình huống", "hài hước", "đời thường"], f"{strategy_str} {title_str}")
 
 def detect_intimate_apparel(text_to_check: str) -> str:
-    if match_kw(["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "váy ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"], text_to_check): return "underwear_bra"
+    if match_kw(["áo lót", "quần lót", "đồ lót", "nội y", "áo ngực", "su đúc", "quần chip", "quần sịp", "bikini", "đồ bơi", "vá ngủ", "đồ ngủ", "miếng dán ngực", "dung dịch vệ sinh", "bra", "panties", "underwear", "lingerie", "briefs", "thong"], text_to_check): return "underwear_bra"
     if match_kw(["áo 2 dây", "áo hai dây", "áo ống", "áo quây", "camisole", "spaghetti strap"], text_to_check): return "camisole"
     return "normal"
 
@@ -759,25 +753,76 @@ def get_universal_physics_rules(product_name, vo_text, is_fashion, is_strict_app
     elif is_strict_appliance: return "ABSOLUTE 3D VOLUMETRIC RIGIDITY: The product MUST strictly maintain its complex multi-part solid structure from all visible angles. ZERO simplification. It DOES NOT morph into a generic object. Components DO NOT bend, shift, or merge. If slightly rotated, the side/profile structure perfectly aligns with the original 3D mesh. Presenter holds it steadily, interaction is decisive, NEVER covering the main body."
     else: return "CAMERA FOCUS LOCKED ON PRODUCT IN FOREGROUND: 100% rigid non-deforming 3D geometry, true-to-life scale (zero morphing); presenter stands completely still (zero body rotation); hands hold the product firmly at chest level (NEVER near the face) and trace surface decisively, never dropping. STRICTLY FORBIDDEN to lift product to face, cheek, or ear."
 
+# 🌟 FIX: ĐỔI HÀNH ĐỘNG SANG TEST THỰC CHIẾN CƯỜNG ĐỘ CAO (BẢN 64.0)
 def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type):
     if intimate_type != "normal": return (
         f"standing professionally in a modest oversized sweater, holding {clean_prod_en} securely in hands to show its premium texture",
-        f"tight macro close-up focused strictly on hands pulling and stretching the highly elastic fabric of {clean_prod_en} to demonstrate extreme resilience",
-        f"tight close-up of hands pressing into the breathable seamless surface of {clean_prod_en} resting flat on a wooden table",
+        f"tight macro close-up forcefully pulling and stretching the highly elastic fabric of {clean_prod_en} to its absolute limit to demonstrate extreme resilience",
+        f"tight close-up vigorously rubbing and pressing into the breathable seamless surface of {clean_prod_en} resting flat on a wooden table",
         f"holding {clean_prod_en} neatly folded like a small towel in hands with a warm welcoming smile, fully dressed"
     )
-    elif match_kw(["sock", "shoe", "boot", "sandal", "sneaker", "tights", "tất", "vớ", "giày", "dép"], f"{clean_prod_en} {check_str}"): return ("stepping forward stylishly showcasing the footwear/socks on feet", "holding the product securely in hands, tracing fingers along the seams and material to show premium quality", "holding the product securely in hands, bending the sole or stretching the material firmly", "posing confidently with focus on the legs/feet")
-    elif is_food: return (f"holding {clean_prod_en} securely while standing completely still and presenting it deliciously", f"taking a satisfying bite or showing the inside texture of {clean_prod_en}", f"pouring, dipping, or stretching {clean_prod_en} to show its mouth-watering details", f"holding {clean_prod_en} securely with a happy, satisfied expression")
+    elif match_kw(["sock", "shoe", "boot", "sandal", "sneaker", "tights", "tất", "vớ", "giày", "dép"], f"{clean_prod_en} {check_str}"): return (
+        "stepping forward stylishly showcasing the footwear/socks on feet", 
+        f"forcefully bending and twisting the sole of {clean_prod_en} in half to prove its ultimate flexibility and indestructible quality", 
+        f"stomping or stepping heavily to demonstrate high-speed extreme shock-absorption of {clean_prod_en}", 
+        "posing confidently with focus on the legs/feet"
+    )
+    elif is_food: return (
+        f"holding {clean_prod_en} securely while standing completely still and presenting it deliciously", 
+        f"forcefully breaking or tearing {clean_prod_en} apart to reveal the steamy, mouth-watering inside texture", 
+        f"taking a huge, highly satisfying bite or rapidly pouring/dipping {clean_prod_en} to show its irresistible taste", 
+        f"holding {clean_prod_en} securely with a happy, satisfied expression"
+    )
     elif is_cosmetics:
         target_part, effect = get_cosmetic_target(clean_prod_en, check_str)
-        return (f"elegantly holding {clean_prod_en} securely near the {target_part}", f"applying {clean_prod_en} DIRECTLY onto the {target_part} (strictly targeting the {target_part}), physically showing a clear visual transformation ({effect})", f"gently blending {clean_prod_en} directly into the {target_part}, the product texture visibly absorbs/changes to emphasize the stunning transformed finish", f"holding {clean_prod_en} securely with a radiant smile, showcasing the perfectly treated {target_part}")
-    elif is_mom_baby: return (f"caring mother holding {clean_prod_en} securely next to her baby", f"gently touching or interacting with {clean_prod_en} to show its features", f"demonstrating the safe use of {clean_prod_en} with the baby", f"holding {clean_prod_en} securely with a caring smile next to the baby")
-    elif is_medicine: return (f"holding {clean_prod_en} securely in hand", f"showing {clean_prod_en} up close next to a clear glass of water", f"dropping or demonstrating the use of {clean_prod_en}", f"holding {clean_prod_en} securely with a healthy, confident smile")
-    elif is_fashion_wearable: return ("stepping forward confidently, modeling the outfit", "close-up on hands touching and smoothing the fabric of the outfit worn on body to show its premium texture", "close-up on hands gently stretching the fabric of the outfit worn on body to demonstrate elasticity and breathability", "posing elegantly (hands strictly kept away from face) and gesturing warmly while modeling the outfit")
-    elif match_kw(["hút bụi", "vacuum"], f"{clean_prod_en} {check_str}"): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
-    elif is_long_handle: return (f"holding the exact reference-matching {clean_prod_en} firmly", f"demonstrating the exact reference-matching {clean_prod_en} swiftly on the floor without any added details or scale distortion", f"scrubbing/gliding the {clean_prod_en} rapidly and decisively across the floor keeping 100% fidelity and true realistic scale", f"holding {clean_prod_en} firmly with a confident gesture")
-    elif is_strict_appliance: return (f"standing completely still while holding {clean_prod_en} firmly to perfectly display its 3D structure", f"presenting {clean_prod_en} clearly without hiding any components", f"demonstrating {clean_prod_en} with fast, decisive hand interaction, maintaining strict 3D volumetric consistency at all times. STRICTLY NO lifting to face", f"holding {clean_prod_en} firmly with a confident open-palm gesture")
-    else: return (f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", f"hands interacting directly with {clean_prod_en} strictly at chest or waist level, keeping it far away from the head", f"demonstrating {clean_prod_en} with fast decisive hand movements at chest level while preserving 100% rigid geometry. NEVER touch face", f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level")
+        return (
+            f"elegantly holding {clean_prod_en} securely near the {target_part}", 
+            f"vigorously rubbing and blending {clean_prod_en} heavily into the {target_part} to prove its deep absorption and fast visual transformation", 
+            f"aggressively wiping or splashing water on the {target_part} to prove that {clean_prod_en} is completely smudge-proof and long-lasting", 
+            f"holding {clean_prod_en} securely with a radiant smile, showcasing the perfectly treated {target_part}"
+        )
+    elif is_mom_baby: return (
+        f"caring mother holding {clean_prod_en} securely next to her baby", 
+        f"actively demonstrating the extreme flexibility, safety, or softness of {clean_prod_en} with firm hand interaction", 
+        f"smoothly and quickly operating {clean_prod_en} in a real-world caring scenario with the baby", 
+        f"holding {clean_prod_en} securely with a caring smile next to the baby"
+    )
+    elif is_medicine: return (
+        f"holding {clean_prod_en} securely in hand", 
+        f"showing {clean_prod_en} up close next to a clear glass of water, demonstrating its pure quality", 
+        f"rapidly mixing or preparing {clean_prod_en} in a fast-paced dynamic usage scenario", 
+        f"holding {clean_prod_en} securely with a healthy, confident smile"
+    )
+    elif is_fashion_wearable: return (
+        "stepping forward confidently, modeling the outfit", 
+        f"forcefully stretching, pulling, and snapping the fabric of {clean_prod_en} worn on body to demonstrate extreme elasticity and durability", 
+        f"vigorously rubbing and brushing the fabric of {clean_prod_en} worn on body to prove it is 100% wrinkle-resistant and breathable", 
+        "posing elegantly (hands strictly kept away from face) and gesturing warmly while modeling the outfit"
+    )
+    elif match_kw(["hút bụi", "vacuum"], f"{clean_prod_en} {check_str}"): return (
+        f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", 
+        f"aggressively pushing the original nozzle of {clean_prod_en} hard against the surface to show its rigid structure", 
+        f"gliding {clean_prod_en} extremely rapidly in focus, visibly sucking heavy dirt straight into the dustbin in high-speed real-world usage", 
+        f"holding {clean_prod_en} securely with a warm open-palm gesture"
+    )
+    elif is_long_handle: return (
+        f"holding the exact reference-matching {clean_prod_en} firmly", 
+        f"aggressively striking or pressing the exact reference-matching {clean_prod_en} firmly against the floor to prove its indestructible rigid handle", 
+        f"scrubbing and gliding {clean_prod_en} extremely rapidly and aggressively across the floor, demonstrating high-speed real-world cleaning power", 
+        f"holding {clean_prod_en} firmly with a confident gesture"
+    )
+    elif is_strict_appliance: return (
+        f"standing completely still while holding {clean_prod_en} firmly to perfectly display its 3D structure", 
+        f"aggressively testing the extreme durability of {clean_prod_en} by pressing, bending, or locking its rigid joints heavily with both hands", 
+        f"demonstrating high-speed, intense real-world usage of {clean_prod_en} with fast decisive hand movements. STRICTLY NO lifting to face", 
+        f"holding {clean_prod_en} firmly with a confident open-palm gesture"
+    )
+    else: return (
+        f"standing perfectly still holding the rigid {clean_prod_en} firmly at CHEST LEVEL. STRICTLY NO lifting to face/ear", 
+        f"forcefully interacting with {clean_prod_en} at chest level, vigorously testing its durability (e.g., pressing, bending, or striking it heavily) while preserving 100% rigid geometry. NEVER touch face", 
+        f"demonstrating high-speed real-world usage of {clean_prod_en} with fast decisive hand movements at chest level. NEVER touch face", 
+        f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level"
+    )
 
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
@@ -951,8 +996,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc ĐẾN AI (trẻ em, người già, chồng, vợ) thì mô tả đối tượng đó. NẾU KHÔNG NHẮC ĐẾN NHÂN VẬT PHỤ NÀO, CHỈ CÓ KOC tự diễn cảm xúc hình thể khớp thoại (VD: nhăn mặt xoa vai). CẤM tự ý bịa thêm người nếu thoại không nhắc.
-       - Cảnh 2 & 3 (Test công năng): KOC trực tiếp cầm sản phẩm test chi tiết. TUYỆT ĐỐI CẤM sờ tay lên mặt nếu không phải mỹ phẩm. BẮT BUỘC mô tả "interacting firmly with both hands at chest level".
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong câu thoại Cảnh 1. Nếu thoại nhắc ĐẾN AI (trẻ em, người già, chồng, vợ) thì mô tả đối tượng đó. CẤM tự ý bịa thêm người nếu thoại không nhắc.
+       - Cảnh 2 (Test Vật Lý): CẤM CHỈ CẦM ĐỨNG IM. BẮT BUỘC KOC phải TEST MẠNH MẼ/BẠO LỰC (kéo giãn, bẻ cong, đập mạnh, chà xát) để chứng minh độ bền.
+       - Cảnh 3 (Sử Dụng Thực Tế): BẮT BUỘC KOC đang SỬ DỤNG THỰC TẾ với TỐC ĐỘ CAO (lau nhà, gõ phím, thái đồ ăn).
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
@@ -960,9 +1006,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
         "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
         "scenes": [
-            {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại (VD: pained expression, frowning, warm smile...)", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "confident", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "smiling", "act": "Mô tả KOC test sản phẩm, cấm sờ mặt (under 20 words)", "sfx": "Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Mô tả hành động TEST VẬT LÝ MẠNH MẼ/BẠO LỰC để chứng minh độ bền, KHÔNG cầm đứng im, dưới 20 words)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Mô tả hành động ĐANG SỬ DỤNG THỰC TẾ với tốc độ nhanh/chuyên nghiệp, KHÔNG nhìn camera, dưới 20 words)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
             {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
