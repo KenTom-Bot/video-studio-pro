@@ -106,21 +106,20 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
 
+# 🌟 BẢN 76.0: CẬP NHẬT LÕI TỪ VỰNG TƯỢNG HÌNH VÀ CẤM VĂN MẪU
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. KHUÔN MẶT VÀ BỐI CẢNH TẠO MỚI HOÀN TOÀN, TUYỆT ĐỐI KHÔNG sao chép từ ảnh gốc.
-2. TỐI ƯU THOẠI (HOOK NGẮN & TẬP TRUNG CÔNG NĂNG): 
-   - HẠN CHẾ MÀO ĐẦU: Câu Hook mở đầu BẮT BUỘC RẤT NGẮN (dưới 15 từ), đập thẳng vào vấn đề hoặc nỗi đau. Tuyệt đối không kể lể dài dòng.
-   - 80/20 RULE: Dành 80% thời lượng kịch bản đi sâu vào việc Review Cận Cảnh chất liệu, kiểu dáng, cấu trúc và tính năng thực tế. Tránh dùng câu cảm thán chung chung.
+2. TỐI ƯU COPYWRITING CẢM XÚC (CRITICAL): 
+   - CẤM DÙNG VĂN MẪU: Tuyệt đối không dùng các từ sáo rỗng như "Nhờ có sản phẩm này", "Giải pháp tối ưu", "Mang lại công năng vượt trội", "Chân ái". 
+   - HOOK NỖI ĐAU: Mở đầu BẮT BUỘC gãi trúng nỗi đau thực tế (Vd: "Đi chơi một mình mà ngại nhờ người lạ chụp hộ...").
+   - TỪ VỰNG TƯỢNG HÌNH: Bắt buộc dùng từ ngữ miêu tả xúc giác đời thực (nhẹ tênh, chắc nịch, trơn tuột, êm ru, lọt thỏm, xốp tan, đầm tay).
 3. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
-   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI/BỐI CẢNH NÀO THÌ NGƯỜI/CẢNH ĐÓ XUẤT HIỆN Ở TIỀN CẢNH.
    - Cảnh 2 & 3 (Test & Sử Dụng): 
-     + NẾU LÀ QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test co giãn.
-     + NẾU LÀ ĐỒ NỘI THẤT/KỆ/BÀN/HỘP: BẮT BUỘC ĐẶT TRÊN BÀN/SÀN. KOC đứng/ngồi cạnh sắp xếp đồ đạc. CẤM CẦM LƠ LỬNG TRÊN TAY.
-     + NẾU LÀ SẢN PHẨM CẦM TAY KHÁC: Cầm trên tay, TEST MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO. CẤM ĐỨNG IM.
-4. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT:
-   - CẤM KOC SỜ LÊN MẶT (Trừ mỹ phẩm). Thao tác dứt khoát, giữ góc nhìn ổn định.
-5. LÕI THOẠI KOC THỰC CHIẾN, CHUẨN BẮC BỘ:
+     + QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test co giãn.
+     + KỆ/BÀN/HỘP NỘI THẤT: BẮT BUỘC ĐẶT TRÊN BÀN/SÀN. KOC xếp đồ đạc. CẤM CẦM LƠ LỬNG.
+     + SẢN PHẨM CẦM TAY KHÁC: TEST MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO. CẤM ĐỨNG IM.
+4. LÕI THOẠI CHUẨN BẮC BỘ:
    - Xưng 'em/mình' - Gọi 'các bác/chị em'. CẤM từ miền Nam ("mấy bà", "rinh", "bé"). Cấm "chốt ngay dưới giỏ hàng".
 """
 
@@ -179,7 +178,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API - LÕI RADAR AUTO-SCAN MODEL CHỐNG LỖI 404
+# 4. GỌI GEMINI API
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -263,7 +262,7 @@ def get_sys_inst_outlines(mode, angle, custom_note=""):
     elif match_kw(["bóc hộp", "unbox"], angle):
         strat_inst = "CRITICAL STRATEGY LOCK: Mở đầu video phải có cảnh đập hộp, rọc hải quan, khoe sự hào hứng (SIÊU NGẮN GỌN)."
         
-    focus_inst = "CRITICAL COPYWRITING RULE: CÂU HOOK MỞ ĐẦU PHẢI SIÊU NGẮN (DƯỚI 15 TỪ). Phải dành 80% độ dài kịch bản để ĐI THẲNG VÀO REVIEW CÔNG NĂNG, chi tiết chất liệu, thiết kế và độ bền của sản phẩm. Không nói lan man, sáo rỗng."
+    focus_inst = "CRITICAL COPYWRITING RULE: DÙNG NGÔN TỪ TƯỢNG HÌNH, TỰ NHIÊN (nhẹ tênh, chắc nịch, trơn tuột, êm ru). KHÔNG dùng văn mẫu sáo rỗng. Phải dành 80% độ dài kịch bản để ĐI THẲNG VÀO REVIEW CÔNG NĂNG chi tiết."
         
     return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n{strat_inst}\n{focus_inst}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
@@ -339,7 +338,6 @@ def auto_save_current_session():
 
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
-# 🌟 BẢN 75.0: TĂNG TỐC ĐỘ ĐỌC LÊN 5.2 TỪ/S VÀ GIẢM THỜI GIAN DẤU CÂU ĐỂ KHỚP NHỊP BẮN RAP
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('?')
@@ -1046,7 +1044,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {{
         "set_en": "Master setting EN (e.g., 'stylish coffee shop').",
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
-        "wardrobe_en": "CRITICAL: MÔ TẢ SET ĐỒ MỚI LẠ, ĐỘC BẢN, KHÔNG ĐƯỢC TRÙNG VỚI CÁC KỊCH BẢN TRƯỚC. SIÊU CHI TIẾT (cổ áo, tay áo, màu sắc).",
+        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
             {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Kệ/Tủ/Hộp thì phải ĐẶT LÊN BÀN/SÀN KHÔNG CẦM. Đồ khác thì cầm trên tay test mạnh mẽ)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
@@ -1280,9 +1278,9 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "[Tên biến thể 1 - Đậm chất chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. YÊU CẦU: Hook phải DƯỚI 15 TỪ. Tập trung review công năng/chất liệu." }},
-            {{ "id": {cur_len+2}, "title": "[Tên biến thể 2 - Đậm chất chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. YÊU CẦU: Hook phải DƯỚI 15 TỪ. Tập trung review công năng/chất liệu." }},
-            {{ "id": {cur_len+3}, "title": "[Tên biến thể 3 - Đậm chất chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. YÊU CẦU: Hook phải DƯỚI 15 TỪ. Tập trung review công năng/chất liệu." }}
+            {{ "id": {cur_len+1}, "title": "[Tên biến thể 1 - Đậm chất chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. YÊU CẦU: Hook phải DƯỚI 15 TỪ và chạm nỗi đau. Dùng TỪ VỰNG TƯỢNG HÌNH. Tập trung review công năng/chất liệu." }},
+            {{ "id": {cur_len+2}, "title": "[Tên biến thể 2 - Đậm chất chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. YÊU CẦU: Hook phải DƯỚI 15 TỪ và chạm nỗi đau. Dùng TỪ VỰNG TƯỢNG HÌNH. Tập trung review công năng/chất liệu." }},
+            {{ "id": {cur_len+3}, "title": "[Tên biến thể 3 - Đậm chất chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. YÊU CẦU: Hook phải DƯỚI 15 TỪ và chạm nỗi đau. Dùng TỪ VỰNG TƯỢNG HÌNH. Tập trung review công năng/chất liệu." }}
         ]
     }}
     """
@@ -1328,9 +1326,9 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "[Tên kịch bản 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại 80-110 từ. YÊU CẦU: Hook <15 từ. Review công năng chuyên sâu." }},
-            {{ "id": {cur_len+2}, "title": "[Tên kịch bản 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại 80-110 từ. YÊU CẦU: Hook <15 từ. Review công năng chuyên sâu." }},
-            {{ "id": {cur_len+3}, "title": "[Tên kịch bản 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại 80-110 từ. YÊU CẦU: Hook <15 từ. Review công năng chuyên sâu." }}
+            {{ "id": {cur_len+1}, "title": "[Tên kịch bản 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại 80-110 từ. YÊU CẦU: Hook <15 từ và gãi trúng nỗi đau. Dùng TỪ VỰNG TƯỢNG HÌNH. Review công năng chuyên sâu." }},
+            {{ "id": {cur_len+2}, "title": "[Tên kịch bản 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại 80-110 từ. YÊU CẦU: Hook <15 từ và gãi trúng nỗi đau. Dùng TỪ VỰNG TƯỢNG HÌNH. Review công năng chuyên sâu." }},
+            {{ "id": {cur_len+3}, "title": "[Tên kịch bản 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại 80-110 từ. YÊU CẦU: Hook <15 từ và gãi trúng nỗi đau. Dùng TỪ VỰNG TƯỢNG HÌNH. Review công năng chuyên sâu." }}
         ]
     }}
     """
@@ -1711,7 +1709,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM. Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior).
+            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior (Mặc định chọn 'adult'. Chỉ chọn 'child/senior' nếu SP đặc thù)).
             
             TẠO 3 KỊCH BẢN ĐA DẠNG BÁM SÁT CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             (ĐẶC BIỆT LƯU Ý: Nếu chiến lược là PAS/Nỗi Đau/Tình Huống, phần mở đầu hook CẤM nhắc đến sản phẩm, chỉ diễn tả tình huống/nỗi đau).
@@ -1726,15 +1724,15 @@ if st.session_state.get("trigger_main_generation"):
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
-                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue'). NO generic colors.",
-                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (max 25 words). CẤM nhắc đến con người, bối cảnh ảnh gốc.",
+                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue', 'glossy dark navy'). NO generic colors.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
                 "scripts": [
-                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
-                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
-                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }}
+                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH (nhẹ tênh, chắc nịch). BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
+                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
+                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }}
                 ]
             }}
             """
@@ -1894,7 +1892,6 @@ if all_sc:
             is_tts = ("Viral" not in curr_mode)
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
             
-            # 🌟 BẢN 75.0: THỜI LƯỢNG MỞ RỘNG (UN-CAPPED) DO ĐÃ FIX TỐC ĐỘ ĐỌC CỰC NHANH
             raw_speech = calculate_speech_duration(vo_text, is_tts)
             act_cushion = 1.0 if is_tts else 1.3
             dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
