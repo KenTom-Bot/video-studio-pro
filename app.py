@@ -109,14 +109,15 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. KHUÔN MẶT VÀ BỐI CẢNH TẠO MỚI HOÀN TOÀN, TUYỆT ĐỐI KHÔNG sao chép từ ảnh gốc.
-2. CẤU TRÚC THOẠI CHUẨN BIÊN TẬP VIÊN (CRITICAL):
-   - HOOK VẤN ĐỀ: Mở đầu BẮT BUỘC nói về nỗi đau, sự bất tiện hoặc mong muốn của khách hàng bằng giọng tâm sự tự nhiên (Dưới 15 từ). CẤM các từ giả tạo như "Sốc thật sự", "Chân ái".
-   - XƯỚNG TÊN SẢN PHẨM: Ngay sau câu Hook, BẮT BUỘC PHẢI GỌI TÊN SẢN PHẨM NHƯ 1 GIẢI PHÁP (Vd: "Thế nên em mới rinh ngay bộ cốc thủy tinh này...").
-   - TỪ VỰNG TƯỢNG HÌNH: Dùng các từ miêu tả cảm giác chân thực (êm ru, chắc nịch, trơn tuột, lọt thỏm, xốp tan, đầm tay). Dành 80% thời lượng review công năng.
-   - CTA CÓ CHỦ NGỮ: Lời kêu gọi hành động ở cuối BẮT BUỘC phải có đại từ (anh/chị, các bác, anh chị em) + hành động bấm link tham khảo (Vd: "Các bác ưng thì bấm vào link góc trái tham khảo nhé"). CẤM NÓI TRỐNG KHÔNG, CẤM NHẮC GIÁ TIỀN.
-3. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
+2. TỐI ƯU COPYWRITING TRẢI NGHIỆM ĐỜI THỰC (CRITICAL):
+   - CẤM VĂN MẪU: Cấm dùng "Hết nước chấm", "Chân ái", "Siêu phẩm", "Giải pháp tối ưu", "Mang lại công năng".
+   - HOOK GỌI ĐÍCH DANH KHÁCH HÀNG + NỖI ĐAU: Mở đầu BẮT BUỘC gọi tệp khách hàng kèm nỗi đau/tình huống đời thường khơi gợi đồng cảm (Vd: "Bác nào ngủ dậy mà vẫn đau mỏi cổ vai gáy thì...", "Chị em nào ngày rửa bát 3 lần sợ hỏng da tay thì..."). Hook siêu ngắn dưới 15 từ. CẤM NHẮC TÊN SP TRONG CÂU HOOK.
+   - XƯỚNG TÊN SẢN PHẨM: Bắt buộc gọi tên sản phẩm ra ngay ở câu thứ 2, sau câu Hook.
+   - VĂN PHONG TÂM SỰ ĐỜI THƯỜNG: Dùng TỪ VỰNG TƯỢNG HÌNH (êm ru, chắc nịch, trơn tuột, lọt thỏm, xốp tan, đầm tay). Không đọc thông số trả bài.
+   - CTA ĐA DẠNG CÓ CHỦ NGỮ: Câu chốt bắt buộc có đại từ (anh/chị/các bác) + hành động mộc mạc, đa dạng (Vd: "Các bác ưng bụng thì nhấp góc trái nhé", "Thích thì múc ngay đi anh em ơi", "Chị em tham khảo link bên dưới nha"). TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN, KHUYẾN MÃI.
+3. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO:
    - Cảnh 2 & 3: QUẦN ÁO MẶC LÊN NGƯỜI; KỆ/HỘP/BÀN ĐẶT TRÊN MẶT PHẲNG VÀ XẾP ĐỒ; SẢN PHẨM KHÁC CẦM TRÊN TAY TEST MẠNH MẼ.
-4. LÕI THOẠI CHUẨN BẮC BỘ: Xưng 'em/mình' - Gọi 'các bác/chị em/anh chị em'. CẤM từ miền Nam ("mấy bà", "rinh", "bé").
+4. LÕI THOẠI CHUẨN BẮC BỘ: Xưng 'em/mình' - Gọi 'các bác/chị em/anh chị em'. CẤM từ miền Nam.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
@@ -889,7 +890,6 @@ def get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearab
         f"holding {clean_prod_en} securely at chest level with a confident gesture. Product remains strictly below shoulder level"
     )
 
-# 🌟 BẢN 82.0: TÍCH HỢP KHÓA TÓC, ĐỘ DÀI QUẦN VÀ TRẠNG THÁI SƠ VIN VÀO STYLIST VIBE
 def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gender, intimate_type, is_fashion, raw_vi_info="", is_food=False, is_cosmetics=False, is_mom_baby=False, is_medicine=False):
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
@@ -1141,7 +1141,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif match_kw(["sneaker", "running", "athletic"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif match_kw(["heel", "loafer", "dress"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    # 🌟 BẢN 82.0: CẤM TỰ Ý ĐỔI TÓC, ĐỘ DÀI QUẦN VÀ SƠ VIN
     char_neg_extra = f"{dynamic_footwear_neg}changing hair from tied to down, changing hair from down to tied, changing shorts to long pants, changing long pants to shorts, tucking in shirt abruptly, untucking shirt abruptly, changing styling, referencing original face, copying original person, matching original background, same environment as reference, caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
@@ -1245,28 +1244,28 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
+        # 🌟 BẢN 83.0: ÉP TOÀN BỘ VIDEO PROMPT THÀNH IMAGE-TO-VIDEO INPUT 
         if idx_scn == 0 and target_subject:
             if is_no_prod:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} Subject: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
-                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} [FOREGROUND ACTION]: {target_subject}, {clean_act} (ZERO PRODUCT). [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
+                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} [FOREGROUND ACTION]: {target_subject}, {clean_act} (ZERO PRODUCT). [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
             else:
                 prod_use_segment = f"PRODUCT IN USE: {target_subject} actively wearing/using {clean_prod_en}. {color_lock_tag}."
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{prod_use_segment}]. [BACKGROUND]: {locked_character_prompt} watching warmly, {micro_expr}"
-                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject} actively using {clean_prod_en}. [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
+                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject} actively using {clean_prod_en}. [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
         else:
             if is_no_prod:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
-                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
+                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
             elif not is_fashion_wearable and idx_scn in [1, 2]:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
-                raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
             else:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
-                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
-        vid_parts = raw_vid.split('[AUDIO]:')
-        if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
-        else: scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
+        # Sửa lỗi Replace
+        scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         
         if not is_no_prod and "EMPTY HANDS, ZERO PRODUCT" in img_core:
             img_core = img_core.replace("EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME", "holding the product naturally").replace("[NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]", "")
@@ -1969,7 +1968,8 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
+                # 🌟 BẢN 83.0: ĐỔI LABEL VÀ CẤU TRÚC JSON ĐỂ HIỂN THỊ RÕ ĐÂY LÀ LỆNH IMAGE-TO-VIDEO
+                st.markdown("**🎥 Prompt Video (Image-to-Video: Dùng ảnh trên làm gốc):**")
                 vid_p = scn.get('vid_p', '')
                 if not is_no_prod and "(ZERO PRODUCT)" in vid_p:
                     vid_p = vid_p.replace("(ZERO PRODUCT)", "")
