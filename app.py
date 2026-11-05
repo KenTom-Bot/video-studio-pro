@@ -179,7 +179,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API - 🌟 BẢN 71.0: LÕI RADAR AUTO-SCAN MODEL CHỐNG LỖI 404
+# 4. GỌI GEMINI API - LÕI RADAR AUTO-SCAN MODEL CHỐNG LỖI 404
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -339,12 +339,11 @@ def auto_save_current_session():
 
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
-# 🌟 BẢN 74.0: SỬA LẠI TỐC ĐỘ ĐỌC (TỪ/GIÂY) ĐỂ CHUẨN XÁC HƠN VỚI THỜI GIAN THỰC
+# 🌟 BẢN 75.0: TĂNG TỐC ĐỘ ĐỌC LÊN 5.2 TỪ/S VÀ GIẢM THỜI GIAN DẤU CÂU ĐỂ KHỚP NHỊP BẮN RAP
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('?')
-    # Giảm tốc độ đọc từ 4.8 xuống 4.2 để sát với tốc độ nói người Việt Nam thực tế
-    return round((words / (4.2 if is_tiktok_shop else 3.8)) + (commas * 0.15) + (periods * 0.25), 1)
+    return round((words / (5.2 if is_tiktok_shop else 4.5)) + (commas * 0.1) + (periods * 0.2), 1)
 
 def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
     try:
@@ -1023,7 +1022,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_lighting_product = detect_lighting_product(check_str)
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, is_lighting_product)
 
-    # 🌟 BẢN 74.0: BƠM STYLE SEED VÀO PROMPT ĐỂ ĐẢM BẢO QUẦN ÁO LUÔN MỚI
     random_style_seed = random.randint(1000, 9999)
     
     prompt_text = f"""
@@ -1126,7 +1124,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["voiceover"] = vo_text
         scn["director"] = sanitize_policy_text(scn.get("dir", scn.get("director", "")))
         
-        # 🌟 BẢN 74.0: BỎ HARD-CAP min(10) ĐỂ THỜI GIAN KHỚP CHUẨN ĐỘ DÀI CỦA THOẠI
         raw_speech = calculate_speech_duration(vo_text, is_tiktok_shop)
         act_cushion = 1.0 if is_tiktok_shop else 1.3
         dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
@@ -1606,7 +1603,7 @@ if not st.session_state.get("is_logged_in", False):
 # ==============================================================================
 # 10. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
 user_allowed_modules = st.session_state.get("licensed_accounts", {}).get(st.session_state.get("current_email", ""), {}).get("roles", ALL_MODULES) or ALL_MODULES
 mode = st.selectbox("🎯 Thể loại:", user_allowed_modules, key=f"mode_sel_{st.session_state.get('reset_key', 0)}", disabled=is_system_busy)
@@ -1714,7 +1711,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior (Mặc định chọn 'adult'. Chỉ chọn 'child/senior' nếu SP đặc thù)).
+            - KOC 100% LÀ NGƯỜI VIỆT NAM. Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior).
             
             TẠO 3 KỊCH BẢN ĐA DẠNG BÁM SÁT CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             (ĐẶC BIỆT LƯU Ý: Nếu chiến lược là PAS/Nỗi Đau/Tình Huống, phần mở đầu hook CẤM nhắc đến sản phẩm, chỉ diễn tả tình huống/nỗi đau).
@@ -1729,8 +1726,8 @@ if st.session_state.get("trigger_main_generation"):
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
-                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue', 'glossy dark navy'). NO generic colors.",
-                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
+                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue'). NO generic colors.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (max 25 words). CẤM nhắc đến con người, bối cảnh ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
@@ -1897,7 +1894,7 @@ if all_sc:
             is_tts = ("Viral" not in curr_mode)
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
             
-            # 🌟 BẢN 74.0: BỎ LỆNH min(10, ...) ĐỂ THỜI LƯỢNG LÊN TỚI 15S+ NẾU THOẠI QUÁ DÀI
+            # 🌟 BẢN 75.0: THỜI LƯỢNG MỞ RỘNG (UN-CAPPED) DO ĐÃ FIX TỐC ĐỘ ĐỌC CỰC NHANH
             raw_speech = calculate_speech_duration(vo_text, is_tts)
             act_cushion = 1.0 if is_tts else 1.3
             dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
