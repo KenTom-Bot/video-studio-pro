@@ -205,23 +205,19 @@ def repair_and_parse_json(text_content: str):
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2500):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
     
-    # 🌟 LÕI RADAR TỰ ĐỘNG QUÉT MÔ HÌNH TỪ API KEY (CHỐNG LỖI 404 VĨNH VIỄN)
     try:
         available_models = []
         for m in client.models.list():
             m_name = m.name.replace('models/', '')
-            # Lọc lấy các mô hình cho phép GenerateContent
             if hasattr(m, 'supported_actions'):
                 if 'generateContent' in m.supported_actions:
                     available_models.append(m_name)
             else:
                 available_models.append(m_name)
         
-        # Luôn ưu tiên dùng các dòng flash vì tốc độ cao và rẻ
         flash_models = [m for m in available_models if 'flash' in m.lower()]
         models_to_try = flash_models if flash_models else available_models
         
-        # Dự phòng nếu danh sách trả về bị rỗng
         if not models_to_try:
             models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro"]
     except Exception:
@@ -244,22 +240,28 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2
             except Exception as e:
                 last_exception = e
                 err_str = str(e).lower()
-                # Bỏ qua ngay lập tức nếu API Key không hỗ trợ model này (404 Not Found)
                 if "404" in err_str or "not_found" in err_str or "not found" in err_str: 
                     break 
-                # Chờ 2s và thử lại nếu máy chủ quá tải (Limit/Quota)
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "exhausted" in err_str:
                     time.sleep((attempt + 1) * 2.0)
                     continue
-                break # Nếu gặp lỗi định dạng JSON, cũng chuyển sang model khác
+                break 
                 
     if last_exception:
         raise Exception(f"Lỗi: Không tìm thấy mô hình tương thích hoặc máy chủ Google đang bảo trì. Chi tiết: {str(last_exception)}")
 
+# 🌟 BẢN 72.0: BỔ SUNG LỆNH HƯỚNG DẪN CHIẾN LƯỢC ĐỘNG VÀO PROMPT CỐT LÕI
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Mẹo/kiến thức, KHÔNG bán hàng)" if is_viral else "TIKTOK SHOP (Bán hàng, chốt deal)"
-    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
+    
+    strat_inst = ""
+    if match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "tình huống", "hài hước", "đời thường"], angle):
+        strat_inst = "CRITICAL STRATEGY LOCK: Phần mở đầu (Hook) CỦA MỌI KỊCH BẢN CHỈ ĐƯỢC NÓI VỀ NỖI ĐAU HOẶC TÌNH HUỐNG. TUYỆT ĐỐI KHÔNG XUẤT HIỆN SẢN PHẨM Ở CÂU ĐẦU TIÊN."
+    elif match_kw(["bóc hộp", "unbox"], angle):
+        strat_inst = "CRITICAL STRATEGY LOCK: Mở đầu video phải có cảnh đập hộp, rọc hải quan, khoe sự hào hứng."
+        
+    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n{strat_inst}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
     pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau rõ nét qua hình thể -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
@@ -1266,12 +1268,13 @@ def clone_script(script_id):
     GỐC #{script_id}: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
     NHIỆM VỤ: Nhân bản 3 biến thể giữ 90% cấu trúc, đổi bối cảnh đời thực khác nhau. Xưng '{dna.get("pro_s", "em")}' - Gọi '{dna.get("pro_a", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
+    BÁM SÁT CHIẾN LƯỢC: '{presentation_format}'.
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
-            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
-            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }}
+            {{ "id": {cur_len+1}, "title": "[Tên biến thể 1 - Đậm chất chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ..." }},
+            {{ "id": {cur_len+2}, "title": "[Tên biến thể 2 - Đậm chất chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ..." }},
+            {{ "id": {cur_len+3}, "title": "[Tên biến thể 3 - Đậm chất chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ..." }}
         ]
     }}
     """
@@ -1310,16 +1313,15 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     {prod_context}
     
     CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("pro_s", "em")}' - Gọi '{dna.get("pro_a", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
-    TẠO 3 KỊCH BẢN Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. ĐẶC BIỆT LƯU Ý:
-    - Kịch bản 1: Giọng điệu năng động, dồn dập.
-    - Kịch bản 2: Giọng tâm sự, chia sẻ, gần gũi.
-    - Kịch bản 3: Giọng chuyên gia, nhấn mạnh công năng.
+    TẠO 3 KỊCH BẢN Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. 
+    BẮT BUỘC PHẢI ÁP DỤNG TRIỆT ĐỂ CHIẾN LƯỢC '{active_format}' VÀO LỜI THOẠI.
+    (Nếu là chiến lược PAS/Nỗi đau/Tình huống -> BẮT BUỘC 2-3 câu đầu tiên CẤM nhắc đến tên sản phẩm).
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
-            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
-            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }}
+            {{ "id": {cur_len+1}, "title": "[Tên kịch bản 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ..." }},
+            {{ "id": {cur_len+2}, "title": "[Tên kịch bản 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ..." }},
+            {{ "id": {cur_len+3}, "title": "[Tên kịch bản 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ..." }}
         ]
     }}
     """
@@ -1694,13 +1696,17 @@ if st.session_state.get("trigger_main_generation"):
 
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
-
+            
+            # 🌟 CẬP NHẬT LỆNH BÁM SÁT CHIẾN LƯỢC VÀ BỎ HARDCODE BẢN NĂNG ĐỘNG
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior (Mặc định chọn 'adult'. Chỉ chọn 'child/senior' nếu SP đặc thù)).
+            - KOC 100% LÀ NGƯỜI VIỆT NAM. Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior).
+            
+            TẠO 3 KỊCH BẢN ĐA DẠNG BÁM SÁT CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
+            (ĐẶC BIỆT LƯU Ý: Nếu chiến lược là PAS/Nỗi Đau/Tình Huống, phần mở đầu hook CẤM nhắc đến sản phẩm, chỉ diễn tả tình huống/nỗi đau).
             
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON SIÊU NÉN:
             {{
@@ -1712,15 +1718,15 @@ if st.session_state.get("trigger_main_generation"):
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
-                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue', 'glossy dark navy'). NO generic colors.",
-                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
+                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue'). NO generic colors.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (max 25 words). CẤM nhắc đến con người, bối cảnh ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
                 "scripts": [
-                    {{ "id": 1, "title": "Bản Năng Động", "set": "Bối cảnh khớp 100% thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "set": "Bối cảnh khớp 100% thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "set": "Bối cảnh khớp 100% thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }}
+                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }},
+                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }},
+                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }}
                 ]
             }}
             """
