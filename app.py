@@ -179,7 +179,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API
+# 4. GỌI GEMINI API - 🌟 BẢN 71.0: LÕI RADAR AUTO-SCAN MODEL CHỐNG LỖI 404
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -253,7 +253,6 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2
     if last_exception:
         raise Exception(f"Lỗi: Không tìm thấy mô hình tương thích hoặc máy chủ Google đang bảo trì. Chi tiết: {str(last_exception)}")
 
-# 🌟 BẢN 73.0: ÉP LỆNH HOOK NGẮN VÀ TẬP TRUNG CÔNG NĂNG
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Mẹo/kiến thức, KHÔNG bán hàng)" if is_viral else "TIKTOK SHOP (Bán hàng, chốt deal)"
@@ -340,10 +339,12 @@ def auto_save_current_session():
 
 def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if text else 0
 
+# 🌟 BẢN 74.0: SỬA LẠI TỐC ĐỘ ĐỌC (TỪ/GIÂY) ĐỂ CHUẨN XÁC HƠN VỚI THỜI GIAN THỰC
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('?')
-    return round((words / (4.8 if is_tiktok_shop else 4.0)) + (commas * (0.08 if is_tiktok_shop else 0.12)) + (periods * (0.12 if is_tiktok_shop else 0.20)), 1)
+    # Giảm tốc độ đọc từ 4.8 xuống 4.2 để sát với tốc độ nói người Việt Nam thực tế
+    return round((words / (4.2 if is_tiktok_shop else 3.8)) + (commas * 0.15) + (periods * 0.25), 1)
 
 def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
     try:
@@ -1022,11 +1023,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_lighting_product = detect_lighting_product(check_str)
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, is_lighting_product)
 
+    # 🌟 BẢN 74.0: BƠM STYLE SEED VÀO PROMPT ĐỂ ĐẢM BẢO QUẦN ÁO LUÔN MỚI
+    random_style_seed = random.randint(1000, 9999)
+    
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
     Kịch bản: '{fixed_title}' | Bối cảnh gốc: '{fixed_setting_base}'
-    KOC: {detected_demographic_en} | {stylist_vibe_text}
+    KOC: {detected_demographic_en} | {stylist_vibe_text} 
+    (STYLE SEED: #{random_style_seed} - ÉP BUỘC TẠO RA TRANG PHỤC KHÁC BIỆT HOÀN TOÀN SO VỚI CÁC LẦN TRƯỚC, KHÔNG ĐƯỢC DÙNG LẠI QUẦN ÁO CŨ)
     
     THOẠI GỐC: "{full_vo_script}"
     
@@ -1043,7 +1048,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {{
         "set_en": "Master setting EN (e.g., 'stylish coffee shop').",
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
-        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
+        "wardrobe_en": "CRITICAL: MÔ TẢ SET ĐỒ MỚI LẠ, ĐỘC BẢN, KHÔNG ĐƯỢC TRÙNG VỚI CÁC KỊCH BẢN TRƯỚC. SIÊU CHI TIẾT (cổ áo, tay áo, màu sắc).",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
             {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Kệ/Tủ/Hộp thì phải ĐẶT LÊN BÀN/SÀN KHÔNG CẦM. Đồ khác thì cầm trên tay test mạnh mẽ)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
@@ -1121,10 +1126,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["voiceover"] = vo_text
         scn["director"] = sanitize_policy_text(scn.get("dir", scn.get("director", "")))
         
+        # 🌟 BẢN 74.0: BỎ HARD-CAP min(10) ĐỂ THỜI GIAN KHỚP CHUẨN ĐỘ DÀI CỦA THOẠI
         raw_speech = calculate_speech_duration(vo_text, is_tiktok_shop)
         act_cushion = 1.0 if is_tiktok_shop else 1.3
-        dynamic_sec = min(10, max(4, math.ceil(raw_speech + act_cushion)))
-        actual_speech = round(dynamic_sec - 0.8, 1) if raw_speech >= dynamic_sec else raw_speech
+        dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
+        actual_speech = round(raw_speech, 1)
         cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
         
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
@@ -1148,7 +1154,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         if idx_scn == 0 and is_pas_scn1_no_prod:
             vo_lower = vo_text.lower()
             needs_child = match_kw(["trẻ em", "trẻ nhỏ", "em bé", "con nít", "trẻ sơ sinh", "trẻ con", "bạn nhỏ", "con nhỏ"], vo_lower)
-            needs_senior = match_kw(["người gia", "ông bà", "cao tuổi", "bố mẹ già", "bà cụ", "ông cụ", "người lớn tuổi"], vo_lower)
+            needs_senior = match_kw(["người già", "ông bà", "cao tuổi", "bố mẹ già", "bà cụ", "ông cụ", "người lớn tuổi"], vo_lower)
             needs_husband = match_kw(["chồng", "ông xã", "anh nhà", "nam giới", "đàn ông", "phái mạnh"], vo_lower)
             needs_wife = match_kw(["vợ", "bà xã", "chị em", "phụ nữ", "mẹ bỉm", "các mẹ", "chị nhà"], vo_lower)
             needs_family = match_kw(["gia đình", "cả nhà"], vo_lower)
@@ -1266,7 +1272,6 @@ def clone_script(script_id):
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
-    # 🌟 ÉP HOOK NGẮN CHO NHÂN BẢN
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1314,7 +1319,6 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
-    # 🌟 ÉP HOOK NGẮN CHO GỌI THÊM
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1602,7 +1606,7 @@ if not st.session_state.get("is_logged_in", False):
 # ==============================================================================
 # 10. KHÔNG GIAN SÁNG TẠO CHÍNH (MAIN APP UI)
 # ==============================================================================
-st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="header-container"><div class="main-title">🎬 Đạo Diễn AI - Hệ Hệ Thống Kịch Bản Pro</div></div>""", unsafe_allow_html=True)
 
 user_allowed_modules = st.session_state.get("licensed_accounts", {}).get(st.session_state.get("current_email", ""), {}).get("roles", ALL_MODULES) or ALL_MODULES
 mode = st.selectbox("🎯 Thể loại:", user_allowed_modules, key=f"mode_sel_{st.session_state.get('reset_key', 0)}", disabled=is_system_busy)
@@ -1705,7 +1709,6 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
-            # 🌟 YÊU CẦU ĐÚC KỊCH BẢN THEO CẤU TRÚC MỚI (HOOK NGẮN + TẬP TRUNG CÔNG NĂNG)
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
@@ -1894,14 +1897,15 @@ if all_sc:
             is_tts = ("Viral" not in curr_mode)
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
             
-            dur_str = str(scn.get('dur', '8s')).replace('s', '').strip()
-            try: dur_int = int(float(dur_str))
-            except: dur_int = 8
-            
-            safe_cushion = round(max(0.0, dur_int - speech_sec), 1)
+            # 🌟 BẢN 74.0: BỎ LỆNH min(10, ...) ĐỂ THỜI LƯỢNG LÊN TỚI 15S+ NẾU THOẠI QUÁ DÀI
+            raw_speech = calculate_speech_duration(vo_text, is_tts)
+            act_cushion = 1.0 if is_tts else 1.3
+            dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
+            actual_speech = round(raw_speech, 1)
+            cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage', scn.get('dir', ''))}")
-            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur', '8s')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
+            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {dynamic_sec}s | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt) | 🛡 Đệm diễn xuất tự nhiên: +{cushion_sec}s</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting', scn.get('set', ''))}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression_en', scn.get('exp', 'Tự nhiên, rạng rỡ'))}*\n\n**🎵 Hiệu ứng âm thanh:** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director', scn.get('dir', ''))}*\n\n**💬 Đoạn thoại cắt tương ứng:** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             
             c_p1, c_p2 = st.columns(2)
