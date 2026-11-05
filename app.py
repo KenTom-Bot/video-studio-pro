@@ -106,29 +106,25 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
 
-# 🌟 BẢN 78.0: LÕI CHỐT ĐƠN (SOFT CTA) KHÉO LÉO, CẤM BÁO GIÁ
+# 🌟 BẢN 79.0: LÕI CẤU TRÚC KỂ CHUYỆN (VẤN ĐỀ -> TÊN SP -> REVIEW -> CTA ĐẦY ĐỦ)
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. KHUÔN MẶT VÀ BỐI CẢNH TẠO MỚI HOÀN TOÀN, TUYỆT ĐỐI KHÔNG sao chép từ ảnh gốc.
-2. TỐI ƯU COPYWRITING CẢM XÚC (CRITICAL): 
-   - CẤM VĂN MẪU LỐ BỊCH: Tuyệt đối không dùng "Hết nước chấm", "Chân ái", "Siêu phẩm", "Giải pháp tối ưu", "Mang lại công năng". 
-   - HOOK THÔI MIÊN TÒ MÒ: Mở đầu BẮT BUỘC gãi trúng nỗi đau hoặc gợi tò mò (Vd: "Bác nào hay bị... thì xem ngay", "Sai lầm lớn nhất là..."). Hook siêu ngắn dưới 15 từ.
-   - VĂN PHONG TÂM SỰ: Dùng TỪ VỰNG TƯỢNG HÌNH (êm ru, chắc nịch, trơn tuột, xốp tan, đầm tay, lọt thỏm).
-   - CTA KHÉO LÉO (QUAN TRỌNG): Kết thúc thoại BẮT BUỘC có 1 câu kêu gọi hành động mộc mạc (VD: "các bác ưng thì xem ở góc trái nhé", "thích thì múc ngay đi ạ"). TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN HAY CON SỐ trong câu chốt này!
+2. CẤU TRÚC THOẠI CHUẨN BIÊN TẬP VIÊN (CRITICAL):
+   - HOOK VẤN ĐỀ: Mở đầu BẮT BUỘC nói về nỗi đau, sự bất tiện hoặc mong muốn của khách hàng bằng giọng tâm sự tự nhiên (Dưới 15 từ). CẤM các từ giả tạo như "Sốc thật sự", "Chân ái".
+   - XƯỚNG TÊN SẢN PHẨM: Ngay sau câu Hook, BẮT BUỘC PHẢI GỌI TÊN SẢN PHẨM NHƯ 1 GIẢI PHÁP (Vd: "Thế nên em mới rinh ngay bộ cốc thủy tinh này...").
+   - TỪ VỰNG TƯỢNG HÌNH: Dùng các từ miêu tả cảm giác chân thực (êm ru, chắc nịch, trơn tuột, lọt thỏm, xốp tan, đầm tay). Dành 80% thời lượng review công năng.
+   - CTA CÓ CHỦ NGỮ: Lời kêu gọi hành động ở cuối BẮT BUỘC phải có đại từ (anh/chị, các bác, anh chị em) + hành động bấm link tham khảo (Vd: "Các bác ưng thì bấm vào link góc trái tham khảo nhé"). CẤM NÓI TRỐNG KHÔNG, CẤM NHẮC GIÁ TIỀN.
 3. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
-   - Cảnh 2 & 3 (Test & Sử Dụng): 
-     + QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test.
-     + KỆ/BÀN/HỘP NỘI THẤT: BẮT BUỘC ĐẶT TRÊN BÀN/SÀN. KOC xếp đồ đạc. CẤM CẦM LƠ LỬNG.
-     + SẢN PHẨM KHÁC: Cầm trên tay, TEST MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO.
-4. LÕI THOẠI CHUẨN BẮC BỘ:
-   - Xưng 'em/mình' - Gọi 'các bác/chị em'. CẤM từ miền Nam ("mấy bà", "rinh", "bé").
+   - Cảnh 2 & 3: QUẦN ÁO MẶC LÊN NGƯỜI; KỆ/HỘP/BÀN ĐẶT TRÊN MẶT PHẲNG VÀ XẾP ĐỒ; SẢN PHẨM KHÁC CẦM TRÊN TAY TEST MẠNH MẼ.
+4. LÕI THOẠI CHUẨN BẮC BỘ: Xưng 'em/mình' - Gọi 'các bác/chị em/anh chị em'. CẤM từ miền Nam ("mấy bà", "rinh", "bé").
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
 POLICY_REPLACEMENTS = {
     r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', 
     r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale',
-    r'\bhết\s*nước\s*chấm\b': 'rất ưng ý', r'\bchân\s*ái\b': 'lựa chọn tuyệt vời'
+    r'\bhết\s*nước\s*chấm\b': 'rất ưng ý', r'\bchân\s*ái\b': 'lựa chọn tuyệt vời', r'\bsốc\s*thật\s*sự\b': 'bất ngờ ghê'
 }
 SOUTHERN_TO_HANOI = {r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bmua\s+liền\b': 'mua ngay'}
 
@@ -180,7 +176,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API
+# 4. GỌI GEMINI API 
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -252,21 +248,12 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2
                 break 
                 
     if last_exception:
-        raise Exception(f"Hệ thống đã thử quét mọi mô hình nhưng đều thất bại. Vui lòng thử lại. Lỗi: {str(last_exception)}")
+        raise Exception(f"Lỗi: Không tìm thấy mô hình tương thích hoặc máy chủ Google đang bảo trì. Chi tiết: {str(last_exception)}")
 
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Mẹo/kiến thức, KHÔNG bán hàng)" if is_viral else "TIKTOK SHOP (Bán hàng, chốt deal)"
-    
-    strat_inst = ""
-    if match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "tình huống", "hài hước", "đời thường"], angle):
-        strat_inst = "CRITICAL STRATEGY LOCK: Phần mở đầu (Hook) CỦA MỌI KỊCH BẢN CHỈ ĐƯỢC NÓI VỀ NỖI ĐAU HOẶC TÌNH HUỐNG KHơi GỢI TÒ MÒ. CẤM XUẤT HIỆN TÊN SẢN PHẨM Ở CÂU ĐẦU TIÊN."
-    elif match_kw(["bóc hộp", "unbox"], angle):
-        strat_inst = "CRITICAL STRATEGY LOCK: Mở đầu video phải có cảnh đập hộp, rọc hải quan, khoe sự hào hứng."
-        
-    focus_inst = "CRITICAL COPYWRITING RULE: CẤM DÙNG VĂN MẪU (như 'hết nước chấm', 'chân ái', 'giải pháp tối ưu'). DÙNG NGÔN TỪ TƯỢNG HÌNH, TỰ NHIÊN (nhẹ tênh, chắc nịch, trơn tuột, êm ru). BẮT BUỘC KẾT THÚC BẰNG CTA MỘC MẠC (Vd: ưng thì chốt góc trái). TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN Ở CUỐI."
-        
-    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n{strat_inst}\n{focus_inst}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
+    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
     pas_flow = "PAS Flow: Cảnh 1 nêu nỗi đau/tình huống -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
@@ -583,7 +570,7 @@ def detect_cosmetics(text_to_check: str) -> bool:
     return match_kw(["kem dưỡng", "son", "son môi", "dưỡng môi", "serum", "phấn", "tẩy trang", "mặt nạ", "sữa rửa mặt", "kem chống nắng", "toner", "lotion", "khử mùi", "lăn nách", "má hồng", "skincare", "makeup"], text_to_check)
 
 def detect_mom_baby(text_to_check: str) -> bool: 
-    return match_kw(["bỉm", "tã", "sữa bột", "đồ chơi trẻ em", "bình sữa", "ti giả", "xe đẩy", "nôi", "m mẹ và bé", "sơ sinh"], text_to_check)
+    return match_kw(["bỉm", "tã", "sữa bột", "đồ chơi trẻ em", "bình sữa", "ti giả", "xe đẩy", "nôi", "mẹ và bé", "sơ sinh"], text_to_check)
 
 def detect_mom_baby_hard_props(text_to_check: str) -> bool: 
     return match_kw(["bình sữa", "xe đẩy", "đồ chơi", "nôi"], text_to_check)
@@ -1024,7 +1011,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     random_style_seed = random.randint(1000, 9999)
     
-    # 🌟 BẢN 78.0: ÉP LỆNH CHỐT ĐƠN (SOFT CTA) VÀO TRỰC TIẾP CẢNH 4
+    # 🌟 BẢN 79.0: GHI ĐÈ LỆNH ĐẠO DIỄN - ÉP CẤU TRÚC: VẤN ĐỀ -> GỌI TÊN SP -> REVIEW -> CTA CHỦ NGỮ
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
@@ -1052,7 +1039,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
             {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
             {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Dưới 20 words)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (Dưới 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối. BẮT BUỘC KẾT THÚC BẰNG LỜI KÊU GỌI (CTA) MỘC MẠC (Vd: ưng thì chốt góc trái). TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN, CON SỐ." }}
+            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (Dưới 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
     """
@@ -1134,9 +1121,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
-        # 🌟 BẢN 77.0: KIỂM TRA ĐỘNG XEM CÂU THOẠI CÓ NHẮC TỚI SẢN PHẨM KHÔNG
+        # 🌟 BẢN 79.0: ĐỒNG BỘ ẢNH (KHÔNG SẢN PHẨM) VỚI CÂU THOẠI ĐÃ ĐƯỢC TỐI ƯU
         vo_lower = vo_text.lower()
-        prod_mentions = [st.session_state.get("content_analysis", {}).get("name", "").lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
+        prod_mentions = [raw_prod_name.lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
         has_prod_in_vo = any(kw in vo_lower for kw in prod_mentions)
         is_no_prod = scn.get("is_no_product_scene", False) and not has_prod_in_vo
         
@@ -1235,7 +1222,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
         else: scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         
-        # Xóa lệnh cấm bị rác nếu câu thoại có nhắc tới sản phẩm
         if not is_no_prod and "EMPTY HANDS, ZERO PRODUCT" in img_core:
             img_core = img_core.replace("EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME", "holding the product naturally").replace("[NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]", "")
         if not is_no_prod and "(ZERO PRODUCT)" in scn["vid_p"]:
@@ -1281,6 +1267,7 @@ def clone_script(script_id):
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
+    # 🌟 BẢN 79.0: ĐÚC KHUÔN CẤU TRÚC KỂ CHUYỆN CHO LỆNH NHÂN BẢN
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1292,9 +1279,9 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "[Tên biến thể 1 - Đậm chất chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. YÊU CẦU: Hook <15 từ. KẾT THÚC BẰNG CTA mộc mạc (chỉ giỏ hàng, TUYỆT ĐỐI KHÔNG BÁO GIÁ)." }},
-            {{ "id": {cur_len+2}, "title": "[Tên biến thể 2 - Đậm chất chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. YÊU CẦU: Hook <15 từ. KẾT THÚC BẰNG CTA mộc mạc (chỉ giỏ hàng, TUYỆT ĐỐI KHÔNG BÁO GIÁ)." }},
-            {{ "id": {cur_len+3}, "title": "[Tên biến thể 3 - Đậm chất chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. YÊU CẦU: Hook <15 từ. KẾT THÚC BẰNG CTA mộc mạc (chỉ giỏ hàng, TUYỆT ĐỐI KHÔNG BÁO GIÁ)." }}
+            {{ "id": {cur_len+1}, "title": "[Tên biến thể 1 - Đậm chất chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. CẤU TRÚC: Hook vấn đề (<15 từ) -> Gọi Tên Sản Phẩm -> Review công năng bằng Từ Tượng Hình -> KẾT THÚC BẰNG CTA có đủ chủ ngữ ('Các bác ưng thì...'), CẤM NHẮC GIÁ." }},
+            {{ "id": {cur_len+2}, "title": "[Tên biến thể 2 - Đậm chất chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. CẤU TRÚC: Hook vấn đề (<15 từ) -> Gọi Tên Sản Phẩm -> Review công năng bằng Từ Tượng Hình -> KẾT THÚC BẰNG CTA có đủ chủ ngữ ('Các bác ưng thì...'), CẤM NHẮC GIÁ." }},
+            {{ "id": {cur_len+3}, "title": "[Tên biến thể 3 - Đậm chất chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. CẤU TRÚC: Hook vấn đề (<15 từ) -> Gọi Tên Sản Phẩm -> Review công năng bằng Từ Tượng Hình -> KẾT THÚC BẰNG CTA có đủ chủ ngữ ('Các bác ưng thì...'), CẤM NHẮC GIÁ." }}
         ]
     }}
     """
@@ -1328,6 +1315,7 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     dna = st.session_state.get("content_analysis") or {}
     prod_context = f"Tên SP: {dna.get('name', '')} | Mô tả: {dna.get('vis_en', '')} | Màu/Đặc điểm: {dna.get('c_vi', '')} | Giá gốc: {dna.get('p_orig', '')} - Giá sale: {dna.get('p_sale', '')}"
     
+    # 🌟 BẢN 79.0: ĐÚC KHUÔN CẤU TRÚC KỂ CHUYỆN CHO LỆNH GỌI THÊM
     prompt = f"""
     SẢN PHẨM ĐANG QUẢNG CÁO (BẮT BUỘC BÁM SÁT THÔNG TIN NÀY):
     {prod_context}
@@ -1335,14 +1323,13 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("pro_s", "em")}' - Gọi '{dna.get("pro_a", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
     TẠO 3 KỊCH BẢN Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. 
     BẮT BUỘC PHẢI ÁP DỤNG TRIỆT ĐỂ CHIẾN LƯỢC '{active_format}' VÀO LỜI THOẠI.
-    (Nếu là chiến lược PAS/Nỗi đau/Tình huống -> BẮT BUỘC 2-3 câu đầu tiên CẤM nhắc đến tên sản phẩm).
     
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "[Tên kịch bản 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại 80-110 từ. Hook <15 từ. KẾT THÚC BẰNG CTA mộc mạc, TUYỆT ĐỐI KHÔNG BÁO GIÁ." }},
-            {{ "id": {cur_len+2}, "title": "[Tên kịch bản 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại 80-110 từ. Hook <15 từ. KẾT THÚC BẰNG CTA mộc mạc, TUYỆT ĐỐI KHÔNG BÁO GIÁ." }},
-            {{ "id": {cur_len+3}, "title": "[Tên kịch bản 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại 80-110 từ. Hook <15 từ. KẾT THÚC BẰNG CTA mộc mạc, TUYỆT ĐỐI KHÔNG BÁO GIÁ." }}
+            {{ "id": {cur_len+1}, "title": "[Tên kịch bản 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. CẤU TRÚC: Hook vấn đề (<15 từ) -> Gọi Tên Sản Phẩm -> Review công năng bằng Từ Tượng Hình -> KẾT THÚC BẰNG CTA có đủ chủ ngữ ('Các bác ưng thì...'), CẤM NHẮC GIÁ." }},
+            {{ "id": {cur_len+2}, "title": "[Tên kịch bản 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. CẤU TRÚC: Hook vấn đề (<15 từ) -> Gọi Tên Sản Phẩm -> Review công năng bằng Từ Tượng Hình -> KẾT THÚC BẰNG CTA có đủ chủ ngữ ('Các bác ưng thì...'), CẤM NHẮC GIÁ." }},
+            {{ "id": {cur_len+3}, "title": "[Tên kịch bản 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. CẤU TRÚC: Hook vấn đề (<15 từ) -> Gọi Tên Sản Phẩm -> Review công năng bằng Từ Tượng Hình -> KẾT THÚC BẰNG CTA có đủ chủ ngữ ('Các bác ưng thì...'), CẤM NHẮC GIÁ." }}
         ]
     }}
     """
@@ -1718,6 +1705,7 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu Hero SKU: '{args.get('hero_sku_override', '')}'" if args.get('hero_sku_override') else "Ưu tiên SKU icon 🔥/Hot. Chỉ chọn 1 MÀU DUY NHẤT để khóa!"
             skirt_note_rule = "ĐẶC BIỆT: Nếu quần dạng váy 1 ống/quần váy, BẮT BUỘC 'vis_en' là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)'!" if detect_single_tube_skirt(args.get("custom_note", "")) else ""
 
+            # 🌟 BẢN 79.0: GHI ĐÈ LỆNH TẠO JSON ĐỂ ÉP CẤU TRÚC: HOOK (VẤN ĐỀ) -> TÊN SP -> REVIEW -> CTA CHỦ NGỮ
             prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
             HERO SKU: {override_instruction}
@@ -1726,7 +1714,6 @@ if st.session_state.get("trigger_main_generation"):
             - KOC 100% LÀ NGƯỜI VIỆT NAM. Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior).
             
             TẠO 3 KỊCH BẢN ĐA DẠNG BÁM SÁT CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
-            (ĐẶC BIỆT LƯU Ý: CẤM XUẤT HIỆN TÊN SẢN PHẨM Ở CÂU ĐẦU TIÊN KHI LÀ CHIẾN LƯỢC PAS).
             
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON SIÊU NÉN:
             {{
@@ -1744,9 +1731,9 @@ if st.session_state.get("trigger_main_generation"):
                     "dim": "Kích thước"
                 }},
                 "scripts": [
-                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH (nhẹ tênh, chắc nịch). Hook siêu ngắn (<15 từ). BẮT BUỘC có câu KÊU GỌI (CTA) khéo léo ở cuối, TUYỆT ĐỐI KHÔNG BÁO GIÁ TIỀN..." }},
-                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. Hook siêu ngắn (<15 từ). BẮT BUỘC có câu KÊU GỌI (CTA) khéo léo ở cuối, TUYỆT ĐỐI KHÔNG BÁO GIÁ TIỀN..." }},
-                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. Hook siêu ngắn (<15 từ). BẮT BUỘC có câu KÊU GỌI (CTA) khéo léo ở cuối, TUYỆT ĐỐI KHÔNG BÁO GIÁ TIỀN..." }}
+                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤU TRÚC: Hook Vấn đề -> Gọi ngay Tên SP -> Review Tượng hình -> CTA có Chủ ngữ..." }},
+                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤU TRÚC: Hook Vấn đề -> Gọi ngay Tên SP -> Review Tượng hình -> CTA có Chủ ngữ..." }},
+                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤU TRÚC: Hook Vấn đề -> Gọi ngay Tên SP -> Review Tượng hình -> CTA có Chủ ngữ..." }}
                 ]
             }}
             """
