@@ -106,19 +106,19 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
 
-# 🌟 BẢN 76.0: CẬP NHẬT LÕI TỪ VỰNG TƯỢNG HÌNH VÀ CẤM VĂN MẪU
+# 🌟 BẢN 77.0: LÕI COPYWRITING THÔI MIÊN, CHỐNG VĂN MẪU SÁO RỖNG
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. KHUÔN MẶT VÀ BỐI CẢNH TẠO MỚI HOÀN TOÀN, TUYỆT ĐỐI KHÔNG sao chép từ ảnh gốc.
 2. TỐI ƯU COPYWRITING CẢM XÚC (CRITICAL): 
-   - CẤM DÙNG VĂN MẪU: Tuyệt đối không dùng các từ sáo rỗng như "Nhờ có sản phẩm này", "Giải pháp tối ưu", "Mang lại công năng vượt trội", "Chân ái". 
-   - HOOK NỖI ĐAU: Mở đầu BẮT BUỘC gãi trúng nỗi đau thực tế (Vd: "Đi chơi một mình mà ngại nhờ người lạ chụp hộ...").
-   - TỪ VỰNG TƯỢNG HÌNH: Bắt buộc dùng từ ngữ miêu tả xúc giác đời thực (nhẹ tênh, chắc nịch, trơn tuột, êm ru, lọt thỏm, xốp tan, đầm tay).
+   - CẤM VĂN MẪU LỐ BỊCH: Tuyệt đối không dùng các từ sáo rỗng như "Hết nước chấm", "Chân ái", "Siêu phẩm", "Giải pháp tối ưu", "Mang lại công năng". 
+   - HOOK THÔI MIÊN TÒ MÒ: Mở đầu BẮT BUỘC gãi trúng nỗi đau hoặc khơi gợi tò mò mạnh (Vd: "Bác nào hay bị... thì xem ngay", "Sai lầm lớn nhất là...", "Tôi hối hận vì không biết cái này sớm hơn"). Câu Hook siêu ngắn dưới 15 từ.
+   - VĂN PHONG TÂM SỰ: Nói dứt khoát, đời thường như bạn thân. Dùng TỪ VỰNG TƯỢNG HÌNH (êm ru, chắc nịch, trơn tuột, xốp tan, đầm tay, lọt thỏm).
 3. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
    - Cảnh 2 & 3 (Test & Sử Dụng): 
-     + QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test co giãn.
+     + QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test.
      + KỆ/BÀN/HỘP NỘI THẤT: BẮT BUỘC ĐẶT TRÊN BÀN/SÀN. KOC xếp đồ đạc. CẤM CẦM LƠ LỬNG.
-     + SẢN PHẨM CẦM TAY KHÁC: TEST MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO. CẤM ĐỨNG IM.
+     + SẢN PHẨM KHÁC: Cầm trên tay, TEST MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO.
 4. LÕI THOẠI CHUẨN BẮC BỘ:
    - Xưng 'em/mình' - Gọi 'các bác/chị em'. CẤM từ miền Nam ("mấy bà", "rinh", "bé"). Cấm "chốt ngay dưới giỏ hàng".
 """
@@ -126,7 +126,9 @@ COMPACT_CORE_RULES = """
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
 POLICY_REPLACEMENTS = {
     r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', 
-    r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale'
+    r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale',
+    # Cắt lọc thêm các từ sáo rỗng
+    r'\bhết\s*nước\s*chấm\b': 'rất ưng ý', r'\bchân\s*ái\b': 'lựa chọn tuyệt vời'
 }
 SOUTHERN_TO_HANOI = {r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bmua\s+liền\b': 'mua ngay'}
 
@@ -258,16 +260,16 @@ def get_sys_inst_outlines(mode, angle, custom_note=""):
     
     strat_inst = ""
     if match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "tình huống", "hài hước", "đời thường"], angle):
-        strat_inst = "CRITICAL STRATEGY LOCK: Phần mở đầu (Hook) CỦA MỌI KỊCH BẢN CHỈ ĐƯỢC NÓI VỀ NỖI ĐAU HOẶC TÌNH HUỐNG (CỰC NGẮN DƯỚI 15 TỪ). TUYỆT ĐỐI KHÔNG XUẤT HIỆN SẢN PHẨM Ở CÂU ĐẦU TIÊN."
+        strat_inst = "CRITICAL STRATEGY LOCK: Phần mở đầu (Hook) CỦA MỌI KỊCH BẢN CHỈ ĐƯỢC NÓI VỀ NỖI ĐAU HOẶC TÌNH HUỐNG KHơi GỢI TÒ MÒ. CẤM XUẤT HIỆN TÊN SẢN PHẨM Ở CÂU ĐẦU TIÊN."
     elif match_kw(["bóc hộp", "unbox"], angle):
-        strat_inst = "CRITICAL STRATEGY LOCK: Mở đầu video phải có cảnh đập hộp, rọc hải quan, khoe sự hào hứng (SIÊU NGẮN GỌN)."
+        strat_inst = "CRITICAL STRATEGY LOCK: Mở đầu video phải có cảnh đập hộp, rọc hải quan, khoe sự hào hứng."
         
-    focus_inst = "CRITICAL COPYWRITING RULE: DÙNG NGÔN TỪ TƯỢNG HÌNH, TỰ NHIÊN (nhẹ tênh, chắc nịch, trơn tuột, êm ru). KHÔNG dùng văn mẫu sáo rỗng. Phải dành 80% độ dài kịch bản để ĐI THẲNG VÀO REVIEW CÔNG NĂNG chi tiết."
+    focus_inst = "CRITICAL COPYWRITING RULE: CẤM DÙNG VĂN MẪU (như 'hết nước chấm', 'chân ái', 'giải pháp tối ưu'). DÙNG NGÔN TỪ TƯỢNG HÌNH, TỰ NHIÊN (nhẹ tênh, chắc nịch, trơn tuột, êm ru). Phải dành 80% độ dài kịch bản để ĐI THẲNG VÀO REVIEW CÔNG NĂNG chi tiết."
         
     return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n{strat_inst}\n{focus_inst}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
-    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau rõ nét qua hình thể -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
+    pas_flow = "PAS Flow: Cảnh 1 nêu nỗi đau/tình huống -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
     return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 # ==============================================================================
@@ -1011,9 +1013,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     action_scene_1, action_scene_2, action_scene_3, action_scene_4 = get_action_templates_by_industry(clean_prod_en, check_str, is_fashion_wearable, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, is_surface_furniture)
     
-    is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
+    # 🌟 BẢN 77.0: ĐỒNG BỘ ẢNH/THOẠI - CHỈ CẨN SP NẾU THOẠI KHÔNG NHẮC ĐẾN
+    full_vo_lower = full_vo_script.lower()
+    prod_mentions = [raw_prod_name.lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
+    has_prod_in_vo = any(kw in full_vo_lower for kw in prod_mentions)
+    
+    is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable and not has_prod_in_vo)
+
     if is_pas_scn1_no_prod:
-        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. If it mentions pain, explicitly describe the KOC vigorously rubbing or massaging that EXACT body part with a clear pained facial expression. ZERO FACE TOUCHING. EMPTY HANDS, ZERO PRODUCT IN FRAME."
+        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. Explicitly describe the KOC visually experiencing that EXACT problem. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
@@ -1027,29 +1035,29 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     MÔ TẢ EN: {clean_prod_en}. 
     Kịch bản: '{fixed_title}' | Bối cảnh gốc: '{fixed_setting_base}'
     KOC: {detected_demographic_en} | {stylist_vibe_text} 
-    (STYLE SEED: #{random_style_seed} - ÉP BUỘC TẠO RA TRANG PHỤC KHÁC BIỆT HOÀN TOÀN SO VỚI CÁC LẦN TRƯỚC, KHÔNG ĐƯỢC DÙNG LẠI QUẦN ÁO CŨ)
+    (STYLE SEED: #{random_style_seed} - ÉP BUỘC TẠO RA TRANG PHỤC KHÁC BIỆT HOÀN TOÀN SO VỚI CÁC LẦN TRƯỚC)
     
     THOẠI GỐC: "{full_vo_script}"
     
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong thoại Cảnh 1. CẤM tự ý bịa thêm người nếu thoại không nhắc.
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong thoại. CẤM bịa thêm người.
        - Cảnh 2 & 3: 
-         + NẾU SẢN PHẨM LÀ QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test vải.
-         + NẾU LÀ ĐỒ NỘI THẤT/ĐỂ BÀN (Kệ, hộp, bàn, tủ): BẮT BUỘC ĐẶT TRÊN BÀN/SÀN (placed firmly on desk/floor). KOC đứng/ngồi cạnh xếp đồ vào kệ. CẤM CẦM LƠ LỬNG.
-         + NẾU LÀ SẢN PHẨM KHÁC: BẮT BUỘC cầm trên tay test mạnh mẽ/bạo lực.
+         + QUẦN ÁO: MẶC LÊN NGƯỜI (worn on body) để test vải.
+         + KỆ/HỘP/BÀN: ĐẶT TRÊN BÀN/SÀN (placed firmly on desk/floor). KOC xếp đồ. CẤM CẦM LƠ LỬNG.
+         + SẢN PHẨM KHÁC: Cầm trên tay test mạnh mẽ/bạo lực.
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
         "set_en": "Master setting EN (e.g., 'stylish coffee shop').",
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
-        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
+        "wardrobe_en": "CRITICAL: MÔ TẢ SET ĐỒ MỚI LẠ, ĐỘC BẢN. SIÊU CHI TIẾT.",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Kệ/Tủ/Hộp thì phải ĐẶT LÊN BÀN/SÀN KHÔNG CẦM. Đồ khác thì cầm trên tay test mạnh mẽ)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Kệ/Tủ/Hộp thì sử dụng ở trên bàn. Đồ khác thì sử dụng thực tế tốc độ cao)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
+            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Dưới 20 words)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (Dưới 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
     """
@@ -1131,7 +1139,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
-        is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
+        # Kiểm tra lại một lần nữa để chắc chắn Lời Thoại và Cảnh đồng bộ
+        prod_mentions = [raw_prod_name.lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
+        has_prod_in_vo = any(kw in vo_text.lower() for kw in prod_mentions)
+        is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable and not has_prod_in_vo)
         
         cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str, is_surface_furniture)
         
@@ -1709,10 +1720,9 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior (Mặc định chọn 'adult'. Chỉ chọn 'child/senior' nếu SP đặc thù)).
+            - KOC 100% LÀ NGƯỜI VIỆT NAM. Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior).
             
             TẠO 3 KỊCH BẢN ĐA DẠNG BÁM SÁT CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
-            (ĐẶC BIỆT LƯU Ý: Nếu chiến lược là PAS/Nỗi Đau/Tình Huống, phần mở đầu hook CẤM nhắc đến sản phẩm, chỉ diễn tả tình huống/nỗi đau).
             
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON SIÊU NÉN:
             {{
@@ -1724,15 +1734,15 @@ if st.session_state.get("trigger_main_generation"):
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
-                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue', 'glossy dark navy'). NO generic colors.",
-                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
+                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue'). NO generic colors.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (max 25 words). CẤM nhắc đến con người, bối cảnh ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
                 "scripts": [
-                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH (nhẹ tênh, chắc nịch). BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
-                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
-                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. BẮT BUỘC: Hook siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }}
+                    {{ "id": 1, "title": "[Tên phong cách 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH (nhẹ tênh, chắc nịch). BẮT BUỘC: Hook khơi gợi siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
+                    {{ "id": 2, "title": "[Tên phong cách 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. BẮT BUỘC: Hook khơi gợi siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }},
+                    {{ "id": 3, "title": "[Tên phong cách 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤM VĂN MẪU. DÙNG TỪ TƯỢNG HÌNH. BẮT BUỘC: Hook khơi gợi siêu ngắn (<15 từ). Tập trung 80% vào review công năng/chất liệu chi tiết..." }}
                 ]
             }}
             """
@@ -1904,20 +1914,35 @@ if all_sc:
             
             c_p1, c_p2 = st.columns(2)
             with c_p1:
-                is_no_prod = scn.get("is_no_product_scene", False)
+                # 🌟 BẢN 77.0: KIỂM TRA ĐỘNG XEM CÂU THOẠI CÓ NHẮC TỚI SẢN PHẨM KHÔNG
+                vo_lower = vo_text.lower()
+                prod_mentions = [st.session_state.get("content_analysis", {}).get("name", "").lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
+                has_prod_in_vo = any(kw in vo_lower for kw in prod_mentions)
+                is_no_prod = scn.get("is_no_product_scene", False) and not has_prod_in_vo
+                
                 if is_no_prod:
                     st.markdown("<div class='no-product-warning'>🚨 LƯU Ý: Phân cảnh này KHÔNG CÓ SẢN PHẨM. Bạn KHÔNG CẦN dùng ảnh tham chiếu sản phẩm khi tạo ảnh!</div>", unsafe_allow_html=True)
                     st.markdown("**🖼 Prompt Ảnh Tinh Gọn (KHÔNG SẢN PHẨM):**")
                 else:
                     st.markdown("**🖼 Prompt Ảnh Tinh Gọn (Midjourney / Flux):**")
-                st.code(img_p := scn.get('img_p', ''), language="text")
+                
+                # Sửa prompt nếu AI chót gắn cờ no_prod nhưng câu thoại lại có sản phẩm
+                img_p = scn.get('img_p', '')
+                if not is_no_prod and "EMPTY HANDS, ZERO PRODUCT" in img_p:
+                    # Gỡ lệnh cấm sản phẩm nếu có
+                    img_p = img_p.replace("EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME", "holding the product naturally").replace("[NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]", "")
+                
+                st.code(img_p, language="text")
                 safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
                 if not is_no_prod:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
                 st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
-                st.code(vid_p := scn.get('vid_p', ''), language="text")
+                vid_p = scn.get('vid_p', '')
+                if not is_no_prod and "(ZERO PRODUCT)" in vid_p:
+                    vid_p = vid_p.replace("(ZERO PRODUCT)", "")
+                st.code(vid_p, language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
             with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx}", expanded=False):
