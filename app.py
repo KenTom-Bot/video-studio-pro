@@ -201,9 +201,30 @@ def repair_and_parse_json(text_content: str):
     except: pass
     raise Exception("Lỗi khi đọc kết quả từ AI. Vui lòng thử lại.")
 
-def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=4096):
+def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2500):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
-    models_to_try = ["gemini-1.5-flash", "gemini-1.5-flash"]
+    
+    # 🌟 LÕI RADAR TỰ ĐỘNG QUÉT MÔ HÌNH TỪ API KEY (CHỐNG LỖI 404 VĨNH VIỄN)
+    try:
+        available_models = []
+        for m in client.models.list():
+            m_name = m.name.replace('models/', '')
+            # Lọc lấy các mô hình cho phép GenerateContent
+            if hasattr(m, 'supported_actions'):
+                if 'generateContent' in m.supported_actions:
+                    available_models.append(m_name)
+            else:
+                available_models.append(m_name)
+        
+        # Luôn ưu tiên dùng các dòng flash vì tốc độ cao và rẻ
+        flash_models = [m for m in available_models if 'flash' in m.lower()]
+        models_to_try = flash_models if flash_models else available_models
+        
+        # Dự phòng nếu danh sách trả về bị rỗng
+        if not models_to_try:
+            models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro"]
+    except Exception:
+        models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro"]
     last_exception = None
     for model_name in models_to_try:
         for attempt in range(3):
