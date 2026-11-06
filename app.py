@@ -109,58 +109,24 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐỒNG NHẤT NHÂN DẠNG & BỐI CẢNH: KOC 100% là người Việt Nam. KHUÔN MẶT VÀ BỐI CẢNH TẠO MỚI HOÀN TOÀN, TUYỆT ĐỐI KHÔNG sao chép từ ảnh gốc.
-2. TỐI ƯU COPYWRITING TRẢI NGHIỆM ĐỜI THỰC (CRITICAL):
-   - CẤM VĂN MẪU: Cấm dùng "Hết nước chấm", "Chân ái", "Siêu phẩm", "Giải pháp tối ưu", "Mang lại công năng".
-   - HOOK GỌI ĐÍCH DANH KHÁCH HÀNG + NỖI ĐAU: Mở đầu BẮT BUỘC gọi tệp khách hàng kèm nỗi đau/tình huống đời thường khơi gợi đồng cảm (Vd: "Bác nào ngủ dậy mà vẫn đau mỏi cổ vai gáy thì...", "Chị em nào ngày rửa bát 3 lần sợ hỏng da tay thì..."). Hook siêu ngắn dưới 15 từ. CẤM NHẮC TÊN SP TRONG CÂU HOOK.
-   - XƯỚNG TÊN SẢN PHẨM: Bắt buộc gọi tên sản phẩm ra ngay ở câu thứ 2, sau câu Hook.
-   - VĂN PHONG TÂM SỰ ĐỜI THƯỜNG: Dùng TỪ VỰNG TƯỢNG HÌNH (êm ru, chắc nịch, trơn tuột, lọt thỏm, xốp tan, đầm tay). Không đọc thông số trả bài.
-   - CTA ĐA DẠNG CÓ CHỦ NGỮ: Câu chốt bắt buộc có đại từ (anh/chị/các bác) + hành động mộc mạc, đa dạng (Vd: "Các bác ưng bụng thì nhấp góc trái nhé", "Thích thì múc ngay đi anh em ơi", "Chị em tham khảo link bên dưới nha"). TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN, KHUYẾN MÃI.
-3. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO:
-   - Cảnh 2 & 3: QUẦN ÁO MẶC LÊN NGƯỜI; KỆ/HỘP/BÀN ĐẶT TRÊN MẶT PHẲNG VÀ XẾP ĐỒ; SẢN PHẨM KHÁC CẦM TRÊN TAY TEST MẠNH MẼ.
-4. LÕI THOẠI CHUẨN BẮC BỘ: Xưng 'em/mình' - Gọi 'các bác/chị em/anh chị em'. CẤM từ miền Nam.
+2. TRỰC QUAN HÓA THỰC CHIẾN CƯỜNG ĐỘ CAO (CRITICAL):
+   - Cảnh 1 (Mở đầu): THOẠI NHẮC ĐẾN AI/BỐI CẢNH NÀO THÌ NGƯỜI/CẢNH ĐÓ XUẤT HIỆN Ở TIỀN CẢNH.
+   - Cảnh 2 & 3 (Test & Sử Dụng): 
+     + NẾU LÀ QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test co giãn.
+     + NẾU LÀ ĐỒ NỘI THẤT/KỆ/BÀN/HỘP: BẮT BUỘC ĐẶT TRÊN BÀN/SÀN. KOC đứng/ngồi cạnh sắp xếp đồ đạc. CẤM CẦM LƠ LỬNG TRÊN TAY.
+     + NẾU LÀ SẢN PHẨM CẦM TAY KHÁC: Cầm trên tay, TEST MẠNH MẼ (bẻ, đập, chà xát) và SỬ DỤNG TỐC ĐỘ CAO. CẤM ĐỨNG IM.
+3. QUY TẮC BÀN TAY & CHỐNG CHE KHUẤT:
+   - CẤM KOC SỜ LÊN MẶT (Trừ mỹ phẩm). Thao tác dứt khoát, giữ góc nhìn ổn định.
+4. LÕI THOẠI KOC THỰC CHIẾN, CHUẨN BẮC BỘ:
+   - Xưng 'em/mình' - Gọi 'các bác/chị em'. CẤM từ miền Nam ("mấy bà", "rinh", "bé"). Cấm "chốt ngay dưới giỏ hàng".
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top', r'\bbrassieres?\b': 'seamless support garment', r'\b(?:lace\s+|cotton\s+|seamless\s+)?panties\b': 'seamless breathable fabric layer', r'\bunderwears?\b': 'soft stretchable fabric base', r'\bbriefs?\b': 'seamless textile base', r'\bthongs?\b': 'seamless stretch fabric', r'\blingerie\b': 'premium textile item', r'\bbikinis?\b': 'resort stretch wear', r'\bcleavage\b': 'modest neckline', r'\bsexy\b': 'elegant', r'\bcrotch\b': 'fabric gusset'}
 POLICY_REPLACEMENTS = {
     r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm', r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả', r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\btrợ\s*giá\b': 'ưu đãi cực hời', 
-    r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale',
-    r'\bhết\s*nước\s*chấm\b': 'rất ưng ý', r'\bchân\s*ái\b': 'lựa chọn tuyệt vời', r'\bsốc\s*thật\s*sự\b': 'bất ngờ ghê'
+    r'\bphiên\s*live\b': 'trong video này', r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'video này', r'\bđang\s*live\b': 'đang sale'
 }
-
-SOUTHERN_TO_HANOI = {
-    r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', 
-    r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', 
-    r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', 
-    r'\b(chiếc|cái|mặc|mua|thử)\s+đầm\b': r'\1 váy',
-    r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', 
-    r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', 
-    r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', 
-    r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', 
-    r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', 
-    r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', 
-    r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', 
-    r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', 
-    r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', 
-    r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', 
-    r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', 
-    r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', 
-    r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', 
-    r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', 
-    r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', 
-    r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', 
-    r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', 
-    r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', 
-    r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', 
-    r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', 
-    r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', 
-    r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', 
-    r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', 
-    r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', 
-    r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', 
-    r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', 
-    r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', 
-    r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', 
-    r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bmua\s+liền\b': 'mua ngay'}
+SOUTHERN_TO_HANOI = {r'\blụa\s+premium\s+everyday\b': 'lụa cao cấp', r'\blụa\s+lustrous\s+satin(?:\s+silk)?\b': 'lụa cao cấp', r'\bmềm\s*rủ\b': 'mềm rũ', r'\bsiêu\s*rủ\b': 'siêu rũ', r'\bđộ\s*rủ\b': 'độ rũ', r'\brủ\s*xuống\b': 'rũ xuống', r'\báp\s*mã\b': 'nay giảm', r'\báp\s*voucher\b': 'nay giảm', r'\b1\s*trăm\s*(?:tư|tứ|bốn)?\s*mươi\b': 'một trăm bốn mươi', r'\b1\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\s*mươi\b': 'một trăm bốn mươi', r'\bmột\s*trăm\s*(?:tư|tứ)\b': 'một trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\s*mươi\b': 'trăm bốn mươi', r'\btrăm\s*(?:tư|tứ)\b': 'trăm bốn mươi', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bnghìn\s+(?:tư|tứ)\b': 'nghìn bốn trăm', r'\b1\s+trăm\b': 'một trăm', r'\b1\s+nghìn\b': 'một nghìn', r'\b1\s+triệu\b': 'một triệu', r'\b140\s*(?:k|nghìn|ngàn)\b': 'một trăm bốn mươi nghìn', r'\b140\b': 'một trăm bốn mươi', r'\b14\b': 'mười bốn', r'\b24\b': 'hai mươi bốn', r'\b34\b': 'ba mươi bốn', r'\b40\b': 'bốn mươi', r'\b44\b': 'bốn mươi bốn', r'\b4\b': 'bốn', r'\bmười\s+(?:tư|tứ)\b': 'mười bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\b(?:tư|tứ)\s+mươi\b': 'bốn mươi', r'\b(\w+)\s+mươi\s+(?:tư|tứ)\b': r'\1 mươi bốn', r'\bnăm\s+(?:tư|tứ)\b': 'năm mươi bốn', r'\bsáu\s+(?:tư|tứ)\b': 'sáu mươi bốn', r'\bbảy\s+(?:tư|tứ)\b': 'bảy mươi bốn', r'\btám\s+(?:tư|tứ)\b': 'tám mươi bốn', r'\bchín\s+(?:tư|tứ)\b': 'chín mươi bốn', r'\bhai\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s+(?:tư|tứ)\b': 'ba mươi bốn', r'\bhăm\s+(?:tư|tứ)\b': 'hai mươi bốn', r'\bba\s*rọi\b': 'ba chỉ', r'\bchiên\s*(?:giòn|phồng|ngập\s*dầu)?\b': 'rán giòn', r'\bchiên\b': 'rán', r'\báo\s*(?:đều|lớp\s*sốt|sốt)\b': 'ngấm đẫm sốt', r'\bcay\s*the\b': 'cay tê', r'\bthe\s*the\b': 'tê tê', r'\bsánh\s*dẻo\b': 'sền sệt', r'\bkẹo\s*lại\b': 'sệt lại', r'\bđậu\s*phộng\b': 'hạt lạc', r'\btrái\s*cây\s*dầm\b': 'hoa quả dầm', r'\btrái\s*cây\b': 'hoa quả', r'\brỗng\s*ruột\b': 'xốp tan', r'\bcực\s*kỳ\s*vừa\s*vặn\b': 'vừa miệng dã man', r'\bđã\s*cái\s*nư\b': 'đã miệng cực kỳ', r'\bxả\s*sơ(?:\s*qua)?\b': 'tráng qua', r'\bxả\s*nước\b': 'tráng nước', r'\brải\s+vào\b': 'xếp vào', r'\brải\b(?=\s+[a-zà-ỹ]+)': 'cho', r'\brửa\s*chén\b': 'rửa bát', r'\bnước\s*rửa\s*chén\b': 'nước rửa bát', r'\bly\s+nước\b': 'cốc nước', r'\bly\s+trà\b': 'cốc trà', r'\bly\s+đá\b': 'cốc đá', r'\bly\b(?=\s+(?:uống|nước|thủy tinh|nhựa))': 'cốc', r'\bmuỗng\b': 'thìa', r'\bbàn\s*ủi\b': 'bàn là', r'\bbao\s*rác\b': 'túi rác', r'\bchổi\s*lông\s*gà\b': 'chổi phất trần', r'\bkhít\s+tai\s+êm\s+ái\b': 'vừa khít mà êm ru', r'\bêm\s+ái\b': 'êm ru', r'\bvỏ\s*ngoài\b': 'bên ngoài', r'\bnét\s+căng\b': 'rõ mồn một', r'\bpin\s*trâu\b': 'pin dùng trâu bò', r'\bsạc\s*lẹ\b': 'sạc nhanh', r'\bthấm\s*lẹ\b': 'thấm nhanh', r'\bbết\s*rít\b': 'nhờn dính', r'\bđầm\b': 'váy', r'\báo\s*thun\b': 'áo phông', r'\bmang\s*giày\b': 'đi giày', r'\bmang\s*dép\b': 'đi dép', r'\bdây\s*nịt\b': 'thắt lưng', r'\bbóp\s*tiền\b': 'ví tiền', r'\bngàn\b': 'nghìn', r'\bxài\b': 'dùng', r'\bgiùm\b': 'hộ', r'\bdùm\b': 'hộ', r'\btui\b': 'tôi', r'\bhén\b': 'nhỉ', r'\bnghen\b': 'nhé', r'\bhen\b': 'nhé', r'\brùi\b': 'rồi', r'\bmần\b': 'làm', r'\bkiếng\b': 'kính', r'\bhổng\b': 'không', r'\bthiệt\b': 'thật', r'\bcưng\s+xỉu\b': 'yêu cực kỳ', r'\bmua\s+liền\b': 'mua ngay'}
 
 # ==============================================================================
 # 3. KẾT NỐI API & DB
@@ -210,7 +176,7 @@ is_system_busy = (
 )
 
 # ==============================================================================
-# 4. GỌI GEMINI API
+# 4. GỌI GEMINI API - 🌟 BẢN 71.0: LÕI RADAR AUTO-SCAN MODEL CHỐNG LỖI 404
 # ==============================================================================
 def repair_and_parse_json(text_content: str):
     if not text_content: raise Exception("AI không phản hồi nội dung. Vui lòng bấm tạo lại.")
@@ -239,19 +205,23 @@ def repair_and_parse_json(text_content: str):
 def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2500):
     if not client: raise Exception("Chưa cấu hình GEMINI_API_KEY trong Streamlit Secrets.")
     
+    # 🌟 LÕI RADAR TỰ ĐỘNG QUÉT MÔ HÌNH TỪ API KEY (CHỐNG LỖI 404 VĨNH VIỄN)
     try:
         available_models = []
         for m in client.models.list():
             m_name = m.name.replace('models/', '')
+            # Lọc lấy các mô hình cho phép GenerateContent
             if hasattr(m, 'supported_actions'):
                 if 'generateContent' in m.supported_actions:
                     available_models.append(m_name)
             else:
                 available_models.append(m_name)
         
+        # Luôn ưu tiên dùng các dòng flash vì tốc độ cao và rẻ
         flash_models = [m for m in available_models if 'flash' in m.lower()]
         models_to_try = flash_models if flash_models else available_models
         
+        # Dự phòng nếu danh sách trả về bị rỗng
         if not models_to_try:
             models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro"]
     except Exception:
@@ -274,32 +244,25 @@ def call_gemini(contents, sys_inst="Bạn là AI hỗ trợ JSON.", max_tokens=2
             except Exception as e:
                 last_exception = e
                 err_str = str(e).lower()
+                # Bỏ qua ngay lập tức nếu API Key không hỗ trợ model này (404 Not Found)
                 if "404" in err_str or "not_found" in err_str or "not found" in err_str: 
                     break 
+                # Chờ 2s và thử lại nếu máy chủ quá tải (Limit/Quota)
                 if "503" in err_str or "unavailable" in err_str or "429" in err_str or "exhausted" in err_str:
                     time.sleep((attempt + 1) * 2.0)
                     continue
-                break 
+                break # Nếu gặp lỗi định dạng JSON, cũng chuyển sang model khác
                 
     if last_exception:
-        raise Exception(f"Hệ thống đã thử quét mọi mô hình nhưng đều thất bại. Vui lòng thử lại. Lỗi: {str(last_exception)}")
+        raise Exception(f"Lỗi: Không tìm thấy mô hình tương thích hoặc máy chủ Google đang bảo trì. Chi tiết: {str(last_exception)}")
 
 def get_sys_inst_outlines(mode, angle, custom_note=""):
     is_viral = ("Viral" in mode)
     goal = "VIRAL (Mẹo/kiến thức, KHÔNG bán hàng)" if is_viral else "TIKTOK SHOP (Bán hàng, chốt deal)"
-    
-    strat_inst = ""
-    if match_kw(["nỗi đau", "pas", "đời sống", "lifestyle", "tình huống", "hài hước", "đời thường"], angle):
-        strat_inst = "CRITICAL STRATEGY LOCK: Phần mở đầu (Hook) CỦA MỌI KỊCH BẢN CHỈ ĐƯỢC GỌI ĐÍCH DANH TỆP KHÁCH HÀNG VÀ NỖI ĐAU (Vd: 'Bác nào hay bị... thì...', 'Chị em nào lười... thì xem ngay'). CẤM XUẤT HIỆN TÊN SẢN PHẨM Ở CÂU ĐẦU TIÊN."
-    elif match_kw(["bóc hộp", "unbox"], angle):
-        strat_inst = "CRITICAL STRATEGY LOCK: Mở đầu video phải có cảnh đập hộp, khoe sự hào hứng."
-        
-    focus_inst = "CRITICAL COPYWRITING RULE: CẤM DÙNG VĂN MẪU. DÙNG NGÔN TỪ TƯỢNG HÌNH ĐỜI THƯỜNG. BẮT BUỘC KẾT THÚC BẰNG CTA ĐA DẠNG, GẦN GŨI CÓ CHỦ NGỮ. TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN Ở CUỐI."
-        
-    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n{strat_inst}\n{focus_inst}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
+    return f"ĐẠO DIỄN TIKTOK PRO | MỤC TIÊU: {goal} | CHIẾN LƯỢC: {angle}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 def get_sys_inst_details(mode, custom_note="", self_pronoun="em", audience_pronoun="các chị em", is_pas_story=False):
-    pas_flow = "PAS Flow: Cảnh 1 nêu nỗi đau/tình huống -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
+    pas_flow = "PAS Flow: Cảnh 1 tại nhà nêu nỗi đau rõ nét qua hình thể -> Cảnh 2,3,4 KOC review chi tiết." if is_pas_story else "Direct Flow: SP làm TRỌNG TÂM xuyên suốt 4 cảnh."
     return f"ĐẠO DIỄN TIKTOK PRO | Xưng '{self_pronoun}' - Gọi '{audience_pronoun}' | {pas_flow}\n🛑 GHI CHÚ: {custom_note}\n{COMPACT_CORE_RULES}"
 
 # ==============================================================================
@@ -373,7 +336,7 @@ def count_words(text: str) -> int: return len(re.findall(r'\b\w+\b', text)) if t
 def calculate_speech_duration(text: str, is_tiktok_shop: bool = True) -> float:
     words = count_words(text)
     commas, periods = text.count(',') + text.count(';'), text.count('.') + text.count('!') + text.count('?')
-    return round((words / (5.2 if is_tiktok_shop else 4.5)) + (commas * 0.1) + (periods * 0.2), 1)
+    return round((words / (4.8 if is_tiktok_shop else 4.0)) + (commas * (0.08 if is_tiktok_shop else 0.12)) + (periods * (0.12 if is_tiktok_shop else 0.20)), 1)
 
 def compress_image_bytes(uploaded_file, max_dimension=768, quality=75):
     try:
@@ -905,39 +868,35 @@ def build_multi_industry_stylist_rules(product_en, hero_color, setting_vi, gende
     is_single_skirt = detect_single_tube_skirt(s_lower)
     is_evening_fashion = match_kw(["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"], s_lower)
     
-    hair_female = random.choice(["Hair neatly tied up", "Hair down naturally"])
-    hair_male = "Neat short hair"
-    hair_str = hair_female if gender == "female" else hair_male
-
-    if intimate_type == "underwear_bra": vibes = [f"Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional ({hair_str})", f"Wearing a chic modest long-sleeve turtleneck sweater, fully covered, professional review style ({hair_str})"]
-    elif intimate_type == "camisole": vibes = [f"Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage ({hair_str})", f"Wearing a modest long-sleeve blouse buttoned to the top, professional ({hair_str})"]
+    if intimate_type == "underwear_bra": vibes = ["Wearing a highly modest, fully-covered oversized long-sleeve knit sweater, zero skin exposure, cozy and highly professional", "Wearing a chic modest long-sleeve turtleneck sweater, fully covered, professional review style", "Wearing a loose comfortable long-sleeve button-up cotton shirt completely buttoned, zero skin exposure"]
+    elif intimate_type == "camisole": vibes = ["Wearing a completely buttoned-up long-sleeve cardigan, fully covering the upper body, zero cleavage", "Wearing a modest long-sleeve blouse buttoned to the top, professional", "Wearing a cozy oversized long-sleeve hoodie, fully covered casual style"]
     elif is_fashion:
         if match_kw(["chân váy", "quần", "skirt", "pants", "jeans", "shorts"], s_lower):
-            if is_beach_resort: vibes = [f"Beach/Resort ({hair_str}, Top: fitted sleeveless silk camisole TUCKED IN, strappy flat sandals)"]
-            elif is_office: vibes = [f"Professional Office ({hair_str}, Top: tailored long-sleeve silk blouse TUCKED IN, pointed-toe leather high heels)"]
-            else: vibes = [f"Trendy Streetwear ({hair_str}, Top: fitted short-sleeve knit round-neck t-shirt UNTUCKED, clean white sneakers)"]
+            if is_beach_resort: vibes = ["Beach/Resort (Top: fitted sleeveless silk camisole TUCKED IN, strappy flat sandals)", "Beach/Resort (Top: crochet halter top, woven beach sandals)", "Beach/Resort (Top: off-shoulder linen blouse, bare feet)"]
+            elif is_office: vibes = ["Professional Office (Top: tailored long-sleeve silk blouse TUCKED IN, pointed-toe leather high heels)", "Professional Office (Top: crisp white long-sleeve button-down shirt TUCKED IN, leather loafers)", "Professional Office (Top: fitted long-sleeve knit turtleneck TUCKED IN, smart pumps)"]
+            else: vibes = ["Trendy Streetwear (Top: fitted short-sleeve knit round-neck t-shirt, clean white sneakers)", "Trendy Streetwear (Top: chic short-sleeve cropped tee, leather ankle boots)", "Trendy Streetwear (Top: oversized short-sleeve graphic t-shirt French tucked, chunky sneakers)"]
         elif match_kw(["áo", "shirt", "top", "jacket", "sweater", "hoodie"], s_lower):
-            if is_beach_resort: vibes = [f"Beach/Resort ({hair_str}, Bottom: breezy long wide-leg linen pants, woven sandals)"]
-            elif is_office: vibes = [f"Professional Office ({hair_str}, Bottom: tailored long wide-leg trousers, pointed-toe heels)"]
-            else: vibes = [f"Trendy Streetwear ({hair_str}, Bottom: fashionable long high-waisted straight jeans, clean white sneakers)"]
+            if is_beach_resort: vibes = ["Beach/Resort (Bottom: breezy wide-leg linen pants, woven sandals)", "Beach/Resort (Bottom: distressed denim shorts, bare feet)", "Beach/Resort (Bottom: flowy floral maxi skirt, flat sandals)"]
+            elif is_office: vibes = ["Professional Office (Bottom: tailored wide-leg trousers, pointed-toe heels)", "Professional Office (Bottom: straight pencil skirt, smart loafers)", "Professional Office (Bottom: high-waisted pleated slacks, low heels)"]
+            else: vibes = ["Trendy Streetwear (Bottom: fashionable high-waisted straight jeans, clean white sneakers)", "Trendy Streetwear (Bottom: pleated midi skirt, leather boots)", "Trendy Streetwear (Bottom: wide-leg cargo pants, chunky sneakers)"]
         else:
-            if is_event_party or is_evening_fashion: vibes = [f"Elegant Evening ({hair_str}, Structured blazer draped over shoulders, stiletto heels)"]
-            elif is_beach_resort: vibes = [f"Beach/Resort ({hair_str}, Wide-brim woven hat, woven beach sandals)"]
-            else: vibes = [f"High-Fashion Lookbook ({hair_str}, Elegant makeup, premium matching footwear)"]
-    elif is_bedroom: vibes = [f"Cozy Bedroom ({hair_str}, Long-sleeve button-up silk sleepwear set with LONG pants, UNTUCKED, barefoot)", f"Cozy Bedroom ({hair_str}, Short-sleeve round-neck cotton pajama top and SHORTS, UNTUCKED, fluffy indoor slippers)"]
-    elif is_bathroom: vibes = [f"Bathroom/Washroom ({hair_str}, White fluffy long-sleeve bathrobe tied at waist, barefoot)", f"Bathroom/Washroom ({hair_str}, Short-sleeve v-neck soft home t-shirt and SHORTS, UNTUCKED, plastic anti-slip slippers)"]
-    elif is_kitchen or is_chore: vibes = [f"Active Home/Chores ({hair_str}, Short-sleeve round-neck casual t-shirt and LONG jeans, TUCKED IN, casual indoor slippers)", f"Active Home/Chores ({hair_str}, Short-sleeve v-neck stretchy home t-shirt and SHORTS, UNTUCKED, bare feet)"]
-    elif is_living_room: vibes = [f"Relaxed Living Room ({hair_str}, Smart-casual long-sleeve button-up shirt and LONG pants, UNTUCKED, minimalist indoor slippers)", f"Relaxed Living Room ({hair_str}, Comfy chic long-sleeve oversized knit sweater and LONG sweatpants, UNTUCKED, bare feet)"]
-    elif is_gym_sport: vibes = [f"Athletic/Gym ({hair_str}, Sleeveless sporty tank top and LONG form-fitting leggings, athletic running shoes)", f"Athletic/Gym ({hair_str}, Short-sleeve breathable workout t-shirt and SHORTS, training sneakers)"]
+            if is_event_party or is_evening_fashion: vibes = ["Elegant Evening (Structured blazer draped over shoulders, stiletto heels)", "Elegant Evening (Minimalist elegant jewelry, strappy heeled sandals)", "Elegant Evening (Classic evening look, elegant clutch, pumps)"]
+            elif is_beach_resort: vibes = ["Beach/Resort (Wide-brim woven hat, woven beach sandals)", "Beach/Resort (Sunglasses on head, barefoot on sand)", "Beach/Resort (Layered over a swimsuit, beach tote, flip flops)"]
+            else: vibes = ["High-Fashion Lookbook (Elegant makeup, premium matching footwear)", "High-Fashion Lookbook (Chic sunglasses, designer bag, ankle boots)", "High-Fashion Lookbook (Sleek hair, minimalist accessories, leather loafers)"]
+    elif is_bedroom: vibes = ["Cozy Bedroom (Long-sleeve button-up silk sleepwear set, UNTUCKED, barefoot)", "Cozy Bedroom (Short-sleeve round-neck cotton pajama top and shorts, fluffy indoor slippers)", "Cozy Bedroom (Oversized short-sleeve round-neck home t-shirt, bare feet)"]
+    elif is_bathroom: vibes = ["Bathroom/Washroom (White fluffy long-sleeve bathrobe tied at waist, barefoot)", "Bathroom/Washroom (Short-sleeve v-neck soft home t-shirt and shorts, plastic anti-slip slippers)", "Bathroom/Washroom (Neat towel wrapped hair, long-sleeve silk robe, barefoot)"]
+    elif is_kitchen or is_chore: vibes = ["Active Home/Chores (Short-sleeve round-neck casual t-shirt and jeans, casual indoor slippers)", "Active Home/Chores (Long-sleeve button-up casual shirt with rolled-up sleeves, protective apron, rubber slippers)", "Active Home/Chores (Short-sleeve v-neck stretchy home t-shirt and shorts, hair tied up neatly, bare feet)"]
+    elif is_living_room: vibes = ["Relaxed Living Room (Smart-casual long-sleeve button-up shirt, UNTUCKED, minimalist indoor slippers)", "Relaxed Living Room (Comfy chic long-sleeve oversized knit sweater, bare feet)", "Relaxed Living Room (Short-sleeve round-neck neat t-shirt and soft sweatpants, cozy socks)"]
+    elif is_gym_sport: vibes = ["Athletic/Gym (Sleeveless sporty tank top and form-fitting leggings, athletic running shoes)", "Athletic/Gym (Short-sleeve breathable workout t-shirt and shorts, training sneakers)", "Athletic/Gym (Long-sleeve athletic zip-up jacket and joggers, sports shoes)"]
     elif is_office: 
-        if gender == "female": vibes = [f"Professional Office ({hair_str}, Long-sleeve button-up elegant blouse, LONG tailored trousers, TUCKED IN, pointed-toe heels)", f"Professional Office ({hair_str}, Short-sleeve button-down chic shirt, LONG wide-leg slacks, TUCKED IN, low heels)"]
-        else: vibes = [f"Professional Office ({hair_str}, Long-sleeve crisp button-down shirt, LONG tailored trousers, TUCKED IN, leather dress shoes)"]
+        if gender == "female": vibes = ["Professional Office (Long-sleeve button-up elegant blouse, tailored trousers, TUCKED IN, pointed-toe heels)", "Professional Office (Smart blazer over a silk v-neck camisole, pencil skirt, loafers)", "Professional Office (Short-sleeve button-down chic shirt, wide-leg slacks, low heels)"]
+        else: vibes = ["Professional Office (Long-sleeve crisp button-down shirt, tailored trousers, TUCKED IN, leather dress shoes)", "Professional Office (Short-sleeve collared polo shirt, chinos, smart loafers)", "Professional Office (Tailored suit jacket without tie, long-sleeve shirt, dress pants, oxfords)"]
     elif is_event_party or is_evening_fashion: 
-        if gender == "female": vibes = [f"Elegant Evening ({hair_str}, Sleeveless glamorous long evening dress, strappy heeled sandals)"]
-        else: vibes = [f"Elegant Evening ({hair_str}, Tailored suit, long-sleeve shirt, LONG dress pants, TUCKED IN, polished dress shoes)"]
+        if gender == "female": vibes = ["Elegant Evening (Sleeveless glamorous evening dress, strappy heeled sandals)", "Elegant Evening (Long-sleeve chic formal outfit, elegant jewelry, stilettos)", "Elegant Evening (Off-shoulder sophisticated cocktail dress, clutch, pumps)"]
+        else: vibes = ["Elegant Evening (Tailored suit, long-sleeve shirt, polished dress shoes)", "Elegant Evening (Sharp blazer over long-sleeve crisp shirt, dress pants, oxfords)", "Elegant Evening (Tuxedo or formal evening wear, leather shoes)"]
     else: 
-        if gender == "female": vibes = [f"Trendy Streetwear ({hair_str}, Long-sleeve denim jacket over short-sleeve round-neck tee, LONG fashionable jeans, UNTUCKED, clean white sneakers)", f"Trendy Streetwear ({hair_str}, Short-sleeve chic knit top, long pleated skirt, TUCKED IN, ankle boots)"]
-        else: vibes = [f"Trendy Streetwear ({hair_str}, Long-sleeve flannel overshirt over short-sleeve tee, LONG clean denim, UNTUCKED, minimalist white sneakers)"]
+        if gender == "female": vibes = ["Trendy Streetwear (Long-sleeve denim jacket over short-sleeve round-neck tee, fashionable jeans, clean white sneakers)", "Trendy Streetwear (Short-sleeve chic knit top, pleated skirt, French tuck, ankle boots)", "Trendy Streetwear (Long-sleeve smart-casual overshirt, wide-leg pants, flat loafers)"]
+        else: vibes = ["Trendy Streetwear (Long-sleeve flannel overshirt over short-sleeve tee, clean denim, UNTUCKED, minimalist white sneakers)", "Trendy Streetwear (Short-sleeve collared shirt, chinos, leather boots)", "Trendy Streetwear (Short-sleeve round-neck casual neat t-shirt, cargo pants, chunky sneakers)"]
 
     vibe = random.choice(vibes)
     
@@ -1049,43 +1008,40 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     is_pas_scn1_no_prod = (is_pas_story and not is_fashion_wearable)
     if is_pas_scn1_no_prod:
-        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. Explicitly describe the KOC visually experiencing that EXACT problem. EMPTY HANDS, ZERO PRODUCT IN FRAME."
+        scene_1_action_inst = "CRITICAL: Analyze the dialogue's specific emotional/physical pain point. If it mentions pain, explicitly describe the KOC vigorously rubbing or massaging that EXACT body part with a clear pained facial expression. ZERO FACE TOUCHING. EMPTY HANDS, ZERO PRODUCT IN FRAME."
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
     is_lighting_product = detect_lighting_product(check_str)
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, is_lighting_product)
 
-    random_style_seed = random.randint(1000, 9999)
-    
     prompt_text = f"""
     TÊN SP: {raw_prod_name}
     MÔ TẢ EN: {clean_prod_en}. 
     Kịch bản: '{fixed_title}' | Bối cảnh gốc: '{fixed_setting_base}'
-    KOC: {detected_demographic_en} | {stylist_vibe_text} 
-    (STYLE SEED: #{random_style_seed} - ÉP BUỘC TẠO RA TRANG PHỤC KHÁC BIỆT HOÀN TOÀN SO VỚI CÁC LẦN TRƯỚC)
+    KOC: {detected_demographic_en} | {stylist_vibe_text}
     
     THOẠI GỐC: "{full_vo_script}"
     
     NHIỆM VỤ ĐẠO DIỄN:
     1. Cắt thoại gốc thành 4 phần (vo).
     2. ĐỒNG BỘ BỐI CẢNH VÀ TRỰC QUAN HÓA NHÂN VẬT (CRITICAL): 
-       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong thoại. CẤM bịa thêm người.
+       - Cảnh 1 (Mở đầu): BẮT BUỘC hình ảnh phải show ĐÚNG đối tượng được nhắc đến trong thoại Cảnh 1. CẤM tự ý bịa thêm người nếu thoại không nhắc.
        - Cảnh 2 & 3: 
-         + QUẦN ÁO: MẶC LÊN NGƯỜI (worn on body) để test vải.
-         + KỆ/HỘP/BÀN: ĐẶT TRÊN BÀN/SÀN (placed firmly on desk/floor). KOC xếp đồ. CẤM CẦM LƠ LỬNG.
-         + SẢN PHẨM KHÁC: Cầm trên tay test mạnh mẽ/bạo lực.
+         + NẾU SẢN PHẨM LÀ QUẦN ÁO: BẮT BUỘC MẶC LÊN NGƯỜI (worn on body) để test vải.
+         + NẾU LÀ ĐỒ NỘI THẤT/ĐỂ BÀN (Kệ, hộp, bàn, tủ): BẮT BUỘC ĐẶT TRÊN BÀN/SÀN (placed firmly on desk/floor). KOC đứng/ngồi cạnh xếp đồ vào kệ. CẤM CẦM LƠ LỬNG.
+         + NẾU LÀ SẢN PHẨM KHÁC: BẮT BUỘC cầm trên tay test mạnh mẽ/bạo lực.
     
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
     {{
         "set_en": "Master setting EN (e.g., 'stylish coffee shop').",
         "wardrobe_vi": "Set đồ tiếng Việt chi tiết 4 cảnh",
-        "wardrobe_en": "CRITICAL: BẮT BUỘC chép y nguyên cấu trúc (Tóc buộc/thả, Áo sơ vin/không sơ vin, Quần dài/ngắn) từ gợi ý Stylist. Vd: 'hair neatly tied up, wearing a short-sleeve shirt TUCKED INTO long pants'.",
+        "wardrobe_en": "CRITICAL: MÔ TẢ SIÊU CHI TIẾT (LOẠI CỔ ÁO, CHIỀU DÀI TAY, QUẦN/VÁY, MÀU SẮC). Ví dụ: 'wearing a light blue round-neck short-sleeve cotton t-shirt, grey pants'.",
         "scenes": [
             {{ "set": "Bối cảnh VN...", "exp": "Mô tả vi biểu cảm khuôn mặt cực kỳ chi tiết khớp với thoại", "act": "{scene_1_action_inst}", "sfx": "Foley", "dir": "Attention", "vo": "Trích phần đầu..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Dưới 20 words)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
-            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (Dưới 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
+            {{ "set": "Bối cảnh VN...", "exp": "intense focus", "act": "{action_scene_2} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Kệ/Tủ/Hộp thì phải ĐẶT LÊN BÀN/SÀN KHÔNG CẦM. Đồ khác thì cầm trên tay test mạnh mẽ)", "sfx": "Aggressive Foley", "dir": "Interest", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "highly satisfied", "act": "{action_scene_3} (Dưới 20 words. Nhớ luật: Quần áo thì phải MẶC LÊN NGƯỜI. Kệ/Tủ/Hộp thì sử dụng ở trên bàn. Đồ khác thì sử dụng thực tế tốc độ cao)", "sfx": "Fast-paced Foley", "dir": "Desire", "vo": "Trích đoạn tiếp theo..." }},
+            {{ "set": "Bối cảnh VN...", "exp": "warm smile", "act": "{action_scene_4} (ZERO face touching, under 18 words)", "sfx": "Foley", "dir": "Action", "vo": "Trích đoạn chốt cuối..." }}
         ]
     }}
     """
@@ -1141,7 +1097,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif match_kw(["sneaker", "running", "athletic"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif match_kw(["heel", "loafer", "dress"], vibe_lower): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    char_neg_extra = f"{dynamic_footwear_neg}changing hair from tied to down, changing hair from down to tied, changing shorts to long pants, changing long pants to shorts, tucking in shirt abruptly, untucking shirt abruptly, changing styling, referencing original face, copying original person, matching original background, same environment as reference, caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    char_neg_extra = f"{dynamic_footwear_neg}referencing original face, copying original person, matching original background, same environment as reference, caucasian, western, foreigner, blonde hair, different face, changing top length, changing sleeve length, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     face_touch_neg = "" if (is_cosmetics or is_food) else "applying makeup, touching face, rubbing cheek, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
     
@@ -1160,19 +1116,16 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
         raw_speech = calculate_speech_duration(vo_text, is_tiktok_shop)
         act_cushion = 1.0 if is_tiktok_shop else 1.3
-        dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
-        actual_speech = round(raw_speech, 1)
+        dynamic_sec = min(10, max(4, math.ceil(raw_speech + act_cushion)))
+        actual_speech = round(dynamic_sec - 0.8, 1) if raw_speech >= dynamic_sec else raw_speech
         cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
         
         scn["dur"], scn["actual_speech_sec"] = f"{dynamic_sec}s", actual_speech
         total_sec += float(dynamic_sec)
         
-        vo_lower = vo_text.lower()
-        prod_mentions = [raw_prod_name.lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
-        has_prod_in_vo = any(kw in vo_lower for kw in prod_mentions)
-        is_no_prod = scn.get("is_no_product_scene", False) and not has_prod_in_vo
+        is_pas_scn1_no_prod = (idx_scn == 0 and is_pas_story and not is_fashion_wearable)
         
-        cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str, is_surface_furniture)
+        cam_shot = get_product_centric_camera_shot(idx_scn, is_fashion_wearable, is_footwear_accessory, is_pas_scn1_no_prod, clean_prod_en, is_strict_appliance, is_long_handle, is_food, is_cosmetics, is_mom_baby, is_medicine, intimate_type, check_str, is_surface_furniture)
         
         base_sfx = re.sub(r'\b(?:music|soundtrack|melody|song|bgm)\b', 'Foley', scn.get("sfx", "Natural Foley"), flags=re.IGNORECASE)
         scn["sfx"] = f"{base_sfx}, {master_env_sfx_en}" if master_env_sfx_en else base_sfx
@@ -1185,7 +1138,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         family_bg_prompt = ""
         current_neg_prompt = base_neg_prompt_core
         
-        if idx_scn == 0 and is_no_prod:
+        if idx_scn == 0 and is_pas_scn1_no_prod:
             vo_lower = vo_text.lower()
             needs_child = match_kw(["trẻ em", "trẻ nhỏ", "em bé", "con nít", "trẻ sơ sinh", "trẻ con", "bạn nhỏ", "con nhỏ"], vo_lower)
             needs_senior = match_kw(["người già", "ông bà", "cao tuổi", "bố mẹ già", "bà cụ", "ông cụ", "người lớn tuổi"], vo_lower)
@@ -1207,7 +1160,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 current_neg_prompt = current_neg_prompt.replace("multiple characters, ", "")
 
         if not is_cosmetics and not is_food and not is_surface_furniture:
-            if is_no_prod:
+            if is_pas_scn1_no_prod:
                 pass 
             else:
                 clean_act = force_no_face_touching(clean_act)
@@ -1215,7 +1168,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 if "chest level" not in clean_act.lower():
                     clean_act = f"{clean_act.rstrip('.')}, both hands actively holding the edges/base of the product at chest level (hands never touch face, never covering the product)"
         
-        if not is_fashion_wearable and not is_surface_furniture and not is_no_prod:
+        if not is_fashion_wearable and not is_surface_furniture and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing") and not "actively using" in clean_act.lower():
                 clean_act = f"standing completely still with zero body rotation, speaking directly to camera, {clean_act}"
         else:
@@ -1244,37 +1197,31 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
-        # 🌟 BẢN 83.0: ÉP TOÀN BỘ VIDEO PROMPT THÀNH IMAGE-TO-VIDEO INPUT 
         if idx_scn == 0 and target_subject:
-            if is_no_prod:
+            if is_pas_scn1_no_prod:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} Subject: {locked_character_prompt} in sharp foreground, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
-                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} [FOREGROUND ACTION]: {target_subject}, {clean_act} (ZERO PRODUCT). [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. {family_bg_prompt} [FOREGROUND ACTION]: {target_subject}, {clean_act} (ZERO PRODUCT). [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
             else:
                 prod_use_segment = f"PRODUCT IN USE: {target_subject} actively wearing/using {clean_prod_en}. {color_lock_tag}."
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{prod_use_segment}]. [BACKGROUND]: {locked_character_prompt} watching warmly, {micro_expr}"
-                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject} actively using {clean_prod_en}. [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [FOREGROUND ACTION]: {target_subject} actively using {clean_prod_en}. [PRESENTER IN BACKGROUND]: {locked_character_prompt}, {micro_expr}, speaking to camera. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s lip-sync. {studio_audio_prompt}"
         else:
-            if is_no_prod:
+            if is_pas_scn1_no_prod:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. Subject: {locked_character_prompt}, {micro_expr}, {clean_act} (EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME). [NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]"
-                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
             elif not is_fashion_wearable and idx_scn in [1, 2]:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Presenter in background: {locked_character_prompt}, {micro_expr}, {clean_act}"
-                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+                raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
             else:
                 img_core = f"[IDENTICAL SETTING]: {cam_shot}, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. Subject: {locked_character_prompt}, {micro_expr}, {clean_act}"
-                raw_vid = f"🖼️ [IMAGE-TO-VIDEO INPUT]: Đính kèm ảnh vừa tạo ở trên làm Khung hình đầu (First Frame) để video giống ảnh 100%.\n🎥 [MOTION PROMPT]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+                raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
-        # Sửa lỗi Replace
-        scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
-        
-        if not is_no_prod and "EMPTY HANDS, ZERO PRODUCT" in img_core:
-            img_core = img_core.replace("EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME", "holding the product naturally").replace("[NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]", "")
-        if not is_no_prod and "(ZERO PRODUCT)" in scn["vid_p"]:
-            scn["vid_p"] = scn["vid_p"].replace("(ZERO PRODUCT)", "")
-            
+        vid_parts = raw_vid.split('[AUDIO]:')
+        if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
+        else: scn["vid_p"] = sanitize_veo3_prompt(raw_vid)
         scn["img_p"] = sanitize_third_party_ip(f"{img_core}, tack-sharp focus on product, photorealistic 8k --ar 9:16 --style raw --v 6.1")
         scn["vid_neg"] = current_neg_prompt
-        scn["is_no_product_scene"] = is_no_prod
+        scn["is_no_product_scene"] = is_pas_scn1_no_prod
         
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
@@ -1319,13 +1266,12 @@ def clone_script(script_id):
     GỐC #{script_id}: '{target.get('title', '')}'
     THOẠI GỐC:\n{full_voice_text}
     NHIỆM VỤ: Nhân bản 3 biến thể giữ 90% cấu trúc, đổi bối cảnh đời thực khác nhau. Xưng '{dna.get("pro_s", "em")}' - Gọi '{dna.get("pro_a", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
-    BÁM SÁT CHIẾN LƯỢC: '{presentation_format}'.
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "[Tên biến thể 1]", "set": "Bối cảnh 1", "vo": "Thoại 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> KẾT THÚC BẰNG CTA đa dạng có chủ ngữ, CẤM NHẮC GIÁ." }},
-            {{ "id": {cur_len+2}, "title": "[Tên biến thể 2]", "set": "Bối cảnh 2", "vo": "Thoại 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> KẾT THÚC BẰNG CTA đa dạng có chủ ngữ, CẤM NHẮC GIÁ." }},
-            {{ "id": {cur_len+3}, "title": "[Tên biến thể 3]", "set": "Bối cảnh 3", "vo": "Thoại 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> KẾT THÚC BẰNG CTA đa dạng có chủ ngữ, CẤM NHẮC GIÁ." }}
+            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
+            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
+            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }}
         ]
     }}
     """
@@ -1364,15 +1310,16 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     {prod_context}
     
     CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("pro_s", "em")}' - Gọi '{dna.get("pro_a", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
-    TẠO 3 KỊCH BẢN Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. 
-    BẮT BUỘC PHẢI ÁP DỤNG TRIỆT ĐỂ CHIẾN LƯỢC '{active_format}' VÀO LỜI THOẠI.
-    
+    TẠO 3 KỊCH BẢN Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. ĐẶC BIỆT LƯU Ý:
+    - Kịch bản 1: Giọng điệu năng động, dồn dập.
+    - Kịch bản 2: Giọng tâm sự, chia sẻ, gần gũi.
+    - Kịch bản 3: Giọng chuyên gia, nhấn mạnh công năng.
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN):
     {{
         "scripts": [
-            {{ "id": {cur_len+1}, "title": "[Tên kịch bản 1 phù hợp chiến lược]", "set": "Bối cảnh 1", "vo": "Thoại 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> KẾT THÚC BẰNG CTA đa dạng có chủ ngữ, CẤM NHẮC GIÁ." }},
-            {{ "id": {cur_len+2}, "title": "[Tên kịch bản 2 phù hợp chiến lược]", "set": "Bối cảnh 2", "vo": "Thoại 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> KẾT THÚC BẰNG CTA đa dạng có chủ ngữ, CẤM NHẮC GIÁ." }},
-            {{ "id": {cur_len+3}, "title": "[Tên kịch bản 3 phù hợp chiến lược]", "set": "Bối cảnh 3", "vo": "Thoại 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> KẾT THÚC BẰNG CTA đa dạng có chủ ngữ, CẤM NHẮC GIÁ." }}
+            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
+            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }},
+            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "set": "Bối cảnh khớp 100% với thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch, TỰ NHIÊN..." }}
         ]
     }}
     """
@@ -1753,9 +1700,7 @@ if st.session_state.get("trigger_main_generation"):
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh.
-            - KOC 100% LÀ NGƯỜI VIỆT NAM. Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior).
-            
-            TẠO 3 KỊCH BẢN ĐA DẠNG BÁM SÁT CHIẾN LƯỢC: '{args.get("unified_strategy_format", "")}'
+            - KOC 100% LÀ NGƯỜI VIỆT NAM (Vietnamese). Phân tích đúng đối tượng sử dụng SP để chọn koc_g (male/female) và koc_a (child/adult/senior (Mặc định chọn 'adult'. Chỉ chọn 'child/senior' nếu SP đặc thù)).
             
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON SIÊU NÉN:
             {{
@@ -1767,15 +1712,15 @@ if st.session_state.get("trigger_main_generation"):
                     "p_orig": <Giá 25000 CHỮ, INT, KHÔNG VD: dạng gốc số>,
                     "p_sale": <Giá 15000 CHỮ, INT, KHÔNG VD: dạng giảm số>,
                     "c_vi": "Màu/Họa tiết tiếng Việt",
-                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue'). NO generic colors.",
-                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (max 25 words). CẤM nhắc đến con người, bối cảnh ảnh gốc.",
+                    "c_en": "Exact precise color shade of the product (e.g., 'matte light slate grey', 'pastel muted blue', 'glossy dark navy'). NO generic colors.",
+                    "vis_en": "Mô tả hình dáng, kết cấu 3D của SP (tổng hợp từ TẤT CẢ ảnh mặt trước/nghiêng) max 25 words. CẤM TUYỆT ĐỐI nhắc đến con người, khuôn mặt, hay bối cảnh của ảnh gốc.",
                     "name": "[Tên SP]: [Điểm độc bản USP]",
                     "dim": "Kích thước"
                 }},
                 "scripts": [
-                    {{ "id": 1, "title": "[Tên phong cách 1]", "set": "Bối cảnh 1", "vo": "Đoạn thoại dài 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> CTA đa dạng có Chủ ngữ (CẤM NHẮC GIÁ)..." }},
-                    {{ "id": 2, "title": "[Tên phong cách 2]", "set": "Bối cảnh 2", "vo": "Đoạn thoại dài 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> CTA đa dạng có Chủ ngữ (CẤM NHẮC GIÁ)..." }},
-                    {{ "id": 3, "title": "[Tên phong cách 3]", "set": "Bối cảnh 3", "vo": "Đoạn thoại dài 80-110 từ. CẤU TRÚC: Hook Gọi đích danh Khách hàng + Nỗi đau (<15 từ, vd: 'Bác nào hay bị...') -> Gọi Tên SP -> Review Tượng Hình -> CTA đa dạng có Chủ ngữ (CẤM NHẮC GIÁ)..." }}
+                    {{ "id": 1, "title": "Bản Năng Động", "set": "Bối cảnh khớp 100% thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }},
+                    {{ "id": 2, "title": "Bản Tâm Sự", "set": "Bối cảnh khớp 100% thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }},
+                    {{ "id": 3, "title": "Bản Chuyên Gia", "set": "Bối cảnh khớp 100% thoại", "vo": "Đoạn thoại dài 80-110 từ, liền mạch..." }}
                 ]
             }}
             """
@@ -1935,45 +1880,32 @@ if all_sc:
             is_tts = ("Viral" not in curr_mode)
             speech_sec = scn.get('actual_speech_sec', calculate_speech_duration(vo_text, is_tts))
             
-            raw_speech = calculate_speech_duration(vo_text, is_tts)
-            act_cushion = 1.0 if is_tts else 1.3
-            dynamic_sec = max(4, math.ceil(raw_speech + act_cushion))
-            actual_speech = round(raw_speech, 1)
-            cushion_sec = round(max(0.5, dynamic_sec - actual_speech), 1)
+            dur_str = str(scn.get('dur', '8s')).replace('s', '').strip()
+            try: dur_int = int(float(dur_str))
+            except: dur_int = 8
+            
+            safe_cushion = round(max(0.0, dur_int - speech_sec), 1)
             
             st.markdown(f"#### 📍 Phân cảnh {idx} - Giai đoạn {scn.get('aida_stage', scn.get('dir', ''))}")
-            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {dynamic_sec}s | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt) | 🛡 Đệm diễn xuất tự nhiên: +{cushion_sec}s</span>", unsafe_allow_html=True)
+            st.markdown(f"<span class='timing-badge'>⏱ Khung phân cảnh chuẩn: {scn.get('dur', '8s')} (Max 10s Veo 3) | Khớp nhịp đọc thực tế: ~{speech_sec}s ({actual_words} từ, {comma_count} phẩy, {period_count} ngắt | ~{round(actual_words/max(1.0, speech_sec), 1)} từ/s) | 🛡 Đệm diễn xuất tự nhiên: +{safe_cushion}s</span>", unsafe_allow_html=True)
             st.markdown(f"🏛 **Bối cảnh:** *{scn.get('setting', scn.get('set', ''))}*\n\n**😊 Vi biểu cảm & Cử chỉ:** *{scn.get('expression_en', scn.get('exp', 'Tự nhiên, rạng rỡ'))}*\n\n**🎵 Hiệu ứng âm thanh:** *{scn.get('sfx', 'Âm thanh thực tế sống động')}*\n\n**🎙 Đạo diễn KOC:** *{scn.get('director', scn.get('dir', ''))}*\n\n**💬 Đoạn thoại cắt tương ứng:** <div class='voiceover-text'>{vo_text}</div>", unsafe_allow_html=True)
             
             c_p1, c_p2 = st.columns(2)
             with c_p1:
-                vo_lower = vo_text.lower()
-                prod_mentions = [st.session_state.get("content_analysis", {}).get("name", "").lower(), "sản phẩm", "em này", "cái này", "bộ này", "chiếc này", "món này", "chai này", "lọ này", "cốc này", "nồi này", "kệ này"]
-                has_prod_in_vo = any(kw in vo_lower for kw in prod_mentions)
-                is_no_prod = scn.get("is_no_product_scene", False) and not has_prod_in_vo
-                
+                is_no_prod = scn.get("is_no_product_scene", False)
                 if is_no_prod:
                     st.markdown("<div class='no-product-warning'>🚨 LƯU Ý: Phân cảnh này KHÔNG CÓ SẢN PHẨM. Bạn KHÔNG CẦN dùng ảnh tham chiếu sản phẩm khi tạo ảnh!</div>", unsafe_allow_html=True)
                     st.markdown("**🖼 Prompt Ảnh Tinh Gọn (KHÔNG SẢN PHẨM):**")
                 else:
                     st.markdown("**🖼 Prompt Ảnh Tinh Gọn (Midjourney / Flux):**")
-                
-                img_p = scn.get('img_p', '')
-                if not is_no_prod and "EMPTY HANDS, ZERO PRODUCT" in img_p:
-                    img_p = img_p.replace("EMPTY HANDS, ZERO PRODUCT, NO PRODUCT IN FRAME", "holding the product naturally").replace("[NOTE: DO NOT USE PRODUCT REFERENCE FOR THIS SCENE]", "")
-                
-                st.code(img_p, language="text")
+                st.code(img_p := scn.get('img_p', ''), language="text")
                 safe_copy_button(img_p, f"📋 Sao Chép Prompt Ảnh Cảnh {idx}")
                 if not is_no_prod:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                # 🌟 BẢN 83.0: ĐỔI LABEL VÀ CẤU TRÚC JSON ĐỂ HIỂN THỊ RÕ ĐÂY LÀ LỆNH IMAGE-TO-VIDEO
-                st.markdown("**🎥 Prompt Video (Image-to-Video: Dùng ảnh trên làm gốc):**")
-                vid_p = scn.get('vid_p', '')
-                if not is_no_prod and "(ZERO PRODUCT)" in vid_p:
-                    vid_p = vid_p.replace("(ZERO PRODUCT)", "")
-                st.code(vid_p, language="text")
+                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
+                st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
             with st.expander(f"🛡 Negative Prompt Chuyên Biệt Cảnh {idx}", expanded=False):
