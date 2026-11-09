@@ -1466,15 +1466,16 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     
     NHIỆM VỤ: TẠO THÊM 3 KỊCH BẢN MỚI Ở 3 BỐI CẢNH ĐỜI THỰC HOÀN TOÀN MỚI. ĐẶC BIỆT LƯU Ý:
     - BẮT BUỘC phải nói đúng về SẢN PHẨM GỐC ở trên. TUYỆT ĐỐI KHÔNG sáng tạo ra sản phẩm khác.
-    - THIẾT KẾ 3 TUYẾN NỘI DUNG ĐA DẠNG: Đưa KOC vào các hoàn cảnh sử dụng thực tế MỚI TINH (VD với thời trang: Đi cafe, Đi quẩy, Hẹn hò, Đi du lịch, Đi tập gym...). 
+    - THIẾT KẾ 3 TUYẾN NỘI DUNG ĐA DẠNG: Đưa KOC vào các hoàn cảnh sử dụng thực tế MỚI TINH.
     - CRITICAL: CẤM VIẾT TRÙNG LẠI các bối cảnh hoặc góc độ (title) đã liệt kê ở danh sách ĐÃ TẠO bên trên.
+    - 🛑 ĐẶC BIỆT LƯU Ý VỀ LỜI THOẠI (full_voiceover_script): BẮT BUỘC CHỈ VIẾT DUY NHẤT LỜI THOẠI CỦA NHÂN VẬT. TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM viết chữ "Cảnh 1", "Cảnh 2"). TUYỆT ĐỐI KHÔNG CHÈN MÔ TẢ HÀNH ĐỘNG. Hãy viết thành 1 đoạn văn TÂM SỰ LIỀN MẠCH, nói full công năng, CẤM BÁO GIÁ TIỀN.
     
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tuyến nội dung MỚI 1 (VD: Outfit Check-in Cafe)", "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tuyến nội dung MỚI 2", "setting": "Bối cảnh MỚI 2", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tuyến nội dung MỚI 3", "setting": "Bối cảnh MỚI 3", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tuyến nội dung MỚI 1 (VD: Outfit Check-in Cafe)", "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tuyến nội dung MỚI 2", "setting": "Bối cảnh MỚI 2", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tuyến nội dung MỚI 3", "setting": "Bối cảnh MỚI 3", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }}
         ]
     }}
     """
@@ -1846,6 +1847,7 @@ if st.session_state.get("trigger_main_generation"):
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
             - CRITICAL: TẠO 3 TUYẾN NỘI DUNG VÀ BỐI CẢNH HOÀN TOÀN KHÁC NHAU. Tùy thuộc vào ngành hàng để đưa ra tình huống thực tế (VD với thời trang/mỹ phẩm: Đi làm, Đi chơi, Hẹn hò, Cafe, Thể thao, Du lịch...). CẤM gò bó vào các góc độ chung chung.
+            - 🛑 ĐẶC BIỆT LƯU Ý VỀ LỜI THOẠI (full_voiceover_script): BẮT BUỘC CHỈ VIẾT DUY NHẤT LỜI THOẠI CỦA NHÂN VẬT. TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM viết chữ "Cảnh 1", "Cảnh 2"). TUYỆT ĐỐI KHÔNG CHÈN MÔ TẢ HÀNH ĐỘNG (CẤM viết các hành động như "Em nhăn mặt", "KOC cầm quần"...). Hãy viết thành 1 đoạn văn TÂM SỰ LIỀN MẠCH, nói full về công năng, CẤM BÁO GIÁ TIỀN.
 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json).
             {{
@@ -1890,9 +1892,9 @@ if st.session_state.get("trigger_main_generation"):
                     "prompt_dna_lock": "Visual DNA lock"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Tuyến nội dung 1 (VD: Outfit Hẹn hò)", "setting": "Bối cảnh 1 (Phù hợp tuyến 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
-                    {{ "id": 2, "title": "Tuyến nội dung 2 (VD: Mặc đi làm)", "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
-                    {{ "id": 3, "title": "Tuyến nội dung 3 (VD: Dạo phố cuối tuần)", "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }}
+                    {{ "id": 1, "title": "Tuyến nội dung 1 (VD: Outfit Hẹn hò)", "setting": "Bối cảnh 1 (Phù hợp tuyến 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
+                    {{ "id": 2, "title": "Tuyến nội dung 2 (VD: Mặc đi làm)", "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
+                    {{ "id": 3, "title": "Tuyến nội dung 3 (VD: Dạo phố cuối tuần)", "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }}
                 ]
             }}
             """
