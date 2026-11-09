@@ -770,7 +770,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     
     if intimate_type == "underwear_bra":
-        vibe = "Intimate Apparel Review (Wearing a premium soft silk robe, cozy bathrobe, or comfortable loose homewear, UNTUCKED, barefoot or fluffy slippers)"
+        vibe = "Intimate Apparel Showcase (If setting is bedroom/home: wearing a premium soft silk robe or cozy loungewear, barefoot/slippers. If setting is showroom/store: wearing an elegant blazer over a camisole, tailored trousers, high heels)"
     elif intimate_type == "camisole":
         vibe = "Casual Loungewear (Wearing a stylish oversized cardigan layered over the product, comfy shorts, UNTUCKED, barefoot or indoor slippers)"
     
@@ -1151,10 +1151,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {{
         "title": "{fixed_title}",
         "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable, not luxurious'). CẤM dùng từ luxury hay high-end.",
-        "wardrobe_lock": {{
-            "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN, cực kỳ thời trang. (Ghi rõ: loại áo, độ dài tay áo, có sơ vin không, kết hợp giày gì).",
-            "master_character_en": "CRITICAL: Define the EXACT outfit down to the sleeve length and tucking. E.g., 'wearing a fitted short-sleeve mocha brown button-up cropped blazer, paired with [Product], and nude pointed-toe high heels.' MUST NOT contain 'or', 'maybe'. This EXACT string locks the outfit across 4 scenes."
-        }},
+        "wardrobe_lock": {
+            "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc buộc hay thả, áo trong, áo ngoài/áo khoác, quần/váy, và giày dép).",
+            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE (e.g., 'hair tied back in a ponytail' OR 'hair let down flowing') AND EXACT FULL OUTFIT (inner shirt, outer jacket, pants/skirt, footwear). E.g., 'hair tied in a neat ponytail, wearing a white camisole under a fitted short-sleeve mocha brown button-up blazer, matching trousers, nude pointed-toe high heels.' MUST NOT contain 'or', 'maybe'. This EXACT string tightly locks the hair, face, and full clothing layers across all 4 scenes."
+        },
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
@@ -1298,6 +1298,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         
         if is_strict_appliance or is_mom_baby_hard: 
             locked_product_prompt_segment = f"STRICT REFERENCE APPLIANCE: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, exact original nozzle/attachment, and surface details. Zero hallucinated parts."
+        elif intimate_type != "normal":
+            locked_product_prompt_segment = f"STRICT REFERENCE INTIMATE APPAREL: {clean_prod_en}. {color_lock_tag}. Maintaining 100% identical shape, exact original structure, precise straps/lace details, and exact fabric texture. Zero deformation, zero morphed structural details. Held securely in hands for close-up physical demonstration (NOT worn directly on the outer body)."
         elif is_food or is_cosmetics or is_mom_baby or is_medicine: 
             locked_product_prompt_segment = f"PRODUCT FOCUS: {clean_prod_en}. {color_lock_tag} as the main subject."
         elif is_footwear_accessory and (idx_scn in [1, 2]):
