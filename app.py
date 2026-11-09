@@ -1887,6 +1887,7 @@ prompt = f"""
             """
             payload = ["PRODUCT IMAGES (EXTRACT RIGID 3D STRUCTURE, EXACT HANDLES/STRAPS, TRUE COLOR, AND OCR PRICES - IGNORE HUMAN MODELS):"]
             for cb, cm in args["temp_images"]:
+                # ...
                 payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
             for c in char_inputs:
                 if c.get("file_bytes"):
