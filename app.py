@@ -1251,11 +1251,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     elif any(k in vibe_lower for k in ["sneaker", "running", "athletic"]): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif any(k in vibe_lower for k in ["heel", "loafer", "dress"]): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    # 🌟 [NEW] CẬP NHẬT LẠI NEGATIVE PROMPT (Chỉ cấm hành động ngược lại)
-    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    # 🌟 [NEW] KHÔI PHỤC BỘ TỪ KHÓA CẤM SỜ MẶT/TÓC
+    face_touch_neg = "" if (is_cosmetics or is_food) else "touching face, touching hair, brushing hair, hand on face, hands near face, rubbing cheek, scratching face, fingers on face, hands raised to head, bringing hands up to face, "
+
+    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Đã bao gồm face_touch_neg)
+    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
-    # 🌟 ÉP CHẶT LỆNH CẤM ĐƯA SẢN PHẨM LÊN MẶT TRONG NEGATIVE PROMPT NẾU KHÔNG PHẢI MỸ PHẨM/ĐỒ ĂN
-    face_touch_neg = "" if (is_cosmetics or is_food) else "holding like a phone, holding to ear, pressing against cheek, touching face, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
+    # (Đoạn base_neg_prompt = f"{anti_morph_neg}..." của bạn vẫn giữ nguyên ở ngay dưới dòng này)
     
     base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}{face_touch_neg}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
@@ -1290,15 +1292,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         # 🌟 [NEW] BỘ LỌC CỨNG: ÉP CẤM SỜ LÊN MẶT NẾU KHÔNG PHẢI MỸ PHẨM
         if not is_cosmetics and not is_food:
             face_patterns = [
-                r'\b(?:rubbing|touching|massaging|scratching|applying|holding|putting)\s+(?:hands?\s+|fingers?\s+)?(?:on|to|near|against)\s+(?:face|cheek|chin|nose|forehead|eye|head)\b',
-                r'\b(?:rubbing|touching|massaging|scratching|applying)\s+(?:face|cheek|chin|nose|forehead|eye|head)\b'
+                r'\b(?:rubbing|touching|massaging|scratching|applying|holding|putting|bringing)\s+(?:hands?\s+|fingers?\s+|arms?\s+)?(?:on|to|near|against|towards)\s+(?:face|cheek|chin|nose|forehead|eye|head|hair)\b',
+                r'\b(?:rubbing|touching|massaging|scratching|applying|brushing)\s+(?:face|cheek|chin|nose|forehead|eye|head|hair)\b'
             ]
             for pat in face_patterns:
-                clean_act = re.sub(pat, 'interacting dynamically at chest level', clean_act, flags=re.IGNORECASE)
+                clean_act = re.sub(pat, 'gesturing dynamically', clean_act, flags=re.IGNORECASE)
             
-            # Khóa thêm chỉ thị thẳng vào prompt để AI Video không tự biên dịch sai
-            if "away from face" not in clean_act.lower():
-                clean_act += " (HANDS AND PRODUCT STRICTLY KEPT AWAY FROM FACE)"
+            # Khóa chỉ thị thẳng vào prompt: Ép tay phải ở dưới ngực/vai
+            if "zero hand-to-face" not in clean_act.lower():
+                clean_act += " (hands gesturing strictly below chest level, absolutely zero hand-to-face contact, do not touch face or hair)"
         
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing"):
