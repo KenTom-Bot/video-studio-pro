@@ -72,9 +72,13 @@ COMPACT_CORE_RULES = """
 3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ (CRITICAL):
    - NHẬP VAI 3 PHONG CÁCH: Kịch bản 1 (Năng động, dồn dập). Kịch bản 2 (Tâm sự, thủ thỉ, gần gũi). Kịch bản 3 (Chuyên gia, tập trung công năng).
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu (Cấm "giá đang giảm giá", cấm "form hộp đứng form").
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm "ngay tay". Chốt tự nhiên: "Deal hôm nay quá êm, mấy bà nhấp góc trái múc luôn nha".
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm "ngay tay". Chốt tự nhiên: "Deal hôm nay quá hời, mấy bà nhấp góc trái mua luôn nha".
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
+5. BỐI CẢNH THUẦN VIỆT BÌNH DÂN, GẦN GŨI (CRITICAL SETTING):
+   - 100% bối cảnh phải toát lên vẻ mộc mạc, bình dân, quen thuộc của đời sống nông thôn hoặc ngoại ô Việt Nam (VD: nhà cấp 4, sân gạch, hiên nhà, bếp giản dị, phòng khách mộc mạc...).
+   - TIẾNG ANH (khi tạo Prompt ảnh/video): BẮT BUỘC dùng các cụm từ "authentic humble rural Vietnamese home, relatable ordinary setting, rustic".
+   - TUYỆT ĐỐI CẤM các bối cảnh xa hoa, hào nhoáng (No luxury, no high-end mansion, no fancy studio).
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
