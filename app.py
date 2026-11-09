@@ -509,23 +509,35 @@ def sanitize_destructive_motion_verbs(action_text: str, is_fashion: bool = False
         for pat, rep in destructive_patterns: cleaned = re.sub(pat, rep, cleaned, flags=re.IGNORECASE)
     return cleaned
 
-def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = ""):
+def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str = "", product_name: str = ""):
     combined_text = f"{vo_text} {setting_text}".lower()
+    prod_lower = product_name.lower()
+    
     outdoor_keywords = ["ngoài trời", "sân vườn", "đường phố", "công viên", "vỉa hè", "ban công", "sân thượng", "dã ngoại", "bãi biển", "outdoor", "street", "garden", "park", "balcony"]
     is_indoor = not any(k in combined_text for k in outdoor_keywords)
     
-    if any(k in combined_text for k in ["đêm", "tối", "khuya", "tắt đèn", "mất điện", "đi ngủ", "night", "dark"]): 
-        return "dimly lit, cinematic low light, dark ambience", "quiet nighttime ambience (no reverb)"
+    # Nhận diện các sản phẩm phát sáng (được phép tối)
+    is_lighting_product = any(k in prod_lower for k in ["đèn pin", "đèn chiếu sáng", "đèn ngủ", "đèn led", "đèn", "flashlight", "lamp", "light"])
+    
+    # Xử lý môi trường và ánh sáng
+    if any(k in combined_text for k in ["đêm", "tối", "khuya", "tắt đèn", "mất điện", "đi ngủ", "night", "dark"]):
+        if is_lighting_product:
+            return "dimly lit, cinematic low light, dark ambience to highlight the product's light", "quiet nighttime ambience (no reverb)"
+        else:
+            # ÉP SÁNG NGAY CẢ KHI LÀ BUỔI TỐI (cho các sản phẩm thường)
+            return ("brightly lit evening interior, warm inviting abundant indoor lighting, very clear and visible" if is_indoor else "well-lit evening street, bright streetlights, clear visibility"), "quiet evening ambience (no reverb)"
+            
     elif any(k in combined_text for k in ["mưa", "ẩm ướt", "nồm"]): 
-        return ("rain droplets on window, soft overcast indoor lighting" if is_indoor else "light rain, wet ground, overcast sky"), "subtle rain ambience (no reverb)"
+        return ("rain droplets on window, bright diffused indoor lighting, abundantly well-illuminated" if is_indoor else "light rain, bright overcast sky, clear visibility"), "subtle rain ambience (no reverb)"
     elif any(k in combined_text for k in ["nắng", "trưa hè"]): 
-        return ("warm sunbeams through window" if is_indoor else "sunny daylight, golden sunbeams"), "subtle breeze ambience (no reverb)"
+        return ("bright warm sunbeams through window, abundantly well-lit room" if is_indoor else "bright sunny daylight, golden sunbeams, highly illuminated"), "subtle breeze ambience (no reverb)"
     elif any(k in combined_text for k in ["sáng sớm", "buổi sáng", "bình minh"]): 
-        return "fresh morning sunlight", "subtle morning ambience (no reverb)"
+        return "bright fresh morning sunlight, well-illuminated", "subtle morning ambience (no reverb)"
     elif any(k in combined_text for k in ["hoàng hôn", "chiều tà", "buổi chiều"]): 
-        return "warm amber sunset glow", "subtle evening ambience (no reverb)"
+        return "bright warm amber sunset glow, clear visibility", "subtle evening ambience (no reverb)"
         
-    return ("clean natural daylight with soft warm fill light" if is_indoor else "bright commercial daylight"), ""
+    # Mặc định luôn luôn RỰC SÁNG
+    return ("brightly lit, clean abundant natural daylight, well-illuminated indoor space, clear visibility" if is_indoor else "bright commercial daylight, abundantly well-illuminated, clear visibility"), ""
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
     if not prompt_text: return ""
@@ -1117,7 +1129,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     else:
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
-    master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base)
+    master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, raw_prod_name)
 
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
