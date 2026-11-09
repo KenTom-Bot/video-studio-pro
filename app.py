@@ -760,6 +760,9 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_chore = any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
     is_living_room = any(k in setting_lower for k in ["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"]) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
     
+    # 🌟 Gộp chung biến nhận diện bối cảnh trong nhà
+    is_home_indoor = is_bedroom or is_bathroom or is_kitchen or is_chore or is_living_room
+    
     is_office = any(k in setting_lower for k in ["văn phòng", "công sở", "công ty", "họp", "office", "workplace"])
     is_gym_sport = any(k in setting_lower for k in ["thể thao", "chạy bộ", "gym", "tập luyện", "yoga", "workout", "sport"])
     is_event_party = any(k in setting_lower for k in ["tiệc", "sự kiện", "đám cưới", "party", "event"])
@@ -769,22 +772,30 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     
     if intimate_type == "underwear_bra":
-        vibe = "Intimate Apparel Showcase (If bedroom/home: premium silk robe, strictly UNTUCKED, barefoot/slippers. If showroom: elegant blazer, strictly TUCKED IN, high heels)"
+        vibe = "Intimate Apparel Showcase (If bedroom/home: premium soft silk robe, strictly UNTUCKED, barefoot or fluffy slippers. If showroom: elegant blazer, strictly TUCKED IN, pointed-toe high heels)"
     elif intimate_type == "camisole":
-        vibe = "Casual Loungewear (Stylish oversized cardigan over product, comfy shorts, strictly UNTUCKED, indoor slippers)"
+        vibe = "Casual Loungewear (Stylish oversized cardigan layered over the product, comfy shorts, strictly UNTUCKED, barefoot or indoor slippers)"
     
     elif is_fashion:
         if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
             if is_beach_resort: vibe = "Beach/Resort (Top: fitted sleeveless camisole, strictly TUCKED IN. Bottom: product. Footwear: flat beach sandals)"
             elif is_office: vibe = "Professional Office (Top: tailored long-sleeve silk blouse, strictly TUCKED IN. Bottom: product. Footwear: pointed-toe heels)"
-            else: vibe = "Trendy Streetwear (Top: chic cropped tee or knit top, strictly UNTUCKED. Bottom: product. Footwear: clean white sneakers)"
-        elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie"]):
+            # 🌟 Đã bổ sung logic ĐỒNG BỘ ĐỒ MẶC NHÀ (Cozy Homewear)
+            elif is_home_indoor: vibe = "Cozy Homewear (Top: comfortable loose cotton t-shirt or cozy sweater, strictly UNTUCKED. Bottom: product. Footwear: fluffy indoor slippers or barefoot)"
+            else: vibe = "Trendy Streetwear (Top: chic cropped tee or stylish knit top, strictly UNTUCKED. Bottom: product. Footwear: clean white sneakers)"
+        elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie", "cardigan", "polo"]):
             if is_beach_resort: vibe = "Beach/Resort (Top: product, strictly UNTUCKED. Bottom: wide-leg linen pants. Footwear: woven sandals)"
-            elif is_office: vibe = "Professional Office (Top: product, strictly TUCKED IN. Bottom: tailored trousers. Footwear: pointed-toe heels)"
-            else: vibe = "Trendy Streetwear (Top: product, strictly UNTUCKED. Bottom: fashionable straight jeans. Footwear: clean white sneakers)"
+            elif is_office: vibe = "Professional Office (Top: product, strictly TUCKED IN. Bottom: tailored trousers or pencil skirt. Footwear: pointed-toe heels)"
+            # 🌟 Đã bổ sung logic ĐỒNG BỘ ĐỒ MẶC NHÀ (Cozy Homewear)
+            elif is_home_indoor: vibe = "Cozy Homewear (Top: product, strictly UNTUCKED. Bottom: comfy loose cotton pants or shorts. Footwear: fluffy indoor slippers or barefoot)"
+            else: vibe = "Trendy Streetwear (Top: product, strictly UNTUCKED. Bottom: fashionable straight jeans or pleated skirt. Footwear: clean white sneakers)"
         else:
-            if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Full product fitted, structured blazer, stilettos)"
-            else: vibe = "High-Fashion Lookbook (Full product fitted, elegant makeup, premium matching footwear)"
+            if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Wearing the full product perfectly fitted, elegant makeup, stilettos)"
+            elif is_beach_resort: vibe = "Beach/Resort (Wearing the full product perfectly fitted, wide-brim woven hat, woven beach sandals)"
+            # 🌟 Đã bổ sung logic ĐỒNG BỘ ĐỒ MẶC NHÀ (Cozy Homewear)
+            elif is_home_indoor: vibe = "Cozy Homewear (Wearing the full product perfectly fitted, strictly UNTUCKED, bare face/light makeup, fluffy indoor slippers or barefoot)"
+            elif is_office: vibe = "Professional Office (Wearing the full product perfectly fitted, strictly TUCKED IN, pointed-toe heels)"
+            else: vibe = "Trendy Streetwear (Wearing the full product perfectly fitted, clean white sneakers or stylish loafers)"
             
     elif is_bedroom:
         vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, strictly UNTUCKED, barefoot or fluffy indoor slippers)"
