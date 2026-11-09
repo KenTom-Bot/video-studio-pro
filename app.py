@@ -60,7 +60,6 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "💡 Chia Sẻ Mẹo Hay & Kiến Thức Hữu Ích",
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
-
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: AI tự phân tích tệp khách hàng để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
@@ -69,10 +68,12 @@ COMPACT_CORE_RULES = """
    - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách.
    - GIA DỤNG/CÔNG NGHỆ/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/eo hoặc dưới sàn. TUYỆT ĐỐI KHÔNG CẦM NHƯ NGHE ĐIỆN THOẠI. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
    - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
-3. LÕI THOẠI KOC THỰC CHIẾN & CHỐNG LẶP TỪ (CRITICAL):
+3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
+   - NỘI DUNG 4 CẢNH: Cảnh 1 (Hook/Nỗi đau) -> Cảnh 2 & Cảnh 3 (Tập trung 100% vào test công năng, chất liệu, cảm nhận thực tế) -> Cảnh 4 (Kêu gọi chốt sale CTA). 
    - NHẬP VAI 3 PHONG CÁCH: Kịch bản 1 (Năng động, dồn dập). Kịch bản 2 (Tâm sự, thủ thỉ, gần gũi). Kịch bản 3 (Chuyên gia, tập trung công năng).
-   - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu (Cấm "giá đang giảm giá", cấm "form hộp đứng form").
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Cấm "ngay tay". Chốt tự nhiên: "Deal hôm nay quá hời, mấy bà nhấp góc trái mua luôn nha".
+   - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào trong toàn bộ kịch bản. Dành phần lời thoại đó để nói thêm về tính năng sản phẩm.
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cảnh 4 chỉ cần kêu gọi hành động mượt mà (VD: "Deal hôm nay quá hời, mấy bà nhấp góc trái xem luôn nha", "Bấm giỏ hàng góc trái"). Cấm dùng từ "ngay tay".
+   - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 5. BỐI CẢNH THUẦN VIỆT BÌNH DÂN, GẦN GŨI (CRITICAL SETTING):
