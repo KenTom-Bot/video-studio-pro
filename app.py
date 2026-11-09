@@ -70,16 +70,14 @@ COMPACT_CORE_RULES = """
    - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
 3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
    - NỘI DUNG 4 CẢNH: Cảnh 1 (Hook/Nỗi đau) -> Cảnh 2 & Cảnh 3 (Tập trung 100% vào test công năng, chất liệu, cảm nhận thực tế) -> Cảnh 4 (Kêu gọi chốt sale CTA). 
-   - NHẬP VAI 3 PHONG CÁCH: Kịch bản 1 (Năng động, dồn dập). Kịch bản 2 (Tâm sự, thủ thỉ, gần gũi). Kịch bản 3 (Chuyên gia, tập trung công năng).
    - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào trong toàn bộ kịch bản. Dành phần lời thoại đó để nói thêm về tính năng sản phẩm.
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cảnh 4 chỉ cần kêu gọi hành động mượt mà (VD: "Deal hôm nay quá hời, mấy bà nhấp góc trái xem luôn nha", "Bấm giỏ hàng góc trái"). Cấm dùng từ "ngay tay".
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cảnh 4 chỉ cần kêu gọi hành động mượt mà.
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
-5. BỐI CẢNH THUẦN VIỆT BÌNH DÂN, GẦN GŨI (CRITICAL SETTING):
-   - 100% bối cảnh phải toát lên vẻ mộc mạc, bình dân, quen thuộc của đời sống nông thôn hoặc ngoại ô Việt Nam (VD: nhà cấp 4, sân gạch, hiên nhà, bếp giản dị, phòng khách mộc mạc...).
-   - TIẾNG ANH (khi tạo Prompt ảnh/video): BẮT BUỘC dùng các cụm từ "authentic humble rural Vietnamese home, relatable ordinary setting, rustic".
-   - TUYỆT ĐỐI CẤM các bối cảnh xa hoa, hào nhoáng (No luxury, no high-end mansion, no fancy studio).
+5. ĐA DẠNG BỐI CẢNH THEO NGÀNH HÀNG (CRITICAL SETTING):
+   - GIA DỤNG/ĐỜI SỐNG/THỰC PHẨM: Ưu tiên bối cảnh thuần Việt bình dân, mộc mạc (nhà cấp 4, bếp giản dị, sân gạch...). Tiếng Anh: "authentic humble rural Vietnamese home, rustic". CẤM xa hoa.
+   - THỜI TRANG/PHỤ KIỆN/MỸ PHẨM: BẮT BUỘC linh hoạt, đa dạng bối cảnh đời thực sang trọng, trẻ trung hoặc năng động (VD: Quán cafe đẹp, Trung tâm thương mại/Mall, Phòng Gym, Phố đi bộ, Studio, Showroom). Lời thoại cũng phải thiên hướng hiện đại, trendy.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -1130,7 +1128,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scene_1_action_inst = f"{action_scene_1} (under 18 words)"
 
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, raw_prod_name)
-
+    
+    # Phân loại hướng dẫn bối cảnh theo ngành hàng
+    if is_fashion_wearable or is_footwear_accessory or is_cosmetics:
+        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC linh hoạt đa dạng bối cảnh (như stylish cafe, modern shopping mall, gym, busy street...) sao cho thật khớp với phong cách thời trang/mỹ phẩm."
+    else:
+        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable')."
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
     MÔ TẢ TIẾNG ANH: {clean_prod_en}. 
@@ -1150,7 +1153,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "title": "{fixed_title}",
-        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable').",
+        "master_setting_en": "{master_setting_instruction}",
         "wardrobe_lock": {{
             "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc, áo trong, áo ngoài, quần/váy, giày dép, và trạng thái SƠ VIN hay BỎ ÁO NGOÀI QUẦN).",
             "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT. You MUST explicitly include either 'TUCKED IN' or 'UNTUCKED' to lock the shirt styling. E.g., 'hair tied in a bun, wearing a beige linen shirt UNTUCKED over brown trousers, bare feet.' MUST NOT contain 'or', 'maybe'."
