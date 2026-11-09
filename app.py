@@ -1142,17 +1142,17 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     NHIỆM VỤ ĐẠO DIỄN:
     1. Dùng "kéo" cắt đoạn thoại trên thành 4 phần hợp lý để điền vào trường "voiceover" của 4 cảnh (TUYỆT ĐỐI KHÔNG VIẾT LẠI THOẠI KHÁC).
     2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng. ĐẶC BIỆT LƯU Ý Ở CẢNH 1: MÔ TẢ ĐÚNG HÀNH ĐỘNG ĐÓ BẰNG TIẾNG ANH VÀO 'action_en'.
-    - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. Nếu thoại rủ "đi cafe", bối cảnh BẮT BUỘC là "coffee shop / cafe". CẤM set "bedroom".
-    - VỊ TRÍ TƯƠNG TÁC (CRITICAL): Tôn trọng công năng sản phẩm. NẾU KHÔNG PHẢI MỸ PHẨM HOẶC ĐỒ ĂN -> TUYỆT ĐỐI CẤM nhân vật đưa tay/sản phẩm lên mặt (CẤM dùng các từ: rubbing face, touching cheek, massaging face). Tay chỉ được cầm sản phẩm ngang ngực (chest level).
-    - HÀNH ĐỘNG HÌNH THỂ (Cảnh 1): Phải mô tả KOC đang biểu cảm cơ thể chân thực khớp với nỗi đau (gãi ngứa, bịt mũi vì hôi, nhăn nhó vì đau mỏi...).
+    - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. CẤM dùng từ luxury hay high-end, ưu tiên bình dân, mộc mạc ('authentic humble rural, ordinary and relatable').
+    - HÀNH ĐỘNG TEST THỰC TẾ (CRITICAL cho Cảnh 2 & 3): BẮT BUỘC trích xuất ĐỘNG TỪ TƯƠNG TÁC từ lời thoại để dịch thành tiếng Anh cho trường `action_en` (VD: thoại nói "lau dầu mỡ" -> action_en phải là "wiping grease off the stove firmly with the product"). CẤM ghi chung chung là "holding".
+    - VỊ TRÍ TƯƠNG TÁC (CRITICAL): Tôn trọng công năng sản phẩm. NẾU KHÔNG PHẢI MỸ PHẨM HOẶC ĐỒ ĂN -> TUYỆT ĐỐI CẤM đưa tay/sản phẩm lên mặt (CẤM dùng: rubbing face, touching cheek). Tay chỉ tương tác ngang ngực hoặc dưới sàn.
 
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "title": "{fixed_title}",
-        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable, not luxurious'). CẤM dùng từ luxury hay high-end.",
+        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable').",
         "wardrobe_lock": {{
             "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc, áo trong, áo ngoài, quần/váy, giày dép, và trạng thái SƠ VIN hay BỎ ÁO NGOÀI QUẦN).",
-            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT. You MUST explicitly include either 'TUCKED IN' (sơ vin) or 'UNTUCKED' (bỏ ngoài quần) to lock the shirt styling. E.g., 'hair tied in a bun, wearing a beige linen shirt UNTUCKED over brown trousers, bare feet.' MUST NOT contain 'or', 'maybe'. This EXACT string tightly locks the hair, tucking status, and clothing across all scenes."
+            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT. You MUST explicitly include either 'TUCKED IN' or 'UNTUCKED' to lock the shirt styling. E.g., 'hair tied in a bun, wearing a beige linen shirt UNTUCKED over brown trousers, bare feet.' MUST NOT contain 'or', 'maybe'."
         }},
         "scenes": [
             {{
@@ -1161,25 +1161,25 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 "expression_en": "{'wincing, vigorously scratching skin, or showing physical discomfort' if is_pas_story else 'lively, engaging expression'}",
                 "action_en": "{scene_1_action_inst} (under 25 words)",
                 "sfx": "Foley thực tế (không nhạc)",
-                "director": "Attention | {'Trực tiếp mô tả HÀNH ĐỘNG CƠ THỂ BỊ NỖI ĐAU (TUYỆT ĐỐI KHÔNG CÓ SẢN PHẨM)' if is_pas_scn1_no_prod else 'Đưa sản phẩm ra tiền cảnh'}",
+                "director": "Attention | {'Trực tiếp mô tả HÀNH ĐỘNG CƠ THỂ BỊ NỖI ĐAU' if is_pas_scn1_no_prod else 'Đưa sản phẩm ra tiền cảnh'}",
                 "voiceover": "Trích chính xác phần đầu của kịch bản thoại gốc..."
             }},
             {{
                 "scene": 2, "aida_stage": "Interest",
                 "setting": "Bối cảnh thực tế...",
                 "expression_en": "relieved, confident and enthusiastic",
-                "action_en": "{action_scene_2} (under 20 words)",
+                "action_en": "MÔ TẢ HÀNH ĐỘNG BÁM SÁT THOẠI (Dịch động từ test SP từ thoại ra tiếng Anh). CẤM ghi chung chung. (under 20 words)",
                 "sfx": "Tiếng thao tác thực tế",
-                "director": "Interest | Giữ đúng tỷ lệ sản phẩm + Cầu nối 3 nhánh",
+                "director": "Interest | Thao tác test thực tế theo thoại",
                 "voiceover": "Trích đoạn tiếp theo của kịch bản thoại gốc..."
             }},
             {{
                 "scene": 3, "aida_stage": "Desire",
                 "setting": "Bối cảnh đồng bộ...",
                 "expression_en": "smiling contentedly with approving nod",
-                "action_en": "{action_scene_3} (under 20 words)",
+                "action_en": "MÔ TẢ HÀNH ĐỘNG TEST THỰC TẾ BÁM SÁT THOẠI. CẤM ghi chung chung. (under 20 words)",
                 "sfx": "Tiếng trải nghiệm thực tế",
-                "director": "Desire | Thao tác cận cảnh không biến dạng sản phẩm",
+                "director": "Desire | Thao tác cận cảnh thực tế",
                 "voiceover": "Trích đoạn tiếp theo của kịch bản thoại gốc..."
             }},
             {{
@@ -1217,7 +1217,19 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
-    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precise wardrobe outfit across all scenes. Presenter speaking directly to the lens] {base_char_prompt}"
+    # 🌟 [NEW] TRÍCH XUẤT TRẠNG THÁI SƠ VIN TỪ STYLIST ĐỂ KHÓA CỨNG
+    vibe_lower = stylist_vibe_text.lower()
+    tucking_lock = ""
+    tucking_neg = ""
+
+    if "strictly untucked" in vibe_lower:
+        tucking_lock = "SHIRT IS STRICTLY UNTUCKED (hem hanging loose completely outside pants/skirt)"
+        tucking_neg = "tucked in shirt, tucked into pants, tucked into skirt, half tuck, french tuck, "
+    elif "strictly tucked in" in vibe_lower:
+        tucking_lock = "SHIRT IS STRICTLY TUCKED IN (hem securely tucked inside pants/skirt)"
+        tucking_neg = "untucked shirt, loose shirt hem, hanging shirt, shirt outside pants, "
+
+    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precise wardrobe outfit across all scenes. {tucking_lock}. Presenter speaking directly to the lens] {base_char_prompt}"
     final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
 
     anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
@@ -1231,12 +1243,12 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
     
     dynamic_footwear_neg = ""
-    vibe_lower = stylist_vibe_text.lower()
     if any(k in vibe_lower for k in ["barefoot", "slipper"]): dynamic_footwear_neg = "sneakers, sports shoes, running shoes, leather shoes, dress shoes, high heels, boots, outside shoes, "
     elif any(k in vibe_lower for k in ["sneaker", "running", "athletic"]): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
     elif any(k in vibe_lower for k in ["heel", "loafer", "dress"]): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
     
-    char_neg_extra = f"{dynamic_footwear_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, tucking in shirt, untucking shirt, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    # 🌟 [NEW] CẬP NHẬT LẠI NEGATIVE PROMPT (Chỉ cấm hành động ngược lại)
+    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     # 🌟 ÉP CHẶT LỆNH CẤM ĐƯA SẢN PHẨM LÊN MẶT TRONG NEGATIVE PROMPT NẾU KHÔNG PHẢI MỸ PHẨM/ĐỒ ĂN
     face_touch_neg = "" if (is_cosmetics or is_food) else "holding like a phone, holding to ear, pressing against cheek, touching face, hand on face, hands near face, touching hair, covering face, product near face, bringing object to face, eating, smelling, "
@@ -1326,12 +1338,14 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
         # 🌟 CẤU TRÚC LẠI THÀNH PROMPT [IMAGE-TO-VIDEO]
+        anti_morph_action_lock = "STRICTLY maintain the product's exact geometric shape, original size, and proportions without any deformation, melting, or morphing during the action."
+        
         if is_pas_scn1_no_prod:
             raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION]: {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
         elif not is_fashion_wearable or ((is_fashion_wearable or is_footwear_accessory) and (idx_scn in [1, 2])):
-            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {anti_morph_action_lock} {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
         else:
-            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {anti_morph_action_lock} {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
         vid_parts = raw_vid.split('[AUDIO]:')
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
