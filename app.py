@@ -1431,7 +1431,12 @@ def clone_script(script_id):
     
 def generate_more_scripts(unified_strategy_format, char_profiles, extra_note=""):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
-    cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
+    
+    # 🌟 Lấy danh sách các kịch bản ĐÃ TẠO để ép AI không được viết trùng
+    existing_scripts = st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts
+    cur_len = len(existing_scripts)
+    existing_info = " | ".join([f"{sc.get('title', '')} ({sc.get('setting', '')})" for sc in existing_scripts])
+    
     active_note = extra_note.strip() if extra_note.strip() else st.session_state.get("current_input_context", "").strip()
     active_format = unified_strategy_format if unified_strategy_format else st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
     
@@ -1445,18 +1450,20 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
     GHI CHÚ: '{active_note if active_note else "none"}'
     
-    NHIỆM VỤ: TẠO THÊM 3 KỊCH BẢN MỚI Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. ĐẶC BIỆT LƯU Ý:
-    - BẮT BUỘC phải nói đúng về SẢN PHẨM GỐC ở trên (Đúng tên, đúng công dụng, đúng giá). TUYỆT ĐỐI KHÔNG sáng tạo ra sản phẩm khác.
-    - Kịch bản 1: Giọng điệu năng động, dồn dập.
-    - Kịch bản 2: Giọng tâm sự, chia sẻ, gần gũi.
-    - Kịch bản 3: Giọng chuyên gia, nhấn mạnh công năng.
+    🛑 CÁC TUYẾN NỘI DUNG/BỐI CẢNH ĐÃ TẠO TRƯỚC ĐÓ (CẤM TRÙNG LẶP):
+    [{existing_info if existing_info else "Chưa có"}]
+    
+    NHIỆM VỤ: TẠO THÊM 3 KỊCH BẢN MỚI Ở 3 BỐI CẢNH ĐỜI THỰC HOÀN TOÀN MỚI. ĐẶC BIỆT LƯU Ý:
+    - BẮT BUỘC phải nói đúng về SẢN PHẨM GỐC ở trên. TUYỆT ĐỐI KHÔNG sáng tạo ra sản phẩm khác.
+    - THIẾT KẾ 3 TUYẾN NỘI DUNG ĐA DẠNG: Đưa KOC vào các hoàn cảnh sử dụng thực tế MỚI TINH (VD với thời trang: Đi cafe, Đi quẩy, Hẹn hò, Đi du lịch, Đi tập gym...). 
+    - CRITICAL: CẤM VIẾT TRÙNG LẠI các bối cảnh hoặc góc độ (title) đã liệt kê ở danh sách ĐÃ TẠO bên trên.
     
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tuyến nội dung MỚI 1 (VD: Outfit Check-in Cafe)", "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tuyến nội dung MỚI 2", "setting": "Bối cảnh MỚI 2", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tuyến nội dung MỚI 3", "setting": "Bối cảnh MỚI 3", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }}
         ]
     }}
     """
@@ -1471,7 +1478,6 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
             "custom_note": active_note, "presentation_format": active_format
         })
     return more_scripts
-
 # ==============================================================================
 # 11. GIAO DIỆN THANH BÊN (SIDEBAR) & QUẢN TRỊ ADMIN
 # ==============================================================================
@@ -1823,11 +1829,12 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu/Họa tiết Hero SKU: '{args['hero_sku_override']}'. NẾU CÓ NHIỀU MÀU TRONG ẢNH, CHỈ GIỮ LẠI ĐÚNG MÀU/HỌA TIẾT NÀY!" if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot. NẾU ẢNH CÓ HỌA TIẾT, BẮT BUỘC PHẢI MÔ TẢ CHI TIẾT HỌA TIẾT. NẾU ẢNH CÓ NHIỀU MÀU, CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU KHÁC!"
             skirt_note_rule = "ĐẶC BIỆT: Ghi chú có yêu cầu 'quần dạng váy 1 ống / quần váy', trong 'product_visual_en' BẮT BUỘC mô tả là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', TUYỆT ĐỐI CẤM dùng từ 'pants' hoặc 'trousers'!" if detect_single_tube_skirt(args["custom_note"]) else ""
 
-            prompt = f"""
+prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args["unified_strategy_format"]}'
             HERO SKU: {override_instruction}
             {skirt_note_rule}
             - Tách biệt 100% SP khỏi người mẫu gốc trong ảnh. Tự thiết kế KOC người Việt phù hợp ('koc_demographic_analysis') & phối đồ Stylist ('stylist_coordination_vi').
+            - CRITICAL: TẠO 3 TUYẾN NỘI DUNG VÀ BỐI CẢNH HOÀN TOÀN KHÁC NHAU. Tùy thuộc vào ngành hàng để đưa ra tình huống thực tế (VD với thời trang/mỹ phẩm: Đi làm, Đi chơi, Hẹn hò, Cafe, Thể thao, Du lịch...). CẤM gò bó vào các góc độ chung chung.
 
             TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json).
             {{
@@ -1872,9 +1879,9 @@ if st.session_state.get("trigger_main_generation"):
                     "prompt_dna_lock": "Visual DNA lock"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-                    {{ "id": 2, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-                    {{ "id": 3, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
+                    {{ "id": 1, "title": "Tuyến nội dung 1 (VD: Outfit Hẹn hò)", "setting": "Bối cảnh 1 (Phù hợp tuyến 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
+                    {{ "id": 2, "title": "Tuyến nội dung 2 (VD: Mặc đi làm)", "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
+                    {{ "id": 3, "title": "Tuyến nội dung 3 (VD: Dạo phố cuối tuần)", "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }}
                 ]
             }}
             """
