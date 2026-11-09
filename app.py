@@ -1128,7 +1128,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     1. Dùng "kéo" cắt đoạn thoại trên thành 4 phần hợp lý để điền vào trường "voiceover" của 4 cảnh (TUYỆT ĐỐI KHÔNG VIẾT LẠI THOẠI KHÁC).
     2. Dựa vào nội dung thoại từng phần, thiết kế bối cảnh (setting) và hành động (action_en) tương ứng. ĐẶC BIỆT LƯU Ý Ở CẢNH 1: MÔ TẢ ĐÚNG HÀNH ĐỘNG ĐÓ BẰNG TIẾNG ANH VÀO 'action_en'.
     - ĐỒNG BỘ BỐI CẢNH (CRITICAL): Bối cảnh chung (master_setting_en) PHẢI KHỚP 100% với không gian được nhắc đến trong lời thoại. Nếu thoại rủ "đi cafe", bối cảnh BẮT BUỘC là "coffee shop / cafe". CẤM set "bedroom".
-    - VỊ TRÍ TƯƠNG TÁC (CRITICAL): Tôn trọng công năng sản phẩm. CẤM đưa sản phẩm lên mặt nếu không phải là mỹ phẩm bôi mặt hoặc đồ ăn.
+    - VỊ TRÍ TƯƠNG TÁC (CRITICAL): Tôn trọng công năng sản phẩm. NẾU KHÔNG PHẢI MỸ PHẨM HOẶC ĐỒ ĂN -> TUYỆT ĐỐI CẤM nhân vật đưa tay/sản phẩm lên mặt (CẤM dùng các từ: rubbing face, touching cheek, massaging face). Tay chỉ được cầm sản phẩm ngang ngực (chest level).
     - HÀNH ĐỘNG HÌNH THỂ (Cảnh 1): Phải mô tả KOC đang biểu cảm cơ thể chân thực khớp với nỗi đau (gãi ngứa, bịt mũi vì hôi, nhăn nhó vì đau mỏi...).
 
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
@@ -1256,6 +1256,19 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("action_en") or action_scene_2, flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
         
+        # 🌟 [NEW] BỘ LỌC CỨNG: ÉP CẤM SỜ LÊN MẶT NẾU KHÔNG PHẢI MỸ PHẨM
+        if not is_cosmetics and not is_food:
+            face_patterns = [
+                r'\b(?:rubbing|touching|massaging|scratching|applying|holding|putting)\s+(?:hands?\s+|fingers?\s+)?(?:on|to|near|against)\s+(?:face|cheek|chin|nose|forehead|eye|head)\b',
+                r'\b(?:rubbing|touching|massaging|scratching|applying)\s+(?:face|cheek|chin|nose|forehead|eye|head)\b'
+            ]
+            for pat in face_patterns:
+                clean_act = re.sub(pat, 'interacting dynamically at chest level', clean_act, flags=re.IGNORECASE)
+            
+            # Khóa thêm chỉ thị thẳng vào prompt để AI Video không tự biên dịch sai
+            if "away from face" not in clean_act.lower():
+                clean_act += " (HANDS AND PRODUCT STRICTLY KEPT AWAY FROM FACE)"
+        
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing"):
                 clean_act = f"standing completely still with zero body rotation, speaking directly to camera, {clean_act}"
@@ -1295,12 +1308,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         # 🌟 AUDIO PROMPT: ĐỒNG BỘ 100% GIỌNG HÀ NỘI CHUẨN ĐA LỨA TUỔI THEO NHÂN VẬT
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
+        # 🌟 CẤU TRÚC LẠI THÀNH PROMPT [IMAGE-TO-VIDEO]
         if is_pas_scn1_no_prod:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}, {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION]: {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
         elif not is_fashion_wearable or ((is_fashion_wearable or is_footwear_accessory) and (idx_scn in [1, 2])):
-            raw_vid = f"[PRODUCT-CENTRIC CAMERA & SETTING]: {cam_shot}, stable camera, {master_setting_en}, {master_env_lighting_en}. [{locked_product_prompt_segment}]. [PRODUCT ACTION & PHYSICS]: {clean_act}. {scene_physics} [PRESENTER]: {locked_character_prompt}, {micro_expr}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync while demonstrating the product in foreground; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
         else:
-            raw_vid = f"[CAMERA & SETTING]: {cam_shot}, gimbal live-action, {master_setting_en}, {master_env_lighting_en}. [SUBJECT]: {locked_character_prompt}, {micro_expr}. [{locked_product_prompt_segment}]. [ACTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
         vid_parts = raw_vid.split('[AUDIO]:')
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
@@ -2031,7 +2045,8 @@ if all_sc:
                     st.caption("💡 *Mẹo giữ nhân vật & màu sản phẩm đồng nhất:* Sau khi tạo ảnh Cảnh 1 ưng ý, copy link ảnh và gắn vào đuôi prompt Cảnh 2, 3, 4: `--cref [URL_ẢNH_CẢNH_1] --cw 100`")
                 
             with c_p2:
-                st.markdown("**🎥 Prompt Video Tinh Gọn (Veo 3 Pro - Âm thanh Studio, Chống Vấp Thoại):**")
+                st.markdown("**🎥 Prompt Video (Image-to-Video) (Veo 3 / Kling / Runway):**")
+                st.caption("💡 *Tải ảnh đã tạo ở khung bên cạnh lên AI Video làm khung hình đầu tiên, sau đó dán prompt này để tạo chuyển động & khớp giọng.*")
                 st.code(vid_p := scn.get('vid_p', ''), language="text")
                 safe_copy_button(vid_p, f"📋 Sao Chép Prompt Video Cảnh {idx}")
             
