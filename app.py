@@ -1300,18 +1300,24 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         clean_act = sanitize_destructive_motion_verbs(sanitize_third_party_ip(re.sub(r'^(?:Character\s+(?:is\s+)?|Subject\s+(?:is\s+)?)', '', scn.get("action_en") or action_scene_2, flags=re.IGNORECASE).strip()).rstrip('.'), is_fashion=is_fashion_wearable, is_food=is_food)
         if is_single_skirt_mode: clean_act = enforce_single_tube_skirt_syntax(clean_act)
         
-        # 🌟 [NEW] BỘ LỌC CỨNG: ÉP CẤM SỜ LÊN MẶT NẾU KHÔNG PHẢI MỸ PHẨM
+        # 🌟 BỘ LỌC TỐI THƯỢNG: CẤM TUYỆT ĐỐI SỜ MẶT (Cho cả Biểu cảm & Hành động)
+        hand_lock_prompt = ""
         if not is_cosmetics and not is_food:
-            face_patterns = [
-                r'\b(?:rubbing|touching|massaging|scratching|applying|holding|putting|bringing)\s+(?:hands?\s+|fingers?\s+|arms?\s+)?(?:on|to|near|against|towards)\s+(?:face|cheek|chin|nose|forehead|eye|head|hair)\b',
-                r'\b(?:rubbing|touching|massaging|scratching|applying|brushing)\s+(?:face|cheek|chin|nose|forehead|eye|head|hair)\b'
-            ]
-            for pat in face_patterns:
-                clean_act = re.sub(pat, 'gesturing dynamically', clean_act, flags=re.IGNORECASE)
+            # 1. Dùng Regex siêu càn quét xóa sạch các từ khóa sờ mặt trong Action và Expression
+            face_parts = r'(?:face|cheek|chin|nose|forehead|eye|head|hair|ear|neck)'
+            face_verbs = r'(?:rubbing|touching|massaging|scratching|applying|holding|putting|bringing|brushing|wiping|resting|fixing|adjusting)'
+            pattern = rf'\b{face_verbs}\b\s+(?:hands?\s+|fingers?\s+|arms?\s+)?(?:on|to|near|against|towards|over)?\s*{face_parts}\b'
             
-            # Khóa chỉ thị thẳng vào prompt: Ép tay phải ở dưới ngực/vai
-            if "zero hand-to-face" not in clean_act.lower():
-                clean_act += " (hands gesturing strictly below chest level, absolutely zero hand-to-face contact, do not touch face or hair)"
+            clean_act = re.sub(pattern, 'gesturing dynamically', clean_act, flags=re.IGNORECASE)
+            micro_expr = re.sub(pattern, 'expressing naturally', micro_expr, flags=re.IGNORECASE)
+            
+            # Cấm thủ công thêm các từ gãi, lau mồ hôi, chống cằm chung chung
+            for word in ["scratching head", "wiping sweat", "resting chin", "fixing hair", "brushing hair", "touching face", "hand on face"]:
+                clean_act = clean_act.lower().replace(word, "gesturing")
+                micro_expr = micro_expr.lower().replace(word, "smiling")
+
+            # 2. TẠO KHÓA LỆNH CHUYÊN BIỆT ĐỂ BƠM THẲNG VÀO VIDEO PROMPT
+            hand_lock_prompt = " [CRITICAL HAND LOCK: Keep hands STRICTLY below chest level at all times. ABSOLUTELY ZERO hand-to-face contact. DO NOT touch face, chin, or hair.]"
         
         if not is_fashion_wearable and not is_pas_scn1_no_prod:
             if not clean_act.lower().startswith("standing"):
@@ -1351,18 +1357,16 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         scn["img_neg"] = base_neg_prompt
         clean_vo_audio = clean_and_normalize_voiceover(re.sub(r'\.{2,}', '.', vo_text).strip())
 
-        # 🌟 AUDIO PROMPT: ĐỒNG BỘ 100% GIỌNG HÀ NỘI CHUẨN ĐA LỨA TUỔI THEO NHÂN VẬT
+        # 🌟 AUDIO PROMPT
         studio_audio_prompt = f"[AUDIO]: Studio-quality close-mic direct ON-CAMERA speech (Presenter's lips moving perfectly, KOC visibly talking directly to the camera, ZERO off-screen narrator, zero room reverb). {voice_prompt}: \"{clean_vo_audio}\". Foley only [{scn['sfx']}], zero BGM, no text overlays."
 
-        # 🌟 CẤU TRÚC LẠI THÀNH PROMPT [IMAGE-TO-VIDEO]
+        # 🌟 CẤU TRÚC LẠI THÀNH PROMPT [IMAGE-TO-VIDEO] VÀ BƠM KHÓA TAY
         anti_morph_action_lock = "STRICTLY maintain the product's exact geometric shape, original size, and proportions without any deformation, melting, or morphing during the action."
         
         if is_pas_scn1_no_prod:
-            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION]: {clean_act}. [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
-        elif not is_fashion_wearable or ((is_fashion_wearable or is_footwear_accessory) and (idx_scn in [1, 2])):
-            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {anti_morph_action_lock} {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION]: {clean_act}.{hand_lock_prompt} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s natural breathing nod. {studio_audio_prompt}"
         else:
-            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}. {anti_morph_action_lock} {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
+            raw_vid = f"[IMAGE-TO-VIDEO (I2V)]: Use the provided exact image as the starting frame. [MOTION & PHYSICS]: {clean_act}.{hand_lock_prompt} {anti_morph_action_lock} {scene_physics} [TIMING ({dynamic_sec}s)]: 0.0s-{actual_speech}s precise accurate Vietnamese lip-sync; final {cushion_sec}s warm smile & nod. {studio_audio_prompt}"
 
         vid_parts = raw_vid.split('[AUDIO]:')
         if len(vid_parts) == 2: scn["vid_p"] = sanitize_veo3_prompt(vid_parts[0]) + "[AUDIO]:" + vid_parts[1]
