@@ -1829,7 +1829,7 @@ if st.session_state.get("trigger_main_generation"):
             override_instruction = f"Khóa màu/Họa tiết Hero SKU: '{args['hero_sku_override']}'. NẾU CÓ NHIỀU MÀU TRONG ẢNH, CHỈ GIỮ LẠI ĐÚNG MÀU/HỌA TIẾT NÀY!" if args['hero_sku_override'] else "Ưu tiên SKU có icon 🔥/Hot. NẾU ẢNH CÓ HỌA TIẾT, BẮT BUỘC PHẢI MÔ TẢ CHI TIẾT HỌA TIẾT. NẾU ẢNH CÓ NHIỀU MÀU, CHỈ CHỌN 1 MÀU DUY NHẤT ĐỂ KHÓA, BỎ QUA CÁC MÀU KHÁC!"
             skirt_note_rule = "ĐẶC BIỆT: Ghi chú có yêu cầu 'quần dạng váy 1 ống / quần váy', trong 'product_visual_en' BẮT BUỘC mô tả là 'full-length A-line maxi skirt (single unified unsplit skirt tube, zero leg division)', TUYỆT ĐỐI CẤM dùng từ 'pants' hoặc 'trousers'!" if detect_single_tube_skirt(args["custom_note"]) else ""
 
-prompt = f"""
+            prompt = f"""
             INPUT: {input_context_str} | THỂ LOẠI: '{mode}' | CHIẾN LƯỢC: '{args["unified_strategy_format"]}'
             HERO SKU: {override_instruction}
             {skirt_note_rule}
@@ -1885,9 +1885,9 @@ prompt = f"""
                 ]
             }}
             """
+            
             payload = ["PRODUCT IMAGES (EXTRACT RIGID 3D STRUCTURE, EXACT HANDLES/STRAPS, TRUE COLOR, AND OCR PRICES - IGNORE HUMAN MODELS):"]
             for cb, cm in args["temp_images"]:
-                # ...
                 payload.append(types.Part.from_bytes(data=cb, mime_type=cm))
             for c in char_inputs:
                 if c.get("file_bytes"):
