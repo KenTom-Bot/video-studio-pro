@@ -1151,10 +1151,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     {{
         "title": "{fixed_title}",
         "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable, not luxurious'). CẤM dùng từ luxury hay high-end.",
-        "wardrobe_lock": {
+        "wardrobe_lock": {{
             "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc buộc hay thả, áo trong, áo ngoài/áo khoác, quần/váy, và giày dép).",
             "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE (e.g., 'hair tied back in a ponytail' OR 'hair let down flowing') AND EXACT FULL OUTFIT (inner shirt, outer jacket, pants/skirt, footwear). E.g., 'hair tied in a neat ponytail, wearing a white camisole under a fitted short-sleeve mocha brown button-up blazer, matching trousers, nude pointed-toe high heels.' MUST NOT contain 'or', 'maybe'. This EXACT string tightly locks the hair, face, and full clothing layers across all 4 scenes."
-        },
+        }},
         "scenes": [
             {{
                 "scene": 1, "aida_stage": "Attention",
