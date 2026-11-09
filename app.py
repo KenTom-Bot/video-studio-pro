@@ -1331,24 +1331,35 @@ def clone_script(script_id):
     target = next((sc for sc in all_combined if str(sc.get("id")) == str(script_id)), None)
     if not target: return []
     cur_len = len(all_combined)
+    
+    # Ưu tiên lấy thoại đã dựng chi tiết, nếu chưa có thì lấy thoại ở outline
     target_detail = st.session_state.generated_details.get(str(script_id), {})
+    if target_detail and "scenes" in target_detail:
+        full_voice_text = " ".join([s.get('voiceover', '') for s in target_detail["scenes"]])
+    else:
+        full_voice_text = target.get("full_voiceover_script", target.get("hook", ""))
+
     user_custom_note = target.get("custom_note") or st.session_state.get("current_input_context", "").strip()
     presentation_format = target.get("presentation_format") or st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
-    
-    original_voices = [f"- Cảnh {s.get('scene')}: \"{s.get('voiceover')}\"" for s in target_detail.get("scenes", [])] if "scenes" in target_detail else []
-    full_voice_text = "\n".join(original_voices) if original_voices else f"- Hook: \"{target.get('hook', '')}\""
-
     dna = st.session_state.get("content_analysis") or {}
+    
     prompt = f"""
     SP: {dna.get('what_and_unique', '')} | GỐC #{script_id}: '{target.get('title', '')}'
-    THOẠI GỐC:\n{full_voice_text}
-    NHIỆM VỤ: Nhân bản 3 biến thể giữ 90% cấu trúc, đổi bối cảnh đời thực khác nhau. Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
+    
+    LỜI THOẠI GỐC (BẮT BUỘC GIỮ NGUYÊN Y HỆT):
+    "{full_voice_text}"
+    
+    NHIỆM VỤ: 
+    1. Tạo 3 kịch bản biến thể với 3 BỐI CẢNH ĐỜI THỰC KHÁC HOÀN TOÀN bối cảnh gốc.
+    2. CRITICAL: BẮT BUỘC GIỮ NGUYÊN 95-100% LỜI THOẠI GỐC. CHỈ ĐƯỢC PHÉP thay đổi tối đa 2-3 từ ở đầu câu Hook để hợp thức hóa bối cảnh mới (VD gốc là "Đang ngồi nhà..." thì đổi thành "Đang ngồi cafe..."), toàn bộ phần còn lại phải SAO CHÉP Y HỆT bản gốc. TUYỆT ĐỐI không sáng tạo thêm thoại mới.
+    3. Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
+    
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Bãi biển... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Biến thể 1", "setting": "Bối cảnh mới 1 (VD: Quán cafe, Bãi biển...)", "full_voiceover_script": "CHÉP LẠI Y HỆT thoại gốc, chỉ sửa 1-3 chữ ở câu đầu cho khớp bối cảnh...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Biến thể 2", "setting": "Bối cảnh mới 2 (VD: Tiệm sách, Siêu thị...)", "full_voiceover_script": "CHÉP LẠI Y HỆT thoại gốc, chỉ sửa 1-3 chữ ở câu đầu cho khớp bối cảnh...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Biến thể 3", "setting": "Bối cảnh mới 3 (VD: Công viên, Ô tô...)", "full_voiceover_script": "CHÉP LẠI Y HỆT thoại gốc, chỉ sửa 1-3 chữ ở câu đầu cho khớp bối cảnh...", "actors": 1 }}
         ]
     }}
     """
@@ -1366,27 +1377,35 @@ def clone_script(script_id):
             "custom_note": user_custom_note, "presentation_format": presentation_format
         })
     return formatted_clones
-
+    
 def generate_more_scripts(unified_strategy_format, char_profiles, extra_note=""):
     mode = st.session_state.get("last_mode", "🛒 TikTok Shop & Bán Hàng")
     cur_len = len(st.session_state.all_scripts + st.session_state.cloned_scripts + st.session_state.expanded_scripts)
     active_note = extra_note.strip() if extra_note.strip() else st.session_state.get("current_input_context", "").strip()
     active_format = unified_strategy_format if unified_strategy_format else st.session_state.get("last_presentation_format", "🌟 AI Tự Động Phân Tích, Đề Xuất & Mix Đa Dạng")
+    
     dna = st.session_state.get("content_analysis") or {}
+    dna_context = json.dumps(dna, ensure_ascii=False)
     
     prompt = f"""
-    SP: {dna.get('what_and_unique', '')} | CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
+    BẮT BUỘC BÁM SÁT THÔNG TIN SẢN PHẨM/CHỦ ĐỀ GỐC SAU ĐÂY:
+    {dna_context}
+    
+    CHIẾN LƯỢC: '{active_format}' | Xưng '{dna.get("self_pronoun", "em")}' - Gọi '{dna.get("audience_pronoun", "các chị em" if not ("Viral" in mode) else "mọi người")}'.
     GHI CHÚ: '{active_note if active_note else "none"}'
-    TẠO 3 KỊCH BẢN Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. ĐẶC BIỆT LƯU Ý:
+    
+    NHIỆM VỤ: TẠO THÊM 3 KỊCH BẢN MỚI Ở 3 BỐI CẢNH ĐỜI THỰC KHÁC NHAU. ĐẶC BIỆT LƯU Ý:
+    - BẮT BUỘC phải nói đúng về SẢN PHẨM GỐC ở trên (Đúng tên, đúng công dụng, đúng giá). TUYỆT ĐỐI KHÔNG sáng tạo ra sản phẩm khác.
     - Kịch bản 1: Giọng điệu năng động, dồn dập.
     - Kịch bản 2: Giọng tâm sự, chia sẻ, gần gũi.
     - Kịch bản 3: Giọng chuyên gia, nhấn mạnh công năng.
+    
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Bản Năng Động", "setting": "Bối cảnh khớp 100% với thoại (VD: Quán cafe, Đường phố... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Bản Tâm Sự", "setting": "Bối cảnh khớp 100% với thoại (VD: Bãi biển, Siêu thị... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Bản Chuyên Gia", "setting": "Bối cảnh khớp 100% với thoại (VD: Công viên, Tiệm sách... Không ghi chung chung)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ, liền mạch, mượt mà, TỰ NHIÊN NHƯ KOC TÂM SỰ...", "actors": 1 }}
         ]
     }}
     """
