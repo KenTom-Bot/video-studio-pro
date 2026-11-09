@@ -1138,7 +1138,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "title": "{fixed_title}",
-        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH (VD: 'stylish coffee shop with natural sunlight'). Bắt buộc chỉ trả 1 mô tả duy nhất để dùng chung. CRITICAL: NO BEDROOM if the voiceover is about going out/cafe.",
+        "master_setting_en": "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable, not luxurious'). CẤM dùng từ luxury hay high-end.",
         "wardrobe_lock": {{
             "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN, cực kỳ thời trang. (Ghi rõ: loại áo, độ dài tay áo, có sơ vin không, kết hợp giày gì).",
             "master_character_en": "CRITICAL: Define the EXACT outfit down to the sleeve length and tucking. E.g., 'wearing a fitted short-sleeve mocha brown button-up cropped blazer, paired with [Product], and nude pointed-toe high heels.' MUST NOT contain 'or', 'maybe'. This EXACT string locks the outfit across 4 scenes."
@@ -1202,7 +1202,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing high-fashion outfit").strip().rstrip('.')
+    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing casual humble everyday outfit").strip().rstrip('.')
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
