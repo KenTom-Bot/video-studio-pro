@@ -1408,10 +1408,10 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Biến thể 1", "setting": "Bối cảnh mới 1 (VD: Quán cafe, Bãi biển...)", "full_voiceover_script": "CHÉP LẠI Y HỆT thoại gốc, chỉ sửa 1-3 chữ ở câu đầu cho khớp bối cảnh...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Biến thể 2", "setting": "Bối cảnh mới 2 (VD: Tiệm sách, Siêu thị...)", "full_voiceover_script": "CHÉP LẠI Y HỆT thoại gốc, chỉ sửa 1-3 chữ ở câu đầu cho khớp bối cảnh...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Biến thể 3", "setting": "Bối cảnh mới 3 (VD: Công viên, Ô tô...)", "full_voiceover_script": "CHÉP LẠI Y HỆT thoại gốc, chỉ sửa 1-3 chữ ở câu đầu cho khớp bối cảnh...", "actors": 1 }}
-        ]
+                    {{ "id": 1, "title": "Tuyến nội dung 1 (VD: Outfit Hẹn hò)", "setting": "Bối cảnh 1 (Phù hợp tuyến 1)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
+                    {{ "id": 2, "title": "Tuyến nội dung 2 (VD: Mặc đi làm)", "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
+                    {{ "id": 3, "title": "Tuyến nội dung 3 (VD: Dạo phố cuối tuần)", "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }}
+                ]
     }}
     """
     res = call_gemini([prompt], get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", "", 1, "Nhân bản", user_custom_note, presentation_format), max_tokens=2500)
@@ -1461,9 +1461,9 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tuyến nội dung MỚI 1 (VD: Outfit Check-in Cafe)", "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tuyến nội dung MỚI 2", "setting": "Bối cảnh MỚI 2", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tuyến nội dung MỚI 3", "setting": "Bối cảnh MỚI 3", "full_voiceover_script": "Đoạn thoại mới dài 80-110 từ. CẢNH 1-2-3 FULL CÔNG NĂNG. TUYỆT ĐỐI KHÔNG BÁO GIÁ, Cảnh 4 chỉ kêu gọi chốt đơn...", "actors": 1 }}
+            {{ "id": {cur_len+1}, "title": "Tuyến nội dung MỚI 1 (VD: Outfit Check-in Cafe)", "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
+            {{ "id": {cur_len+2}, "title": "Tuyến nội dung MỚI 2", "setting": "Bối cảnh MỚI 2", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
+            {{ "id": {cur_len+3}, "title": "Tuyến nội dung MỚI 3", "setting": "Bối cảnh MỚI 3", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }}
         ]
     }}
     """
