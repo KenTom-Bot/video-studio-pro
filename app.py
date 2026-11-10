@@ -754,12 +754,12 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     s_lower, h_lower = f"{product_en} {setting_vi} {raw_vi_info}".lower(), hero_color.lower()
     setting_lower = setting_vi.lower()
     
+    # 🌟 1. NHẬN DIỆN BỐI CẢNH (Context Detection)
     is_bedroom = any(k in setting_lower for k in ["phòng ngủ", "giường", "bedroom", "pijama", "đồ ngủ", "ngủ", "thức dậy"])
     is_bathroom = any(k in setting_lower for k in ["phòng tắm", "nhà vệ sinh", "toilet", "bathroom", "nhà tắm"])
     is_kitchen = any(k in setting_lower for k in ["bếp", "nấu", "kitchen", "cooking", "ăn"])
     is_chore = any(k in setting_lower for k in ["dọn dẹp", "lau nhà", "vệ sinh", "chà sàn", "phòng giặt", "máy giặt", "laundry", "góc giặt", "ban công"])
     is_living_room = any(k in setting_lower for k in ["phòng khách", "sofa", "nhà", "ở nhà", "living room", "home"]) and not (is_bedroom or is_kitchen or is_chore or is_bathroom)
-    
     is_home_indoor = is_bedroom or is_bathroom or is_kitchen or is_chore or is_living_room
     
     is_office = any(k in setting_lower for k in ["văn phòng", "công sở", "công ty", "họp", "office", "workplace"])
@@ -770,36 +770,46 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     is_single_skirt = detect_single_tube_skirt(s_lower)
     is_evening_fashion = any(k in s_lower for k in ["váy", "đầm", "dự tiệc", "đi tiệc", "công sở", "thanh lịch", "áo dài", "dress", "gown"])
     
-    # 🌟 [NEW] LẤY NGỮ CẢNH THỜI TIẾT TỪ RAW INFO ĐỂ ĐIỀU CHỈNH TRANG PHỤC
+    # 🌟 2. NHẬN DIỆN THỜI TIẾT (Weather Detection)
     is_cold_weather = any(k in s_lower for k in ["lạnh", "rét", "mùa đông", "đại hàn", "ấm áp", "giữ ấm", "lót lông", "gió lùa", "nỉ", "áo khoác", "len", "winter", "cold"])
     
-    if intimate_type == "underwear_bra":
-        vibe = "Intimate Apparel Showcase (If bedroom/home: premium soft silk robe, strictly UNTUCKED, barefoot or fluffy slippers. If showroom: elegant blazer, strictly TUCKED IN, pointed-toe high heels)"
-    elif intimate_type == "camisole":
-        vibe = "Casual Loungewear (Stylish oversized cardigan layered over the product, comfy shorts, strictly UNTUCKED, barefoot or indoor slippers)"
+    # 🌟 3. MA TRẬN PHỐI ĐỒ (Styling Matrix)
     
+    # Nhóm Đồ lót / Nội y
+    if intimate_type == "underwear_bra":
+        vibe = "Intimate Apparel Showcase (If bedroom/home: premium soft silk robe or cozy cotton homewear, strictly UNTUCKED, barefoot or fluffy slippers. If showroom/studio: elegant blazer over a camisole, tailored trousers, strictly TUCKED IN, pointed-toe high heels)"
+    elif intimate_type == "camisole":
+        vibe = "Casual Loungewear (Stylish oversized cardigan layered loosely over the product, comfy shorts, strictly UNTUCKED, barefoot or indoor slippers)"
+    
+    # Nhóm Thời trang (Wearable Fashion)
     elif is_fashion:
+        # Nếu sản phẩm là quần/chân váy (Bottoms)
         if any(k in s_lower for k in ["chân váy", "quần", "skirt", "pants", "jeans", "shorts"]):
             if is_beach_resort: vibe = "Beach/Resort (Top: fitted sleeveless camisole, strictly TUCKED IN. Bottom: product. Footwear: flat beach sandals)"
-            elif is_office: vibe = "Professional Office (Top: tailored long-sleeve silk blouse, strictly TUCKED IN. Bottom: product. Footwear: pointed-toe heels)"
+            elif is_office: vibe = "Professional Office (Top: tailored long-sleeve silk blouse, strictly TUCKED IN. Bottom: product. Footwear: pointed-toe heels or smart loafers)"
             elif is_home_indoor: vibe = f"Cozy Homewear (Top: {'warm cozy sweater' if is_cold_weather else 'comfortable loose cotton t-shirt'}, strictly UNTUCKED. Bottom: product. Footwear: fluffy indoor slippers or barefoot)"
-            else: vibe = f"Trendy Streetwear (Top: {'stylish cozy knit sweater or chic winter coat' if is_cold_weather else 'chic versatile top or stylish t-shirt'}, strictly UNTUCKED. Bottom: product. Footwear: clean white sneakers)"
+            else: vibe = f"Trendy Streetwear (Top: {'stylish cozy knit sweater or chic winter coat' if is_cold_weather else 'chic versatile croptop or stylish t-shirt'}, strictly UNTUCKED. Bottom: product. Footwear: clean white sneakers)"
+        
+        # Nếu sản phẩm là áo/áo khoác (Tops)
         elif any(k in s_lower for k in ["áo", "shirt", "top", "jacket", "sweater", "hoodie", "cardigan", "polo"]):
-            if is_beach_resort: vibe = "Beach/Resort (Top: product, strictly UNTUCKED. Bottom: wide-leg linen pants. Footwear: woven sandals)"
-            elif is_office: vibe = "Professional Office (Top: product, strictly TUCKED IN. Bottom: tailored trousers or pencil skirt. Footwear: pointed-toe heels)"
+            if is_beach_resort: vibe = "Beach/Resort (Top: product, strictly UNTUCKED. Bottom: wide-leg linen pants or comfy shorts. Footwear: woven sandals)"
+            elif is_office: vibe = "Professional Office (Top: product, strictly TUCKED IN. Bottom: tailored trousers or pencil skirt. Footwear: pointed-toe heels or loafers)"
             elif is_home_indoor: vibe = "Cozy Homewear (Top: product, strictly UNTUCKED. Bottom: comfy loose cotton pants or shorts. Footwear: fluffy indoor slippers or barefoot)"
             else: vibe = "Trendy Streetwear (Top: product, strictly UNTUCKED. Bottom: fashionable straight jeans or pleated skirt. Footwear: clean white sneakers)"
+        
+        # Nếu sản phẩm là váy liền/đồ bộ (Full body)
         else:
-            if is_event_party or is_evening_fashion: vibe = "Elegant Evening (Wearing the full product perfectly fitted, elegant makeup, stilettos)"
+            if is_event_party or is_evening_fashion: vibe = f"Elegant Evening (Wearing the full product perfectly fitted, {'with a chic winter coat or fur shawl' if is_cold_weather else 'elegant makeup'}, stilettos)"
             elif is_beach_resort: vibe = "Beach/Resort (Wearing the full product perfectly fitted, wide-brim woven hat, woven beach sandals)"
-            elif is_home_indoor: vibe = "Cozy Homewear (Wearing the full product perfectly fitted, strictly UNTUCKED, bare face/light makeup, fluffy indoor slippers or barefoot)"
+            elif is_home_indoor: vibe = "Cozy Homewear (Wearing the full product perfectly fitted, strictly UNTUCKED, bare face or light makeup, fluffy indoor slippers or barefoot)"
             elif is_office: vibe = "Professional Office (Wearing the full product perfectly fitted, strictly TUCKED IN, pointed-toe heels)"
             else: vibe = "Trendy Streetwear (Wearing the full product perfectly fitted, clean white sneakers or stylish loafers)"
             
+    # Nhóm Gia dụng / Đời sống / Mỹ phẩm (Non-Fashion)
     elif is_bedroom:
         vibe = "Cozy Bedroom (Soft silk/cotton sleepwear or loose pajamas, strictly UNTUCKED, barefoot or fluffy indoor slippers)"
     elif is_bathroom:
-        vibe = "Bathroom/Washroom (Bathrobe or comfortable home wear, strictly UNTUCKED, barefoot or plastic anti-slip slippers)"
+        vibe = "Bathroom/Washroom (Bathrobe or comfortable home wear, hair neatly tied back, strictly UNTUCKED, barefoot or plastic anti-slip slippers)"
     elif is_kitchen or is_chore:
         vibe = f"Active Home/Chores (Neat comfy {'warm sweater or long-sleeve knit' if is_cold_weather else 'linen/cotton wear, rolled-up sleeves'}, strictly UNTUCKED, casual indoor slippers)"
     elif is_living_room:
@@ -816,6 +826,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         if gender == "female": vibe = f"Trendy Cafe/Streetwear ({'Chic cozy knit sweater or stylish winter coat' if is_cold_weather else 'Chic versatile top or stylish t-shirt'}, fashionable jeans, strictly UNTUCKED, clean white sneakers)"
         else: vibe = f"Trendy Cafe/Streetwear ({'Smart-casual sweater or stylish jacket' if is_cold_weather else 'Smart-casual top or polo'}, clean denim, strictly UNTUCKED, minimalist white sneakers)"
 
+    # 🌟 4. CÁC QUY TẮC PHỤ TRỢ (Tương phản, váy 1 ống)
     contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
     if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
     elif is_mom_baby: contrast_note = "Trang phục màu pastel ấm áp, chất liệu thân thiện (cozy soft pastel clothes)"
@@ -823,6 +834,7 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         
     skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
     
+    # 🌟 5. BỘ LỌC ĐẶC QUYỀN CHO TẤT/VỚ (Ghi đè mọi logic quần dài)
     clean_s_lower = re.sub(r'\btất\s+(cả|nhiên|tần tật|thảy)\b', '', s_lower)
     is_socks = bool(re.search(r'\b(vớ|bít tất|tất chân|sock|socks|stocking|tights|tất)\b', clean_s_lower))
     
