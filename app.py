@@ -814,8 +814,8 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         if gender == "female": vibe = "Elegant Evening (Glamorous evening dress, stilettos)"
         else: vibe = "Elegant Evening (Tailored suit, polished dress shoes)"
     else: 
-        if gender == "female": vibe = "Trendy Cafe/Streetwear (Stylish layered outfit, fashionable jeans, strictly UNTUCKED, clean white sneakers)"
-        else: vibe = "Trendy Cafe/Streetwear (Smart-casual layered outfit, overshirt, clean denim, strictly UNTUCKED, minimalist white sneakers)"
+        if gender == "female": vibe = "Trendy Cafe/Streetwear (Chic versatile top or stylish t-shirt, fashionable jeans, strictly UNTUCKED, clean white sneakers)"
+        else: vibe = "Trendy Cafe/Streetwear (Smart-casual top or polo, clean denim, strictly UNTUCKED, minimalist white sneakers)"
 
     contrast_note = "Trang phục màu Beige/Mocha/Xanh pastel làm nổi bật SP trắng/sáng" if any(k in h_lower for k in ["trắng", "white", "kem"]) else "Trang phục thanh lịch, màu sắc nhã nhặn tôn lên SP"
     if is_cosmetics: contrast_note = "Trang điểm tinh tế, tóc tai gọn gàng, trang phục tôn da (clean elegant makeup, neat hair)"
@@ -1176,8 +1176,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "title": "{fixed_title}",
         "master_setting_en": "{master_setting_instruction}",
         "wardrobe_lock": {{
-            "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc, áo trong, áo ngoài, quần/váy, giày dép, và trạng thái SƠ VIN hay BỎ ÁO NGOÀI QUẦN).",
-            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT. You MUST explicitly include either 'TUCKED IN' or 'UNTUCKED' to lock the shirt styling. E.g., 'hair tied in a bun, wearing a beige linen shirt UNTUCKED over brown trousers, bare feet.' MUST NOT contain 'or', 'maybe'."
+            "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc, kiểu áo (có thể 1 lớp hoặc nhiều lớp tùy ý), quần/váy, giày dép, và trạng thái SƠ VIN hay BỎ ÁO NGOÀI QUẦN).",
+            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT (Can be a single top or layered, be diverse). You MUST explicitly include either 'TUCKED IN' or 'UNTUCKED' to lock the shirt styling. E.g., 'hair tied in a bun, wearing a stylish white crop top UNTUCKED with denim shorts, clean sneakers.' MUST NOT contain 'or', 'maybe'."
         }},
         "scenes": [
             {{
