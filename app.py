@@ -825,6 +825,12 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
     skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
     return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}"
 
+    # 🌟 [NEW] BỘ LỌC ĐẶC QUYỀN CHO TẤT/VỚ (SOCKS)
+    is_socks = any(k in s_lower for k in ["tất", "vớ", "sock", "stocking", "tights"])
+    sock_rule = " | CRITICAL SOCKS RULE: The bottom wardrobe MUST strictly be SHORTS or MINI SKIRT (váy ngắn/zip ngắn trên đầu gối) to 100% expose the socks. AI will auto-select the specific style and color of the shorts/skirt to perfectly match the current setting." if is_socks else ""
+    
+    return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}{sock_rule}"
+
 # ==============================================================================
 # 6. QUẢN LÝ DB (SUPABASE) VÀ LƯU TRỮ
 # ==============================================================================
