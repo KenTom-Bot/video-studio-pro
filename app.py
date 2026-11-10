@@ -600,7 +600,9 @@ def detect_footwear_or_accessory(text_to_check: str) -> bool:
     return any(k in t for k in [
         "giày", "dép", "sneaker", "boot", "sandal", "heel", "túi xách", "ví", "balo", 
         "mũ", "nón", "kính", "thắt lưng", "đồng hồ", "trang sức", "dây chuyền", "nhẫn", "khuyên tai", 
-        "shoe", "handbag", "backpack", "wallet", "watch", "glasses", "tất", "vớ", "socks"
+        "shoe", "handbag", "backpack", "wallet", "watch", "glasses", "tất", "vớ", "socks",
+        # 🌟 Bổ sung phụ kiện mùa đông
+        "găng tay", "bao tay", "khăn", "khăn quàng", "glove", "scarf", "mitten"
     ])
 
 def detect_long_handle_tool(text_to_check: str) -> bool:
@@ -1161,11 +1163,11 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, raw_prod_name)
     
-    # Phân loại hướng dẫn bối cảnh theo ngành hàng
+    # Phân loại hướng dẫn bối cảnh theo ngành hàng và ÉP PHÂN TÍCH LỜI THOẠI
     if is_fashion_wearable or is_footwear_accessory or is_cosmetics:
-        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC linh hoạt đa dạng bối cảnh (như stylish cafe, modern shopping mall, gym, busy street...) sao cho thật khớp với phong cách thời trang/mỹ phẩm."
+        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: Phân tích kỹ LỜI THOẠI để chọn bối cảnh khớp 100% (VD: thoại nhắc 'đi làm' -> bối cảnh BẮT BUỘC là đường phố, bãi gửi xe hoặc văn phòng; thoại nhắc 'cafe' -> quán cafe). Phải linh hoạt đa dạng bối cảnh."
     else:
-        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: BẮT BUỘC phải theo phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic, ordinary and relatable')."
+        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: Phân tích LỜI THOẠI để dựng cảnh. NẾU thoại không nhắc đến bối cảnh đặc thù (như đi làm, ngoài đường), thì mới ưu tiên phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic')."
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
     MÔ TẢ TIẾNG ANH: {clean_prod_en}. 
