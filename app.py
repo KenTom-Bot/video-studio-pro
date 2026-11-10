@@ -824,8 +824,10 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         
     skirt_rule = " | ĐẶC BIỆT: Phần dưới là VÁY 1 ỐNG RỘNG (full-length A-line maxi skirt, single unified unsplit skirt tube, zero leg division - CẤM viết từ pants/trousers)!" if is_single_skirt else ""
     
-    # 🌟 [NEW] BỘ LỌC ĐẶC QUYỀN CHO TẤT/VỚ (SOCKS)
-    is_socks = any(k in s_lower for k in ["tất", "vớ", "sock", "stocking", "tights"])
+    # 🌟 [NEW] BỘ LỌC ĐẶC QUYỀN CHO TẤT/VỚ (Fix lỗi từ đồng âm "tất cả")
+    clean_s_lower = re.sub(r'\btất\s+(cả|nhiên|tần tật|thảy)\b', '', s_lower)
+    is_socks = bool(re.search(r'\b(vớ|bít tất|tất chân|sock|socks|stocking|tights|tất)\b', clean_s_lower))
+    
     if is_socks:
         # Xóa sạch các từ khóa quần dài trong vibe để tránh AI bị mâu thuẫn lệnh
         vibe = re.sub(r'\b(jeans|trousers|pants|denim|pencil skirt)\b', 'shorts or mini skirt', vibe, flags=re.IGNORECASE)
@@ -834,7 +836,6 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         sock_rule = ""
     
     return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}{sock_rule}"
-
 # ==============================================================================
 # 6. QUẢN LÝ DB (SUPABASE) VÀ LƯU TRỮ
 # ==============================================================================
@@ -1275,12 +1276,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     # 🌟 [NEW] KHÔI PHỤC BỘ TỪ KHÓA CẤM SỜ MẶT/TÓC
     face_touch_neg = "" if (is_cosmetics or is_food) else "touching face, touching hair, brushing hair, hand on face, hands near face, rubbing cheek, scratching face, fingers on face, hands raised to head, bringing hands up to face, "
 
-    # 🌟 [NEW] CẤM QUẦN DÀI NẾU LÀ TẤT/VỚ
-    is_socks_scene = any(k in check_str.lower() for k in ["tất", "vớ", "sock", "stocking", "tights"])
+    # 🌟 CẤM QUẦN DÀI NẾU LÀ TẤT/VỚ (Fix lỗi từ đồng âm "tất cả")
+    clean_check_str = re.sub(r'\btất\s+(cả|nhiên|tần tật|thảy)\b', '', check_str.lower())
+    is_socks_scene = bool(re.search(r'\b(vớ|bít tất|tất chân|sock|socks|stocking|tights|tất)\b', clean_check_str))
     sock_neg = "long pants, long trousers, jeans, maxi skirt, covering legs, pants covering socks, long denim, " if is_socks_scene else ""
 
-    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Đã bao gồm face_touch_neg)
-    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Đã bao gồm face_touch_neg và sock_neg)
+    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}{sock_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     # (Đoạn base_neg_prompt = f"{anti_morph_neg}..." của bạn vẫn giữ nguyên ở ngay dưới dòng này)
     
