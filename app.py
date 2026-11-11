@@ -845,6 +845,16 @@ def build_multi_industry_stylist_rules(product_en: str, hero_color: str, setting
         sock_rule = " | CRITICAL SOCKS RULE: The bottom wardrobe MUST strictly be SHORTS or MINI SKIRT (váy ngắn/zip ngắn trên đầu gối) to 100% expose the socks. AI will auto-select the specific style and color of the shorts/skirt to perfectly match the current setting."
     else:
         sock_rule = ""
+
+    # 🌟 6. [NEW] BỘ LỌC ĐẶC QUYỀN CHO CROPTOP / ÁO KHOÁC LỬNG
+    is_croptop = any(k in s_lower for k in ["croptop", "crop top", "áo lửng", "dáng ngắn", "ngắn ngang eo", "áo khoác ngắn", "áo khoác lửng"])
+    
+    if is_croptop:
+        # Ghi đè lệnh UNTUCKED để áo trong không lòi ra ngoài
+        vibe = re.sub(r'strictly UNTUCKED', 'inner layer strictly TUCKED IN or wearing a fitted crop top', vibe, flags=re.IGNORECASE)
+        croptop_rule = " | CRITICAL CROPTOP RULE: The inner shirt/top MUST NOT hang below the outer cropped jacket. The inner layer must be seamlessly TUCKED IN to the pants/skirt, OR be a short fitted crop top to perfectly highlight the cropped silhouette of the outer product."
+    else:
+        croptop_rule = ""
     
     return f"HOLISTIC STYLIST LOCK: Fashion Vibe must be [{vibe}]. {contrast_note}{skirt_rule}{sock_rule}"
     
