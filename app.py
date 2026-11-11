@@ -75,9 +75,9 @@ COMPACT_CORE_RULES = """
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
-5. ĐA DẠNG BỐI CẢNH THEO NGÀNH HÀNG (CRITICAL SETTING):
-   - GIA DỤNG/ĐỜI SỐNG/THỰC PHẨM: Ưu tiên bối cảnh thuần Việt bình dân, mộc mạc (nhà cấp 4, bếp giản dị, sân gạch...). Tiếng Anh: "authentic humble rural Vietnamese home, rustic". CẤM xa hoa.
-   - THỜI TRANG/PHỤ KIỆN/MỸ PHẨM: BẮT BUỘC linh hoạt, đa dạng bối cảnh đời thực sang trọng, trẻ trung hoặc năng động (VD: Quán cafe đẹp, Trung tâm thương mại/Mall, Phòng Gym, Phố đi bộ, Studio, Showroom). Lời thoại cũng phải thiên hướng hiện đại, trendy.
+5. ĐA DẠNG BỐI CẢNH ĐỜI THỰC (CRITICAL SETTING):
+   - Bắt buộc phân tích LỜI THOẠI và CÔNG NĂNG sản phẩm để chọn bối cảnh khớp 100%. 
+   - Không gian đa dạng: Nhà ở hiện đại, gọn gàng (phòng khách, bếp, ngủ, tắm), hoặc không gian ngoài (cafe, siêu thị, văn phòng, phòng gym). Bối cảnh phải thực tế, gần gũi với đời sống (Clean, modern, everyday Vietnamese setting).
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -1163,11 +1163,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     master_env_lighting_en, master_env_sfx_en = extract_environmental_lighting_and_weather(full_vo_script, fixed_setting_base, raw_prod_name)
     
-    # Phân loại hướng dẫn bối cảnh theo ngành hàng và ÉP PHÂN TÍCH LỜI THOẠI
-    if is_fashion_wearable or is_footwear_accessory or is_cosmetics:
-        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: Phân tích kỹ LỜI THOẠI để chọn bối cảnh khớp 100% (VD: thoại nhắc 'đi làm' -> bối cảnh BẮT BUỘC là đường phố, bãi gửi xe hoặc văn phòng; thoại nhắc 'cafe' -> quán cafe). Phải linh hoạt đa dạng bối cảnh."
-    else:
-        master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: Phân tích LỜI THOẠI để dựng cảnh. NẾU thoại không nhắc đến bối cảnh đặc thù (như đi làm, ngoài đường), thì mới ưu tiên phong cách nông thôn/bình dân ('authentic humble rural Vietnamese home, rustic')."
+   # Phân loại hướng dẫn bối cảnh: ÉP PHÂN TÍCH LỜI THOẠI & TRẢ LẠI SỰ HIỆN ĐẠI
+    master_setting_instruction = "Mô tả tiếng Anh chi tiết chung cho CẢ 4 CẢNH. CRITICAL: Phân tích kỹ LỜI THOẠI để chọn bối cảnh khớp 100% (VD: thoại nhắc 'đi làm' -> bối cảnh đường phố/văn phòng; thoại nhắc 'nấu ăn' -> không gian bếp hiện đại, gọn gàng). Không gian phải thực tế, gần gũi, clean modern everyday Vietnamese setting."
+
     prompt_text = f"""
     TÊN SẢN PHẨM TIẾNG VIỆT: {raw_prod_name} (Màu/Họa tiết gốc: {hero_color_str})
     MÔ TẢ TIẾNG ANH: {clean_prod_en}. 
@@ -1251,7 +1249,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
-    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing casual humble everyday outfit").strip().rstrip('.')
+    outfit_style_fallback = "stylish high-fashion outfit" if (is_fashion_wearable or is_footwear_accessory or is_cosmetics) else "casual everyday outfit"
+    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing {outfit_style_fallback}").strip().rstrip('.')
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
     
