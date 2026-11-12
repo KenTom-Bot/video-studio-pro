@@ -1413,6 +1413,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     res["scenes"] = scenes
     res["total_dur"] = f"Khoảng {int(total_sec)} giây"
     res["full_voiceover_script"] = clean_and_normalize_voiceover(full_vo_script)
+    final_outfit_vi = w_lock.get("outfit_vi", "AI tự động phối đồ")
     
     summary_lines = [
         f"⏱ <b>Thời lượng:</b> Khoảng {int(total_sec)}s | 🎬 <b>Chiến lược:</b> {presentation_format}",
