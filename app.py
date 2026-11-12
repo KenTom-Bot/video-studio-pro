@@ -1197,8 +1197,8 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         "title": "{fixed_title}",
         "master_setting_en": "{master_setting_instruction}",
         "wardrobe_lock": {{
-            "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN. (BẮT BUỘC ghi rõ: Kiểu tóc, kiểu áo (có thể 1 lớp hoặc nhiều lớp tùy ý), quần/váy, giày dép, và trạng thái SƠ VIN hay BỎ ÁO NGOÀI QUẦN).",
-            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT (Can be a single top or layered, be diverse). You MUST explicitly include either 'TUCKED IN' or 'UNTUCKED' to lock the shirt styling. E.g., 'hair tied in a bun, wearing a stylish white crop top UNTUCKED with denim shorts, clean sneakers.' MUST NOT contain 'or', 'maybe'."
+            "outfit_vi": "Thiết kế 1 set đồ ĐỘC BẢN và CỐ ĐỊNH XUYÊN SUỐT 4 CẢNH. (BẮT BUỘC ghi rõ kiểu dáng + MÀU SẮC CHÍNH XÁC của từng món: Kiểu tóc, màu áo lót trong, màu áo khoác ngoài (nếu có), màu quần/váy, màu giày dép, trạng thái SƠ VIN/BỎ NGOÀI).",
+            "master_character_en": "CRITICAL: Define EXACT HAIRSTYLE and EXACT FULL OUTFIT WITH SPECIFIC COLORS & MATERIALS FOR EVERY SINGLE LAYER. You MUST explicitly name the color of the inner top, outer jacket (if any), bottom, and shoes. E.g., 'black hair tied in a ponytail, wearing a fitted white cotton t-shirt UNTUCKED under a brown leather jacket, with blue denim jeans and white canvas sneakers.' MUST NOT use generic words like 'stylish top'. MUST NOT contain 'or', 'maybe'."
         }},
         "scenes": [
             {{
