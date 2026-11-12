@@ -71,7 +71,7 @@ COMPACT_CORE_RULES = """
 3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
    - NỘI DUNG 4 CẢNH: Cảnh 1 (Hook/Nỗi đau) -> Cảnh 2 & Cảnh 3 (Tập trung 100% vào test công năng, chất liệu, cảm nhận thực tế) -> Cảnh 4 (Kêu gọi chốt sale CTA). 
    - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào trong toàn bộ kịch bản. Dành phần lời thoại đó để nói thêm về tính năng sản phẩm.
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cảnh 4 chỉ cần kêu gọi hành động mượt mà.
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cuối kịch bản (Cảnh 4), BẮT BUỘC phải có 1 câu kêu gọi xem giỏ hàng ở góc trái thật mượt mà, tự nhiên, bám theo đại từ xưng hô (VD: "Nay đang có ưu đãi cực hời, mọi người bấm ngay vào giỏ hàng góc trái nhé" hoặc "Link ưu đãi mình để ở góc trái, các bác chốt liền tay nha..."). CẤM gượng ép.
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
