@@ -1310,6 +1310,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
     total_sec = 0.0
+    locked_character_prompt = base_char_prompt
     for idx_scn, scn in enumerate(scenes):
         vo_text = clean_and_normalize_voiceover(scn.get("voiceover", ""))
         scn["voiceover"] = vo_text
