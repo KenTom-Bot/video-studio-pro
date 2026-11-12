@@ -1261,49 +1261,41 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     
     outfit_style_fallback = "stylish high-fashion outfit" if (is_fashion_wearable or is_footwear_accessory or is_cosmetics) else "casual everyday outfit"
     base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing {outfit_style_fallback}").strip().rstrip('.')
+    
+    # 🌟 1. BỘ LỌC ÉP BUỘC NGƯỜI VIỆT NAM (Khắc phục lỗi người nước ngoài)
+    if "vietnamese" not in base_char_prompt.lower():
+        base_char_prompt = f"authentic Vietnamese Southeast Asian person, natural black hair, {base_char_prompt}"
+        
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
-    
-    # 🌟 [NEW] TRÍCH XUẤT TRẠNG THÁI SƠ VIN TỪ STYLIST ĐỂ KHÓA CỨNG
-    vibe_lower = stylist_vibe_text.lower()
-    tucking_lock = ""
-    tucking_neg = ""
 
-    if "strictly untucked" in vibe_lower:
-        tucking_lock = "SHIRT IS STRICTLY UNTUCKED (hem hanging loose completely outside pants/skirt)"
-        tucking_neg = "tucked in shirt, tucked into pants, tucked into skirt, half tuck, french tuck, "
-    elif "strictly tucked in" in vibe_lower:
-        tucking_lock = "SHIRT IS STRICTLY TUCKED IN (hem securely tucked inside pants/skirt)"
-        tucking_neg = "untucked shirt, loose shirt hem, hanging shirt, shirt outside pants, "
-
-    locked_character_prompt = f"[IDENTICAL CHARACTER LOCK: EXACT SAME face, body shape, hairstyle, hair color, and precise wardrobe outfit across all scenes. {tucking_lock}. Presenter speaking directly to the lens] {base_char_prompt}"
-    final_outfit_vi = w_lock.get("outfit_vi") or "Trang phục Stylist đồng bộ 4 cảnh"
-
-    anti_drop_neg = "dropping product, falling object, letting go of object, slipping, throwing, "
-    anti_morph_neg = "extra handles, hallucinated handles, mismatched handle, changing straps, changing shape, deforming geometry, "
-    skirt_neg_extra = "split-leg pants, bifurcated trousers, two separate pant legs, divided culottes, " if is_single_skirt_mode else ""
+    # 🌟 2. BỘ LỌC CHỐNG "SƠ VIN NỬA MÙA" (Khắc phục lỗi áo lôi thôi)
+    is_tucked = "tucked" in base_char_prompt.lower() and "untucked" not in base_char_prompt.lower()
+    is_untucked = "untucked" in base_char_prompt.lower()
     
-    if is_aline_skirt: 
-        skirt_neg_extra += "flared skirt, pleated skirt, ruffled skirt, billowing fabric, bell-shaped skirt, circular skirt, flowy wide skirt, gathering, "
-        
-    appliance_neg_extra = "changing nozzle, adding extension stick, swapping brush head, mutating attachment, hallucinated parts, extra spouts, modified shape, changing proportions, warped structure, " if (is_strict_appliance and not is_food and not is_cosmetics) else ""
-    color_neg_extra = "multiple product colors, mixed colors, wrong product color, different colored variants, solid flat color overriding pattern, missing original pattern, "
+    # Cấm vĩnh viễn các kiểu sơ vin lởm chởm
+    tucking_neg = "half-tucked, partially tucked, french tuck, front tuck, messy tuck, sloppy shirt, sloppy clothes, "
     
-    dynamic_footwear_neg = ""
-    if any(k in vibe_lower for k in ["barefoot", "slipper"]): dynamic_footwear_neg = "sneakers, sports shoes, running shoes, leather shoes, dress shoes, high heels, boots, outside shoes, "
-    elif any(k in vibe_lower for k in ["sneaker", "running", "athletic"]): dynamic_footwear_neg = "barefoot, slippers, high heels, leather dress shoes, oxfords, sandals, "
-    elif any(k in vibe_lower for k in ["heel", "loafer", "dress"]): dynamic_footwear_neg = "barefoot, slippers, running shoes, chunky sneakers, athletic shoes, "
-    
-    # 🌟 [NEW] KHÔI PHỤC BỘ TỪ KHÓA CẤM SỜ MẶT/TÓC
-    face_touch_neg = "" if (is_cosmetics or is_food) else "touching face, touching hair, brushing hair, hand on face, hands near face, rubbing cheek, scratching face, fingers on face, hands raised to head, bringing hands up to face, "
+    if is_tucked:
+        base_char_prompt = base_char_prompt.replace("tucked in", "neatly and completely TUCKED IN to the waistband with zero overhang")
+        tucking_neg += "untucked, shirt hanging out, loose shirt tail, "
+    elif is_untucked:
+        base_char_prompt = base_char_prompt.replace("untucked", "strictly UNTUCKED, loose shirt hanging completely outside the pants/skirt")
+        tucking_neg += "tucked in, shirt inside pants, waistband visible over shirt, "
 
-    # 🌟 CẤM QUẦN DÀI NẾU LÀ TẤT/VỚ (Fix lỗi từ đồng âm "tất cả")
+    # 🌟 CẤM QUẦN DÀI NẾU LÀ TẤT/VỚ 
     clean_check_str = re.sub(r'\btất\s+(cả|nhiên|tần tật|thảy)\b', '', check_str.lower())
     is_socks_scene = bool(re.search(r'\b(vớ|bít tất|tất chân|sock|socks|stocking|tights|tất)\b', clean_check_str))
     sock_neg = "long pants, long trousers, jeans, maxi skirt, covering legs, pants covering socks, long denim, " if is_socks_scene else ""
 
-    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Đã bao gồm face_touch_neg và sock_neg)
-    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}{sock_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+    # 🌟 CẤM TỰ TẠO THÊM SẢN PHẨM TRÊN TAY
+    duplicate_prod_neg = "holding clothes, holding shoes, holding extra product, duplicate product in hands, spawning items in hands, product in hands, " if is_fashion_wearable else ""
+
+    # 🌟 3. TỪ KHÓA CẤM NGƯỜI NƯỚC NGOÀI VÀO BỘ LỌC NEGATIVE PROMPT
+    foreigner_neg = "caucasian, foreigner, westerner, european, mixed race, white person, blonde hair, colored hair, blue eyes, "
+
+    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Đã nhồi đủ các lớp khiên bảo vệ)
+    char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}{sock_neg}{duplicate_prod_neg}{foreigner_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     # (Đoạn base_neg_prompt = f"{anti_morph_neg}..." của bạn vẫn giữ nguyên ở ngay dưới dòng này)
     
