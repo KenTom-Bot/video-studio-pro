@@ -1273,9 +1273,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_tucked = "tucked" in base_char_prompt.lower() and "untucked" not in base_char_prompt.lower()
     is_untucked = "untucked" in base_char_prompt.lower()
     
-    # Cấm vĩnh viễn các kiểu sơ vin lởm chởm
     tucking_neg = "half-tucked, partially tucked, french tuck, front tuck, messy tuck, sloppy shirt, sloppy clothes, "
-    
     if is_tucked:
         base_char_prompt = base_char_prompt.replace("tucked in", "neatly and completely TUCKED IN to the waistband with zero overhang")
         tucking_neg += "untucked, shirt hanging out, loose shirt tail, "
@@ -1283,26 +1281,24 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         base_char_prompt = base_char_prompt.replace("untucked", "strictly UNTUCKED, loose shirt hanging completely outside the pants/skirt")
         tucking_neg += "tucked in, shirt inside pants, waistband visible over shirt, "
 
-    # 🌟 CẤM QUẦN DÀI NẾU LÀ TẤT/VỚ 
+    # 🌟 3. KHAI BÁO TOÀN BỘ CÁC BIẾN CẤM (Đảm bảo không bao giờ bị lỗi not defined)
+    dynamic_footwear_neg = "high heels, stilettos, pumps, wedges, " if any(k in base_char_prompt.lower() for k in ["barefoot", "slippers", "indoor"]) else ""
+    
+    face_touch_neg = "" if (is_cosmetics or is_food) else "touching face, touching hair, brushing hair, hand on face, hands near face, rubbing cheek, scratching face, fingers on face, hands raised to head, bringing hands up to face, "
+    
     clean_check_str = re.sub(r'\btất\s+(cả|nhiên|tần tật|thảy)\b', '', check_str.lower())
     is_socks_scene = bool(re.search(r'\b(vớ|bít tất|tất chân|sock|socks|stocking|tights|tất)\b', clean_check_str))
     sock_neg = "long pants, long trousers, jeans, maxi skirt, covering legs, pants covering socks, long denim, " if is_socks_scene else ""
-
-    # 🌟 CẤM TỰ TẠO THÊM SẢN PHẨM TRÊN TAY
+    
     duplicate_prod_neg = "holding clothes, holding shoes, holding extra product, duplicate product in hands, spawning items in hands, product in hands, " if is_fashion_wearable else ""
-
-    # 🌟 3. TỪ KHÓA CẤM NGƯỜI NƯỚC NGOÀI VÀO BỘ LỌC NEGATIVE PROMPT
+    
     foreigner_neg = "caucasian, foreigner, westerner, european, mixed race, white person, blonde hair, colored hair, blue eyes, "
 
-    # 🌟 KHÔI PHỤC BIẾN CẤM GIÀY CAO GÓT KHI Ở NHÀ (Nếu bị mất)
-    dynamic_footwear_neg = "high heels, stilettos, pumps, wedges, " if any(k in base_char_prompt.lower() for k in ["barefoot", "slippers", "indoor"]) else ""
-
-    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Giữ nguyên như cũ)
+    # 🌟 4. TỔNG HỢP LẠI NEGATIVE PROMPT (Đã đầy đủ tất cả các biến ở trên)
     char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}{sock_neg}{duplicate_prod_neg}{foreigner_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
-    # (Đoạn base_neg_prompt = f"{anti_morph_neg}..." của bạn vẫn giữ nguyên ở ngay dưới dòng này)
+    base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}ugly, deformed, noisy, blurry, distorted, out of focus, bad anatomy, extra limbs, poorly drawn face, poorly drawn hands, missing fingers"
     
-    base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}{face_touch_neg}dark, moody, underexposed, poorly lit, heavy shadows, oversized product, giant product, massive brush, huge handle, product larger than human, out of scale, disproportionate scale, incorrect proportions, product out of focus, blurry product, tiny product in background, camera zooming on face instead of product, deforming geometry, melting plastic, folding/collapsing glitch, inconsistent product color, grey parts on white product, duplicate garment in hands, extra fingers, deformed hands, floating objects, nsfw, nudity, cleavage, text, watermark, subtitles, UI elements, background music, bgm, singing, fire, sparks, flames, smoke, plasma, glowing magic aura, visible wind lines, macro close up"
     if not is_fashion_wearable:
         base_neg_prompt += ", character turning, body swaying, walking, spinning, camera moving, camera panning"
     
