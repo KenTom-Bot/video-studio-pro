@@ -1296,6 +1296,13 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
 
     # 🌟 4. TỔNG HỢP LẠI NEGATIVE PROMPT (Đã đầy đủ tất cả các biến ở trên)
     char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}{sock_neg}{duplicate_prod_neg}{foreigner_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
+
+    # 🌟 KHÔI PHỤC CÁC BIẾN CẤM GỐC (Tránh lỗi not defined)
+    anti_morph_neg = "morphing, melting, distorted, mutating, "
+    anti_drop_neg = ""
+    skirt_neg_extra = "pants, trousers, " if is_single_skirt_mode else ""
+    appliance_neg_extra = ""
+    color_neg_extra = ""
     
     base_neg_prompt = f"{anti_morph_neg}{anti_drop_neg}{skirt_neg_extra}{appliance_neg_extra}{color_neg_extra}{char_neg_extra}ugly, deformed, noisy, blurry, distorted, out of focus, bad anatomy, extra limbs, poorly drawn face, poorly drawn hands, missing fingers"
     
