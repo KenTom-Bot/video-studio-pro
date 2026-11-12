@@ -1294,7 +1294,10 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     # 🌟 3. TỪ KHÓA CẤM NGƯỜI NƯỚC NGOÀI VÀO BỘ LỌC NEGATIVE PROMPT
     foreigner_neg = "caucasian, foreigner, westerner, european, mixed race, white person, blonde hair, colored hair, blue eyes, "
 
-    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Đã nhồi đủ các lớp khiên bảo vệ)
+    # 🌟 KHÔI PHỤC BIẾN CẤM GIÀY CAO GÓT KHI Ở NHÀ (Nếu bị mất)
+    dynamic_footwear_neg = "high heels, stilettos, pumps, wedges, " if any(k in base_char_prompt.lower() for k in ["barefoot", "slippers", "indoor"]) else ""
+
+    # 🌟 CẬP NHẬT LẠI CHAR_NEG_EXTRA (Giữ nguyên như cũ)
     char_neg_extra = f"{dynamic_footwear_neg}{tucking_neg}{face_touch_neg}{sock_neg}{duplicate_prod_neg}{foreigner_neg}changing top length, changing sleeve length, changing background, changing room, different room, changing clothes, changing shoes, changing hairstyle, changing hair color, changing shirt, changing pants, changing shirt styling, different face, different hair, changing outfit, inconsistent wardrobe, adding clothing layers, removing clothing layers, morphing clothes, multiple characters, "
     
     # (Đoạn base_neg_prompt = f"{anti_morph_neg}..." của bạn vẫn giữ nguyên ở ngay dưới dòng này)
