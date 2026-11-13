@@ -1270,16 +1270,27 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
 
-    # 🌟 2. BỘ LỌC CHỐNG "SƠ VIN NỬA MÙA" (Khắc phục lỗi áo lôi thôi)
-    is_tucked = "tucked" in base_char_prompt.lower() and "untucked" not in base_char_prompt.lower()
-    is_untucked = "untucked" in base_char_prompt.lower()
+    # 🌟 2. QUẢN LÝ SƠ VIN ĐỘC TÀI BẰNG PYTHON (ÉP LOGIC THEO BỐI CẢNH)
+    # Lấy quyết định từ hàm Stylist (đã phân tích bối cảnh) thay vì tin tưởng AI Gemini
+    force_tuck = "tucked in" in stylist_vibe_text.lower()
+    force_untuck = "untucked" in stylist_vibe_text.lower()
     
+    # Loại trừ các trang phục liền thân (váy liền, áo choàng) không thể sơ vin
+    is_one_piece = any(k in base_char_prompt.lower() for k in ["dress", "gown", "robe", "jumpsuit", "swimsuit", "bikini", "váy liền"])
+    if is_one_piece: 
+        force_tuck, force_untuck = False, False
+
     tucking_neg = "half-tucked, partially tucked, french tuck, front tuck, messy tuck, sloppy shirt, sloppy clothes, "
-    if is_tucked:
-        base_char_prompt = base_char_prompt.replace("tucked in", "neatly and completely TUCKED IN to the waistband with zero overhang")
+    
+    # Tẩy sạch các từ khóa sơ vin do AI tự đẻ ra để Python kiểm soát 100%
+    base_char_prompt = re.sub(r'\b(?:strictly\s+)?(?:tucked\s+in|untucked|tucked|tuck)\b', '', base_char_prompt, flags=re.IGNORECASE).strip()
+    base_char_prompt = re.sub(r'\s+', ' ', base_char_prompt).replace(" ,", ",")
+    
+    if force_tuck:
+        base_char_prompt += ", neatly and completely TUCKED IN to the waistband with zero overhang"
         tucking_neg += "untucked, shirt hanging out, loose shirt tail, "
-    elif is_untucked:
-        base_char_prompt = base_char_prompt.replace("untucked", "strictly UNTUCKED, loose shirt hanging completely outside the pants/skirt")
+    elif force_untuck:
+        base_char_prompt += ", strictly UNTUCKED, loose shirt hanging completely outside the pants/skirt"
         tucking_neg += "tucked in, shirt inside pants, waistband visible over shirt, "
 
     # 🌟 3. KHAI BÁO TOÀN BỘ CÁC BIẾN CẤM (Đảm bảo không bao giờ bị lỗi not defined)
