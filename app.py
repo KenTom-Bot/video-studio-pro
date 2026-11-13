@@ -64,22 +64,24 @@ COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: AI tự phân tích tệp khách hàng để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
 2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Nêu nỗi đau): BẮT BUỘC có hành động hình thể chân thực (VD: ngứa thì gãi mạnh, hôi thì nhăn mặt bịt mũi, mỏi thì xoa bóp).
+   - Cảnh 1 (Hook): BẮT BUỘC có hành động hình thể chân thực, đưa thẳng sản phẩm ra tiền cảnh.
    - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách.
-   - GIA DỤNG/CÔNG NGHỆ/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/eo hoặc dưới sàn. TUYỆT ĐỐI KHÔNG CẦM NHƯ NGHE ĐIỆN THOẠI. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
-   - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội phải khớp độ tuổi/giới tính KOC.
+   - GIA DỤNG/CÔNG NGHỆ/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/eo hoặc dưới sàn. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
+   - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội chuẩn.
 3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
-   - NỘI DUNG 4 CẢNH: Cảnh 1 (Hook/Nỗi đau) -> Cảnh 2 & Cảnh 3 (Tập trung 100% vào test công năng, chất liệu, cảm nhận thực tế) -> Cảnh 4 (Kêu gọi chốt sale CTA). 
-   - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào trong toàn bộ kịch bản. Dành phần lời thoại đó để nói thêm về tính năng sản phẩm.
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cuối kịch bản (Cảnh 4), BẮT BUỘC phải có 1 câu kêu gọi xem giỏ hàng ở góc trái thật mượt mà, tự nhiên, bám theo đại từ xưng hô (VD: "Nay đang có ưu đãi cực hời, mọi người bấm ngay vào giỏ hàng góc trái nhé" hoặc "Link ưu đãi mình để ở góc trái, các bác chốt liền tay nha..."). CẤM gượng ép.
+   - CẤU TRÚC KỊCH BẢN BẮT BUỘC: 
+     + Đoạn đầu (Hook): BẮT BUỘC nhắc ngay TÊN SẢN PHẨM, CÔNG DỤNG CHÍNH và SỰ KHÁC BIỆT so với thị trường ngay trong 1-2 câu đầu tiên (Đi thẳng vào vấn đề, không vòng vo).
+     + Đoạn giữa (Phân tích): Đi sâu vào chi tiết CẤU TẠO (thiết kế, chất liệu) và review thực tế CHI TIẾT CÔNG NĂNG của sản phẩm.
+     + Đoạn cuối (CTA): Kêu gọi hành động.
+   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cuối kịch bản, BẮT BUỘC phải có 1 câu kêu gọi xem giỏ hàng ở góc trái thật mượt mà, tự nhiên, bám theo đại từ xưng hô (VD: "Nay đang có ưu đãi cực hời, mọi người bấm ngay vào giỏ hàng góc trái nhé" hoặc "Link ưu đãi mình để ở góc trái, các bác chốt liền tay nha..."). CẤM gượng ép.
+   - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào.
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 5. ĐA DẠNG BỐI CẢNH ĐỜI THỰC (CRITICAL SETTING):
    - Bắt buộc phân tích LỜI THOẠI và CÔNG NĂNG sản phẩm để chọn bối cảnh khớp 100%. 
-   - Không gian đa dạng: Nhà ở hiện đại, gọn gàng (phòng khách, bếp, ngủ, tắm), hoặc không gian ngoài (cafe, siêu thị, văn phòng, phòng gym). Bối cảnh phải thực tế, gần gũi với đời sống (Clean, modern, everyday Vietnamese setting).
+   - Không gian đa dạng, thực tế, gần gũi với đời sống (Clean, modern, everyday Vietnamese setting).
 """
-
 INTIMATE_SAFE_ENGLISH_LEXICON = {
     r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top',
     r'\bbrassieres?\b': 'seamless support garment',
