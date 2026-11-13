@@ -60,6 +60,7 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "💡 Chia Sẻ Mẹo Hay & Kiến Thức Hữu Ích",
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
+
 COMPACT_CORE_RULES = """
 🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
 1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: AI tự phân tích tệp khách hàng để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
@@ -70,7 +71,8 @@ COMPACT_CORE_RULES = """
    - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội chuẩn.
 3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
    - CẤU TRÚC KỊCH BẢN BẮT BUỘC: 
-     + Đoạn đầu (Hook - 3 giây đầu): CẤM DẪN DẮT VÒNG VO (Cấm tuyệt đối kiểu mở bài "Bạn đang mệt mỏi...", "Thời tiết dạo này...", "Chắc hẳn ai cũng..."). CÂU ĐẦU TIÊN PHẢI NGẮN DƯỚI 15 TỪ, ĐẬP THẲNG LUÔN TÊN SẢN PHẨM VÀ SỰ KHÁC BIỆT/CÔNG DỤNG VÀO MẶT NGƯỜI XEM (VD: "Chị em nào lười gội đầu thì rinh ngay chai dầu gội khô bồng bềnh này", hoặc "Chiếc áo khoác chống nước này chính là chân ái mùa đông...").
+     + Đoạn đầu (Hook - 3 giây đầu): CẤM DẪN DẮT VÒNG VO. CÂU ĐẦU TIÊN DƯỚI 15 TỪ, ĐẬP THẲNG TÊN SẢN PHẨM VÀ SỰ KHÁC BIỆT/CÔNG DỤNG. 
+     [CRITICAL]: BẮT BUỘC ĐA DẠNG CẤU TRÚC HOOK GIỮA CÁC KỊCH BẢN. Xoay vòng ngẫu nhiên các công thức: Nêu thẳng giải pháp ("Ai hay bị X thì rinh ngay Y"), Cảm thán điểm độc quyền ("Chưa thấy cái Y nào mà X như này"), Tuyên bố chân ái ("Chân ái gọi tên Y vì X"), hoặc Lời khuyên mạnh/Cảnh báo ("Đừng mua Y nếu chưa biết đến tính năng X"). TUYỆT ĐỐI KHÔNG lặp lại một văn mẫu.
      + Đoạn giữa (Phân tích): Đi sâu vào chi tiết CẤU TẠO (thiết kế, chất liệu) và review thực tế CHI TIẾT CÔNG NĂNG của sản phẩm.
      + Đoạn cuối (CTA): BẮT BUỘC có 1 câu kêu gọi bấm vào giỏ hàng góc trái vì đang có ưu đãi (VD: "Nay đang có ưu đãi hời, mọi người chốt ngay ở giỏ hàng góc trái nhé"). CẤM gượng ép.
    - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào.
