@@ -70,18 +70,17 @@ COMPACT_CORE_RULES = """
    - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội chuẩn.
 3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
    - CẤU TRÚC KỊCH BẢN BẮT BUỘC: 
-     + Đoạn đầu (Hook): BẮT BUỘC nhắc ngay TÊN SẢN PHẨM, CÔNG DỤNG CHÍNH và SỰ KHÁC BIỆT so với thị trường ngay trong 1-2 câu đầu tiên (Đi thẳng vào vấn đề, không vòng vo).
+     + Đoạn đầu (Hook - 3 giây đầu): CẤM DẪN DẮT VÒNG VO (Cấm tuyệt đối kiểu mở bài "Bạn đang mệt mỏi...", "Thời tiết dạo này...", "Chắc hẳn ai cũng..."). CÂU ĐẦU TIÊN PHẢI NGẮN DƯỚI 15 TỪ, ĐẬP THẲNG LUÔN TÊN SẢN PHẨM VÀ SỰ KHÁC BIỆT/CÔNG DỤNG VÀO MẶT NGƯỜI XEM (VD: "Chị em nào lười gội đầu thì rinh ngay chai dầu gội khô bồng bềnh này", hoặc "Chiếc áo khoác chống nước này chính là chân ái mùa đông...").
      + Đoạn giữa (Phân tích): Đi sâu vào chi tiết CẤU TẠO (thiết kế, chất liệu) và review thực tế CHI TIẾT CÔNG NĂNG của sản phẩm.
-     + Đoạn cuối (CTA): Kêu gọi hành động.
-   - VĂN PHONG CHỐT SALE TỰ NHIÊN: Ở cuối kịch bản, BẮT BUỘC phải có 1 câu kêu gọi xem giỏ hàng ở góc trái thật mượt mà, tự nhiên, bám theo đại từ xưng hô (VD: "Nay đang có ưu đãi cực hời, mọi người bấm ngay vào giỏ hàng góc trái nhé" hoặc "Link ưu đãi mình để ở góc trái, các bác chốt liền tay nha..."). CẤM gượng ép.
+     + Đoạn cuối (CTA): BẮT BUỘC có 1 câu kêu gọi bấm vào giỏ hàng góc trái vì đang có ưu đãi (VD: "Nay đang có ưu đãi hời, mọi người chốt ngay ở giỏ hàng góc trái nhé"). CẤM gượng ép.
    - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào.
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
 5. ĐA DẠNG BỐI CẢNH ĐỜI THỰC (CRITICAL SETTING):
-   - Bắt buộc phân tích LỜI THOẠI và CÔNG NĂNG sản phẩm để chọn bối cảnh khớp 100%. 
-   - Không gian đa dạng, thực tế, gần gũi với đời sống (Clean, modern, everyday Vietnamese setting).
+   - Bắt buộc phân tích LỜI THOẠI và CÔNG NĂNG sản phẩm để chọn bối cảnh khớp 100%. Không gian đa dạng, thực tế, clean modern everyday Vietnamese setting.
 """
+
 INTIMATE_SAFE_ENGLISH_LEXICON = {
     r'\b(?:push-?up\s+|lace\s+|wireless\s+|seamless\s+)?bras?\b': 'seamless comfort fabric top',
     r'\bbrassieres?\b': 'seamless support garment',
