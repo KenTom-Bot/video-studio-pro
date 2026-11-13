@@ -1270,19 +1270,25 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
 
-    # 🌟 2. QUẢN LÝ SƠ VIN ĐỘC TÀI BẰNG PYTHON (ÉP LOGIC THEO BỐI CẢNH)
-    # Lấy quyết định từ hàm Stylist (đã phân tích bối cảnh) thay vì tin tưởng AI Gemini
+    # 🌟 2. QUẢN LÝ SƠ VIN ĐỘC TÀI BẰNG PYTHON (ÉP LOGIC THEO BỐI CẢNH & CHẤT LIỆU)
     force_tuck = "tucked in" in stylist_vibe_text.lower()
     force_untuck = "untucked" in stylist_vibe_text.lower()
     
-    # Loại trừ các trang phục liền thân (váy liền, áo choàng) không thể sơ vin
+    # Loại trừ các trang phục liền thân (váy liền, áo choàng)
     is_one_piece = any(k in base_char_prompt.lower() for k in ["dress", "gown", "robe", "jumpsuit", "swimsuit", "bikini", "váy liền"])
+    
+    # 🌟 [NEW] KHÔNG THỂ SƠ VIN ĐỒ DÀY/MÙA ĐÔNG (Sweater, Hoodie, Coat, Jacket)
+    is_bulky_top = any(k in base_char_prompt.lower() for k in ["sweater", "hoodie", "coat", "jacket", "cardigan", "knit", "len", "khoác", "nỉ"])
+    
     if is_one_piece: 
         force_tuck, force_untuck = False, False
+    elif is_bulky_top:
+        force_tuck = False
+        force_untuck = True # Đồ dày BẮT BUỘC thả vạt áo ra ngoài
 
     tucking_neg = "half-tucked, partially tucked, french tuck, front tuck, messy tuck, sloppy shirt, sloppy clothes, "
     
-    # Tẩy sạch các từ khóa sơ vin do AI tự đẻ ra để Python kiểm soát 100%
+    # Tẩy sạch các từ khóa do AI tự đẻ ra để Python kiểm soát 100%
     base_char_prompt = re.sub(r'\b(?:strictly\s+)?(?:tucked\s+in|untucked|tucked|tuck)\b', '', base_char_prompt, flags=re.IGNORECASE).strip()
     base_char_prompt = re.sub(r'\s+', ' ', base_char_prompt).replace(" ,", ",")
     
