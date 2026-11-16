@@ -1976,6 +1976,11 @@ if st.session_state.get("trigger_main_generation"):
             for attempt in range(max_retries):
                 try:
                     res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, 1, args["unified_strategy_format"], args["custom_note"], args["unified_strategy_format"]), max_tokens=4096)
+                    
+                    # 🌟 [NEW] XỬ LÝ LỖI AI TRẢ VỀ LIST THAY VÌ DICT
+                    if isinstance(res, list):
+                        res = res[0] if len(res) > 0 and isinstance(res[0], dict) else {"outlines": res}
+                        
                     ca_result = res.get("content_analysis") or {}
                     outlines = extract_scenes(res)
                     if not outlines: outlines = res.get("outlines", res.get("script_outlines", []))
