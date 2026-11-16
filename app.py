@@ -1283,9 +1283,9 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     force_untuck = "untucked" in stylist_vibe_text.lower()
     
     # Loại trừ các trang phục liền thân (váy liền, áo choàng)
-    is_one_piece = any(k in base_char_prompt.lower() for k in ["dress", "gown", "robe", "jumpsuit", "swimsuit", "bikini", "váy liền"])
+    is_one_piece = any(k in base_char_prompt.lower() for k in ["dress", "gown", "robe", "jumpsuit", "swimsuit", "bikini", "váy liền", "skirt tube"])
     
-    # 🌟 [NEW] KHÔNG THỂ SƠ VIN ĐỒ DÀY/MÙA ĐÔNG (Sweater, Hoodie, Coat, Jacket)
+    # KHÔNG THỂ SƠ VIN ĐỒ DÀY/MÙA ĐÔNG (Sweater, Hoodie, Coat, Jacket)
     is_bulky_top = any(k in base_char_prompt.lower() for k in ["sweater", "hoodie", "coat", "jacket", "cardigan", "knit", "len", "khoác", "nỉ"])
     
     if is_one_piece: 
@@ -1294,18 +1294,21 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         force_tuck = False
         force_untuck = True # Đồ dày BẮT BUỘC thả vạt áo ra ngoài
 
-    tucking_neg = "half-tucked, partially tucked, french tuck, front tuck, messy tuck, sloppy shirt, sloppy clothes, "
+    # Cấm vĩnh viễn mọi biến thể sơ vin lởm chởm
+    tucking_neg = "half-tucked, partially tucked, french tuck, front tuck, one side tucked, messy tuck, sloppy shirt, folded hem, "
     
-    # Tẩy sạch các từ khóa do AI tự đẻ ra để Python kiểm soát 100%
-    base_char_prompt = re.sub(r'\b(?:strictly\s+)?(?:tucked\s+in|untucked|tucked|tuck)\b', '', base_char_prompt, flags=re.IGNORECASE).strip()
-    base_char_prompt = re.sub(r'\s+', ' ', base_char_prompt).replace(" ,", ",")
+    # Tẩy sạch các từ khóa sơ vin lỏng lẻo cũ
+    base_char_prompt = re.sub(r'\b(?:strictly\s+|neatly\s+and\s+completely\s+)?(?:tucked\s+in|untucked|tucked|tuck)(?:\s+to\s+the\s+waistband\s+with\s+zero\s+overhang)?\b', '', base_char_prompt, flags=re.IGNORECASE).strip()
+    base_char_prompt = re.sub(r', loose shirt hanging completely outside the pants/skirt', '', base_char_prompt, flags=re.IGNORECASE).strip()
+    base_char_prompt = re.sub(r'\s+', ' ', base_char_prompt).replace(" ,", ",").strip().rstrip(',')
     
+    # Đóng khung Lệnh Trực Tiếp [SHIRT STYLING: ...] để thu hút 100% sự chú ý của AI tạo ảnh
     if force_tuck:
-        base_char_prompt += ", neatly and completely TUCKED IN to the waistband with zero overhang"
-        tucking_neg += "untucked, shirt hanging out, loose shirt tail, "
+        base_char_prompt += ", [SHIRT STYLING: neatly and fully TUCKED IN flat into the pants/skirt, clearly visible waistband, zero overhang]"
+        tucking_neg += "untucked, shirt hanging out, loose shirt tail, shirt covering belt, "
     elif force_untuck:
-        base_char_prompt += ", strictly UNTUCKED, loose shirt hanging completely outside the pants/skirt"
-        tucking_neg += "tucked in, shirt inside pants, waistband visible over shirt, "
+        base_char_prompt += ", [SHIRT STYLING: strictly 100% UNTUCKED, the entire bottom hem hangs loose outside covering the waistband]"
+        tucking_neg += "tucked in, shirt inside pants, waistband visible over shirt, belt visible over shirt, "
 
     # 🌟 3. KHAI BÁO TOÀN BỘ CÁC BIẾN CẤM (Đảm bảo không bao giờ bị lỗi not defined)
     dynamic_footwear_neg = "high heels, stilettos, pumps, wedges, " if any(k in base_char_prompt.lower() for k in ["barefoot", "slippers", "indoor"]) else ""
