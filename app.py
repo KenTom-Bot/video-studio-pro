@@ -1269,11 +1269,23 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
     outfit_style_fallback = "stylish high-fashion outfit" if (is_fashion_wearable or is_footwear_accessory or is_cosmetics) else "casual everyday outfit"
-    base_char_prompt = sanitize_third_party_ip(w_lock.get("master_character_en") or f"{detected_demographic_en}, wearing {outfit_style_fallback}").strip().rstrip('.')
     
-    # 🌟 1. BỘ LỌC ÉP BUỘC NGƯỜI VIỆT NAM (Khắc phục lỗi người nước ngoài)
+    # 🌟 1. KHÓA CHẾT GIỚI TÍNH ĐỂ TRÁNH LỖI LÚC NAM LÚC NỮ
+    ai_wardrobe = sanitize_third_party_ip(w_lock.get("master_character_en", "")).strip().rstrip('.')
+    if ai_wardrobe:
+        # Xóa các định danh lỏng lẻo ở đầu (nếu có) để ép dùng định danh chuẩn
+        clean_wardrobe = re.sub(r'^(?:a\s+)?(?:vietnamese\s+)?(?:man|woman|boy|girl|person|male|female|senior)\b,?\s*(?:with|wearing)?\s*', 'wearing ', ai_wardrobe, flags=re.IGNORECASE).strip()
+        if not clean_wardrobe.startswith("wearing") and not clean_wardrobe.startswith("with"): 
+            clean_wardrobe = f"wearing {clean_wardrobe}"
+        # Ghép CỨNG giới tính chuẩn vào với quần áo
+        base_char_prompt = f"{detected_demographic_en}, {clean_wardrobe}"
+    else:
+        base_char_prompt = f"{detected_demographic_en}, wearing {outfit_style_fallback}"
+    
+    # 🌟 1.1 BỘ LỌC ÉP BUỘC NGƯỜI VIỆT NAM (Dự phòng)
     if "vietnamese" not in base_char_prompt.lower():
-        base_char_prompt = f"authentic Vietnamese Southeast Asian person, natural black hair, {base_char_prompt}"
+        gender_noun = "man" if detected_gender == "male" else "woman"
+        base_char_prompt = f"authentic Vietnamese Southeast Asian {gender_noun}, natural black hair, {base_char_prompt}"
         
     if is_single_skirt_mode: base_char_prompt = enforce_single_tube_skirt_syntax(base_char_prompt)
     if not is_fashion_wearable: base_char_prompt += ", standing completely still with zero body rotation"
