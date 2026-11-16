@@ -1245,20 +1245,23 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     """
     sys_inst = get_sys_inst_details(current_active_mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, "Max 10s", 1, char_profiles, user_custom_note, presentation_format, self_pronoun, audience_pronoun, fixed_setting_base, True, is_pas_story, forced_footwear, target_id)
     
-    scenes, w_lock, master_setting_en = [], {}, "clean minimalist modern setting"
-    max_retries = 2
-    for attempt in range(max_retries):
-        try:
-            res = call_gemini([prompt_text], sys_inst, max_tokens=4096)
-            scenes = extract_scenes(res)
-            if scenes and isinstance(scenes, list) and len(scenes) > 0:
-                master_setting_en = sanitize_third_party_ip(res.get("master_setting_en", "clean minimalist modern setting")).strip().rstrip('.')
-                w_lock = res.get("wardrobe_lock", {})
-                break
-        except Exception as e:
-            if attempt == max_retries - 1:
-                raise Exception(f"Lỗi khi gọi AI: {str(e)}")
-            time.sleep(1.5)
+    ca_result, outlines = {}, []
+            max_retries = 2
+            for attempt in range(max_retries):
+                try:
+                    res = call_gemini(payload, get_sys_inst_outlines(mode, "Điện Ảnh Chân Thực", "On-camera", char_rules, 1, args["unified_strategy_format"], args["custom_note"], args["unified_strategy_format"]), max_tokens=4096)
+                    
+                    # 🌟 [NEW] XỬ LÝ LỖI AI TRẢ VỀ LIST THAY VÌ DICT
+                    if isinstance(res, list):
+                        res = res[0] if len(res) > 0 and isinstance(res[0], dict) else {"outlines": res}
+                        
+                    ca_result = res.get("content_analysis") or {}
+                    outlines = extract_scenes(res)
+                    if not outlines: outlines = res.get("outlines", res.get("script_outlines", []))
+                    if ca_result and outlines: break
+                except Exception as e:
+                    if attempt == max_retries - 1: raise Exception(f"Lỗi khi gọi AI: {str(e)}")
+                    time.sleep(1.5)
 
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
