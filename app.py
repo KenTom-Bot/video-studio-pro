@@ -1262,7 +1262,6 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
                 except Exception as e:
                     if attempt == max_retries - 1: raise Exception(f"Lỗi khi gọi AI: {str(e)}")
                     time.sleep(1.5)
-
     if not scenes: raise Exception("AI không tạo được danh sách phân cảnh. Vui lòng bấm tạo lại.")
     
     outfit_style_fallback = "stylish high-fashion outfit" if (is_fashion_wearable or is_footwear_accessory or is_cosmetics) else "casual everyday outfit"
