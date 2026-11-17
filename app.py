@@ -75,7 +75,7 @@ COMPACT_CORE_RULES = """
      [CRITICAL]: BẮT BUỘC ĐA DẠNG CẤU TRÚC HOOK GIỮA CÁC KỊCH BẢN. Xoay vòng ngẫu nhiên các công thức: Nêu thẳng giải pháp ("Ai hay bị X thì rinh ngay Y"), Cảm thán điểm độc quyền ("Chưa thấy cái Y nào mà X như này"), Tuyên bố chân ái ("Chân ái gọi tên Y vì X"), hoặc Lời khuyên mạnh/Cảnh báo ("Đừng mua Y nếu chưa biết đến tính năng X"). TUYỆT ĐỐI KHÔNG lặp lại một văn mẫu.
      + Đoạn giữa (Phân tích): Đi sâu vào chi tiết CẤU TẠO (thiết kế, chất liệu) và review thực tế CHI TIẾT CÔNG NĂNG của sản phẩm.
      + Đoạn cuối (CTA): BẮT BUỘC có 1 câu kêu gọi bấm vào giỏ hàng góc trái vì đang có ưu đãi (VD: "Nay đang có ưu đãi hời, mọi người chốt ngay ở giỏ hàng góc trái nhé"). CẤM gượng ép.
-   - TUYỆT ĐỐI CẤM ĐỀ CẬP GIÁ TIỀN: Không nhắc "giá gốc", "giảm còn", hay bất kỳ con số tiền bạc nào.
+   - TUYỆT ĐỐI CẤM TỪ BỊ CẤM/NHẠY CẢM: KHÔNG nhắc đến "giá gốc", "giảm còn", hay các con số báo giá. KHÔNG dùng các từ liên quan đến tình trạng bệnh lý, y tế như "bệnh", "đau đầu", "đau nhức", "điều trị", "đặc trị", "khỏi hẳn"... thay vào đó dùng các cụm từ nhẹ nhàng như "khó chịu", "cải thiện", "hỗ trợ".
    - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
 4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
    - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
@@ -112,7 +112,13 @@ POLICY_REPLACEMENTS = {
     r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn',
     r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn',
     r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'đợt ưu đãi này', 
-    r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi'
+    r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi',
+    
+    # 🌟 BỘ LỌC TỪ CẤM Y TẾ, BỆNH LÝ (BỔ SUNG)
+    r'\bđau\s*đầu\b': 'căng thẳng', r'\bđau\s*nhức\b': 'nhức mỏi',
+    r'\bmệt\s*mỏi\b': 'kém thoải mái', r'\bkiệt\s*sức\b': 'cần nạp năng lượng',
+    r'\bchữa\b': 'hỗ trợ', r'\bbệnh\b': 'vấn đề', r'\bviêm\b': 'khó chịu',
+    r'\bđau\s*dạ\s*dày\b': 'khó chịu tiêu hóa', r'\bmất\s*ngủ\b': 'khó ngủ',
 }
 
 SOUTHERN_TO_HANOI = {
