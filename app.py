@@ -575,9 +575,10 @@ def extract_environmental_lighting_and_weather(vo_text: str, setting_text: str =
 
 def sanitize_veo3_prompt(prompt_text: str) -> str:
     if not prompt_text: return ""
-    p = re.sub(r'\bgesturing\s+(?:warmly\s+)?(?:toward\s+)?corner\b', 'sharing recommendations with an open-palm gesture', prompt_text, flags=re.IGNORECASE)
-    return sanitize_third_party_ip(re.sub(r'\bpointing\s+(?:downward\s+)?(?:to\s+)?(?:corner|cart)\b', 'speaking with welcoming open hands', p, flags=re.IGNORECASE))
-
+    p = re.sub(r'\bgesturing\s+(?:warmly\s+)?(?:toward\s+)?corner\b', 'sharing recommendations with EMPTY HANDS', prompt_text, flags=re.IGNORECASE)
+    p = re.sub(r'\bopen-?palm\s+gesture\b', 'empty hands', p, flags=re.IGNORECASE)
+    return sanitize_third_party_ip(re.sub(r'\bpointing\s+(?:downward\s+)?(?:to\s+)?(?:corner|cart)\b', 'speaking with EMPTY HANDS', p, flags=re.IGNORECASE))
+    
 def generate_char_rules_string(profiles):
     if not profiles: return "100% Vietnamese persona, natural black hair, consistent outfit across 3 scenes."
     return " | ".join([f"Actor {p['id']} ({p['role']}): 100% Vietnamese persona, consistent look across scenes" for p in profiles])
@@ -734,8 +735,8 @@ def get_universal_physics_rules(product_name: str, vo_text: str = "", is_fashion
     
     elif is_fashion:
         if is_aline_skirt:
-            return "Structured garment physics: the A-line skirt holds its firm, clean geometric shape without billowing, flaring, or pleating in motion. Subject models the garment WORN ON BODY. Fabric testing is done strictly WHILE WEARING IT. Hands kept strictly away from face."
-        return "Natural fabric drape in motion; subject models the garment WORN ON BODY. Fabric testing (stretching/touching) is done strictly WHILE WEARING IT. Zero duplicate items in hands. Hands kept strictly away from face."
+            return "Structured garment physics: the A-line skirt holds its firm, clean geometric shape without billowing, flaring, or pleating in motion. Subject models the garment WORN ON BODY. Fabric testing is done strictly WHILE WEARING IT. EMPTY HANDS, holding absolutely nothing. Hands kept strictly away from face."
+        return "Natural fabric drape in motion; subject models the garment WORN ON BODY. Fabric testing (stretching/touching) is done strictly WHILE WEARING IT. EMPTY HANDS, holding absolutely nothing. Zero duplicate items in hands. Hands kept strictly away from face."
     
     elif any(k in p for k in ["hút bụi", "vacuum", "máy sấy", "máy thổi"]): return "CAMERA FOCUS LOCKED ON DEVICE HEAD/NOZZLE: 100% rigid non-deforming body lock, keeping its EXACT original nozzle/attachment (zero morphing to long sticks). The nozzle glides swiftly and firmly, visibly removing dirt or blowing air in real-time. Holding securely, never dropping. Hands kept strictly away from face."
     elif is_long_handle or any(k in p for k in ["chà sàn", "lau nhà", "bàn chải", "cọ", "tẩy", "rửa", "mop", "brush", "scrubber", "cleaner"]): return "Rigid tool body lock, true-to-life scale (NO giant sizes); product glides/scrubs rapidly and decisively across the floor/surface, visibly removing dirt/stains on the spot. Gripping firmly, never dropping. Hands kept strictly away from face."
@@ -770,10 +771,10 @@ def get_action_templates_by_industry(clean_prod_en: str, check_str: str, is_fash
     elif is_medicine: return (f"holding {clean_prod_en} securely in hand", f"showing {clean_prod_en} up close next to a clear glass of water", f"dropping or demonstrating the use of {clean_prod_en}", f"holding {clean_prod_en} securely with a healthy, confident smile")
 
     elif is_fashion_wearable: return (
-        "stepping forward confidently, modeling the outfit", 
-        "close-up on hands touching and smoothing the fabric of the outfit worn on body to show its premium texture", 
-        "close-up on hands gently stretching the fabric of the outfit worn on body to demonstrate elasticity and breathability", 
-        "posing elegantly (hands strictly kept away from face) and gesturing warmly while modeling the outfit"
+        "stepping forward confidently with EMPTY HANDS, modeling the outfit", 
+        "close-up on EMPTY HANDS touching and smoothing the fabric of the outfit worn on body to show its premium texture", 
+        "close-up on EMPTY HANDS gently stretching the fabric of the outfit worn on body to demonstrate elasticity and breathability", 
+        "posing elegantly with EMPTY HANDS (hands strictly kept away from face) and gesturing naturally while modeling the outfit"
     )
     
     elif any(k in p for k in ["hút bụi", "vacuum"]): return (f"holding {clean_prod_en} with its EXACT original nozzle firmly, maintaining realistic scale", f"positioning the original nozzle of {clean_prod_en} on the surface to show its rigid structure", f"gliding {clean_prod_en} rapidly in focus using its original attachment, visibly sucking dirt straight into the dustbin", f"holding {clean_prod_en} securely with a warm open-palm gesture")
@@ -1363,7 +1364,7 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
     is_socks_scene = bool(re.search(r'\b(vớ|bít tất|tất chân|sock|socks|stocking|tights|tất)\b', clean_check_str))
     sock_neg = "long pants, long trousers, jeans, maxi skirt, covering legs, pants covering socks, long denim, " if is_socks_scene else ""
     
-    duplicate_prod_neg = "holding clothes, holding shoes, holding extra product, duplicate product in hands, spawning items in hands, product in hands, " if is_fashion_wearable else ""
+    duplicate_prod_neg = "holding any object, object in hands, spawning items in hands, holding extra product, holding bag, holding phone, holding makeup, duplicate product, product in hands, holding clothes, holding shoes, " if is_fashion_wearable else ""
     
     foreigner_neg = "caucasian, foreigner, westerner, european, mixed race, white person, blonde hair, colored hair, blue eyes, "
 
