@@ -2300,7 +2300,20 @@ if all_sc:
             sc_id = outline["id"]
             with st.container(border=True):
                 c1, c2, c3 = st.columns([2.5, 1, 1])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span>", unsafe_allow_html=True)
+                
+                # ĐỒNG BỘ HUY HIỆU CHO KỊCH BẢN ĐÃ LƯU
+                hook_strat = outline.get("hook_strategy_used", "")
+                framework = outline.get("framework_used", "")
+                hook_score = outline.get("hook_score", "")
+                badges = []
+                if hook_strat: badges.append(f"🎯 {hook_strat}")
+                if framework: badges.append(f"🧩 {framework}")
+                if hook_score: badges.append(f"🏆 {hook_score}đ")
+                hook_badge = f" | <span style='color:#0284c7; font-size:14px; font-weight:700;'>{' - '.join(badges)}</span>" if badges else ""
+                
+                # BỎ HẲN BIẾN {outline.get('title')}, CHỈ IN ID VÀ HUY HIỆU XANH
+                c1.markdown(f"**#{sc_id}** <span class=badge-ready>ĐÃ LƯU</span> {hook_badge}", unsafe_allow_html=True)
+                
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
                 
@@ -2326,21 +2339,20 @@ if all_sc:
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
                 
-                # 🌟 TRÍCH XUẤT ĐIỂM, HOOK VÀ FRAMEWORK TỪ JSON
+                # TRÍCH XUẤT HUY HIỆU
                 hook_strat = outline.get("hook_strategy_used", "")
                 framework = outline.get("framework_used", "")
                 hook_score = outline.get("hook_score", "")
                 
                 badges = []
-                if hook_strat: badges.append(f"🎯 Hook: {hook_strat}")
-                if framework: badges.append(f"🧩 Khung: {framework}")
+                if hook_strat: badges.append(f"🎯 {hook_strat}")
+                if framework: badges.append(f"🧩 {framework}")
                 if hook_score: badges.append(f"🏆 {hook_score}đ")
                 
-                # Nối chuỗi HTML để tạo huy hiệu đẹp mắt
-                hook_badge = f" | <span style='color:#0284c7; font-size:13px; font-weight:600;'>{' - '.join(badges)}</span>" if badges else ""
+                hook_badge = f" | <span style='color:#0284c7; font-size:14px; font-weight:700;'>{' - '.join(badges)}</span>" if badges else ""
                 
-                # 🌟 ÉP IN HUY HIỆU VÀO TIÊU ĐỀ
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span> {hook_badge}", unsafe_allow_html=True)
+                # BỎ HẲN BIẾN {outline.get('title')}, CHỈ IN ID VÀ HUY HIỆU XANH
+                c1.markdown(f"**#{sc_id}** <span class=badge-pending>CHỜ DỰNG</span> {hook_badge}", unsafe_allow_html=True)
                 
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
