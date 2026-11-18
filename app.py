@@ -87,17 +87,20 @@ HOOK_AND_FRAMEWORK_LIBRARY = """
 
 COMPACT_CORE_RULES = f"""
 🛑 QUY TẮC TỐI ƯU CHUYỂN ĐỔI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐÚNG TỆP KHÁCH HÀNG: AI khóa chặt 100% nhân vật là người Việt Nam (Nam/Nữ/Trẻ em/Người già) khớp với tệp.
-2. CHIẾN LƯỢC HOOK ĐA DẠNG (CRITICAL): CÂU ĐẦU TIÊN DƯỚI 15 TỪ. CẤM dẫn dắt vòng vo. BẮT BUỘC chọn 1 trong 12 công thức Hook từ THƯ VIỆN.
-3. CẤU TRÚC AI SALES 6 & THỜI LƯỢNG LINH HOẠT (CRITICAL 4 SCENES):
-   - AI tự phân bổ lượng lời thoại sao cho nhịp độ mỗi cảnh dao động linh hoạt từ 4s đến tối đa 10s.
-   - Cảnh 1: TARGET & HOOK - Nêu vấn đề/Nỗi đau + Đưa thẳng sản phẩm ra tiền cảnh.
-   - Cảnh 2: SOLUTION - Giới thiệu giải pháp và thiết kế, cấu tạo sản phẩm.
-   - Cảnh 3: DEMO - Thao tác trực quan, quay cận cảnh test công năng thực tế.
-   - Cảnh 4: VALUE & ACTION - Chốt lợi ích và Kêu gọi bấm vào giỏ hàng góc trái khéo léo (KHÔNG BÁO GIÁ).
+1. ĐÚNG TỆP KHÁCH HÀNG: AI khóa chặt 100% nhân vật là người Việt Nam khớp với tệp.
+2. CHIẾN LƯỢC HOOK ĐA DẠNG: CÂU ĐẦU TIÊN DƯỚI 15 TỪ. CẤM dẫn dắt vòng vo. BẮT BUỘC chọn 1 trong 12 công thức Hook.
+3. CẤU TRÚC AI SALES 6 & THỜI LƯỢNG LINH HOẠT (CRITICAL):
+  - Phân bổ lời thoại tự nhiên từ 4s đến tối đa 10s mỗi cảnh.
+  - Cảnh 1: TARGET & HOOK - Nêu vấn đề/Nỗi đau + Đưa thẳng sản phẩm ra.
+  - Cảnh 2: SOLUTION - Giới thiệu giải pháp và thiết kế sản phẩm.
+  - Cảnh 3: DEMO - Thao tác trực quan, quay cận cảnh công năng.
+  - Cảnh 4: VALUE & ACTION - Chốt lợi ích và Kêu gọi bấm vào giỏ hàng góc trái khéo léo.
 {HOOK_AND_FRAMEWORK_LIBRARY}
-4. VẬT LÝ & TƯƠNG TÁC: Cấm sờ sản phẩm lên mặt (trừ mỹ phẩm). Cầm đúng tay cầm gốc, hành động dứt khoát.
-5. CHỐNG TỪ CẤM: TUYỆT ĐỐI KHÔNG dùng từ ngữ y tế/bệnh lý (đau đầu, chữa bệnh, đặc trị...). Dùng từ nói giảm nói tránh. CẤM lặp từ.
+4. VẬT LÝ & TƯƠNG TÁC: Cấm sờ sản phẩm lên mặt (trừ mỹ phẩm).
+5. CHỐNG TỪ CẤM & BÁO GIÁ (CRITICAL): 
+   - TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN (Cấm bịa ra các số tiền như "hai trăm nghìn", "giá rẻ").
+   - CẤM sử dụng các từ mang tính phóng đại: "cam kết", "tuyệt đối", "100%", "chắc chắn".
+   - CẤM dùng từ ngữ y tế/bệnh lý: "đau đầu", "đau lưng", "chữa bệnh", "đặc trị". Hãy dùng từ nói giảm (khó chịu, nhức mỏi, hỗ trợ).
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -115,27 +118,33 @@ INTIMATE_SAFE_ENGLISH_LEXICON = {
 }
 
 POLICY_REPLACEMENTS = {
-    r'\ban\s*toàn\s*tuyệt\s*đối\b': 'cực kỳ an toàn', r'\byên\s*tâm\s*tuyệt\s*đối\b': 'cực kỳ yên tâm',
-    r'\btuyệt\s*đối\s*an\s*toàn\b': 'cực kỳ an toàn', r'\btuyệt\s*đối\s*yên\s*tâm\b': 'cực kỳ yên tâm',
-    r'\bhoàn\s*toàn\s*yên\s*tâm\b': 'cực kỳ yên tâm', r'\bhoàn\s*toàn\s*an\s*toàn\b': 'rất an toàn',
-    r'\b100\s*%\s*an\s*toàn\b': 'rất an toàn', r'\ban\s*toàn\s*100\s*%\b': 'cực kỳ an toàn',
+    # Nhóm từ quá đà, thổi phồng
+    r'\bcam\s*kết\b': 'rất tự tin', 
+    r'\btuyệt\s*đối\b': 'hoàn toàn',
+    r'\b100\s*%\b': 'rất',
+    r'\bhoàn\s*toàn\s*yên\s*tâm\b': 'cực kỳ yên tâm', 
+    r'\bhoàn\s*toàn\s*an\s*toàn\b': 'rất an toàn',
     r'(\b[a-zà-ỹ]+)\s+tuyệt\s*đối\b': r'cực kỳ \1',
+    
+    # Nhóm y tế, bệnh lý, chữa bệnh
     r'\bchữa\s*bệnh\b': 'hỗ trợ sức khỏe', r'\bchữa\s*khỏi\b': 'hỗ trợ cải thiện',
     r'\bđặc\s*trị\b': 'sản phẩm chuyên biệt', r'\bthuốc\s*đặc\s*trị\b': 'sản phẩm chuyên biệt',
     r'\btriệt\s*để\b': 'hiệu quả', r'\btrị\s*dứt\s*điểm\b': 'hỗ trợ cải thiện hiệu quả',
     r'\bdứt\s*điểm\b': 'cải thiện', r'\bthuốc\s*trị\b': 'sản phẩm hỗ trợ',
-    r'\bđiều\s*trị\b': 'hỗ trợ quá trình', r'\bcam\s*kết\s*khỏi\b': 'giúp người dùng an tâm',
+    r'\bđiều\s*trị\b': 'hỗ trợ quá trình',
     r'\bbác\s*sĩ\s*khuyên\s*dùng\b': 'được nhiều người tin dùng',
-    r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn',
-    r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm', r'\bkhỏi\s*hẳn\b': 'đỡ hẳn',
-    r'\btrợ\s*giá\b': 'ưu đãi cực hời', r'\bphiên\s*live\b': 'đợt ưu đãi này', 
-    r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi',
-    
-    # 🌟 BỘ LỌC TỪ CẤM Y TẾ, BỆNH LÝ (BỔ SUNG)
     r'\bđau\s*đầu\b': 'căng thẳng', r'\bđau\s*nhức\b': 'nhức mỏi',
+    r'\bđau\s*lưng\b': 'nhức mỏi cơ thể', r'\bđau\s*mỏi\b': 'nhức mỏi',
     r'\bmệt\s*mỏi\b': 'kém thoải mái', r'\bkiệt\s*sức\b': 'cần nạp năng lượng',
     r'\bchữa\b': 'hỗ trợ', r'\bbệnh\b': 'vấn đề', r'\bviêm\b': 'khó chịu',
     r'\bđau\s*dạ\s*dày\b': 'khó chịu tiêu hóa', r'\bmất\s*ngủ\b': 'khó ngủ',
+    r'\bkhỏi\s*hẳn\b': 'đỡ hẳn',
+
+    # Nhóm làm đẹp cấp tốc / Giá cả
+    r'\btrắng\s*cấp\s*tốc\b': 'sáng khỏe tự nhiên', r'\bgiảm\s*béo\s*cấp\s*tốc\b': 'hỗ trợ vóc dáng thon gọn',
+    r'\bxóa\s*sạch\s*nám\b': 'giúp mờ thâm sạm',
+    r'\btrợ\s*giá\b': 'ưu đãi', r'\bphiên\s*live\b': 'đợt ưu đãi này', 
+    r'\btrên\s*live\b': 'đợt này', r'\blivestream\b': 'chương trình ưu đãi'
 }
 
 SOUTHERN_TO_HANOI = {
@@ -1533,15 +1542,34 @@ def clone_script(script_id):
         "outlines": [
                     { 
                         "id": 1, 
-                        "title": "Tên kịch bản (Phải ghi rõ chiến lược Hook. VD: Outfit Hẹn hò - Đánh Nỗi Đau)", 
+                        "title": "Chỉ ghi nguyên TÊN CÔNG THỨC HOOK (VD: Khơi gợi mong muốn)", 
                         "setting": "Bối cảnh 1", 
-                        "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook",
-                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
-                        "hook_score": "Chấm điểm Hook thang 100",
-                        "full_voiceover_script": "Đoạn thoại 80-110 từ...", 
+                        "hook_strategy_used": "Ghi lại tên công thức Hook",
+                        "framework_used": "Ghi tên Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. KHÔNG gắn quá sâu vào bối cảnh chi tiết, hãy tập trung nói về cảm giác/lợi ích chung. CÂU ĐẦU DƯỚI 15 TỪ. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM dùng từ 'cam kết', 'tuyệt đối', 'bệnh'. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
                         "actors": 1 
                     },
-                    # ... Tương tự cho các id 2 và 3 ...
+                    { 
+                        "id": 2, 
+                        "title": "Chỉ ghi nguyên TÊN CÔNG THỨC HOOK (VD: Đánh vào nỗi đau)", 
+                        "setting": "Bối cảnh 2", 
+                        "hook_strategy_used": "Ghi lại tên công thức Hook",
+                        "framework_used": "Ghi tên Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. KHÔNG gắn quá sâu vào bối cảnh chi tiết. CÂU ĐẦU DƯỚI 15 TỪ. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM dùng từ 'cam kết', 'tuyệt đối', 'bệnh'. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "actors": 1 
+                    },
+                    { 
+                        "id": 3, 
+                        "title": "Chỉ ghi nguyên TÊN CÔNG THỨC HOOK", 
+                        "setting": "Bối cảnh 3", 
+                        "hook_strategy_used": "Ghi lại tên công thức Hook",
+                        "framework_used": "Ghi tên Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. KHÔNG gắn quá sâu vào bối cảnh chi tiết. CÂU ĐẦU DƯỚI 15 TỪ. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM dùng từ 'cam kết', 'tuyệt đối', 'bệnh'. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "actors": 1 
+                    }
                 ]
     }}
     """
