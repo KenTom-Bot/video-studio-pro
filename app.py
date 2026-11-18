@@ -89,11 +89,12 @@ COMPACT_CORE_RULES = f"""
 🛑 QUY TẮC TỐI ƯU CHUYỂN ĐỔI (BẮT BUỘC TUÂN THỦ 100%):
 1. ĐÚNG TỆP KHÁCH HÀNG: AI khóa chặt 100% nhân vật là người Việt Nam (Nam/Nữ/Trẻ em/Người già) khớp với tệp.
 2. CHIẾN LƯỢC HOOK ĐA DẠNG (CRITICAL): CÂU ĐẦU TIÊN DƯỚI 15 TỪ. CẤM dẫn dắt vòng vo. BẮT BUỘC chọn 1 trong 12 công thức Hook từ THƯ VIỆN.
-3. TIMELINE 32 GIÂY & CẤU TRÚC AI SALES 6 (CRITICAL 4 SCENES):
-   - Cảnh 1 (0-8s): TARGET & HOOK - Nêu vấn đề/Nỗi đau + Đưa sản phẩm ra.
-   - Cảnh 2 (8-16s): SOLUTION - Giới thiệu giải pháp và thiết kế sản phẩm.
-   - Cảnh 3 (16-24s): DEMO - Thao tác trực quan, quay cận cảnh công năng.
-   - Cảnh 4 (24-32s): VALUE & ACTION - Chốt lợi ích và Kêu gọi bấm vào giỏ hàng góc trái khéo léo (KHÔNG BÁO GIÁ).
+3. CẤU TRÚC AI SALES 6 & THỜI LƯỢNG LINH HOẠT (CRITICAL 4 SCENES):
+   - AI tự phân bổ lượng lời thoại sao cho nhịp độ mỗi cảnh dao động linh hoạt từ 4s đến tối đa 10s.
+   - Cảnh 1: TARGET & HOOK - Nêu vấn đề/Nỗi đau + Đưa thẳng sản phẩm ra tiền cảnh.
+   - Cảnh 2: SOLUTION - Giới thiệu giải pháp và thiết kế, cấu tạo sản phẩm.
+   - Cảnh 3: DEMO - Thao tác trực quan, quay cận cảnh test công năng thực tế.
+   - Cảnh 4: VALUE & ACTION - Chốt lợi ích và Kêu gọi bấm vào giỏ hàng góc trái khéo léo (KHÔNG BÁO GIÁ).
 {HOOK_AND_FRAMEWORK_LIBRARY}
 4. VẬT LÝ & TƯƠNG TÁC: Cấm sờ sản phẩm lên mặt (trừ mỹ phẩm). Cầm đúng tay cầm gốc, hành động dứt khoát.
 5. CHỐNG TỪ CẤM: TUYỆT ĐỐI KHÔNG dùng từ ngữ y tế/bệnh lý (đau đầu, chữa bệnh, đặc trị...). Dùng từ nói giảm nói tránh. CẤM lặp từ.
