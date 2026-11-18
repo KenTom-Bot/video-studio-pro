@@ -1586,16 +1586,43 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
     
     NHIỆM VỤ: TẠO THÊM 3 KỊCH BẢN MỚI Ở 3 BỐI CẢNH ĐỜI THỰC HOÀN TOÀN MỚI. ĐẶC BIỆT LƯU Ý:
     - BẮT BUỘC phải nói đúng về SẢN PHẨM GỐC ở trên. TUYỆT ĐỐI KHÔNG sáng tạo ra sản phẩm khác.
-    - THIẾT KẾ 3 TUYẾN NỘI DUNG ĐA DẠNG: Đưa KOC vào các hoàn cảnh sử dụng thực tế MỚI TINH.
-    - CRITICAL: CẤM VIẾT TRÙNG LẠI các bối cảnh hoặc góc độ (title) đã liệt kê ở danh sách ĐÃ TẠO bên trên.
-    - 🛑 ĐẶC BIỆT LƯU Ý VỀ LỜI THOẠI (full_voiceover_script): BẮT BUỘC CHỈ VIẾT DUY NHẤT LỜI THOẠI CỦA NHÂN VẬT. TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM viết chữ "Cảnh 1", "Cảnh 2"). TUYỆT ĐỐI KHÔNG CHÈN MÔ TẢ HÀNH ĐỘNG. Hãy viết thành 1 đoạn văn TÂM SỰ LIỀN MẠCH, nói full công năng, CẤM BÁO GIÁ TIỀN.
+    - CẤM VIẾT TRÙNG LẠI các bối cảnh hoặc góc độ đã liệt kê ở danh sách ĐÃ TẠO bên trên.
+    - BẮT BUỘC áp dụng 12 Công thức Hook và 6 Khung Kịch Bản (Framework) để xây dựng nội dung.
+    - 🛑 ĐẶC BIỆT LƯU Ý VỀ LỜI THOẠI (full_voiceover_script): BẮT BUỘC CHỈ VIẾT DUY NHẤT LỜI THOẠI. TUYỆT ĐỐI KHÔNG CHIA CẢNH. CÂU ĐẦU TIÊN DƯỚI 15 TỪ, ĐẬP THẲNG VÀO SP, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHÈN HÀNH ĐỘNG.
     
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-            {{ "id": {cur_len+1}, "title": "Tuyến nội dung MỚI 1 (VD: Outfit Check-in Cafe)", "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
-            {{ "id": {cur_len+2}, "title": "Tuyến nội dung MỚI 2", "setting": "Bối cảnh MỚI 2", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
-            {{ "id": {cur_len+3}, "title": "Tuyến nội dung MỚI 3", "setting": "Bối cảnh MỚI 3", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }}
+            {{ 
+                "id": {cur_len+1}, 
+                "title": "Tên kịch bản MỚI 1 (Ghi rõ chiến lược Hook. VD: Dạo phố - Đánh Nỗi Đau)", 
+                "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", 
+                "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook",
+                "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
+                "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                "actors": 1 
+            }},
+            {{ 
+                "id": {cur_len+2}, 
+                "title": "Tên kịch bản MỚI 2 (Ghi rõ chiến lược Hook)", 
+                "setting": "Bối cảnh MỚI 2", 
+                "hook_strategy_used": "Ghi tên công thức Hook khác kịch bản trên",
+                "framework_used": "Ghi tên Khung kịch bản",
+                "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                "actors": 1 
+            }},
+            {{ 
+                "id": {cur_len+3}, 
+                "title": "Tên kịch bản MỚI 3 (Ghi rõ chiến lược Hook)", 
+                "setting": "Bối cảnh MỚI 3", 
+                "hook_strategy_used": "Ghi tên công thức Hook khác 2 kịch bản trên",
+                "framework_used": "Ghi tên Khung kịch bản",
+                "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                "actors": 1 
+            }}
         ]
     }}
     """
