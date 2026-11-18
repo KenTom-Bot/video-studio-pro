@@ -1540,37 +1540,37 @@ def clone_script(script_id):
     
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
-        "outlines": [
-                    { 
+"outlines": [
+                    {{ 
                         "id": 1, 
-                        "title": "Chỉ ghi nguyên TÊN CÔNG THỨC HOOK (VD: Khơi gợi mong muốn)", 
+                        "title": "Tên kịch bản ngắn gọn", 
                         "setting": "Bối cảnh 1", 
-                        "hook_strategy_used": "Ghi lại tên công thức Hook",
-                        "framework_used": "Ghi tên Khung kịch bản",
+                        "hook_strategy_used": "Ghi tên 1 trong 12 công thức Hook",
+                        "framework_used": "Ghi tên 1 trong 6 Khung kịch bản",
                         "hook_score": "Chấm điểm Hook thang 100 (>85)",
-                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. KHÔNG gắn quá sâu vào bối cảnh chi tiết, hãy tập trung nói về cảm giác/lợi ích chung. CÂU ĐẦU DƯỚI 15 TỪ. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM dùng từ 'cam kết', 'tuyệt đối', 'bệnh'. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH.", 
                         "actors": 1 
-                    },
-                    { 
+                    }},
+                    {{ 
                         "id": 2, 
-                        "title": "Chỉ ghi nguyên TÊN CÔNG THỨC HOOK (VD: Đánh vào nỗi đau)", 
+                        "title": "Tên kịch bản ngắn gọn", 
                         "setting": "Bối cảnh 2", 
-                        "hook_strategy_used": "Ghi lại tên công thức Hook",
-                        "framework_used": "Ghi tên Khung kịch bản",
+                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1)",
+                        "framework_used": "Tên Khung kịch bản",
                         "hook_score": "Chấm điểm Hook thang 100 (>85)",
-                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. KHÔNG gắn quá sâu vào bối cảnh chi tiết. CÂU ĐẦU DƯỚI 15 TỪ. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM dùng từ 'cam kết', 'tuyệt đối', 'bệnh'. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH.", 
                         "actors": 1 
-                    },
-                    { 
+                    }},
+                    {{ 
                         "id": 3, 
-                        "title": "Chỉ ghi nguyên TÊN CÔNG THỨC HOOK", 
+                        "title": "Tên kịch bản ngắn gọn", 
                         "setting": "Bối cảnh 3", 
-                        "hook_strategy_used": "Ghi lại tên công thức Hook",
-                        "framework_used": "Ghi tên Khung kịch bản",
+                        "hook_strategy_used": "Tên công thức Hook (khác 2 kịch bản trên)",
+                        "framework_used": "Tên Khung kịch bản",
                         "hook_score": "Chấm điểm Hook thang 100 (>85)",
-                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. KHÔNG gắn quá sâu vào bối cảnh chi tiết. CÂU ĐẦU DƯỚI 15 TỪ. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM dùng từ 'cam kết', 'tuyệt đối', 'bệnh'. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH.", 
                         "actors": 1 
-                    }
+                    }}
                 ]
     }}
     """
@@ -1624,32 +1624,32 @@ def generate_more_scripts(unified_strategy_format, char_profiles, extra_note="")
         "outlines": [
             {{ 
                 "id": {cur_len+1}, 
-                "title": "Tên kịch bản MỚI 1 (Ghi rõ chiến lược Hook. VD: Dạo phố - Đánh Nỗi Đau)", 
-                "setting": "Bối cảnh MỚI 1 (Tuyệt đối không trùng cái cũ)", 
-                "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook",
-                "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
+                "title": "Tên kịch bản MỚI 1", 
+                "setting": "Bối cảnh MỚI 1", 
+                "hook_strategy_used": "Ghi tên 1 trong 12 công thức Hook",
+                "framework_used": "Ghi tên 1 trong 6 Khung kịch bản",
                 "hook_score": "Chấm điểm Hook thang 100 (>85)",
-                "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH.", 
                 "actors": 1 
             }},
             {{ 
                 "id": {cur_len+2}, 
-                "title": "Tên kịch bản MỚI 2 (Ghi rõ chiến lược Hook)", 
+                "title": "Tên kịch bản MỚI 2", 
                 "setting": "Bối cảnh MỚI 2", 
-                "hook_strategy_used": "Ghi tên công thức Hook khác kịch bản trên",
-                "framework_used": "Ghi tên Khung kịch bản",
+                "hook_strategy_used": "Tên công thức Hook khác kịch bản trên",
+                "framework_used": "Tên Khung kịch bản",
                 "hook_score": "Chấm điểm Hook thang 100 (>85)",
-                "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH.", 
                 "actors": 1 
             }},
             {{ 
                 "id": {cur_len+3}, 
-                "title": "Tên kịch bản MỚI 3 (Ghi rõ chiến lược Hook)", 
+                "title": "Tên kịch bản MỚI 3", 
                 "setting": "Bối cảnh MỚI 3", 
-                "hook_strategy_used": "Ghi tên công thức Hook khác 2 kịch bản trên",
-                "framework_used": "Ghi tên Khung kịch bản",
+                "hook_strategy_used": "Tên công thức Hook khác 2 kịch bản trên",
+                "framework_used": "Tên Khung kịch bản",
                 "hook_score": "Chấm điểm Hook thang 100 (>85)",
-                "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH.", 
                 "actors": 1 
             }}
         ]
