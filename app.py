@@ -62,25 +62,22 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 ]
 
 COMPACT_CORE_RULES = """
-🛑 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ 100%):
-1. KOC 100% LÀ NGƯỜI VIỆT NAM & ĐÚNG ĐỘ TUỔI TÙY SẢN PHẨM: AI tự phân tích tệp khách hàng để gán KOC là Nam/Nữ, Trẻ em/Thanh niên/Người già. Tuyệt đối CẤM tạo người nước ngoài. Khóa chặt diện mạo, MÀU SẮC ĐÍCH DANH và CHẤT LIỆU xuyên suốt 4 cảnh.
-2. HÀNH ĐỘNG HÌNH THỂ & VỊ TRÍ TƯƠNG TÁC (CRITICAL):
-   - Cảnh 1 (Hook): BẮT BUỘC có hành động hình thể chân thực, đưa thẳng sản phẩm ra tiền cảnh.
-   - MỸ PHẨM: Công dụng ở đâu bôi CHÍNH XÁC ở đó! Son bôi môi, má hồng bôi má, lăn nách bôi nách.
-   - GIA DỤNG/CÔNG NGHỆ/THỜI TRANG: Cấm đưa lên mặt/tai. Tương tác ngang ngực/eo hoặc dưới sàn. Cầm đúng tay cầm gốc, KHÔNG thả rơi.
-   - 100% CÁC CẢNH KOC ĐỀU NÓI TRỰC TIẾP VÀO ỐNG KÍNH (No off-screen narrator). Giọng Hà Nội chuẩn.
-3. LÕI THOẠI KOC THỰC CHIẾN & CẤM BÁO GIÁ (CRITICAL):
-   - CẤU TRÚC KỊCH BẢN BẮT BUỘC: 
-     + Đoạn đầu (Hook - 3 giây đầu): CẤM DẪN DẮT VÒNG VO. CÂU ĐẦU TIÊN DƯỚI 15 TỪ, ĐẬP THẲNG TÊN SẢN PHẨM VÀ SỰ KHÁC BIỆT/CÔNG DỤNG. 
-     [CRITICAL]: BẮT BUỘC ĐA DẠNG CẤU TRÚC HOOK GIỮA CÁC KỊCH BẢN. Xoay vòng ngẫu nhiên các công thức: Nêu thẳng giải pháp ("Ai hay bị X thì rinh ngay Y"), Cảm thán điểm độc quyền ("Chưa thấy cái Y nào mà X như này"), Tuyên bố chân ái ("Chân ái gọi tên Y vì X"), hoặc Lời khuyên mạnh/Cảnh báo ("Đừng mua Y nếu chưa biết đến tính năng X"). TUYỆT ĐỐI KHÔNG lặp lại một văn mẫu.
-     + Đoạn giữa (Phân tích): Đi sâu vào chi tiết CẤU TẠO (thiết kế, chất liệu) và review thực tế CHI TIẾT CÔNG NĂNG của sản phẩm.
-     + Đoạn cuối (CTA): BẮT BUỘC có 1 câu kêu gọi bấm vào giỏ hàng góc trái vì đang có ưu đãi (VD: "Nay đang có ưu đãi hời, mọi người chốt ngay ở giỏ hàng góc trái nhé"). CẤM gượng ép.
-   - TUYỆT ĐỐI CẤM TỪ BỊ CẤM/NHẠY CẢM: KHÔNG nhắc đến "giá gốc", "giảm còn", hay các con số báo giá. KHÔNG dùng các từ liên quan đến tình trạng bệnh lý, y tế như "bệnh", "đau đầu", "đau nhức", "điều trị", "đặc trị", "khỏi hẳn"... thay vào đó dùng các cụm từ nhẹ nhàng như "khó chịu", "cải thiện", "hỗ trợ".
-   - CHỐNG LẶP TỪ TUYỆT ĐỐI: Không lặp từ trong cùng câu.
-4. VĂN NÓI HÀ NỘI THUẦN VIỆT:
-   - CẤM sử dụng dấu chấm lửng (...), dấu gạch nối (-), ký hiệu ([ ]) trong thoại.
-5. ĐA DẠNG BỐI CẢNH ĐỜI THỰC (CRITICAL SETTING):
-   - Bắt buộc phân tích LỜI THOẠI và CÔNG NĂNG sản phẩm để chọn bối cảnh khớp 100%. Không gian đa dạng, thực tế, clean modern everyday Vietnamese setting.
+🛑 QUY TẮC TỐI ƯU CHUYỂN ĐỔI (BẮT BUỘC TUÂN THỦ 100%):
+1. ĐÚNG TỆP KHÁCH HÀNG: AI tự phân tích và khóa chặt 100% nhân vật là người Việt Nam (Nam/Nữ/Trẻ em/Người già) khớp với tệp người mua.
+2. CHIẾN LƯỢC HOOK ĐA DẠNG (CRITICAL): CÂU ĐẦU TIÊN DƯỚI 15 TỪ. CẤM dẫn dắt vòng vo. BẮT BUỘC chọn 1 trong các công thức Hook sau và KHÔNG ĐƯỢC TRÙNG LẶP giữa các kịch bản:
+   - (1) Gọi đúng tệp + Nỗi đau ("Các chị hay nấu ăn mà lười lau bếp thì xem cái này...")
+   - (2) Tò mò ("Nhìn giống X nhưng công dụng thật sự lại là Y...")
+   - (3) Kết quả trước - Giải thích sau ("Góc bếp gọn gàng thế này chỉ nhờ món đồ này đây...")
+   - (4) Sai lầm thường gặp ("Đừng làm X nữa, dùng cái này nhàn hơn nhiều...")
+   - (5) Thử nghiệm thực tế ("Đổ thử nước lên xem thấm được bao nhiêu nhé...")
+   - (6) Đồng cảm ("Nấu cơm xong đã mệt, nhìn dọn rửa càng ngại...")
+3. TIMELINE 32 GIÂY & CẤU TRÚC AI SALES 6 (CRITICAL 4 SCENES):
+   - Cảnh 1 (0-8s): TARGET & HOOK - Nêu vấn đề/Nỗi đau + Đưa sản phẩm ra.
+   - Cảnh 2 (8-16s): SOLUTION - Giới thiệu giải pháp và thiết kế sản phẩm.
+   - Cảnh 3 (16-24s): DEMO - Thao tác trực quan, quay cận cảnh công năng.
+   - Cảnh 4 (24-32s): VALUE & ACTION - Chốt lợi ích và Kêu gọi (CTA) bấm vào giỏ hàng góc trái khéo léo (KHÔNG BÁO GIÁ).
+4. VẬT LÝ & TƯƠNG TÁC: Cấm sờ sản phẩm lên mặt (trừ mỹ phẩm). Cầm đúng tay cầm gốc, hành động phải nhanh gọn, dứt khoát.
+5. CHỐNG TỪ CẤM: TUYỆT ĐỐI KHÔNG dùng từ ngữ y tế/bệnh lý (đau đầu, chữa bệnh, đặc trị...). Dùng từ nói giảm nói tránh (khó chịu, hỗ trợ, cải thiện). CẤM lặp từ.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -1467,8 +1464,15 @@ def create_scene_details(target_id, mode, style="Điện Ảnh Chân Thực"):
         f"🗣 <b>Xưng hô:</b> '{self_pronoun}' - '{audience_pronoun}' | 🏙 <b>Bối cảnh:</b> {fixed_setting_base}",
         f"👗 <b>Trang phục KOC (Khóa 4 cảnh):</b> {final_outfit_vi}"
     ]
+    
+    # 🌟 [NEW] TRÍCH XUẤT VÀ HIỂN THỊ CHIẾN LƯỢC HOOK & ĐIỂM SỐ
+    hook_strat = outline.get("hook_strategy_used", "")
+    hook_score = outline.get("hook_score", "")
+    if hook_strat or hook_score:
+        summary_lines.append(f"🎯 <b>Chiến lược Hook:</b> {hook_strat} | 🏆 <b>Điểm:</b> {hook_score}")
+
     if user_custom_note and user_custom_note.lower() not in ["mặc định chuẩn", "không có"]:
-        summary_lines.append(f"🎯 <b>Ghi chú riêng:</b> {user_custom_note}")
+        summary_lines.append(f"📝 <b>Ghi chú riêng:</b> {user_custom_note}")
         
     res["director_summary"] = "<br>".join(summary_lines)
     
@@ -1507,9 +1511,33 @@ def clone_script(script_id):
     TRẢ VỀ JSON DUY NHẤT (KHÔNG BỌC TRONG MARKDOWN ````json):
     {{
         "outlines": [
-                    {{ "id": 1, "title": "Tuyến nội dung 1 (VD: Outfit Hẹn hò)", "setting": "Bối cảnh 1 (Phù hợp tuyến 1)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
-                    {{ "id": 2, "title": "Tuyến nội dung 2 (VD: Mặc đi làm)", "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }},
-                    {{ "id": 3, "title": "Tuyến nội dung 3 (VD: Dạo phố cuối tuần)", "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)", "full_voiceover_script": "CHỈ VIẾT LỜI THOẠI LIỀN MẠCH, TUYỆT ĐỐI KHÔNG CHIA CẢNH (CẤM ghi chữ 'Cảnh 1', 'Cảnh 2'), CẤM chèn mô tả hành động. Đoạn thoại 80-110 từ. Tập trung full công năng, CẤM BÁO GIÁ.", "actors": 1 }}
+                    { 
+                      "id": 1, 
+                      "title": "Tuyến nội dung 1 (Đánh vào Nỗi đau)", 
+                      "setting": "Bối cảnh 1", 
+                      "hook_strategy_used": "Ghi rõ tên 1 trong các công thức Hook đã dùng (VD: Gọi đúng tệp + Nỗi đau)",
+                      "hook_score": "Chấm điểm Hook theo thang 100 (Phải > 85 điểm mới đạt)",
+                      "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                      "actors": 1 
+                    },
+                    { 
+                      "id": 2, 
+                      "title": "Tuyến nội dung 2 (Tạo sự tò mò)", 
+                      "setting": "Bối cảnh 2 (Khác biệt)", 
+                      "hook_strategy_used": "Ghi công thức Hook khác kịch bản 1",
+                      "hook_score": "Điểm > 85",
+                      "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", 
+                      "actors": 1 
+                    },
+                    { 
+                      "id": 3, 
+                      "title": "Tuyến nội dung 3 (Thử nghiệm thực tế)", 
+                      "setting": "Bối cảnh 3", 
+                      "hook_strategy_used": "Ghi công thức Hook khác kịch bản 1 và 2",
+                      "hook_score": "Điểm > 85",
+                      "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", 
+                      "actors": 1 
+                    }
                 ]
     }}
     """
