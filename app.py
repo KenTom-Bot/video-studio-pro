@@ -1533,34 +1533,15 @@ def clone_script(script_id):
         "outlines": [
                     { 
                         "id": 1, 
-                        "title": "Tuyến nội dung 1", 
+                        "title": "Tên kịch bản (Phải ghi rõ chiến lược Hook. VD: Outfit Hẹn hò - Đánh Nỗi Đau)", 
                         "setting": "Bối cảnh 1", 
-                        "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook đã dùng",
-                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản đã dùng",
-                        "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
-                        "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
-                        "actors": 1 
-                    },
-                    { 
-                        "id": 2, 
-                        "title": "Tuyến nội dung 2", 
-                        "setting": "Bối cảnh 2", 
-                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1)",
-                        "framework_used": "Tên Khung kịch bản",
-                        "hook_score": "Chấm điểm Hook thang 100 (> 85)",
+                        "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook",
+                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100",
                         "full_voiceover_script": "Đoạn thoại 80-110 từ...", 
                         "actors": 1 
                     },
-                    { 
-                        "id": 3, 
-                        "title": "Tuyến nội dung 3", 
-                        "setting": "Bối cảnh 3", 
-                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1 và 2)",
-                        "framework_used": "Tên Khung kịch bản",
-                        "hook_score": "Chấm điểm Hook thang 100 (> 85)",
-                        "full_voiceover_script": "Đoạn thoại 80-110 từ...", 
-                        "actors": 1 
-                    }
+                    # ... Tương tự cho các id 2 và 3 ...
                 ]
     }}
     """
@@ -2290,7 +2271,7 @@ if all_sc:
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
                 
-                # 🌟 TRÍCH XUẤT ĐIỂM, HOOK VÀ FRAMEWORK TỪ AI
+                # 🌟 TRÍCH XUẤT ĐIỂM, HOOK VÀ FRAMEWORK
                 hook_strat = outline.get("hook_strategy_used", "")
                 framework = outline.get("framework_used", "")
                 hook_score = outline.get("hook_score", "")
@@ -2302,7 +2283,9 @@ if all_sc:
                 
                 hook_badge = f" | <span style='color:#0284c7; font-size:13px; font-weight:600;'>{' - '.join(badges)}</span>" if badges else ""
                 
+                # Đảm bảo hook_badge được gắn vào dòng này
                 c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span> {hook_badge}", unsafe_allow_html=True)
+                
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
                 
