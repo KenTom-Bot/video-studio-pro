@@ -61,23 +61,42 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
     "😂 Tình Huống Hài Hước & Đời Thường"
 ]
 
-COMPACT_CORE_RULES = """
+HOOK_AND_FRAMEWORK_LIBRARY = """
+📚 THƯ VIỆN 12 CÔNG THỨC HOOK (BẮT BUỘC CHỌN 3 HOOK KHÁC NHAU CHO 3 KỊCH BẢN):
+1. Gọi đúng khách hàng + Nỗi đau ("Các chị hay nấu ăn mà cứ phải lau mặt bếp thì xem cái này nhé!")
+2. Tạo sự tò mò ("Nhìn giống X thế này thôi, nhưng công dụng thật sự mới hay!")
+3. Kết quả trước – Giải thích sau ("Góc bếp đang bừa bộn mà xếp lại gọn gàng chỉ nhờ món này đây.")
+4. Sai lầm thường gặp ("Đừng làm X nữa, dùng cái này nhàn hơn nhiều.")
+5. Gọi hoàn cảnh sử dụng ("Bạn nào đang ở trọ, bếp vừa nhỏ vừa chật thì chiếc này khá tiện!")
+6. Thử nghiệm trực tiếp ("Đổ thử nước lên chiếc thảm này xem nó thấm được đến đâu nhé!")
+7. So sánh cũ và mới ("Thay vì mỗi lần làm X lại phải Y, dùng cái này gọn hơn nhiều.")
+8. Nhu cầu theo mùa vụ ("Sắp đến Noel/Tết/Hè rồi, đừng bỏ qua món đồ nhỏ xinh này nhé!")
+9. Đa công dụng ("Một món mà vừa làm X, vừa làm Y, lại làm Z.")
+10. Giá trị nhận được ("Không cần sắm đồ đắt tiền, một chiếc nhỏ thế này cũng giúp X hơn hẳn.")
+11. Đồng cảm khách hàng ("Làm X xong đã mệt rồi, nhìn Y lại càng ngại dọn.")
+12. Khơi gợi mong muốn ("Chỉ cần thêm vài món đồ nhỏ thế này là nhìn vừa gọn vừa có gu hơn hẳn.")
+
+📋 THƯ VIỆN 6 KHUNG KỊCH BẢN (FRAMEWORK) BÁN HÀNG:
+1. PAS (Vấn đề → Bất tiện → Giải pháp): Ưu tiên cho Gia dụng, mẹ bé.
+2. AIDA (Chú ý → Quan tâm → Mong muốn → Hành động): Phù hợp Đa ngành hàng.
+3. BAB (Trước đây → Sau khi dùng → Giải pháp): Ưu tiên Sắp xếp, vệ sinh, làm đẹp.
+4. FAB (Tính năng → Ưu điểm → Lợi ích): Ưu tiên Công nghệ, điện tử.
+5. 4P (Viễn cảnh → Lời hứa → Bằng chứng → Hành động): Ưu tiên Mỹ phẩm, TPCN.
+6. Direct Demo (Sản phẩm → Minh họa → Lợi ích → CTA): Dành cho Sản phẩm độc đáo.
+"""
+
+COMPACT_CORE_RULES = f"""
 🛑 QUY TẮC TỐI ƯU CHUYỂN ĐỔI (BẮT BUỘC TUÂN THỦ 100%):
-1. ĐÚNG TỆP KHÁCH HÀNG: AI tự phân tích và khóa chặt 100% nhân vật là người Việt Nam (Nam/Nữ/Trẻ em/Người già) khớp với tệp người mua.
-2. CHIẾN LƯỢC HOOK ĐA DẠNG (CRITICAL): CÂU ĐẦU TIÊN DƯỚI 15 TỪ. CẤM dẫn dắt vòng vo. BẮT BUỘC chọn 1 trong các công thức Hook sau và KHÔNG ĐƯỢC TRÙNG LẶP giữa các kịch bản:
-   - (1) Gọi đúng tệp + Nỗi đau ("Các chị hay nấu ăn mà lười lau bếp thì xem cái này...")
-   - (2) Tò mò ("Nhìn giống X nhưng công dụng thật sự lại là Y...")
-   - (3) Kết quả trước - Giải thích sau ("Góc bếp gọn gàng thế này chỉ nhờ món đồ này đây...")
-   - (4) Sai lầm thường gặp ("Đừng làm X nữa, dùng cái này nhàn hơn nhiều...")
-   - (5) Thử nghiệm thực tế ("Đổ thử nước lên xem thấm được bao nhiêu nhé...")
-   - (6) Đồng cảm ("Nấu cơm xong đã mệt, nhìn dọn rửa càng ngại...")
+1. ĐÚNG TỆP KHÁCH HÀNG: AI khóa chặt 100% nhân vật là người Việt Nam (Nam/Nữ/Trẻ em/Người già) khớp với tệp.
+2. CHIẾN LƯỢC HOOK ĐA DẠNG (CRITICAL): CÂU ĐẦU TIÊN DƯỚI 15 TỪ. CẤM dẫn dắt vòng vo. BẮT BUỘC chọn 1 trong 12 công thức Hook từ THƯ VIỆN.
 3. TIMELINE 32 GIÂY & CẤU TRÚC AI SALES 6 (CRITICAL 4 SCENES):
    - Cảnh 1 (0-8s): TARGET & HOOK - Nêu vấn đề/Nỗi đau + Đưa sản phẩm ra.
    - Cảnh 2 (8-16s): SOLUTION - Giới thiệu giải pháp và thiết kế sản phẩm.
    - Cảnh 3 (16-24s): DEMO - Thao tác trực quan, quay cận cảnh công năng.
-   - Cảnh 4 (24-32s): VALUE & ACTION - Chốt lợi ích và Kêu gọi (CTA) bấm vào giỏ hàng góc trái khéo léo (KHÔNG BÁO GIÁ).
-4. VẬT LÝ & TƯƠNG TÁC: Cấm sờ sản phẩm lên mặt (trừ mỹ phẩm). Cầm đúng tay cầm gốc, hành động phải nhanh gọn, dứt khoát.
-5. CHỐNG TỪ CẤM: TUYỆT ĐỐI KHÔNG dùng từ ngữ y tế/bệnh lý (đau đầu, chữa bệnh, đặc trị...). Dùng từ nói giảm nói tránh (khó chịu, hỗ trợ, cải thiện). CẤM lặp từ.
+   - Cảnh 4 (24-32s): VALUE & ACTION - Chốt lợi ích và Kêu gọi bấm vào giỏ hàng góc trái khéo léo (KHÔNG BÁO GIÁ).
+{HOOK_AND_FRAMEWORK_LIBRARY}
+4. VẬT LÝ & TƯƠNG TÁC: Cấm sờ sản phẩm lên mặt (trừ mỹ phẩm). Cầm đúng tay cầm gốc, hành động dứt khoát.
+5. CHỐNG TỪ CẤM: TUYỆT ĐỐI KHÔNG dùng từ ngữ y tế/bệnh lý (đau đầu, chữa bệnh, đặc trị...). Dùng từ nói giảm nói tránh. CẤM lặp từ.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
@@ -1515,27 +1534,30 @@ def clone_script(script_id):
                         "id": 1, 
                         "title": "Tuyến nội dung 1", 
                         "setting": "Bối cảnh 1", 
-                        "hook_strategy_used": "Ghi rõ tên 1 công thức Hook đã dùng",
+                        "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook đã dùng",
+                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản đã dùng",
                         "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
-                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU TIÊN DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "full_voiceover_script": "Đoạn thoại 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
                         "actors": 1 
                     },
                     { 
                         "id": 2, 
                         "title": "Tuyến nội dung 2", 
                         "setting": "Bối cảnh 2", 
-                        "hook_strategy_used": "Ghi tên công thức Hook khác kịch bản 1",
-                        "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
-                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1)",
+                        "framework_used": "Tên Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (> 85)",
+                        "full_voiceover_script": "Đoạn thoại 80-110 từ...", 
                         "actors": 1 
                     },
                     { 
                         "id": 3, 
                         "title": "Tuyến nội dung 3", 
                         "setting": "Bối cảnh 3", 
-                        "hook_strategy_used": "Ghi tên công thức Hook khác kịch bản 1 và 2",
-                        "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
-                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1 và 2)",
+                        "framework_used": "Tên Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (> 85)",
+                        "full_voiceover_script": "Đoạn thoại 80-110 từ...", 
                         "actors": 1 
                     }
                 ]
@@ -2267,12 +2289,19 @@ if all_sc:
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
                 
-                # 🌟 TRÍCH XUẤT ĐIỂM HOOK VÀ CHIẾN LƯỢC TỪ AI
+                # 🌟 TRÍCH XUẤT ĐIỂM, HOOK VÀ FRAMEWORK TỪ AI
                 hook_strat = outline.get("hook_strategy_used", "")
+                framework = outline.get("framework_used", "")
                 hook_score = outline.get("hook_score", "")
-                hook_badge = f" | 🎯 {hook_strat} - 🏆 {hook_score}/100đ" if hook_strat or hook_score else ""
                 
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span> <span style='color:#0284c7; font-size:13px; font-weight:600;'>{hook_badge}</span>", unsafe_allow_html=True)
+                badges = []
+                if hook_strat: badges.append(f"🎯 Hook: {hook_strat}")
+                if framework: badges.append(f"🧩 Khung: {framework}")
+                if hook_score: badges.append(f"🏆 {hook_score}đ")
+                
+                hook_badge = f" | <span style='color:#0284c7; font-size:13px; font-weight:600;'>{' - '.join(badges)}</span>" if badges else ""
+                
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span> {hook_badge}", unsafe_allow_html=True)
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
                 
