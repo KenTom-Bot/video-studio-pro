@@ -1512,31 +1512,31 @@ def clone_script(script_id):
     {{
         "outlines": [
                     { 
-                      "id": 1, 
-                      "title": "Tuyến nội dung 1 (Đánh vào Nỗi đau)", 
-                      "setting": "Bối cảnh 1", 
-                      "hook_strategy_used": "Ghi rõ tên 1 trong các công thức Hook đã dùng (VD: Gọi đúng tệp + Nỗi đau)",
-                      "hook_score": "Chấm điểm Hook theo thang 100 (Phải > 85 điểm mới đạt)",
-                      "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
-                      "actors": 1 
+                        "id": 1, 
+                        "title": "Tuyến nội dung 1", 
+                        "setting": "Bối cảnh 1", 
+                        "hook_strategy_used": "Ghi rõ tên 1 công thức Hook đã dùng",
+                        "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU TIÊN DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "actors": 1 
                     },
                     { 
-                      "id": 2, 
-                      "title": "Tuyến nội dung 2 (Tạo sự tò mò)", 
-                      "setting": "Bối cảnh 2 (Khác biệt)", 
-                      "hook_strategy_used": "Ghi công thức Hook khác kịch bản 1",
-                      "hook_score": "Điểm > 85",
-                      "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", 
-                      "actors": 1 
+                        "id": 2, 
+                        "title": "Tuyến nội dung 2", 
+                        "setting": "Bối cảnh 2", 
+                        "hook_strategy_used": "Ghi tên công thức Hook khác kịch bản 1",
+                        "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "actors": 1 
                     },
                     { 
-                      "id": 3, 
-                      "title": "Tuyến nội dung 3 (Thử nghiệm thực tế)", 
-                      "setting": "Bối cảnh 3", 
-                      "hook_strategy_used": "Ghi công thức Hook khác kịch bản 1 và 2",
-                      "hook_score": "Điểm > 85",
-                      "full_voiceover_script": "Đoạn thoại dài 80-110 từ...", 
-                      "actors": 1 
+                        "id": 3, 
+                        "title": "Tuyến nội dung 3", 
+                        "setting": "Bối cảnh 3", 
+                        "hook_strategy_used": "Ghi tên công thức Hook khác kịch bản 1 và 2",
+                        "hook_score": "Chấm điểm Hook thang 100 (Bắt buộc > 85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ, CẤM VÒNG VO. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", 
+                        "actors": 1 
                     }
                 ]
     }}
@@ -2266,7 +2266,13 @@ if all_sc:
             sc_id = outline["id"]
             with st.container(border=True):
                 c1, c2 = st.columns([3, 1.2])
-                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span>", unsafe_allow_html=True)
+                
+                # 🌟 TRÍCH XUẤT ĐIỂM HOOK VÀ CHIẾN LƯỢC TỪ AI
+                hook_strat = outline.get("hook_strategy_used", "")
+                hook_score = outline.get("hook_score", "")
+                hook_badge = f" | 🎯 {hook_strat} - 🏆 {hook_score}/100đ" if hook_strat or hook_score else ""
+                
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span> <span style='color:#0284c7; font-size:13px; font-weight:600;'>{hook_badge}</span>", unsafe_allow_html=True)
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
                 
