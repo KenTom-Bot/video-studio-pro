@@ -62,19 +62,19 @@ UNIFIED_STRATEGY_FORMAT_OPTS = [
 ]
 
 HOOK_AND_FRAMEWORK_LIBRARY = """
-📚 THƯ VIỆN 12 CÔNG THỨC HOOK (BẮT BUỘC CHỌN 3 HOOK KHÁC NHAU CHO 3 KỊCH BẢN):
-1. Gọi đúng khách hàng + Nỗi đau ("Các chị hay nấu ăn mà cứ phải lau mặt bếp thì xem cái này nhé!")
-2. Tạo sự tò mò ("Nhìn giống X thế này thôi, nhưng công dụng thật sự mới hay!")
-3. Kết quả trước – Giải thích sau ("Góc bếp đang bừa bộn mà xếp lại gọn gàng chỉ nhờ món này đây.")
-4. Sai lầm thường gặp ("Đừng làm X nữa, dùng cái này nhàn hơn nhiều.")
-5. Gọi hoàn cảnh sử dụng ("Bạn nào đang ở trọ, bếp vừa nhỏ vừa chật thì chiếc này khá tiện!")
-6. Thử nghiệm trực tiếp ("Đổ thử nước lên chiếc thảm này xem nó thấm được đến đâu nhé!")
-7. So sánh cũ và mới ("Thay vì mỗi lần làm X lại phải Y, dùng cái này gọn hơn nhiều.")
-8. Nhu cầu theo mùa vụ ("Sắp đến Noel/Tết/Hè rồi, đừng bỏ qua món đồ nhỏ xinh này nhé!")
-9. Đa công dụng ("Một món mà vừa làm X, vừa làm Y, lại làm Z.")
-10. Giá trị nhận được ("Không cần sắm đồ đắt tiền, một chiếc nhỏ thế này cũng giúp X hơn hẳn.")
-11. Đồng cảm khách hàng ("Làm X xong đã mệt rồi, nhìn Y lại càng ngại dọn.")
-12. Khơi gợi mong muốn ("Chỉ cần thêm vài món đồ nhỏ thế này là nhìn vừa gọn vừa có gu hơn hẳn.")
+📚 THƯ VIỆN 12 CÔNG THỨC HOOK (BẮT BUỘC CHỌN 3 HOOK KHÁC NHAU. TUYỆT ĐỐI KHÔNG COPY VĂN MẪU, PHẢI TỰ CHẾ TÁC LẠI CHO ĐÚNG VỚI SẢN PHẨM ĐANG BÁN):
+1. Gọi đúng khách hàng + Nỗi đau (Ví dụ: "Các chị hay [hành động] mà cứ bị [nỗi đau] thì xem cái này nhé!")
+2. Tạo sự tò mò (Ví dụ: "Nhìn giống [X] thế này thôi, nhưng công dụng thật sự mới hay!")
+3. Kết quả trước – Giải thích sau (Ví dụ: "[Vấn đề] đang [Tình trạng] mà [Kết quả] chỉ nhờ món này đây.")
+4. Sai lầm thường gặp (Ví dụ: "Đừng làm [Sai lầm] nữa, dùng cái này nhàn hơn nhiều.")
+5. Gọi hoàn cảnh sử dụng (Ví dụ: "Bạn nào đang [Hoàn cảnh], [Khó khăn] thì chiếc này khá tiện!")
+6. Thử nghiệm trực tiếp (Ví dụ: "Làm thử [Hành động] lên [Sản phẩm] xem nó [Kết quả] đến đâu nhé!")
+7. So sánh cũ và mới (Ví dụ: "Thay vì mỗi lần làm [X] lại phải [Y], dùng cái này gọn hơn nhiều.")
+8. Nhu cầu theo mùa vụ (Ví dụ: "Sắp đến [Mùa/Dịp] rồi, đừng bỏ qua món đồ này nhé!")
+9. Đa công dụng (Ví dụ: "Một món mà vừa làm [X], vừa làm [Y], lại làm [Z].")
+10. Giá trị nhận được (Ví dụ: "Không cần sắm đồ đắt tiền, một chiếc nhỏ thế này cũng giúp [Lợi ích] hơn hẳn.")
+11. Đồng cảm khách hàng (Ví dụ: "Làm [X] xong đã mệt rồi, nhìn [Y] lại càng ngại.")
+12. Khơi gợi mong muốn (Ví dụ: "Chỉ cần thêm món đồ nhỏ thế này là nhìn vừa [Đẹp] vừa [Sang] hơn hẳn.")
 
 📋 THƯ VIỆN 6 KHUNG KỊCH BẢN (FRAMEWORK) BÁN HÀNG:
 1. PAS (Vấn đề → Bất tiện → Giải pháp): Ưu tiên cho Gia dụng, mẹ bé.
@@ -2313,7 +2313,8 @@ if all_sc:
                 hook_badge = f" | <span style='color:#0284c7; font-size:14px; font-weight:700;'>{' - '.join(badges)}</span>" if badges else ""
                 
                 # BỎ HẲN BIẾN {outline.get('title')}, CHỈ IN ID VÀ HUY HIỆU XANH
-                c1.markdown(f"**#{sc_id}** <span class=badge-ready>ĐÃ LƯU</span> {hook_badge}", unsafe_allow_html=True)
+                # KHÔI PHỤC LẠI TIÊU ĐỀ
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-ready>ĐÃ LƯU</span> {hook_badge}", unsafe_allow_html=True)
                 
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
@@ -2353,7 +2354,8 @@ if all_sc:
                 hook_badge = f" | <span style='color:#0284c7; font-size:14px; font-weight:700;'>{' - '.join(badges)}</span>" if badges else ""
                 
                 # BỎ HẲN BIẾN {outline.get('title')}, CHỈ IN ID VÀ HUY HIỆU XANH
-                c1.markdown(f"**#{sc_id}** <span class=badge-pending>CHỜ DỰNG</span> {hook_badge}", unsafe_allow_html=True)
+                # KHÔI PHỤC LẠI TIÊU ĐỀ
+                c1.markdown(f"**#{sc_id}. {outline.get('title')}** <span class=badge-pending>CHỜ DỰNG</span> {hook_badge}", unsafe_allow_html=True)
                 
                 vo_preview = outline.get("full_voiceover_script", outline.get("hook", ""))
                 c1.markdown(f"<div class='preview-script'>💬 {clean_and_normalize_voiceover(vo_preview)}</div>", unsafe_allow_html=True)
