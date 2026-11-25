@@ -101,6 +101,10 @@ COMPACT_CORE_RULES = f"""
    - TUYỆT ĐỐI KHÔNG NHẮC ĐẾN GIÁ TIỀN (Cấm bịa ra các số tiền như "hai trăm nghìn", "giá rẻ").
    - CẤM sử dụng các từ mang tính phóng đại: "cam kết", "tuyệt đối", "100%", "chắc chắn".
    - CẤM dùng từ ngữ y tế/bệnh lý: "đau đầu", "đau lưng", "chữa bệnh", "đặc trị". Hãy dùng từ nói giảm (khó chịu, nhức mỏi, hỗ trợ).
+6. QUY TẮC "CẮT RÀO - VĂN NÓI" (CRITICAL FOR VOICEOVER):
+   - CẤM CÂU RÀO TRƯỚC: Cấm mở đầu bằng các câu chung chung kiểu "chỉ nhờ món đồ này đây", "hôm nay em giới thiệu". Câu 1 BẮT BUỘC đi thẳng vào [Nỗi đau cụ thể] hoặc [Tên chính xác của SP], độ dài dưới 18 từ.
+   - 100% VĂN NÓI ĐỜI THƯỜNG: CẤM dùng từ ngữ văn viết/mô tả sàn TMĐT (cấm các cụm: "giải phóng không gian", "tạo cảm giác", "tăng tính thẩm mỹ", "sự lựa chọn hàng đầu", "hoàn hảo"). Dùng từ ngắn gọn, tự nhiên như người thật trò chuyện.
+   - CẤM LẶP Ý: Mỗi câu chỉ truyền tải 1 thông tin duy nhất (Câu 1: Nỗi đau + Tên SP -> Câu 2: Chất liệu/Thiết kế -> Câu 3: Ứng dụng thực tế -> Câu 4: CTA giỏ hàng). Không lặp lại công dụng đã nói ở câu trước.
 """
 
 INTIMATE_SAFE_ENGLISH_LEXICON = {
