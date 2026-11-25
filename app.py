@@ -2068,9 +2068,36 @@ if st.session_state.get("trigger_main_generation"):
                     "prompt_dna_lock": "Visual DNA lock"
                 }},
                 "outlines": [
-                    {{ "id": 1, "title": "Tuyến nội dung 1 (VD: Outfit Hẹn hò)", "setting": "Bối cảnh 1 (Phù hợp tuyến 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
-                    {{ "id": 2, "title": "Tuyến nội dung 2 (VD: Mặc đi làm)", "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }},
-                    {{ "id": 3, "title": "Tuyến nội dung 3 (VD: Dạo phố cuối tuần)", "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)", "full_voiceover_script": "Đoạn thoại dài 80-110 từ. VIẾT THÀNH ĐOẠN VĂN LỜI THOẠI LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.", "actors": 1 }}
+                    {{
+                        "id": 1,
+                        "title": "Tên kịch bản ngắn gọn 1",
+                        "setting": "Bối cảnh 1 (Phù hợp tuyến 1)",
+                        "hook_strategy_used": "Ghi rõ tên 1 trong 12 công thức Hook",
+                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.",
+                        "actors": 1
+                    }},
+                    {{
+                        "id": 2,
+                        "title": "Tên kịch bản ngắn gọn 2",
+                        "setting": "Bối cảnh 2 (Hoàn toàn khác bối cảnh 1)",
+                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1)",
+                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.",
+                        "actors": 1
+                    }},
+                    {{
+                        "id": 3,
+                        "title": "Tên kịch bản ngắn gọn 3",
+                        "setting": "Bối cảnh 3 (Hoàn toàn khác bối cảnh 1, 2)",
+                        "hook_strategy_used": "Tên công thức Hook (khác kịch bản 1 và 2)",
+                        "framework_used": "Ghi rõ tên 1 trong 6 Khung kịch bản",
+                        "hook_score": "Chấm điểm Hook thang 100 (>85)",
+                        "full_voiceover_script": "Đoạn thoại dài 80-110 từ. CÂU ĐẦU DƯỚI 15 TỪ ĐẬP THẲNG VÀO SP. TUYỆT ĐỐI KHÔNG BÁO GIÁ. CẤM TỪ NHẠY CẢM. VIẾT LIỀN MẠCH, CẤM CHIA CẢNH, CẤM CHÈN HÀNH ĐỘNG.",
+                        "actors": 1
+                    }}
                 ]
             }}
             """
